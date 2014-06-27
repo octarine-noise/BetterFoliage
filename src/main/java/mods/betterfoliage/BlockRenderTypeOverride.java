@@ -13,8 +13,7 @@ public class BlockRenderTypeOverride {
 		public int getRenderType(int original, Block block);
 	}
 	
-	/** Entry point from transformed RenderBlocks class. If no provider is given,
-	 *  replicates default behaviour
+	/** Entry point from transformed RenderBlocks class.
 	 * @param block block instance
 	 * @return block render type
 	 */

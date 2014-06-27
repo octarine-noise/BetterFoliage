@@ -14,11 +14,13 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkCheckHandler;
 import cpw.mods.fml.relauncher.Side;
 
-@Mod(name=BetterFoliage.MOD_NAME, modid=BetterFoliage.MOD_ID, acceptedMinecraftVersions="[1.7.2]", guiFactory="mods.betterfoliage.client.gui.ConfigGuiFactory")
+@Mod(name=BetterFoliage.MOD_NAME, modid=BetterFoliage.MOD_ID, acceptedMinecraftVersions=BetterFoliage.MC_VERSIONS, guiFactory=BetterFoliage.GUI_FACTORY)
 public class BetterFoliage {
 
 	public static final String MOD_ID = "BetterFoliage";
 	public static final String MOD_NAME = "Better Foliage";
+	public static final String MC_VERSIONS = "[1.7.2]";
+	public static final String GUI_FACTORY = "mods.betterfoliage.client.gui.ConfigGuiFactory";
 	
 	@Mod.Instance
 	public static BetterFoliage instance;
@@ -31,7 +33,7 @@ public class BetterFoliage {
 	public void preInit(FMLPreInitializationEvent event)  {
 		log = event.getModLog();
 		if (event.getSide() == Side.CLIENT) {
-			configDir = new File(event.getModConfigurationDirectory(), "betterfoliage");
+			configDir = new File(event.getModConfigurationDirectory(), MOD_ID);
 			configDir.mkdir();
 			Config.load();
 			BetterFoliageClient.preInit();

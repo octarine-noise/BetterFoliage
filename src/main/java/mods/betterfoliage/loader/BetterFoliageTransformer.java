@@ -13,7 +13,7 @@ public class BetterFoliageTransformer extends EZTransformerBase {
 	@MethodTransform(className="net.minecraft.client.renderer.RenderBlocks",
 					 obf=@MethodMatch(name=DeobfNames.RB_RBBRT_NAME_OBF, signature=DeobfNames.RB_RBBRT_SIG_OBF),
 					 deobf=@MethodMatch(name=DeobfNames.RB_RBBRT_NAME_MCP, signature=DeobfNames.RB_RBBRT_SIG_MCP),
-					 log="Adding RenderBlocks.renderBlockByRenderType() render type ovverride")
+					 log="Applying RenderBlocks.renderBlockByRenderType() render type ovverride")
 	public void handleRenderBlockOverride(MethodNode method, boolean obf) {
 		AbstractInsnNode invokeGetRenderType = findNext(method.instructions.getFirst(), matchInvokeAny());
 		AbstractInsnNode storeRenderType = findNext(invokeGetRenderType, matchOpcode(Opcodes.ISTORE));
