@@ -22,6 +22,12 @@ public class DeobfNames {
 	/** Obfuscated signature of BlockRenderTypeOverride.getRenderType(Block) */
 	public static final String BRTO_GRT_SIG_OBF = "(Lahu;)I";
 	
+	/** MCP signature of BlockRenderTypeOverride.getRenderType(Block) */
+	public static final String BRTO_GRTO_SIG_MCP = "(ILnet/minecraft/block/Block;)I";
+	
+	/** Obfuscated signature of BlockRenderTypeOverride.getRenderType(Block) */
+	public static final String BRTO_GRTO_SIG_OBF = "(ILahu;)I";
+	
 	/** MCP name of SimpleReloadableResourceManager.domainResourceManagers */
 	public static final String SRRM_DRM_MCP = "domainResourceManagers";
 

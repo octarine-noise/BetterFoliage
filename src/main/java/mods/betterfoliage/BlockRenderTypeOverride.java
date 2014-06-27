@@ -10,7 +10,7 @@ public class BlockRenderTypeOverride {
 	public static IRenderTypeProvider provider = null;
 	
 	public static interface IRenderTypeProvider {
-		public int getRenderType(Block block);
+		public int getRenderType(int original, Block block);
 	}
 	
 	/** Entry point from transformed RenderBlocks class. If no provider is given,
@@ -18,7 +18,7 @@ public class BlockRenderTypeOverride {
 	 * @param block block instance
 	 * @return block render type
 	 */
-	public static int getRenderType(Block block) {
-		return provider == null ? block.getRenderType() : provider.getRenderType(block);
+	public static int getRenderTypeOverride(int orig, Block block) {
+		return provider == null ? orig : provider.getRenderType(orig, block);
 	}
 }

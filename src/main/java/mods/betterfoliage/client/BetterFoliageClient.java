@@ -57,15 +57,18 @@ public class BetterFoliageClient implements IRenderTypeProvider, ILeafTextureRec
 		}
 	}
 
-	public int getRenderType(Block block) {
+	public int getRenderType(int original, Block block) {
+		// universal sign for DON'T RENDER ME!
+		if (original == -1) return original;
+		
 		if (Config.grassEnabled && block instanceof BlockGrass) return grassRenderId;
 		
 		if (Config.leavesEnabled)
 			for (Class<?> clazz : blockLeavesClasses)
-				if (clazz.isAssignableFrom(block.getClass()))
+				if (clazz.isAssignableFrom(block.getClass()) && (original == 0 || original >= 42))
 					return leavesRenderId;
 		
-		return block.getRenderType();
+		return original;
 	}
 
 	public boolean isLeafTexture(TextureAtlasSprite icon) {
