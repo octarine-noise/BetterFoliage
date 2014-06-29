@@ -142,7 +142,14 @@ public class LeafTextureGenerator implements IIconRegister, IResourceManager {
 	@SubscribeEvent
 	public void endTextureReload(TextureStitchEvent.Post event) {
 		blockTextures = null;
-		if (event.map.getTextureType() == 0) BetterFoliage.log.info(String.format("Generated %d leaf textures", counter));
+		if (event.map.getTextureType() == 0) {
+			BetterFoliage.log.info(String.format("Generated %d leaf textures", counter));
+			
+			// don't leave a mess
+			Map<String, IResourceManager> domainManagers = ReflectionUtil.getDomainResourceManagers();
+			if (domainManagers == null) return;
+			domainManagers.remove(domainName);
+		}
 	}
 	
 	public void loadLeafMappings(File leafMaskFile) {

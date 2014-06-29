@@ -8,7 +8,10 @@ import net.minecraftforge.common.config.Configuration;
 public class Config {
 
 	public static boolean leavesEnabled = true;
+	public static boolean leavesSkew = false;
 	public static boolean grassEnabled = true;
+	public static boolean cactusEnabled = true;
+	public static boolean lilypadEnabled = true;
 	
 	public static OptionDouble leavesHOffset = new OptionDouble(0.0, 0.4, 0.025, 0.2);
 	public static OptionDouble leavesVOffset = new OptionDouble(0.0, 0.4, 0.025, 0.1);
@@ -19,6 +22,9 @@ public class Config {
 	public static OptionDouble grassHeightMax = new OptionDouble(0.1, 1.5, 0.05, 1.0);
 	public static OptionDouble grassSize = new OptionDouble(0.5, 1.5, 0.05, 1.0);
 	
+	public static OptionDouble lilypadHOffset = new OptionDouble(0.0, 0.25, 0.025, 0.1);
+	public static OptionInteger lilypadChance = new OptionInteger(0, 64, 1, 16);
+	
 	private Config() {}
 	
 	public static void load() {
@@ -26,6 +32,7 @@ public class Config {
 		config.load();
 		
 		leavesEnabled = config.get("render", "leavesEnabled", true).getBoolean(true);
+		leavesSkew = config.get("render", "leavesOffsetSkew", false).getBoolean(false);
 		loadValue(config, "render", "leavesHorizontalOffset", leavesHOffset);
 		loadValue(config, "render", "leavesVerticalOffset", leavesVOffset);
 		loadValue(config, "render", "leavesSize", leavesSize);
@@ -36,6 +43,11 @@ public class Config {
 		loadValue(config, "render", "grassHeightMax", grassHeightMax);
 		if (grassHeightMin.value > grassHeightMax.value) grassHeightMin.value = grassHeightMax.value;
 		
+		grassEnabled = config.get("render", "cactusEnabled", true).getBoolean(true);
+		grassEnabled = config.get("render", "lilypadEnabled", true).getBoolean(true);
+		loadValue(config, "render", "lilypadHorizontalOffset", lilypadHOffset);
+		loadValue(config, "render", "lilypadChance", lilypadChance);
+		
 		if (config.hasChanged()) config.save();
 	}
 	
@@ -44,6 +56,7 @@ public class Config {
 		config.load();
 		
 		config.get("render", "leavesEnabled", true).set(leavesEnabled);
+		config.get("render", "leavesOffsetSkew", false).set(leavesSkew);
 		saveValue(config, "render", "leavesHorizontalOffset", leavesHOffset);
 		saveValue(config, "render", "leavesVerticalOffset", leavesVOffset);
 		saveValue(config, "render", "leavesSize", leavesSize);
@@ -52,6 +65,11 @@ public class Config {
 		saveValue(config, "render", "grassHorizontalOffset", grassHOffset);
 		saveValue(config, "render", "grassHeightMin", grassHeightMin);
 		saveValue(config, "render", "grassHeightMax", grassHeightMax);
+		
+		config.get("render", "cactusEnabled", true).set(cactusEnabled);
+		config.get("render", "lilypadEnabled", true).set(lilypadEnabled);
+		saveValue(config, "render", "lilypadHorizontalOffset", lilypadHOffset);
+		saveValue(config, "render", "lilypadChance", lilypadChance);
 		
 		if (config.hasChanged()) config.save();
 	}
@@ -62,6 +80,22 @@ public class Config {
 	
 	protected static void loadValue(Configuration config, String category, String key, OptionDouble option) {
 		option.value = config.get(category, key, option.value).getDouble(option.value);
+		if (option.value > option.max) {
+			option.value = option.max;
+			saveValue(config, category, key, option);
+		}
+		if (option.value < option.min) {
+			option.value = option.min;
+			saveValue(config, category, key, option);
+		}
+	}
+	
+	protected static void saveValue(Configuration config, String category, String key, OptionInteger option) {
+		config.get(category, key, option.value).set(option.value);
+	}
+	
+	protected static void loadValue(Configuration config, String category, String key, OptionInteger option) {
+		option.value = config.get(category, key, option.value).getInt(option.value);
 		if (option.value > option.max) {
 			option.value = option.max;
 			saveValue(config, category, key, option);

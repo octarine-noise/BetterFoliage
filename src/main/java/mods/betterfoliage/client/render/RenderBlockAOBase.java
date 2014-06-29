@@ -7,11 +7,13 @@ import java.util.List;
 
 import mods.betterfoliage.common.util.Double3;
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
+import net.minecraftforge.common.util.ForgeDirection;
 
 import org.lwjgl.opengl.GL11;
 
@@ -39,6 +41,9 @@ public class RenderBlockAOBase extends RenderBlocks {
 	
 	protected double[] uValues = new double[] {0.0, 16.0, 16.0, 0.0};
 	protected double[] vValues = new double[] {0.0, 0.0, 16.0, 16.0};
+	
+	protected ForgeDirection[] faceDir1 = new ForgeDirection[] {ForgeDirection.WEST, ForgeDirection.WEST, ForgeDirection.WEST, ForgeDirection.EAST, ForgeDirection.SOUTH, ForgeDirection.NORTH};
+	protected ForgeDirection[] faceDir2 = new ForgeDirection[] {ForgeDirection.NORTH, ForgeDirection.SOUTH, ForgeDirection.UP, ForgeDirection.UP, ForgeDirection.UP, ForgeDirection.UP};
 	
 	/** Random vector pool. Unit rotation vectors in the XZ plane, Y coord goes between [-1.0, 1.0].
 	 * Filled at init time */
@@ -71,6 +76,9 @@ public class RenderBlockAOBase extends RenderBlocks {
 	public ShadingValues aoZNXYPN = new ShadingValues();
 	public ShadingValues aoZNXYNP = new ShadingValues();
 	public ShadingValues aoZNXYNN = new ShadingValues();
+
+	// temporary shading values for a single face
+	public ShadingValues faceAOPP, faceAOPN, faceAONN, faceAONP;
 	
 	/** Initialize random values */
 	public void init() {
@@ -93,8 +101,24 @@ public class RenderBlockAOBase extends RenderBlocks {
 	 * @return semirandom value
 	 */
 	protected int getSemiRandomFromPos(double x, double y, double z, int seed) {
-		int sum = MathHelper.floor_double(x) * 3 + MathHelper.floor_double(y) * 5 + MathHelper.floor_double(z) * 7 + seed * 11;
-		return sum & 63;
+		long lx = MathHelper.floor_double(x);
+		long ly = MathHelper.floor_double(y);
+		long lz = MathHelper.floor_double(z);
+		long value = (lx * lx + ly * ly + lz * lz + lx * ly + ly * lz + lz * lx) & 63;
+		value = (3 * lx * value + 5 * ly * value + 7 * lz * value) & 63;
+		return (int) value;
+	}
+	
+	public void renderInventoryBlock(Block block, int metadata, int modelId, RenderBlocks renderer) {
+		renderStandardBlockAsItem(renderer, block, metadata, 1.0f);
+	}
+	
+	public boolean shouldRender3DInInventory(int modelId) {
+		return true;
+	}
+	
+	public int getRenderId() {
+		return 0;
 	}
 	
 	protected void renderStandardBlockAsItem(RenderBlocks renderer, Block p_147800_1_, int p_147800_2_, float p_147800_3_) {
@@ -152,6 +176,101 @@ public class RenderBlockAOBase extends RenderBlocks {
         GL11.glTranslatef(0.5F, 0.5F, 0.5F);
 	}
 	
+	protected void setShadingForFace(ForgeDirection dir) {
+		if (dir == ForgeDirection.DOWN) {
+			// dir1 WEST, dir2 NORTH
+			faceAOPP = aoYNXZPP; faceAOPN = aoYNXZPN; faceAONN = aoYNXZNN; faceAONP = aoYNXZNP;
+		} else if (dir == ForgeDirection.UP) {
+			// dir1 WEST, dir2 SOUTH
+			faceAOPP = aoYPXZPP; faceAOPN = aoYPXZPN; faceAONN = aoYPXZNN; faceAONP = aoYPXZNP;
+		} else if (dir == ForgeDirection.NORTH) {
+			// dir1 WEST, dir2 UP
+			faceAOPP = aoZNXYNP; faceAOPN = aoZNXYNN; faceAONN = aoZNXYPN; faceAONP = aoZNXYPP;
+		} else if (dir == ForgeDirection.SOUTH) {
+			// dir1 EAST, dir2 UP
+			faceAOPP = aoZPXYPP; faceAOPN = aoZPXYPN; faceAONN = aoZPXYNN; faceAONP = aoZPXYNP;
+		} else if (dir == ForgeDirection.WEST) {
+			// dir1 SOUTH, dir2 UP
+			faceAOPP = aoXNYZPP; faceAOPN = aoXNYZNP; faceAONN = aoXNYZNN; faceAONP = aoXNYZPN;
+		} else if (dir == ForgeDirection.EAST) {
+			// dir1 NORTH, dir2 UP
+			faceAOPP = aoXPYZPN; faceAOPN = aoXPYZNN; faceAONN = aoXPYZNP; faceAONP = aoXPYZPP;
+		}
+	}
+	
+	public void renderCrossedSideQuads(Double3 drawBase, ForgeDirection dir, double scale, double halfHeight, Double3 rendomVec, double offset, IIcon renderIcon, int uvRot, boolean noShading) {
+		Double3 facePP, faceNP, faceNormal, drawCenter;
+		
+		if (dir == ForgeDirection.UP) {
+			// special case for block top, we'll be rendering a LOT of those
+			facePP = new Double3(-scale, 0.0, scale);
+			faceNP = new Double3(scale, 0.0, scale);
+			faceNormal = new Double3(0.0, halfHeight, 0.0);
+			drawCenter = drawBase.add(faceNormal);
+			if (rendomVec != null) {
+				drawCenter = drawBase.add(faceNormal).add(rendomVec.scaleAxes(-offset, 0.0, offset));
+			}
+		} else {
+			facePP = new Double3(faceDir1[dir.ordinal()]).add(new Double3(faceDir2[dir.ordinal()])).scale(scale);
+			faceNP = new Double3(faceDir1[dir.ordinal()]).inverse().add(new Double3(faceDir2[dir.ordinal()])).scale(scale);
+			faceNormal = new Double3(dir).scale(halfHeight);
+			drawCenter = drawBase.add(faceNormal);
+			if (rendomVec != null) {
+				drawCenter = drawCenter.add(new Double3(faceDir1[dir.ordinal()]).scale(rendomVec.x).scale(offset))
+									   .add(new Double3(faceDir2[dir.ordinal()]).scale(rendomVec.z).scale(offset));
+			}
+		}
+		
+		if (Minecraft.isAmbientOcclusionEnabled() && !noShading) {
+			setShadingForFace(dir);
+			renderQuadWithShading(renderIcon, drawCenter, facePP, faceNormal, uvRot,			faceAOPP, faceAONN, faceAONN, faceAOPP);
+			renderQuadWithShading(renderIcon, drawCenter, facePP.inverse(), faceNormal, uvRot,	faceAONN, faceAOPP, faceAOPP, faceAONN);
+			renderQuadWithShading(renderIcon, drawCenter, faceNP, faceNormal, uvRot, 			faceAONP, faceAOPN, faceAOPN, faceAONP);
+			renderQuadWithShading(renderIcon, drawCenter, faceNP.inverse(), faceNormal, uvRot,	faceAOPN, faceAONP, faceAONP, faceAOPN);
+		} else {
+			renderQuad(renderIcon, drawCenter, facePP, faceNormal, uvRot);
+			renderQuad(renderIcon, drawCenter, facePP.inverse(), faceNormal, uvRot);
+			renderQuad(renderIcon, drawCenter, faceNP, faceNormal, uvRot);
+			renderQuad(renderIcon, drawCenter, faceNP.inverse(), faceNormal, uvRot);
+		}
+	}
+	
+	protected void renderCrossedBlockQuadsTranslate(Double3 blockCenter, double halfSize, Double3 offsetVec, IIcon crossLeafIcon, int uvRot, boolean isAirTop, boolean isAirBottom) {
+		Double3 drawCenter = blockCenter;
+		if (offsetVec != null) drawCenter = drawCenter.add(offsetVec);
+		Double3 horz1 = new Double3(halfSize, 0.0, halfSize);
+		Double3 horz2 = new Double3(halfSize, 0.0, -halfSize);
+		Double3 vert1 = new Double3(0.0, halfSize * 1.41, 0.0);
+		
+		renderCrossedBlockQuadsInternal(drawCenter, horz1, horz2, vert1, crossLeafIcon, uvRot, isAirTop, isAirBottom);
+	}
+	
+	protected void renderCrossedBlockQuadsSkew(Double3 blockCenter, double halfSize, Double3 offsetVec1, Double3 offsetVec2, IIcon crossLeafIcon, int uvRot, boolean isAirTop, boolean isAirBottom) {
+		Double3 horz1 = new Double3(halfSize, 0.0, halfSize).add(offsetVec1);
+		Double3 horz2 = new Double3(halfSize, 0.0, -halfSize).add(offsetVec2);
+		Double3 vert1 = new Double3(0.0, halfSize * 1.41, 0.0);
+		
+		renderCrossedBlockQuadsInternal(blockCenter, horz1, horz2, vert1, crossLeafIcon, uvRot, isAirTop, isAirBottom);
+	}
+	
+	private void renderCrossedBlockQuadsInternal(Double3 drawCenter, Double3 horz1, Double3 horz2, Double3 vert1, IIcon crossLeafIcon, int uvRot, boolean isAirTop, boolean isAirBottom) {
+		if (Minecraft.isAmbientOcclusionEnabled()) {
+			renderQuadWithShading(crossLeafIcon, drawCenter, horz1, vert1, uvRot,
+					isAirTop ? aoYPXZPP : aoZPXYPP, isAirTop ? aoYPXZNN : aoXNYZPN, isAirBottom ? aoYNXZNN : aoXNYZNN, isAirBottom ? aoYNXZPP : aoZPXYPN);
+			renderQuadWithShading(crossLeafIcon, drawCenter, horz1.inverse(), vert1, uvRot,
+					isAirTop ? aoYPXZNN : aoZNXYNP, isAirTop ? aoYPXZPP : aoXPYZPP, isAirBottom ? aoYNXZPP : aoXPYZNP, isAirBottom ? aoYNXZNN : aoZNXYNN);
+			renderQuadWithShading(crossLeafIcon, drawCenter, horz2, vert1, uvRot,
+					isAirTop ? aoYPXZPN : aoXPYZPN, isAirTop ? aoYPXZNP : aoZPXYNP, isAirBottom ? aoYNXZNP : aoZPXYNN, isAirBottom ? aoYNXZPN : aoXPYZNN);
+			renderQuadWithShading(crossLeafIcon, drawCenter, horz2.inverse(), vert1, uvRot,
+					isAirTop ? aoYPXZNP : aoXNYZPP, isAirTop ? aoYPXZPN : aoZNXYPP, isAirBottom ? aoYNXZPN : aoZNXYPN, isAirBottom ? aoYNXZNP : aoXNYZNP);
+		} else {
+			renderQuad(crossLeafIcon, drawCenter, horz1, vert1, uvRot);
+			renderQuad(crossLeafIcon, drawCenter, horz1.inverse(), vert1, uvRot);
+			renderQuad(crossLeafIcon, drawCenter, horz2, vert1, uvRot);
+			renderQuad(crossLeafIcon, drawCenter, horz2.inverse(), vert1, uvRot);
+		}
+	}
+	
 	@Override
 	public void renderFaceZNeg(Block block, double x, double y, double z, IIcon icon) {
 		super.renderFaceZNeg(block, x, y, z, icon);
@@ -206,9 +325,6 @@ public class RenderBlockAOBase extends RenderBlocks {
 		saveShadingBottomRight(aoYPXZNN);
 	}
 	
-	/** Save AO values for top left vertex
-	 * @param values {@link ShadingValues} to store values in
-	 */
 	protected void saveShadingTopLeft(ShadingValues values) {
 		if (--values.passCounter != 0) return;
 		values.brightness = brightnessTopLeft;
@@ -313,5 +429,9 @@ public class RenderBlockAOBase extends RenderBlocks {
 		tessellator.setBrightness(aoPN.brightness);
 		tessellator.setColorOpaque_F(aoPN.red, aoPN.green, aoPN.blue);
 		tessellator.addVertexWithUV(center.x + vec1.x - vec2.x, center.y + vec1.y - vec2.y, center.z + vec1.z - vec2.z, icon.getInterpolatedU(uValues[(uvRot + 3) & 3]), icon.getInterpolatedV(vValues[(uvRot + 3) & 3]));
+	}
+	
+	protected int getBrightness(Block block, int x, int y, int z) {
+		return block.getMixedBrightnessForBlock(blockAccess, x, y, z);
 	}
 }

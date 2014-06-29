@@ -6,8 +6,15 @@ message.betterfoliage.optionOff=OFF
 message.betterfoliage.close=Close
 message.betterfoliage.betterLeaves=Better Leaves: %s
 message.betterfoliage.betterGrass=Better Grass: %s
+message.betterfoliage.betterCactus=Better Cactus: %s
+message.betterfoliage.betterLilypad=Better Lilypad: %s
+
 message.betterfoliage.size=Size
 message.betterfoliage.hOffset=H.Offset
 message.betterfoliage.vOffset=V.Offset
 message.betterfoliage.minHeight=Min.Height
 message.betterfoliage.maxHeight=Max.Height
+message.betterfoliage.flowerChance=Flower Chance
+message.betterfoliage.leavesMode=Leaves Offset: %s
+message.betterfoliage.leavesSkew=Skew
+message.betterfoliage.leavesTranslate=Translate
