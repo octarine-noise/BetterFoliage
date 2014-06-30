@@ -24,7 +24,7 @@ public class RenderBlockBetterLeaves extends RenderBlockAOBase implements IRende
 	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
 		if (!Config.leavesEnabled) return false;
 		if (original > 0 && original < 42) return false;
-		return BetterFoliageClient.leafBlockIDs.contains(Block.blockRegistry.getIDForObject(block)) && !isBlockSurrounded(blockAccess, x, y, z);
+		return BetterFoliageClient.leaves.matchesID(block) && !isBlockSurrounded(blockAccess, x, y, z);
 	}
 	
 	public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer) {

@@ -1,9 +1,7 @@
 package mods.betterfoliage.client;
 
 import java.io.File;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.render.IRenderBlockDecorator;
@@ -15,25 +13,24 @@ import mods.betterfoliage.client.resource.ILeafTextureRecognizer;
 import mods.betterfoliage.client.resource.LeafTextureGenerator;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLeavesBase;
+import net.minecraft.block.BlockTallGrass;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.init.Blocks;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.world.WorldEvent;
 
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 import cpw.mods.fml.client.registry.RenderingRegistry;
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 public class BetterFoliageClient implements ILeafTextureRecognizer {
 
 	public static Map<Integer, IRenderBlockDecorator> decorators = Maps.newHashMap();
 	public static LeafTextureGenerator leafGenerator;
 	
-	public static Set<Class<?>> blockLeavesClasses = Sets.newHashSet();
-	public static Set<Integer> leafBlockIDs = Sets.newHashSet();
+	public static BlockMatcher leaves;
+	public static BlockMatcher crops;
 	
 	public static void preInit() {
 		FMLCommonHandler.instance().bus().register(new KeyHandler());
@@ -44,9 +41,15 @@ public class BetterFoliageClient implements ILeafTextureRecognizer {
 		registerRenderer(new RenderBlockBetterCactus());
 		registerRenderer(new RenderBlockBetterLilypad());
 		
-		blockLeavesClasses.add(BlockLeavesBase.class);
-		addLeafBlockClass("forestry.arboriculture.gadgets.BlockLeaves");
-		addLeafBlockClass("thaumcraft.common.blocks.BlockMagicalLeaves");
+		leaves = new BlockMatcher(BlockLeavesBase.class.getName(),
+								  "forestry.arboriculture.gadgets.BlockLeaves",
+								  "thaumcraft.common.blocks.BlockMagicalLeaves");
+		leaves.load(new File(BetterFoliage.configDir, "whitelistLeaves.cfg"));
+		
+		crops = new BlockMatcher(BlockTallGrass.class.getName(),
+								 "biomesoplenty.common.blocks.BlockBOPFlower",
+								 "biomesoplenty.common.blocks.BlockBOPFlower2");
+		crops.load(new File(BetterFoliage.configDir, "whitelistCrops.cfg"));
 		
 		BetterFoliage.log.info("Registering leaf texture generator");
 		leafGenerator = new LeafTextureGenerator();
@@ -81,26 +84,4 @@ public class BetterFoliageClient implements ILeafTextureRecognizer {
 		decorator.init();
 	}
 
-	protected static void addLeafBlockClass(String className) {
-		try {
-			blockLeavesClasses.add(Class.forName(className));
-		} catch(ClassNotFoundException e) {
-		}
-	}
-	
-	/** Caches leaf block IDs on world load for fast lookup
-	 * @param event
-	 */
-	@SuppressWarnings("unchecked")
-	@SubscribeEvent
-	public void handleWorldLoad(WorldEvent.Load event) {
-		Iterator<Block> iter = Block.blockRegistry.iterator();
-		while (iter.hasNext()) {
-			Block block = iter.next();
-			int blockId = Block.blockRegistry.getIDForObject(block);
-			for (Class<?> clazz : BetterFoliageClient.blockLeavesClasses)
-				if (clazz.isAssignableFrom(block.getClass()))
-					leafBlockIDs.add(blockId);
-		}
-	}
 }

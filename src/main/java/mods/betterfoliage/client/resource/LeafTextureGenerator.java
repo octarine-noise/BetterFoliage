@@ -106,7 +106,7 @@ public class LeafTextureGenerator implements IIconRegister, IResourceManager {
 		Iterator<Block> iter = Block.blockRegistry.iterator();
 		while(iter.hasNext()) {
 			Block block = iter.next();
-			for (Class<?> clazz : BetterFoliageClient.blockLeavesClasses) if (clazz.isAssignableFrom(block.getClass())) {
+			if (BetterFoliageClient.leaves.matchesClass(block)) {
 				BetterFoliage.log.debug(String.format("Inspecting leaf block: %s", block.getClass().getName()));
 				block.registerBlockIcons(this);
 			}
