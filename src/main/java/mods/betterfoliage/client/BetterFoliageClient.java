@@ -87,6 +87,14 @@ public class BetterFoliageClient implements ILeafTextureRecognizer {
 		return original;
 	}
 	
+	public static int getGLSLBlockIdOverride(int original, Block block) {
+		if (leaves.matchesID(original & 0xFFFF))
+			return Block.blockRegistry.getIDForObject(Blocks.leaves) & 0xFFFF | block.getRenderType() << 16;
+		if (crops.matchesID(original & 0xFFFF))
+			return Block.blockRegistry.getIDForObject(Blocks.tallgrass) & 0xFFFF | block.getRenderType() << 16;
+		return original;
+	}
+	
 	public static void registerRenderer(IRenderBlockDecorator decorator) {
 		int renderId = RenderingRegistry.getNextAvailableRenderId();
 		decorators.put(renderId, decorator);

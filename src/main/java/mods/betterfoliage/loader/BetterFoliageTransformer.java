@@ -32,4 +32,17 @@ public class BetterFoliageTransformer extends EZTransformerBase {
 			new VarInsnNode(Opcodes.ISTORE, 5)
 		);
 	}
+	
+	@MethodTransform(className="shadersmodcore.client.Shaders",
+			 obf=@MethodMatch(name="pushEntity", signature=DeobfNames.SHADERS_PE_SIG_OBF),
+			 deobf=@MethodMatch(name="pushEntity", signature=DeobfNames.SHADERS_PE_SIG_MCP),
+			 log="Applying Shaders.pushEntity() block id ovverride")
+	public void handleGLSLBlockIDOverride(MethodNode method, boolean obf) {
+		AbstractInsnNode arrayStore = findNext(method.instructions.getFirst(), matchOpcode(Opcodes.IASTORE));
+		insertAfter(method.instructions, arrayStore.getPrevious(),
+			new VarInsnNode(Opcodes.ALOAD, 1),
+			obf ? new MethodInsnNode(Opcodes.INVOKESTATIC, "mods/betterfoliage/client/BetterFoliageClient", "getGLSLBlockIdOverride", DeobfNames.BFC_GLSLID_SIG_OBF) :
+				  new MethodInsnNode(Opcodes.INVOKESTATIC, "mods/betterfoliage/client/BetterFoliageClient", "getGLSLBlockIdOverride", DeobfNames.BFC_GLSLID_SIG_MCP)
+		);
+	}
 }

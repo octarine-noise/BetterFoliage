@@ -54,4 +54,18 @@ public class DeobfNames {
 	
 	/** SRG name of TextureMap.mapRegisteredSprites */
 	public static final String TM_MRS_SRG = "field_110574_e";
+	
+	/** MCP signature of Shaders.pushEntity() */
+	public static final String SHADERS_PE_SIG_MCP = "(Lnet/minecraft/client/renderer/RenderBlocks;Lnet/minecraft/block/Block;III)V";
+	
+	/** Obfuscated signature of Shaders.pushEntity() */
+	public static final String SHADERS_PE_SIG_OBF = "(Lble;Lahu;III)V";
+	
+	/** MCP signature of BetterFoliageClient.getGLSLBlockIdOverride() */
+	public static final String BFC_GLSLID_SIG_MCP = "(ILnet/minecraft/block/Block;)I"; 
+	
+	/** Obfuscated signature of BetterFoliageClient.getGLSLBlockIdOverride() */
+	public static final String BFC_GLSLID_SIG_OBF = "(ILahu;)I";
+	
+
 }
