@@ -52,7 +52,6 @@ public class BetterFoliageClient implements ILeafTextureRecognizer {
 		leafGenerator = new LeafTextureGenerator();
 		MinecraftForge.EVENT_BUS.register(leafGenerator);
 		leafGenerator.recognizers.add(new BetterFoliageClient());
-		leafGenerator.loadLeafMappings(new File(BetterFoliage.configDir, "leafMask.properties"));
 
 		MinecraftForge.EVENT_BUS.register(new BetterFoliageClient());
 	}

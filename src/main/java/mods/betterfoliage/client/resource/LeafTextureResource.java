@@ -4,9 +4,9 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Map;
 
 import javax.imageio.ImageIO;
 
@@ -31,7 +31,7 @@ public class LeafTextureResource implements IResource {
 	/** Name of the default alpha mask to use */
 	public static String defaultMask = "rough";
 	
-	public LeafTextureResource(ResourceLocation resLeaf, Map<String, String> maskMappings) {
+	public LeafTextureResource(ResourceLocation resLeaf) {
 		IResourceManager resourceManager = Minecraft.getMinecraft().getResourceManager();
 		try {
 			// load normal leaf texture
@@ -41,12 +41,7 @@ public class LeafTextureResource implements IResource {
 			int size = origImage.getWidth();
 
 			// load alpha mask of appropriate size
-			String maskType = defaultMask;
-			for(Map.Entry<String, String> entry : maskMappings.entrySet()) if (resLeaf.getResourcePath().contains(entry.getKey())) {
-				maskType = entry.getValue();
-				break;
-			}
-			BufferedImage maskImage = loadLeafMaskImage(maskType, size * 2);
+			BufferedImage maskImage = loadLeafMaskImage(defaultMask, size * 2);
 			int scale = size * 2 / maskImage.getWidth();
 			
 			// tile leaf texture 2x2
@@ -71,6 +66,8 @@ public class LeafTextureResource implements IResource {
 			ImageIO.write(overlayIcon, "PNG", baos);
 			data = baos.toByteArray();
 		} catch (Exception e) {
+			// stop log spam with GLSL installed
+			if (e instanceof FileNotFoundException) return;
 			BetterFoliage.log.info(String.format("Could not create leaf texture: %s, exception: %s", resLeaf.toString(), e.getClass().getSimpleName()));
 		}
 	}

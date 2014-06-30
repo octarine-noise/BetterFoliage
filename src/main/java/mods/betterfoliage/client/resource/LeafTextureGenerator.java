@@ -1,13 +1,9 @@
 package mods.betterfoliage.client.resource;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 import mods.betterfoliage.BetterFoliage;
@@ -28,7 +24,6 @@ import net.minecraftforge.client.event.TextureStitchEvent;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -56,9 +51,6 @@ public class LeafTextureGenerator implements IIconRegister, IResourceManager {
 	/** Number of textures generated in the current run */
 	int counter = 0;
 	
-	/** Map leaf types to alpha masks */
-	public Map<String, String> maskMappings = Maps.newHashMap();
-	
 	public Set<String> getResourceDomains() {
 		return ImmutableSet.<String>of(domainName);
 	}
@@ -66,7 +58,7 @@ public class LeafTextureGenerator implements IIconRegister, IResourceManager {
 	public IResource getResource(ResourceLocation resourceLocation) throws IOException {
 		// remove "/blocks/textures/" from beginning
 		String origResPath = resourceLocation.getResourcePath().substring(16);
-		LeafTextureResource result = new LeafTextureResource(new ResourceLocation(origResPath), maskMappings);
+		LeafTextureResource result = new LeafTextureResource(new ResourceLocation(origResPath));
 		if (result.data == null) {
 			return Minecraft.getMinecraft().getResourceManager().getResource(missing_resource);
 		} else {
@@ -152,35 +144,4 @@ public class LeafTextureGenerator implements IIconRegister, IResourceManager {
 		}
 	}
 	
-	public void loadLeafMappings(File leafMaskFile) {
-		Properties props = new Properties();
-		try {
-			FileInputStream fis = new FileInputStream(leafMaskFile);
-			props.load(fis);
-		} catch (Exception e) {
-			maskMappings.put("spruce", "fine");
-			maskMappings.put("fir", "fine");
-			maskMappings.put("bamboo", "fine");
-			saveLeafMappings(leafMaskFile);
-			return;
-		}
-		
-		for (Map.Entry<Object, Object> entry : props.entrySet()) {
-			maskMappings.put(entry.getKey().toString(), entry.getValue().toString());
-		}
-		BetterFoliage.log.info(String.format("Loaded %d leaf mask mappings", maskMappings.size()));
-	}
-	
-	protected void saveLeafMappings(File leafMaskFile) {
-		try {
-			FileOutputStream fos = new FileOutputStream(leafMaskFile);
-			Properties props = new Properties();
-			props.putAll(maskMappings);
-			props.store(fos, "");
-		} catch (Exception e) {
-			BetterFoliage.log.info("Failed to save default leaf mask mappings");
-			return;
-		}
-		BetterFoliage.log.info("Created default leaf mask mappings");
-	}
 }
