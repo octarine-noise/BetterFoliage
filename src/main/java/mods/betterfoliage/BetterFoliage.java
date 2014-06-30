@@ -9,7 +9,6 @@ import mods.betterfoliage.common.config.Config;
 import org.apache.logging.log4j.Logger;
 
 import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkCheckHandler;
 import cpw.mods.fml.relauncher.Side;
@@ -37,12 +36,6 @@ public class BetterFoliage {
 			configDir.mkdir();
 			Config.load();
 			BetterFoliageClient.preInit();
-		}
-	}
-	
-	@Mod.EventHandler
-	public void postInit(FMLPostInitializationEvent event) {
-		if (event.getSide() == Side.CLIENT) {
 		}
 	}
 	
