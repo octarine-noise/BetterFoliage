@@ -6,7 +6,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -21,24 +20,35 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 public class BlockMatcher {
 
-	public Set<String> defaultClasses = Sets.newHashSet();
-	public Set<Class<?>> classes = Sets.newHashSet();
+	public Set<String> whiteList = Sets.newHashSet();
+	public Set<String> blackList = Sets.newHashSet();
 	public Set<Integer> blockIDs = Sets.newHashSet();
 	
 	public BlockMatcher(String... defaults) {
-		Collections.addAll(defaultClasses, defaults);
+		for (String clazz : defaults) addClass(clazz);
 		MinecraftForge.EVENT_BUS.register(this);
 	}
 	
 	public void addClass(String className) {
-		try {
-			classes.add(Class.forName(className));
-		} catch(ClassNotFoundException e) {
-		}
+		if (className.startsWith("-"))
+			blackList.add(className.substring(1));
+		else
+			whiteList.add(className);
 	}
 	
 	public boolean matchesClass(Block block) {
-		for (Class<?> clazz : classes) if (clazz.isAssignableFrom(block.getClass())) return true;
+		for (String className : blackList) {
+			try {
+				Class<?> clazz = Class.forName(className);
+				if (clazz.isAssignableFrom(block.getClass())) return false;
+			} catch(ClassNotFoundException e) {}
+		}
+		for (String className : whiteList) {
+			try {
+				Class<?> clazz = Class.forName(className);
+				if (clazz.isAssignableFrom(block.getClass())) return true;
+			} catch(ClassNotFoundException e) {}
+		}
 		return false;
 	}
 	
@@ -54,6 +64,8 @@ public class BlockMatcher {
 		BufferedReader reader = null;
 		try {
 			reader = new BufferedReader(new FileReader(file));
+			whiteList.clear();
+			blackList.clear();
 			String line = reader.readLine();
 			while(line != null) {
 				addClass(line.trim());
@@ -62,7 +74,6 @@ public class BlockMatcher {
 			reader.close();
 		} catch (FileNotFoundException e) {
 			saveDefaults(file);
-			for (String clazz : defaultClasses) addClass(clazz);
 		} catch (IOException e) {
 			BetterFoliage.log.warn(String.format("Error reading configuration: %s", file.getName()));
 		}
@@ -72,8 +83,13 @@ public class BlockMatcher {
 		FileWriter writer = null;
 		try {
 			writer = new FileWriter(file);
-			for (String clazz : defaultClasses) {
-				writer.write(clazz);
+			for (String className : whiteList) {
+				writer.write(className);
+				writer.write("\n");
+			}
+			for (String className : blackList) {
+				writer.write("-");
+				writer.write(className);
 				writer.write("\n");
 			}
 			writer.close();

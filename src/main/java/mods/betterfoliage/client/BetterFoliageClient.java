@@ -12,7 +12,12 @@ import mods.betterfoliage.client.render.impl.RenderBlockBetterLilypad;
 import mods.betterfoliage.client.resource.ILeafTextureRecognizer;
 import mods.betterfoliage.client.resource.LeafTextureGenerator;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockCarrot;
+import net.minecraft.block.BlockCrops;
+import net.minecraft.block.BlockDoublePlant;
 import net.minecraft.block.BlockLeavesBase;
+import net.minecraft.block.BlockPotato;
+import net.minecraft.block.BlockReed;
 import net.minecraft.block.BlockTallGrass;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.init.Blocks;
@@ -44,12 +49,18 @@ public class BetterFoliageClient implements ILeafTextureRecognizer {
 		leaves = new BlockMatcher(BlockLeavesBase.class.getName(),
 								  "forestry.arboriculture.gadgets.BlockLeaves",
 								  "thaumcraft.common.blocks.BlockMagicalLeaves");
-		leaves.load(new File(BetterFoliage.configDir, "whitelistLeaves.cfg"));
+		leaves.load(new File(BetterFoliage.configDir, "classesLeaves.cfg"));
 		
-		crops = new BlockMatcher(BlockTallGrass.class.getName(),
+		crops = new BlockMatcher(BlockCrops.class.getName(),
+								 "-" + BlockCarrot.class.getName(),
+								 "-" + BlockPotato.class.getName(),
+								 BlockTallGrass.class.getName(),
+								 BlockDoublePlant.class.getName(),
+								 BlockReed.class.getName(),
 								 "biomesoplenty.common.blocks.BlockBOPFlower",
-								 "biomesoplenty.common.blocks.BlockBOPFlower2");
-		crops.load(new File(BetterFoliage.configDir, "whitelistCrops.cfg"));
+								 "biomesoplenty.common.blocks.BlockBOPFlower2",
+								 "tconstruct.blocks.slime.SlimeTallGrass");
+		crops.load(new File(BetterFoliage.configDir, "classesCrops.cfg"));
 		
 		BetterFoliage.log.info("Registering leaf texture generator");
 		leafGenerator = new LeafTextureGenerator();
