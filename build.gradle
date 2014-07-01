@@ -17,10 +17,10 @@ buildscript {
 apply plugin: 'forge'
 
 minecraft {
-	version = '1.7.2-10.12.2.1147'
+	version = '1.7.10-10.13.0.1159'
 }
 
-jar.baseName = 'BetterFoliage-1.7.2'
+jar.baseName = 'BetterFoliage-1.7.10'
 group = 'com.github.octarine-noise'
 version='0.9.3b'
 

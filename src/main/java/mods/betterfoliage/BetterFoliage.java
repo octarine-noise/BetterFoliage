@@ -18,7 +18,7 @@ public class BetterFoliage {
 
 	public static final String MOD_ID = "BetterFoliage";
 	public static final String MOD_NAME = "Better Foliage";
-	public static final String MC_VERSIONS = "[1.7.2]";
+	public static final String MC_VERSIONS = "[1.7.10]";
 	public static final String GUI_FACTORY = "mods.betterfoliage.client.gui.ConfigGuiFactory";
 	
 	@Mod.Instance

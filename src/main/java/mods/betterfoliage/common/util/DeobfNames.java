@@ -8,7 +8,7 @@ public class DeobfNames {
 	public static final String RB_NAME_MCP = "net/minecraft/client/renderer/RenderBlocks";
 	
 	/** Obfuscated name of RenderBlocks */
-	public static final String RB_NAME_OBF = "ble";
+	public static final String RB_NAME_OBF = "blm";
 	
 	/** MCP name of RenderBlocks.blockAccess */
 	public static final String RB_BA_NAME_MCP = "blockAccess";
@@ -20,7 +20,7 @@ public class DeobfNames {
 	public static final String RB_BA_SIG_MCP = "Lnet/minecraft/world/IBlockAccess;";
 	
 	/** Obfuscated signature of RenderBlocks.blockAccess */
-	public static final String RB_BA_SIG_OBF = "Lafx;";
+	public static final String RB_BA_SIG_OBF = "Lahl;";
 	
 	/** MCP name of RenderBlocks.renderBlockByRenderType() */
 	public static final String RB_RBBRT_NAME_MCP = "renderBlockByRenderType";
@@ -32,13 +32,13 @@ public class DeobfNames {
 	public static final String RB_RBBRT_SIG_MCP = "(Lnet/minecraft/block/Block;III)Z";
 	
 	/** Obfuscated signature of RenderBlocks.renderBlockByRenderType() */
-	public static final String RB_RBBRT_SIG_OBF = "(Lahu;III)Z";
+	public static final String RB_RBBRT_SIG_OBF = "(Laji;III)Z";
 	
 	/** MCP signature of BetterFoliageClient.getRenderTypeOverride() */
 	public static final String BFC_GRTO_SIG_MCP = "(Lnet/minecraft/world/IBlockAccess;IIILnet/minecraft/block/Block;I)I";
 	
 	/** Obfuscated signature of BetterFoliageClient.getRenderTypeOverride() */
-	public static final String BFC_GRTO_SIG_OBF = "(Lafx;IIILahu;I)I";
+	public static final String BFC_GRTO_SIG_OBF = "(Lahl;IIILaji;I)I";
 	
 	/** MCP name of SimpleReloadableResourceManager.domainResourceManagers */
 	public static final String SRRM_DRM_MCP = "domainResourceManagers";
@@ -59,13 +59,13 @@ public class DeobfNames {
 	public static final String SHADERS_PE_SIG_MCP = "(Lnet/minecraft/client/renderer/RenderBlocks;Lnet/minecraft/block/Block;III)V";
 	
 	/** Obfuscated signature of Shaders.pushEntity() */
-	public static final String SHADERS_PE_SIG_OBF = "(Lble;Lahu;III)V";
+	public static final String SHADERS_PE_SIG_OBF = "(Lblm;Laji;III)V";
 	
 	/** MCP signature of BetterFoliageClient.getGLSLBlockIdOverride() */
 	public static final String BFC_GLSLID_SIG_MCP = "(ILnet/minecraft/block/Block;)I"; 
 	
 	/** Obfuscated signature of BetterFoliageClient.getGLSLBlockIdOverride() */
-	public static final String BFC_GLSLID_SIG_OBF = "(ILahu;)I";
+	public static final String BFC_GLSLID_SIG_OBF = "(ILaji;)I";
 	
 
 }
