@@ -12,6 +12,7 @@ public class Config {
 	public static boolean grassEnabled = true;
 	public static boolean cactusEnabled = true;
 	public static boolean lilypadEnabled = true;
+	public static boolean reedEnabled = true;
 	
 	public static OptionDouble leavesHOffset = new OptionDouble(0.0, 0.4, 0.025, 0.2);
 	public static OptionDouble leavesVOffset = new OptionDouble(0.0, 0.4, 0.025, 0.1);
@@ -24,6 +25,11 @@ public class Config {
 	
 	public static OptionDouble lilypadHOffset = new OptionDouble(0.0, 0.25, 0.025, 0.1);
 	public static OptionInteger lilypadChance = new OptionInteger(0, 64, 1, 16);
+	
+	public static OptionDouble reedHOffset = new OptionDouble(0.0, 0.25, 0.025, 0.1);
+	public static OptionDouble reedHeightMin = new OptionDouble(1.5, 3.5, 0.1, 2.0);
+	public static OptionDouble reedHeightMax = new OptionDouble(1.5, 3.5, 0.1, 2.5);
+	public static OptionInteger reedChance = new OptionInteger(0, 64, 1, 32);
 	
 	private Config() {}
 	
@@ -48,6 +54,12 @@ public class Config {
 		loadValue(config, "render", "lilypadHorizontalOffset", lilypadHOffset);
 		loadValue(config, "render", "lilypadChance", lilypadChance);
 		
+		reedEnabled = config.get("render", "reedEnabled", true).getBoolean(true);
+		loadValue(config, "render", "reedHeightMin", reedHeightMin);
+		loadValue(config, "render", "reedHeightMax", reedHeightMax);
+		loadValue(config, "render", "reedChance", reedChance);
+		if (reedHeightMin.value > reedHeightMax.value) reedHeightMin.value = reedHeightMax.value;
+		
 		if (config.hasChanged()) config.save();
 	}
 	
@@ -70,6 +82,11 @@ public class Config {
 		config.get("render", "lilypadEnabled", true).set(lilypadEnabled);
 		saveValue(config, "render", "lilypadHorizontalOffset", lilypadHOffset);
 		saveValue(config, "render", "lilypadChance", lilypadChance);
+		
+		config.get("render", "reedEnabled", true).set(reedEnabled);
+		saveValue(config, "render", "reedHeightMin", reedHeightMin);
+		saveValue(config, "render", "reedHeightMax", reedHeightMax);
+		saveValue(config, "render", "reedChance", reedChance);
 		
 		if (config.hasChanged()) config.save();
 	}

@@ -1,6 +1,7 @@
 package mods.betterfoliage.client;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 
 import mods.betterfoliage.BetterFoliage;
@@ -9,6 +10,9 @@ import mods.betterfoliage.client.render.impl.RenderBlockBetterCactus;
 import mods.betterfoliage.client.render.impl.RenderBlockBetterGrass;
 import mods.betterfoliage.client.render.impl.RenderBlockBetterLeaves;
 import mods.betterfoliage.client.render.impl.RenderBlockBetterLilypad;
+import mods.betterfoliage.client.render.impl.RenderBlockBetterReed;
+import mods.betterfoliage.client.resource.BlockTextureGenerator;
+import mods.betterfoliage.client.resource.HalfTextureResource;
 import mods.betterfoliage.client.resource.ILeafTextureRecognizer;
 import mods.betterfoliage.client.resource.LeafTextureGenerator;
 import net.minecraft.block.Block;
@@ -20,7 +24,9 @@ import net.minecraft.block.BlockPotato;
 import net.minecraft.block.BlockReed;
 import net.minecraft.block.BlockTallGrass;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.IResource;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.MinecraftForge;
 
@@ -45,6 +51,7 @@ public class BetterFoliageClient implements ILeafTextureRecognizer {
 		registerRenderer(new RenderBlockBetterGrass());
 		registerRenderer(new RenderBlockBetterCactus());
 		registerRenderer(new RenderBlockBetterLilypad());
+		registerRenderer(new RenderBlockBetterReed());
 		
 		leaves = new BlockMatcher(BlockLeavesBase.class.getName(),
 								  "forestry.arboriculture.gadgets.BlockLeaves",
@@ -66,6 +73,19 @@ public class BetterFoliageClient implements ILeafTextureRecognizer {
 		leafGenerator = new LeafTextureGenerator();
 		MinecraftForge.EVENT_BUS.register(leafGenerator);
 		leafGenerator.recognizers.add(new BetterFoliageClient());
+		
+		MinecraftForge.EVENT_BUS.register(new BlockTextureGenerator("bf_reed_bottom", null) {
+			@Override
+			public IResource getResource(ResourceLocation var1) throws IOException {
+				return new HalfTextureResource(unwrapResource(var1), true);
+			}
+		});
+		MinecraftForge.EVENT_BUS.register(new BlockTextureGenerator("bf_reed_top", null) {
+			@Override
+			public IResource getResource(ResourceLocation var1) throws IOException {
+				return new HalfTextureResource(unwrapResource(var1), false);
+			}
+		});
 
 		MinecraftForge.EVENT_BUS.register(new BetterFoliageClient());
 	}
