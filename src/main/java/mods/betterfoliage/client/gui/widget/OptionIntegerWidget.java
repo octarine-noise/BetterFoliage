@@ -1,20 +1,19 @@
-package mods.betterfoliage.client.gui;
+package mods.betterfoliage.client.gui.widget;
 
 import java.util.List;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-
-import mods.betterfoliage.common.config.OptionDouble;
+import mods.betterfoliage.common.config.OptionInteger;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class OptionDoubleWidget implements IOptionWidget {
+public class OptionIntegerWidget implements IOptionWidget {
 
-	public OptionDouble option;
+	public OptionInteger option;
 	public int x;
 	public int y;
 	public int width;
@@ -22,9 +21,8 @@ public class OptionDoubleWidget implements IOptionWidget {
 	public int idDecrement;
 	public int idIncrement;
 	public String keyLabel;
-	public String formatString;
 	
-	public OptionDoubleWidget(OptionDouble option, int x, int y, int width, int numWidth, int idDecrement, int idIncrement, String keyLabel, String formatString) {
+	public OptionIntegerWidget(OptionInteger option, int x, int y, int width, int numWidth, int idDecrement, int idIncrement, String keyLabel) {
 		this.option = option;
 		this.x = x;
 		this.y = y;
@@ -33,7 +31,6 @@ public class OptionDoubleWidget implements IOptionWidget {
 		this.idDecrement = idDecrement;
 		this.idIncrement = idIncrement;
 		this.keyLabel = keyLabel;
-		this.formatString = formatString;
 	}
 	
 	public void addButtons(List<GuiButton> buttonList, int xOffset, int yOffset) {
@@ -43,9 +40,9 @@ public class OptionDoubleWidget implements IOptionWidget {
 	
 	public void drawStrings(GuiScreen screen, FontRenderer fontRenderer, int xOffset, int yOffset, int labelColor, int numColor) {
 		screen.drawString(fontRenderer, I18n.format(keyLabel), xOffset + x, yOffset + y + 5, labelColor);
-		screen.drawCenteredString(fontRenderer, String.format(formatString, option.value), xOffset + x + width - 20 - numWidth / 2, yOffset + y + 5, numColor);
+		screen.drawCenteredString(fontRenderer, Integer.toString(option.value), xOffset + x + width - 20 - numWidth / 2, yOffset + y + 5, numColor);
 	}
-
+	
 	public void onAction(int buttonId) {
 		if (buttonId == idDecrement) option.decrement();
 		if (buttonId == idIncrement) option.increment();

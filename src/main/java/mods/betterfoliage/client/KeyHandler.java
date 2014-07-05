@@ -7,7 +7,7 @@ import cpw.mods.fml.common.gameevent.InputEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import mods.betterfoliage.BetterFoliage;
-import mods.betterfoliage.client.gui.ConfigGuiScreen;
+import mods.betterfoliage.client.gui.ConfigGuiMain;
 import net.minecraft.client.settings.KeyBinding;
 
 @SideOnly(Side.CLIENT)
@@ -22,6 +22,6 @@ public class KeyHandler {
 	
 	@SubscribeEvent
 	public void handleKeyPress(InputEvent.KeyInputEvent event) {
-		if (guiBinding.isPressed()) FMLClientHandler.instance().showGuiScreen(new ConfigGuiScreen(null));
+		if (guiBinding.isPressed()) FMLClientHandler.instance().showGuiScreen(new ConfigGuiMain(null));
 	}
 }
