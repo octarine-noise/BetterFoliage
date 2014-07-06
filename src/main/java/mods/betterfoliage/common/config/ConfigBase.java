@@ -41,21 +41,21 @@ public class ConfigBase {
 			if (field.getType().equals(boolean.class) || field.getType().equals(Boolean.class)) {
 				try {
 					Property prop = config.get(annot.category(), annot.key(), field.getBoolean(this));
-					field.setBoolean(this, prop.getBoolean());
+					field.setBoolean(this, prop.getBoolean(field.getBoolean(this)));
 				} catch (Exception e) {
 				}
 			} else if (field.getType().equals(OptionInteger.class)) {
 				try {
 					OptionInteger option = (OptionInteger) field.get(this);
 					Property prop =  config.get(annot.category(), annot.key(), option.value);
-					option.value = prop.getInt();
+					option.value = prop.getInt(option.value);
 				} catch (Exception e) {
 				}
 			} else if (field.getType().equals(OptionDouble.class)) {
 				try {
 					OptionDouble option = (OptionDouble) field.get(this);
 					Property prop =  config.get(annot.category(), annot.key(), option.value);
-					option.value = prop.getDouble();
+					option.value = prop.getDouble(option.value);
 				} catch (Exception e) {
 				}
 			}
