@@ -32,19 +32,16 @@ import cpw.mods.fml.relauncher.SideOnly;
 public class LeafTextureGenerator extends BlockTextureGenerator implements IIconRegister {
 
 	public LeafTextureGenerator() {
-		super("bf_leaves_autogen", new ResourceLocation("betterfoliage", "textures/blocks/missingleaf.png"));
+		super("bf_leaves_autogen", new ResourceLocation("betterfoliage", "textures/blocks/missing_leaf.png"));
 	}
 
 	/** List of helpers which can identify leaf textures loaded by alternate means */
 	public List<ILeafTextureRecognizer> recognizers = Lists.newLinkedList();
 
 	public IResource getResource(ResourceLocation resourceLocation) throws IOException {
-		LeafTextureResource result = new LeafTextureResource(unwrapResource(resourceLocation));
-		if (result.data != null) {
-			counter++;
-			return result;
-		}
-		return getMissingResource();
+		LeafTextureResource result = new LeafTextureResource(unwrapResource(resourceLocation), getMissingResource());
+		if (result.data != null) counter++;
+		return result;
 	}
 
 	/** Leaf blocks register their textures here. An extra texture will be registered in the atlas

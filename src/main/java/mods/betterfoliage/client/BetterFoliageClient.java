@@ -74,16 +74,16 @@ public class BetterFoliageClient implements ILeafTextureRecognizer {
 		MinecraftForge.EVENT_BUS.register(leafGenerator);
 		leafGenerator.recognizers.add(new BetterFoliageClient());
 		
-		MinecraftForge.EVENT_BUS.register(new BlockTextureGenerator("bf_reed_bottom", null) {
+		MinecraftForge.EVENT_BUS.register(new BlockTextureGenerator("bf_reed_bottom", new ResourceLocation("betterfoliage", "textures/blocks/missing_leaf.png")) {
 			@Override
 			public IResource getResource(ResourceLocation var1) throws IOException {
-				return new HalfTextureResource(unwrapResource(var1), true);
+				return new HalfTextureResource(unwrapResource(var1), true, getMissingResource());
 			}
 		});
-		MinecraftForge.EVENT_BUS.register(new BlockTextureGenerator("bf_reed_top", null) {
+		MinecraftForge.EVENT_BUS.register(new BlockTextureGenerator("bf_reed_top", new ResourceLocation("betterfoliage", "textures/blocks/missing_leaf.png")) {
 			@Override
 			public IResource getResource(ResourceLocation var1) throws IOException {
-				return new HalfTextureResource(unwrapResource(var1), false);
+				return new HalfTextureResource(unwrapResource(var1), false, getMissingResource());
 			}
 		});
 

@@ -26,9 +26,14 @@ import net.minecraft.util.ResourceLocation;
 public class HalfTextureResource implements IResource {
 
 	/** Raw PNG data*/
-	protected byte[] data = null;
+	public byte[] data = null;
 	
-	public HalfTextureResource(ResourceLocation resource, boolean bottom) {
+	/** Resource to return if generation fails */
+	public IResource fallbackResource;
+	
+	public HalfTextureResource(ResourceLocation resource, boolean bottom, IResource fallbackResource) {
+		this.fallbackResource = fallbackResource;
+		
 		IResourceManager resourceManager = Minecraft.getMinecraft().getResourceManager();
 		try {
 			// load full texture
@@ -53,7 +58,7 @@ public class HalfTextureResource implements IResource {
 	
 	@Override
 	public InputStream getInputStream() {
-		return data != null ? new ByteArrayInputStream(data) : null;
+		return data != null ? new ByteArrayInputStream(data) : fallbackResource.getInputStream();
 	}
 
 	@Override
