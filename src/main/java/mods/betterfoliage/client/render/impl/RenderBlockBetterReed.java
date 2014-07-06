@@ -6,7 +6,6 @@ import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.render.IRenderBlockDecorator;
 import mods.betterfoliage.client.render.IconSet;
 import mods.betterfoliage.client.render.RenderBlockAOBase;
-import mods.betterfoliage.common.config.Config;
 import mods.betterfoliage.common.util.Double3;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDirt;
@@ -29,13 +28,13 @@ public class RenderBlockBetterReed extends RenderBlockAOBase implements IRenderB
 	public NoiseGeneratorSimplex noise;
 	
 	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
-		if (!Config.reedEnabled) return false;
+		if (!BetterFoliage.config.reedEnabled) return false;
 		if (y >= 254 || !(block instanceof BlockDirt)) return false;
 		if (blockAccess.getBlock(x, y + 1, z).getMaterial() != Material.water) return false;
 		if (!blockAccess.isAirBlock(x, y + 2, z)) return false;
 		
 		int terrainVariation = MathHelper.floor_double((noise.func_151605_a(x, z) + 1.0) * 32.0);
-		return terrainVariation < Config.reedChance.value;
+		return terrainVariation < BetterFoliage.config.reedChance.value;
 	}
 	
 	public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer) {
@@ -54,11 +53,11 @@ public class RenderBlockBetterReed extends RenderBlockAOBase implements IRenderB
 		IIcon topIcon = reedTopIcons.get(iconVariation);
 		if (bottomIcon == null || topIcon == null) return true;
 		
-		double quarterHeight = 0.25 * (Config.reedHeightMin.value + pRand[heightVariation] * (Config.reedHeightMax.value - Config.reedHeightMin.value));
+		double quarterHeight = 0.25 * (BetterFoliage.config.reedHeightMin.value + pRand[heightVariation] * (BetterFoliage.config.reedHeightMax.value - BetterFoliage.config.reedHeightMin.value));
 		Tessellator.instance.setBrightness(getBrightness(block, x, y + 2, z));
 		Tessellator.instance.setColorOpaque(255, 255, 255);
-		renderCrossedSideQuads(new Double3(x + 0.5, y + 1.0, z + 0.5), ForgeDirection.UP, 0.5, quarterHeight, pRot[iconVariation], Config.reedHOffset.value, bottomIcon, 0, true);
-		renderCrossedSideQuads(new Double3(x + 0.5, y + 1.0 + 2.0 * quarterHeight, z + 0.5), ForgeDirection.UP, 0.5, quarterHeight, pRot[iconVariation], Config.reedHOffset.value, topIcon, 0, true);
+		renderCrossedSideQuads(new Double3(x + 0.5, y + 1.0, z + 0.5), ForgeDirection.UP, 0.5, quarterHeight, pRot[iconVariation], BetterFoliage.config.reedHOffset.value, bottomIcon, 0, true);
+		renderCrossedSideQuads(new Double3(x + 0.5, y + 1.0 + 2.0 * quarterHeight, z + 0.5), ForgeDirection.UP, 0.5, quarterHeight, pRot[iconVariation], BetterFoliage.config.reedHOffset.value, topIcon, 0, true);
 		
 		return true;
 	}

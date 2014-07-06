@@ -4,7 +4,6 @@ import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.render.IRenderBlockDecorator;
 import mods.betterfoliage.client.render.IconSet;
 import mods.betterfoliage.client.render.RenderBlockAOBase;
-import mods.betterfoliage.common.config.Config;
 import mods.betterfoliage.common.util.Double3;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockGrass;
@@ -27,7 +26,7 @@ public class RenderBlockBetterGrass extends RenderBlockAOBase implements IRender
 	
 	
 	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
-		if (!Config.grassEnabled) return false;
+		if (!BetterFoliage.config.grassEnabled) return false;
 		if (!((block instanceof BlockGrass || block == Blocks.mycelium))) return false;
 		if (y == 255 || !blockAccess.isAirBlock(x, y + 1, z)) return false;
 		return true;
@@ -48,10 +47,10 @@ public class RenderBlockBetterGrass extends RenderBlockAOBase implements IRender
 		IIcon renderIcon = (block == Blocks.mycelium) ? myceliumIcons.get(variation) : grassIcons.get(variation);
 		if (renderIcon == null) return true;
 		
-		double scale = Config.grassSize.value * 0.5;
-		double halfHeight = 0.5 * (Config.grassHeightMin.value + pRand[heightVariation] * (Config.grassHeightMax.value - Config.grassHeightMin.value));
+		double scale = BetterFoliage.config.grassSize.value * 0.5;
+		double halfHeight = 0.5 * (BetterFoliage.config.grassHeightMin.value + pRand[heightVariation] * (BetterFoliage.config.grassHeightMax.value - BetterFoliage.config.grassHeightMin.value));
 		Tessellator.instance.setBrightness(getBrightness(block, x, y + 1, z));
-		renderCrossedSideQuads(new Double3(x + 0.5, y + 1.0, z + 0.5), ForgeDirection.UP, scale, halfHeight, pRot[variation], Config.grassHOffset.value, renderIcon, 0, false);
+		renderCrossedSideQuads(new Double3(x + 0.5, y + 1.0 - 0.125 * halfHeight, z + 0.5), ForgeDirection.UP, scale, halfHeight, pRot[variation], BetterFoliage.config.grassHOffset.value, renderIcon, 0, false);
 		
 		return true;
 	}

@@ -1,6 +1,6 @@
 package mods.betterfoliage.client.gui;
 
-import mods.betterfoliage.common.config.Config;
+import mods.betterfoliage.BetterFoliage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -45,26 +45,26 @@ public class ConfigGuiMain extends ConfigGuiScreenBase {
 	}
 
 	protected void updateButtons() {
-		setButtonOptionBoolean(Button.TOGGLE_LEAVES.ordinal(), "message.betterfoliage.betterLeaves", Config.leavesEnabled);
-		setButtonOptionBoolean(Button.TOGGLE_GRASS.ordinal(), "message.betterfoliage.betterGrass", Config.grassEnabled);
-		setButtonOptionBoolean(Button.TOGGLE_CACTUS.ordinal(), "message.betterfoliage.betterCactus", Config.cactusEnabled);
-		setButtonOptionBoolean(Button.TOGGLE_LILYPAD.ordinal(), "message.betterfoliage.betterLilypad", Config.lilypadEnabled);
-		setButtonOptionBoolean(Button.TOGGLE_REED.ordinal(), "message.betterfoliage.betterReed", Config.reedEnabled);
+		setButtonOptionBoolean(Button.TOGGLE_LEAVES.ordinal(), "message.betterfoliage.betterLeaves", BetterFoliage.config.leavesEnabled);
+		setButtonOptionBoolean(Button.TOGGLE_GRASS.ordinal(), "message.betterfoliage.betterGrass", BetterFoliage.config.grassEnabled);
+		setButtonOptionBoolean(Button.TOGGLE_CACTUS.ordinal(), "message.betterfoliage.betterCactus", BetterFoliage.config.cactusEnabled);
+		setButtonOptionBoolean(Button.TOGGLE_LILYPAD.ordinal(), "message.betterfoliage.betterLilypad", BetterFoliage.config.lilypadEnabled);
+		setButtonOptionBoolean(Button.TOGGLE_REED.ordinal(), "message.betterfoliage.betterReed", BetterFoliage.config.reedEnabled);
 		((GuiButton) buttonList.get(Button.CONFIG_CACTUS.ordinal())).enabled = false;
 	}
 	
 	@Override
 	protected void onButtonPress(int id) {
 		if (id == Button.CLOSE.ordinal()) {
-			Config.save();
+			BetterFoliage.config.save();
 			Minecraft.getMinecraft().renderGlobal.loadRenderers();
 			FMLClientHandler.instance().showGuiScreen(parent);
 		}
-		if (id == Button.TOGGLE_LEAVES.ordinal()) Config.leavesEnabled = !Config.leavesEnabled;
-		if (id == Button.TOGGLE_GRASS.ordinal()) Config.grassEnabled = !Config.grassEnabled;
-		if (id == Button.TOGGLE_CACTUS.ordinal()) Config.cactusEnabled = !Config.cactusEnabled;
-		if (id == Button.TOGGLE_LILYPAD.ordinal()) Config.lilypadEnabled = !Config.lilypadEnabled;
-		if (id == Button.TOGGLE_REED.ordinal()) Config.reedEnabled = !Config.reedEnabled;
+		if (id == Button.TOGGLE_LEAVES.ordinal()) BetterFoliage.config.leavesEnabled = !BetterFoliage.config.leavesEnabled;
+		if (id == Button.TOGGLE_GRASS.ordinal()) BetterFoliage.config.grassEnabled = !BetterFoliage.config.grassEnabled;
+		if (id == Button.TOGGLE_CACTUS.ordinal()) BetterFoliage.config.cactusEnabled = !BetterFoliage.config.cactusEnabled;
+		if (id == Button.TOGGLE_LILYPAD.ordinal()) BetterFoliage.config.lilypadEnabled = !BetterFoliage.config.lilypadEnabled;
+		if (id == Button.TOGGLE_REED.ordinal()) BetterFoliage.config.reedEnabled = !BetterFoliage.config.reedEnabled;
 		
 		if (id== Button.CONFIG_LEAVES.ordinal()) FMLClientHandler.instance().showGuiScreen(new ConfigGuiLeaves(this));
 		if (id== Button.CONFIG_GRASS.ordinal()) FMLClientHandler.instance().showGuiScreen(new ConfigGuiGrass(this));
