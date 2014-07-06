@@ -1,4 +1,4 @@
-package mods.betterfoliage.client.gui;
+package mods.betterfoliage.client.gui.widget;
 
 import java.util.List;
 

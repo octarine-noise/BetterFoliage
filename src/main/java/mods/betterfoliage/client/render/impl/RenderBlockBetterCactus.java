@@ -1,8 +1,9 @@
 package mods.betterfoliage.client.render.impl;
 
+import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.render.FakeRenderBlockAOBase;
 import mods.betterfoliage.client.render.IRenderBlockDecorator;
-import mods.betterfoliage.common.config.Config;
+import mods.betterfoliage.client.render.IconSet;
 import mods.betterfoliage.common.util.Double3;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
@@ -21,13 +22,13 @@ import cpw.mods.fml.relauncher.SideOnly;
 public class RenderBlockBetterCactus extends FakeRenderBlockAOBase implements IRenderBlockDecorator {
 
 	public IIcon cactusRoundIcon;
-	public IIcon cactusSideIcons[] = new IIcon[2];
+	public IconSet cactusSideIcons = new IconSet("bettergrassandleaves", "better_cactus_arm_%d");
 	
 	public static ForgeDirection[] cactusDirections = new ForgeDirection[] { ForgeDirection.NORTH, ForgeDirection.SOUTH, ForgeDirection.EAST, ForgeDirection.WEST};
 	public static double cactusRadius = 0.4375;
 	
 	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
-		return Config.cactusEnabled && block == Blocks.cactus;
+		return BetterFoliage.config.cactusEnabled && block == Blocks.cactus;
 	}
 	
 	public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer) {
@@ -51,7 +52,7 @@ public class RenderBlockBetterCactus extends FakeRenderBlockAOBase implements IR
 		Double3 drawBase = blockCenter.add(new Double3(drawDirection).scale(cactusRadius));
 		
 		Tessellator.instance.setBrightness(getBrightness(block, x, y, z));
-		renderCrossedSideQuads(drawBase, drawDirection, 0.5, 0.5, pRot[iconVariation], 0.2, cactusSideIcons[iconVariation % 2], 0, false);
+		if (cactusSideIcons.hasIcons()) renderCrossedSideQuads(drawBase, drawDirection, 0.5, 0.5, pRot[iconVariation], 0.2, cactusSideIcons.get(iconVariation), 0, false);
 		renderCrossedBlockQuadsSkew(blockCenter, 0.65,
 									pRot[iconVariation].scaleAxes(0.1, 0.0, 0.1),
 									pRot[(iconVariation + 1) & 63].scaleAxes(0.1, 0.0, 0.1),
@@ -78,7 +79,9 @@ public class RenderBlockBetterCactus extends FakeRenderBlockAOBase implements IR
 	@SubscribeEvent
 	public void handleTextureReload(TextureStitchEvent.Pre event) {
 		if (event.map.getTextureType() != 0) return;
+		
 		cactusRoundIcon = event.map.registerIcon("bettergrassandleaves:better_cactus");
-		for (int idx = 0; idx < 2; idx++) cactusSideIcons[idx] = event.map.registerIcon("bettergrassandleaves:better_cactus_arm_" + Integer.toString(idx));
+		cactusSideIcons.registerIcons(event.map);
+		BetterFoliage.log.info(String.format("Found %d cactus arm textures", cactusSideIcons.numLoaded));
 	}
 }

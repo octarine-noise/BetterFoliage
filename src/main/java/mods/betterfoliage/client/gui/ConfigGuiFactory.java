@@ -18,7 +18,7 @@ public class ConfigGuiFactory implements IModGuiFactory {
 	}
 
 	public Class<? extends GuiScreen> mainConfigGuiClass() {
-		return ConfigGuiScreen.class;
+		return ConfigGuiMain.class;
 	}
 
 	public Set<RuntimeOptionCategoryElement> runtimeGuiCategories() {

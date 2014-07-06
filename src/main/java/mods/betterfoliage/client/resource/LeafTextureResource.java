@@ -31,7 +31,12 @@ public class LeafTextureResource implements IResource {
 	/** Name of the default alpha mask to use */
 	public static String defaultMask = "rough";
 	
-	public LeafTextureResource(ResourceLocation resLeaf) {
+	/** Resource to return if generation fails */
+	public IResource fallbackResource;
+	
+	public LeafTextureResource(ResourceLocation resLeaf, IResource fallbackResource) {
+		this.fallbackResource = fallbackResource;
+		
 		IResourceManager resourceManager = Minecraft.getMinecraft().getResourceManager();
 		try {
 			// load normal leaf texture
@@ -97,7 +102,7 @@ public class LeafTextureResource implements IResource {
 	}
 	
 	public InputStream getInputStream() {
-		return data != null ? new ByteArrayInputStream(data) : null;
+		return data != null ? new ByteArrayInputStream(data) : fallbackResource.getInputStream();
 	}
 
 	public boolean hasMetadata() {
