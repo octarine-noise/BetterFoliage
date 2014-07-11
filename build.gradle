@@ -22,7 +22,7 @@ minecraft {
 
 jar.baseName = 'BetterFoliage-1.7.2'
 group = 'com.github.octarine-noise'
-version='0.9.4b'
+version='0.9.5b'
 
 processResources {
 	inputs.property "version", project.version
