@@ -104,8 +104,8 @@ public class RenderBlockAOBase extends RenderBlocks {
 		long lx = MathHelper.floor_double(x);
 		long ly = MathHelper.floor_double(y);
 		long lz = MathHelper.floor_double(z);
-		long value = (lx * lx + ly * ly + lz * lz + lx * ly + ly * lz + lz * lx) & 63;
-		value = (3 * lx * value + 5 * ly * value + 7 * lz * value) & 63;
+		long value = (lx * lx + ly * ly + lz * lz + lx * ly + ly * lz + lz * lx + seed * seed) & 63;
+		value = (3 * lx * value + 5 * ly * value + 7 * lz * value + 11 * seed) & 63;
 		return (int) value;
 	}
 	
