@@ -24,20 +24,19 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class RenderBlockBetterReed extends RenderBlockAOBase implements IRenderBlockDecorator {
+public class RenderBlockBetterAlgae extends RenderBlockAOBase implements IRenderBlockDecorator {
 
-	public IconSet reedBottomIcons = new IconSet("bf_reed_bottom", "bettergrassandleaves:better_reed_%d");
-	public IconSet reedTopIcons = new IconSet("bf_reed_top", "bettergrassandleaves:better_reed_%d");
+	public IconSet algaeIcons = new IconSet("bettergrassandleaves", "better_algae_%d");
 	public NoiseGeneratorSimplex noise;
 	
 	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
-		if (!BetterFoliage.config.reedEnabled) return false;
+		if (!BetterFoliage.config.algaeEnabled) return false;
 		if (y >= 254 || !(block instanceof BlockDirt)) return false;
 		if (blockAccess.getBlock(x, y + 1, z).getMaterial() != Material.water) return false;
-		if (!blockAccess.isAirBlock(x, y + 2, z)) return false;
-		if (blockAccess.getBiomeGenForCoords(x, z).temperature < 0.4f || blockAccess.getBiomeGenForCoords(x, z).rainfall < 0.4f) return false;
+		if (blockAccess.getBlock(x, y + 2, z).getMaterial() != Material.water) return false;
+		if (blockAccess.getBiomeGenForCoords(x, z).temperature < 0.4f) return false;
 		int terrainVariation = MathHelper.floor_double((noise.func_151605_a(x, z) + 1.0) * 32.0);
-		return terrainVariation < BetterFoliage.config.reedChance.value;
+		return terrainVariation < BetterFoliage.config.algaeChance.value;
 	}
 	
 	public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer) {
@@ -49,18 +48,16 @@ public class RenderBlockBetterReed extends RenderBlockAOBase implements IRenderB
 		setRenderBoundsFromBlock(block);
 		renderStandardBlock(block, x, y, z);
 		
-		int iconVariation = getSemiRandomFromPos(x, y, z, 0);
+		int variation = getSemiRandomFromPos(x, y, z, 0);
 		int heightVariation = getSemiRandomFromPos(x, y, z, 1);
 		
-		IIcon bottomIcon = reedBottomIcons.get(iconVariation);
-		IIcon topIcon = reedTopIcons.get(iconVariation);
-		if (bottomIcon == null || topIcon == null) return true;
+		IIcon renderIcon = algaeIcons.get(variation);
+		if (renderIcon == null) return true;
 		
-		double quarterHeight = 0.25 * (BetterFoliage.config.reedHeightMin.value + pRand[heightVariation] * (BetterFoliage.config.reedHeightMax.value - BetterFoliage.config.reedHeightMin.value));
-		Tessellator.instance.setBrightness(getBrightness(block, x, y + 2, z));
-		Tessellator.instance.setColorOpaque(255, 255, 255);
-		renderCrossedSideQuads(new Double3(x + 0.5, y + 1.0, z + 0.5), ForgeDirection.UP, 0.5, quarterHeight, pRot[iconVariation], BetterFoliage.config.reedHOffset.value, bottomIcon, 0, true);
-		renderCrossedSideQuads(new Double3(x + 0.5, y + 1.0 + 2.0 * quarterHeight, z + 0.5), ForgeDirection.UP, 0.5, quarterHeight, pRot[iconVariation], BetterFoliage.config.reedHOffset.value, topIcon, 0, true);
+		double scale = BetterFoliage.config.algaeSize.value * 0.5;
+		double halfHeight = 0.5 * (BetterFoliage.config.algaeHeightMin.value + pRand[heightVariation] * (BetterFoliage.config.algaeHeightMax.value - BetterFoliage.config.algaeHeightMin.value));
+		Tessellator.instance.setBrightness(getBrightness(block, x, y + 1, z));
+		renderCrossedSideQuads(new Double3(x + 0.5, y + 1.0 - 0.125 * halfHeight, z + 0.5), ForgeDirection.UP, scale, halfHeight, pRot[variation], BetterFoliage.config.algaeHOffset.value, renderIcon, 0, false);
 		
 		return true;
 	}
@@ -69,14 +66,13 @@ public class RenderBlockBetterReed extends RenderBlockAOBase implements IRenderB
 	public void handleTextureReload(TextureStitchEvent.Pre event) {
 		if (event.map.getTextureType() != 0) return;
 		
-		reedBottomIcons.registerIcons(event.map);
-		reedTopIcons.registerIcons(event.map);
-		BetterFoliage.log.info(String.format("Found %d reed textures", reedBottomIcons.numLoaded));
+		algaeIcons.registerIcons(event.map);
+		BetterFoliage.log.info(String.format("Found %d algae textures", algaeIcons.numLoaded));
 	}
 	
 	@SubscribeEvent
 	public void handleWorldLoad(WorldEvent.Load event) {
-		noise = new NoiseGeneratorSimplex(new Random(event.world.getWorldInfo().getSeed()));
+		noise = new NoiseGeneratorSimplex(new Random(event.world.getWorldInfo().getSeed() + 1));
 	}
 	
 }

@@ -5,7 +5,7 @@ import mods.betterfoliage.client.BetterFoliageClient;
 import mods.betterfoliage.client.render.IRenderBlockDecorator;
 import mods.betterfoliage.client.render.RenderBlockAOBase;
 import mods.betterfoliage.common.util.Double3;
-import mods.betterfoliage.common.util.ReflectionUtil;
+import mods.betterfoliage.common.util.Utils;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderBlocks;
@@ -37,7 +37,7 @@ public class RenderBlockBetterLeaves extends RenderBlockAOBase implements IRende
 		if (block.getRenderType() == 0) {
 			renderStandardBlock(block, x, y, z);
 		} else {
-			ISimpleBlockRenderingHandler handler = ReflectionUtil.getRenderingHandler(block.getRenderType());
+			ISimpleBlockRenderingHandler handler = Utils.getRenderingHandler(block.getRenderType());
 			handler.renderWorldBlock(world, x, y, z, block, block.getRenderType(), this);
 		}
 

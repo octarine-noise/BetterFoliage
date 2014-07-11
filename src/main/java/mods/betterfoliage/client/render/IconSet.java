@@ -1,17 +1,16 @@
 package mods.betterfoliage.client.render;
 
-import java.io.IOException;
-
-import net.minecraft.client.Minecraft;
+import mods.betterfoliage.common.util.Utils;
 import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.client.resources.IResource;
-import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 /** Loads an indexed set of textures
  * @author octarine-noise
  */
+@SideOnly(Side.CLIENT)
 public class IconSet {
 
 	/** Icon array */
@@ -33,18 +32,13 @@ public class IconSet {
 	
 	public void registerIcons(IIconRegister register) {
 		numLoaded = 0;
-		IResourceManager manager = Minecraft.getMinecraft().getResourceManager();
-		
 		for (int idx = 0; idx < 16; idx++) {
 			icons[idx] = null;
 			// if the path contains a domain, use that to check if the resource exists
 			String resolvedDomain = path.contains(":") ? new ResourceLocation(path).getResourceDomain() : domain;
 			String resolvedPath = String.format("textures/blocks/" + (path.contains(":") ? new ResourceLocation(path).getResourcePath() : path) + ".png", idx);
-			try {
-				IResource resource = manager.getResource(new ResourceLocation(resolvedDomain, resolvedPath));
-				if (resource != null) icons[numLoaded++] = register.registerIcon(domain + ":" + String.format(path, idx));
-			} catch (IOException e) {
-			}
+			if (Utils.resourceExists(new ResourceLocation(resolvedDomain, resolvedPath)))
+				icons[numLoaded++] = register.registerIcon(domain + ":" + String.format(path, idx));
 		}
 	}
 	

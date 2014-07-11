@@ -42,6 +42,9 @@ public class EZTransformerBase implements IClassTransformer {
 	protected Logger logger = LogManager.getLogger(getClass().getSimpleName());
 	
 	public byte[] transform(String name, String transformedName, byte[] basicClass) {
+		// ???
+		if (basicClass == null) return null;
+		
 		// read class
 		ClassNode classNode = new ClassNode();
         ClassReader classReader = new ClassReader(basicClass);

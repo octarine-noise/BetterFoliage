@@ -3,13 +3,15 @@ key.betterfoliage.gui=Open Settings
 message.betterfoliage.optionOn=ON
 message.betterfoliage.optionOff=OFF
 message.betterfoliage.config=Config
-
+message.betterfoliage.back=Back
 message.betterfoliage.close=Close
-message.betterfoliage.betterLeaves=Better Leaves: %s
-message.betterfoliage.betterGrass=Better Grass: %s
+
+message.betterfoliage.betterLeaves=Extra Leaves: %s
+message.betterfoliage.betterGrass=Short Grass: %s
 message.betterfoliage.betterCactus=Better Cactus: %s
 message.betterfoliage.betterLilypad=Better Lilypad: %s
-message.betterfoliage.betterReed=Better Reeds: %s
+message.betterfoliage.betterReed=Reeds: %s
+message.betterfoliage.betterAlgae=Algae: %s
 
 message.betterfoliage.size=Size
 message.betterfoliage.hOffset=H.Offset
@@ -21,3 +23,4 @@ message.betterfoliage.reedChance=Reed Chance
 message.betterfoliage.leavesMode=Leaves Offset: %s
 message.betterfoliage.leavesSkew=Skew
 message.betterfoliage.leavesTranslate=Translate
+message.betterfoliage.algaeChance=Algae Chance

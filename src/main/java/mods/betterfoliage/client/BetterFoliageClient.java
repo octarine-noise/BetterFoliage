@@ -6,6 +6,7 @@ import java.util.Map;
 
 import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.render.IRenderBlockDecorator;
+import mods.betterfoliage.client.render.impl.RenderBlockBetterAlgae;
 import mods.betterfoliage.client.render.impl.RenderBlockBetterCactus;
 import mods.betterfoliage.client.render.impl.RenderBlockBetterGrass;
 import mods.betterfoliage.client.render.impl.RenderBlockBetterLeaves;
@@ -52,6 +53,7 @@ public class BetterFoliageClient implements ILeafTextureRecognizer {
 		registerRenderer(new RenderBlockBetterCactus());
 		registerRenderer(new RenderBlockBetterLilypad());
 		registerRenderer(new RenderBlockBetterReed());
+		registerRenderer(new RenderBlockBetterAlgae());
 		
 		leaves = new BlockMatcher(BlockLeavesBase.class.getName(),
 								  "forestry.arboriculture.gadgets.BlockLeaves",

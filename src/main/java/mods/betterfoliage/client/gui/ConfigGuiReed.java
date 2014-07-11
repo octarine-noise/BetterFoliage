@@ -5,6 +5,7 @@ import mods.betterfoliage.client.gui.widget.OptionDoubleWidget;
 import mods.betterfoliage.client.gui.widget.OptionIntegerWidget;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.resources.I18n;
 import cpw.mods.fml.client.FMLClientHandler;
 
 public class ConfigGuiReed extends ConfigGuiScreenBase {
@@ -21,7 +22,7 @@ public class ConfigGuiReed extends ConfigGuiScreenBase {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void addButtons(int x, int y) {
-		buttonList.add(new GuiButton(0, x - 50, y + 50, 100, 20, "Close"));
+		buttonList.add(new GuiButton(0, x - 50, y + 50, 100, 20, I18n.format("message.betterfoliage.back")));
 	}
 
 	@Override

@@ -9,8 +9,9 @@ import java.util.Set;
 import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.BetterFoliageClient;
 import mods.betterfoliage.common.util.DeobfNames;
-import mods.betterfoliage.common.util.ReflectionUtil;
+import mods.betterfoliage.common.util.Utils;
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.IResource;
@@ -31,6 +32,10 @@ import cpw.mods.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class LeafTextureGenerator extends BlockTextureGenerator implements IIconRegister {
 
+	public String nonGeneratedDomain = "betterfoliage";
+	
+	public int nonGeneratedCounter = 0;
+	
 	public LeafTextureGenerator() {
 		super("bf_leaves_autogen", new ResourceLocation("betterfoliage", "textures/blocks/missing_leaf.png"));
 	}
@@ -39,7 +44,17 @@ public class LeafTextureGenerator extends BlockTextureGenerator implements IIcon
 	public List<ILeafTextureRecognizer> recognizers = Lists.newLinkedList();
 
 	public IResource getResource(ResourceLocation resourceLocation) throws IOException {
-		LeafTextureResource result = new LeafTextureResource(unwrapResource(resourceLocation), getMissingResource());
+		ResourceLocation original = unwrapResource(resourceLocation);
+		
+		// check for provided texture
+		ResourceLocation handDrawnLocation = new ResourceLocation(nonGeneratedDomain, String.format("textures/blocks/%s/%s", original.getResourceDomain(), original.getResourcePath())); 
+		if (Utils.resourceExists(handDrawnLocation)) {
+			nonGeneratedCounter++;
+			return Minecraft.getMinecraft().getResourceManager().getResource(handDrawnLocation);
+		}
+		
+		// generate our own
+		LeafTextureResource result = new LeafTextureResource(original, getMissingResource());
 		if (result.data != null) counter++;
 		return result;
 	}
@@ -62,6 +77,7 @@ public class LeafTextureGenerator extends BlockTextureGenerator implements IIcon
 	@SuppressWarnings("unchecked")
 	@Override
 	public void onStitchStart(Pre event) {
+		nonGeneratedCounter = 0;
 		BetterFoliage.log.info("Reloading leaf textures");
 		
 		// register simple block textures
@@ -76,8 +92,8 @@ public class LeafTextureGenerator extends BlockTextureGenerator implements IIcon
 		
 		// enumerate all registered textures, find leaf textures among them
 		Map<String, TextureAtlasSprite> mapAtlas = null;
-		mapAtlas = ReflectionUtil.getField(blockTextures, DeobfNames.TM_MRS_SRG, Map.class);
-		if (mapAtlas == null) mapAtlas = ReflectionUtil.getField(blockTextures, DeobfNames.TM_MRS_MCP, Map.class);
+		mapAtlas = Utils.getField(blockTextures, DeobfNames.TM_MRS_SRG, Map.class);
+		if (mapAtlas == null) mapAtlas = Utils.getField(blockTextures, DeobfNames.TM_MRS_MCP, Map.class);
 		if (mapAtlas == null) {
 			BetterFoliage.log.warn("Failed to reflect texture atlas, textures may be missing");
 		} else {
@@ -95,6 +111,7 @@ public class LeafTextureGenerator extends BlockTextureGenerator implements IIcon
 
 	@Override
 	public void onStitchEnd(Post event) {
+		BetterFoliage.log.info(String.format("Found %d pre-drawn leaf textures", nonGeneratedCounter));
 		BetterFoliage.log.info(String.format("Generated %d leaf textures", counter));
 	}
 

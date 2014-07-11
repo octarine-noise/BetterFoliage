@@ -4,5 +4,5 @@
   "version": "$version",
   "mcversion": "$mcversion",
   "description": "Leafier leaves and grassier grass",
-  "credits": "Made by octarine-noise"
+  "authorList" : ["octarine-noise"]
 }]

@@ -4,6 +4,7 @@ import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.gui.widget.OptionDoubleWidget;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.resources.I18n;
 import cpw.mods.fml.client.FMLClientHandler;
 
 public class ConfigGuiLeaves extends ConfigGuiScreenBase {
@@ -21,7 +22,7 @@ public class ConfigGuiLeaves extends ConfigGuiScreenBase {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void addButtons(int x, int y) {
-		buttonList.add(new GuiButton(Button.CLOSE.ordinal(), x - 50, y + 50, 100, 20, "Close"));
+		buttonList.add(new GuiButton(Button.CLOSE.ordinal(), x - 50, y + 50, 100, 20, I18n.format("message.betterfoliage.back")));
 		buttonList.add(new GuiButton(Button.LEAVES_OFFSET_MODE.ordinal(), x - 100, y - 40, 200, 20, ""));
 	}
 
