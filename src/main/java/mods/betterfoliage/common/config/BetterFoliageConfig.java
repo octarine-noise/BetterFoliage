@@ -20,6 +20,9 @@ public class BetterFoliageConfig extends ConfigBase {
 	@CfgElement(category="reed", key="enabled")
 	public boolean reedEnabled = true;
 	
+	@CfgElement(category="algae", key="enabled")
+	public boolean algaeEnabled = true;
+	
 	@CfgElement(category="leaves", key="horizontalOffset")
 	public OptionDouble leavesHOffset = new OptionDouble(0.0, 0.4, 0.025, 0.2);
 	
@@ -61,4 +64,19 @@ public class BetterFoliageConfig extends ConfigBase {
 	@CfgElement(category="reed", key="chance")
 	public OptionInteger reedChance = new OptionInteger(0, 64, 1, 32);
 	
+	@CfgElement(category="algae", key="horizontalOffset")
+	public OptionDouble algaeHOffset = new OptionDouble(0.0, 0.25, 0.025, 0.1);
+	
+	@CfgElement(category="algae", key="size")
+	public OptionDouble algaeSize = new OptionDouble(0.5, 1.5, 0.05, 1.0);
+	
+	@CfgElement(category="algae", key="heightMin")
+	@Limit(max="algaeHeightMax")
+	public OptionDouble algaeHeightMin = new OptionDouble(0.1, 1.5, 0.05, 0.5);
+	
+	@CfgElement(category="algae", key="heightMax")
+	public OptionDouble algaeHeightMax = new OptionDouble(0.1, 1.5, 0.05, 1.0);
+	
+	@CfgElement(category="algae", key="chance")
+	public OptionInteger algaeChance = new OptionInteger(0, 64, 1, 48);
 }

@@ -3,7 +3,6 @@ key.betterfoliage.gui=Open Settings
 message.betterfoliage.optionOn=ON
 message.betterfoliage.optionOff=OFF
 message.betterfoliage.config=Config
-
 message.betterfoliage.back=Back
 message.betterfoliage.close=Close
 
@@ -24,3 +23,4 @@ message.betterfoliage.reedChance=Reed Chance
 message.betterfoliage.leavesMode=Leaves Offset: %s
 message.betterfoliage.leavesSkew=Skew
 message.betterfoliage.leavesTranslate=Translate
+message.betterfoliage.algaeChance=Algae Chance
