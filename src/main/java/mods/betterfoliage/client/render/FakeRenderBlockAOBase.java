@@ -1,11 +1,14 @@
 package mods.betterfoliage.client.render;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
 import net.minecraft.util.IIcon;
 
 /** Same as {@link RenderBlockAOBase}, but does not actually render anything.
  * @author octarine-noise
  */
+@SideOnly(Side.CLIENT)
 public class FakeRenderBlockAOBase extends RenderBlockAOBase {
 
 	@Override

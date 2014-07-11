@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Set;
 
 import mods.betterfoliage.BetterFoliage;
-import mods.betterfoliage.common.util.ReflectionUtil;
+import mods.betterfoliage.common.util.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.resources.IResource;
@@ -18,7 +18,10 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
+@SideOnly(Side.CLIENT)
 public abstract class BlockTextureGenerator implements IResourceManager {
 
 	/** Resource domain name of generated textures */
@@ -48,7 +51,7 @@ public abstract class BlockTextureGenerator implements IResourceManager {
 		
 		blockTextures = event.map;
 		counter = 0;
-		Map<String, IResourceManager> domainManagers = ReflectionUtil.getDomainResourceManagers();
+		Map<String, IResourceManager> domainManagers = Utils.getDomainResourceManagers();
 		if (domainManagers == null) {
 			BetterFoliage.log.warn("Failed to inject texture generator");
 			return;
@@ -64,7 +67,7 @@ public abstract class BlockTextureGenerator implements IResourceManager {
 		if (event.map.getTextureType() != 0) return;
 		
 		// don't leave a mess
-		Map<String, IResourceManager> domainManagers = ReflectionUtil.getDomainResourceManagers();
+		Map<String, IResourceManager> domainManagers = Utils.getDomainResourceManagers();
 		if (domainManagers != null) domainManagers.remove(domainName);
 		
 		onStitchEnd(event);

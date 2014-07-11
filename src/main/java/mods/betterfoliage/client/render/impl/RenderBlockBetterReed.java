@@ -20,7 +20,10 @@ import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.event.world.WorldEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
+@SideOnly(Side.CLIENT)
 public class RenderBlockBetterReed extends RenderBlockAOBase implements IRenderBlockDecorator {
 
 	public IconSet reedBottomIcons = new IconSet("bf_reed_bottom", "bettergrassandleaves:better_reed_%d");

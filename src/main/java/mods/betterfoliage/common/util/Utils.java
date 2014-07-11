@@ -1,16 +1,19 @@
 package mods.betterfoliage.common.util;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Map;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;
+import net.minecraft.util.ResourceLocation;
 import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
 import cpw.mods.fml.client.registry.RenderingRegistry;
 
-public class ReflectionUtil {
+public class Utils {
 
-	private ReflectionUtil() {}
+	private Utils() {}
 	
 	@SuppressWarnings("unchecked")
 	public static Map<String, IResourceManager> getDomainResourceManagers() {
@@ -54,5 +57,14 @@ public class ReflectionUtil {
 		} catch (Exception e) {
 			return null;
 		}
+	}
+	
+	public static boolean resourceExists(ResourceLocation resourceLocation) {
+		try {
+			IResource resource = Minecraft.getMinecraft().getResourceManager().getResource(resourceLocation);
+			if (resource != null) return true;
+		} catch (IOException e) {
+		}
+		return false;
 	}
 }
