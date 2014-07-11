@@ -106,6 +106,7 @@ public class BlockMatcher {
 	@SuppressWarnings("unchecked")
 	@SubscribeEvent
 	public void handleWorldLoad(WorldEvent.Load event) {
+		blockIDs.clear();
 		Iterator<Block> iter = Block.blockRegistry.iterator();
 		while (iter.hasNext()) {
 			Block block = iter.next();
