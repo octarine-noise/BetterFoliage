@@ -27,7 +27,8 @@ public class ConfigGuiMain extends ConfigGuiScreenBase {
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void addButtons(int x, int y) {
-		buttonList.add(new GuiButton(Button.CLOSE.ordinal(), x - 50, y + 80, 100, 20, "Close"));
+		buttonList.add(new GuiButton(Button.CLOSE.ordinal(), x - 50, y + 80, 100, 20, I18n.format("message.betterfoliage.close")));
+		
 		buttonList.add(new GuiButton(Button.TOGGLE_LEAVES.ordinal(), x - 100, y - 100, 150, 20, ""));
 		buttonList.add(new GuiButton(Button.CONFIG_LEAVES.ordinal(), x + 60, y - 100, 40, 20, I18n.format("message.betterfoliage.config")));
 		
