@@ -44,6 +44,10 @@ public class RenderBlockBetterLeaves extends RenderBlockAOBase implements IRende
 		// find generated texture to render with, assume the
 		// "true" texture of the block is the one on the north size
 		TextureAtlasSprite blockLeafIcon = (TextureAtlasSprite) block.getIcon(world, x, y, z, ForgeDirection.NORTH.ordinal());
+		if (blockLeafIcon == null) {
+			BetterFoliage.log.warn(String.format("null leaf texture, x:%d, y:%d, z:%d, meta:%d, block:%s", x, y, z, blockAccess.getBlockMetadata(x, y, z), block.getClass().getName()));
+			return true;
+		}
 		IIcon crossLeafIcon = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(BetterFoliageClient.leafGenerator.domainName + ":" + blockLeafIcon.getIconName());
 		if (crossLeafIcon == null) {
 			return true;
