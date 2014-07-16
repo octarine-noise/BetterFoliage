@@ -2,7 +2,6 @@ package mods.betterfoliage.client.resource;
 
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -20,7 +19,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.TextureStitchEvent.Post;
 import net.minecraftforge.client.event.TextureStitchEvent.Pre;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import cpw.mods.fml.relauncher.Side;
@@ -39,9 +37,6 @@ public class LeafTextureGenerator extends BlockTextureGenerator implements IIcon
 	public LeafTextureGenerator() {
 		super("bf_leaves_autogen", new ResourceLocation("betterfoliage", "textures/blocks/missing_leaf.png"));
 	}
-
-	/** List of helpers which can identify leaf textures loaded by alternate means */
-	public List<ILeafTextureRecognizer> recognizers = Lists.newLinkedList();
 
 	public IResource getResource(ResourceLocation resourceLocation) throws IOException {
 		ResourceLocation original = unwrapResource(resourceLocation);

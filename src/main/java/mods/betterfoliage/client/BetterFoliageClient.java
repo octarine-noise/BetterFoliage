@@ -14,7 +14,6 @@ import mods.betterfoliage.client.render.impl.RenderBlockBetterLilypad;
 import mods.betterfoliage.client.render.impl.RenderBlockBetterReed;
 import mods.betterfoliage.client.resource.BlockTextureGenerator;
 import mods.betterfoliage.client.resource.HalfTextureResource;
-import mods.betterfoliage.client.resource.ILeafTextureRecognizer;
 import mods.betterfoliage.client.resource.LeafTextureGenerator;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockCarrot;
@@ -36,7 +35,7 @@ import com.google.common.collect.Maps;
 import cpw.mods.fml.client.registry.RenderingRegistry;
 import cpw.mods.fml.common.FMLCommonHandler;
 
-public class BetterFoliageClient implements ILeafTextureRecognizer {
+public class BetterFoliageClient {
 
 	public static Map<Integer, IRenderBlockDecorator> decorators = Maps.newHashMap();
 	public static LeafTextureGenerator leafGenerator;
@@ -74,7 +73,6 @@ public class BetterFoliageClient implements ILeafTextureRecognizer {
 		BetterFoliage.log.info("Registering leaf texture generator");
 		leafGenerator = new LeafTextureGenerator();
 		MinecraftForge.EVENT_BUS.register(leafGenerator);
-		leafGenerator.recognizers.add(new BetterFoliageClient());
 		
 		MinecraftForge.EVENT_BUS.register(new BlockTextureGenerator("bf_reed_bottom", new ResourceLocation("betterfoliage", "textures/blocks/missing_leaf.png")) {
 			@Override
@@ -92,7 +90,7 @@ public class BetterFoliageClient implements ILeafTextureRecognizer {
 		MinecraftForge.EVENT_BUS.register(new BetterFoliageClient());
 	}
 
-	public boolean isLeafTexture(TextureAtlasSprite icon) {
+	public static boolean isLeafTexture(TextureAtlasSprite icon) {
 		String resourceLocation = icon.getIconName();
 		if (resourceLocation.startsWith("forestry:leaves/")) return true;
 		return false;
