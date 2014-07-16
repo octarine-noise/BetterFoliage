@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Map;
 
+import mods.betterfoliage.loader.DeobfHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;
@@ -18,8 +19,8 @@ public class Utils {
 	@SuppressWarnings("unchecked")
 	public static Map<String, IResourceManager> getDomainResourceManagers() {
 		IResourceManager manager = Minecraft.getMinecraft().getResourceManager();
-		Map<String, IResourceManager> result = getField(manager, DeobfNames.SRRM_DRM_MCP, Map.class);
-		if (result == null) result = getField(manager, DeobfNames.SRRM_DRM_SRGNAME, Map.class);
+		Map<String, IResourceManager> result = getField(manager, "domainResourceManagers", Map.class);
+		if (result == null) result = getField(manager, DeobfHelper.transformElementSearge("domainResourceManagers"), Map.class);
 		return result;
 	}
 	

@@ -4,7 +4,6 @@ import java.util.Map;
 
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 
-@IFMLLoadingPlugin.MCVersion("1.7.2")
 @IFMLLoadingPlugin.TransformerExclusions({"mods.betterfoliage.loader"})
 public class BetterFoliageLoader implements IFMLLoadingPlugin {
 

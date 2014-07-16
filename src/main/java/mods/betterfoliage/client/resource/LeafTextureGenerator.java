@@ -8,8 +8,8 @@ import java.util.Set;
 
 import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.BetterFoliageClient;
-import mods.betterfoliage.common.util.DeobfNames;
 import mods.betterfoliage.common.util.Utils;
+import mods.betterfoliage.loader.DeobfHelper;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -92,16 +92,15 @@ public class LeafTextureGenerator extends BlockTextureGenerator implements IIcon
 		
 		// enumerate all registered textures, find leaf textures among them
 		Map<String, TextureAtlasSprite> mapAtlas = null;
-		mapAtlas = Utils.getField(blockTextures, DeobfNames.TM_MRS_SRG, Map.class);
-		if (mapAtlas == null) mapAtlas = Utils.getField(blockTextures, DeobfNames.TM_MRS_MCP, Map.class);
+		mapAtlas = Utils.getField(blockTextures, DeobfHelper.transformElementSearge("mapRegisteredSprites"), Map.class);
+		if (mapAtlas == null) mapAtlas = Utils.getField(blockTextures, "mapRegisteredSprites", Map.class);
 		if (mapAtlas == null) {
 			BetterFoliage.log.warn("Failed to reflect texture atlas, textures may be missing");
 		} else {
 			Set<String> foundLeafTextures = Sets.newHashSet();
 			for (TextureAtlasSprite icon : mapAtlas.values())
-				for (ILeafTextureRecognizer recognizer : recognizers)
-					if (recognizer.isLeafTexture(icon))
-						foundLeafTextures.add(icon.getIconName());
+				if (BetterFoliageClient.isLeafTexture(icon))
+					foundLeafTextures.add(icon.getIconName());
 			for (String resourceLocation : foundLeafTextures) {
 				BetterFoliage.log.debug(String.format("Found non-block-registered leaf texture: %s", resourceLocation));
 				blockTextures.registerIcon(new ResourceLocation(domainName, resourceLocation).toString());

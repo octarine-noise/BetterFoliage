@@ -24,22 +24,18 @@ public class EZTransformerBase implements IClassTransformer {
 		public boolean matches(AbstractInsnNode node);
 	}
 	
-	@Retention(RetentionPolicy.RUNTIME)
-	public static @interface MethodMatch {
-		public String name();
-		public String signature();
-	}
-	
 	@Target(ElementType.METHOD)
 	@Retention(RetentionPolicy.RUNTIME)
 	public static @interface MethodTransform {
 		public String className();
-		public MethodMatch deobf();
-		public MethodMatch obf();
+		public String methodName();
+		public String signature();
 		public String log();
 	}
 	
 	protected Logger logger = LogManager.getLogger(getClass().getSimpleName());
+	
+	protected Boolean isObfuscated;
 	
 	public byte[] transform(String name, String transformedName, byte[] basicClass) {
 		// ???
@@ -55,25 +51,26 @@ public class EZTransformerBase implements IClassTransformer {
 			// check for annotated method with correct signature
 			MethodTransform annot = classMethod.getAnnotation(MethodTransform.class);
 			if (annot == null) continue;
-			if (classMethod.getParameterTypes().length != 2) continue;
+			if (classMethod.getParameterTypes().length != 1) continue;
 			if (!classMethod.getParameterTypes()[0].equals(MethodNode.class)) continue;
-			if (!classMethod.getParameterTypes()[1].equals(boolean.class)) continue;
 			
 			// try to find specified method in class
 			if (!transformedName.equals(annot.className())) continue;
+			logger.debug(String.format("Found class: %s -> %s", name, transformedName));
 			for (MethodNode methodNode : classNode.methods) {
-				Boolean obf = null;
-				if (methodNode.name.equals(annot.obf().name()) && methodNode.desc.equals(annot.obf().signature())) {
-					obf = true;
-				} else if (methodNode.name.equals(annot.deobf().name()) && methodNode.desc.equals(annot.deobf().signature())) {
-					obf = false;
+				logger.trace(String.format("Checking method: %s, sig: %s", methodNode.name, methodNode.desc));
+				isObfuscated = null;
+				if (methodNode.name.equals(DeobfHelper.transformElementName(annot.methodName())) && methodNode.desc.equals(DeobfHelper.transformSignature(annot.signature()))) {
+					isObfuscated = true;
+				} else if (methodNode.name.equals(annot.methodName()) && methodNode.desc.equals(annot.signature())) {
+					isObfuscated = false;
 				}
 				
-				if (obf != null) {
+				if (isObfuscated != null) {
 					// transform
 					hasTransformed = true;
 					try {
-						classMethod.invoke(this, new Object[] {methodNode, obf});
+						classMethod.invoke(this, new Object[] {methodNode});
 						logger.info(String.format("%s: SUCCESS", annot.log()));
 					} catch (Exception e) {
 						logger.info(String.format("%s: FAILURE", annot.log()));
@@ -89,6 +86,18 @@ public class EZTransformerBase implements IClassTransformer {
 		return !hasTransformed ? basicClass : writer.toByteArray();
 	}
 
+	protected String className(String className) {
+		return isObfuscated ? DeobfHelper.transformClassName(className) : className;
+	}
+	
+	protected String element(String fieldName) {
+		return isObfuscated ? DeobfHelper.transformElementName(fieldName) : fieldName;
+	}
+	
+	protected String signature(String signature) {
+		return isObfuscated ? DeobfHelper.transformSignature(signature) : signature;
+	}
+	
 	protected AbstractInsnNode findNext(AbstractInsnNode start, IInstructionMatch match) {
 		AbstractInsnNode current = start;
 		while(current != null) {
