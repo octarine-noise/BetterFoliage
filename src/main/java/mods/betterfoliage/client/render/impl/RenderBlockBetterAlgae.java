@@ -43,7 +43,7 @@ public class RenderBlockBetterAlgae extends RenderBlockAOBase implements IRender
 		// store world for later use
 		blockAccess = world;
 		
-		// render grass block
+		// render dirt block
 		setPassCounters(1);
 		setRenderBoundsFromBlock(block);
 		renderStandardBlock(block, x, y, z);

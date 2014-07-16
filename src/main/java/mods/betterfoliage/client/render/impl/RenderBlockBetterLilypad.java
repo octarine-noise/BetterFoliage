@@ -30,7 +30,7 @@ public class RenderBlockBetterLilypad extends FakeRenderBlockAOBase implements I
 		// store world for later use
 		blockAccess = world;
 		
-		// render grass block
+		// render lilypad block
 		renderBlockLilyPad(block, x, y, z);
 		
 		int chanceVariation = getSemiRandomFromPos(x, y, z, 0);
