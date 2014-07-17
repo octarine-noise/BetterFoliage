@@ -1,8 +1,14 @@
 package mods.betterfoliage.common.util;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.util.Map;
+
+import com.google.common.base.Charsets;
 
 import mods.betterfoliage.loader.DeobfHelper;
 import net.minecraft.client.Minecraft;
@@ -67,5 +73,22 @@ public class Utils {
 		} catch (IOException e) {
 		}
 		return false;
+	}
+	
+	public static void copyFromTextResource(ResourceLocation resourceLocation, File target) {
+		try {
+			IResource defaults = Minecraft.getMinecraft().getResourceManager().getResource(resourceLocation);
+			BufferedReader reader = new BufferedReader(new InputStreamReader(defaults.getInputStream(), Charsets.UTF_8));
+			FileWriter writer = new FileWriter(target);
+			
+			String line = reader.readLine();
+			while(line != null) {
+				writer.write(line + System.lineSeparator());
+				line = reader.readLine();
+			}
+			reader.close();
+			writer.close();
+		} catch(IOException e) {
+		}
 	}
 }

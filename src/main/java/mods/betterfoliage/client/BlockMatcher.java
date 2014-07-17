@@ -10,8 +10,9 @@ import java.util.Iterator;
 import java.util.Set;
 
 import mods.betterfoliage.BetterFoliage;
+import mods.betterfoliage.common.util.Utils;
 import net.minecraft.block.Block;
-import net.minecraftforge.common.MinecraftForge;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.world.WorldEvent;
 
 import com.google.common.collect.Sets;
@@ -23,11 +24,6 @@ public class BlockMatcher {
 	public Set<String> whiteList = Sets.newHashSet();
 	public Set<String> blackList = Sets.newHashSet();
 	public Set<Integer> blockIDs = Sets.newHashSet();
-	
-	public BlockMatcher(String... defaults) {
-		for (String clazz : defaults) addClass(clazz);
-		MinecraftForge.EVENT_BUS.register(this);
-	}
 	
 	public void addClass(String className) {
 		if (className.startsWith("-"))
@@ -60,7 +56,9 @@ public class BlockMatcher {
 		return blockIDs.contains(Block.blockRegistry.getIDForObject(block));
 	}
 	
-	public void load(File file) {
+	public void load(File file, ResourceLocation defaults) {
+		if (!file.exists()) Utils.copyFromTextResource(defaults, file);
+		
 		BufferedReader reader = null;
 		try {
 			reader = new BufferedReader(new FileReader(file));

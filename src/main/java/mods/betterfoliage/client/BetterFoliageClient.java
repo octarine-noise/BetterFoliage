@@ -16,13 +16,6 @@ import mods.betterfoliage.client.resource.BlockTextureGenerator;
 import mods.betterfoliage.client.resource.HalfTextureResource;
 import mods.betterfoliage.client.resource.LeafTextureGenerator;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockCarrot;
-import net.minecraft.block.BlockCrops;
-import net.minecraft.block.BlockDoublePlant;
-import net.minecraft.block.BlockLeavesBase;
-import net.minecraft.block.BlockPotato;
-import net.minecraft.block.BlockReed;
-import net.minecraft.block.BlockTallGrass;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.init.Blocks;
@@ -40,8 +33,8 @@ public class BetterFoliageClient {
 	public static Map<Integer, IRenderBlockDecorator> decorators = Maps.newHashMap();
 	public static LeafTextureGenerator leafGenerator;
 	
-	public static BlockMatcher leaves;
-	public static BlockMatcher crops;
+	public static BlockMatcher leaves = new BlockMatcher();
+	public static BlockMatcher crops = new BlockMatcher();
 	
 	public static void preInit() {
 		FMLCommonHandler.instance().bus().register(new KeyHandler());
@@ -54,21 +47,11 @@ public class BetterFoliageClient {
 		registerRenderer(new RenderBlockBetterReed());
 		registerRenderer(new RenderBlockBetterAlgae());
 		
-		leaves = new BlockMatcher(BlockLeavesBase.class.getName(),
-								  "forestry.arboriculture.gadgets.BlockLeaves",
-								  "thaumcraft.common.blocks.BlockMagicalLeaves");
-		leaves.load(new File(BetterFoliage.configDir, "classesLeaves.cfg"));
+		leaves.load(new File(BetterFoliage.configDir, "classesLeaves.cfg"), new ResourceLocation("betterfoliage:classesLeavesDefault.cfg"));
+		MinecraftForge.EVENT_BUS.register(leaves);
 		
-		crops = new BlockMatcher(BlockCrops.class.getName(),
-								 "-" + BlockCarrot.class.getName(),
-								 "-" + BlockPotato.class.getName(),
-								 BlockTallGrass.class.getName(),
-								 BlockDoublePlant.class.getName(),
-								 BlockReed.class.getName(),
-								 "biomesoplenty.common.blocks.BlockBOPFlower",
-								 "biomesoplenty.common.blocks.BlockBOPFlower2",
-								 "tconstruct.blocks.slime.SlimeTallGrass");
-		crops.load(new File(BetterFoliage.configDir, "classesCrops.cfg"));
+		crops.load(new File(BetterFoliage.configDir, "classesCrops.cfg"), new ResourceLocation("betterfoliage:classesCropsDefault.cfg"));
+		MinecraftForge.EVENT_BUS.register(crops);
 		
 		BetterFoliage.log.info("Registering leaf texture generator");
 		leafGenerator = new LeafTextureGenerator();
