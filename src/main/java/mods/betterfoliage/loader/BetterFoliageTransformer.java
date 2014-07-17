@@ -7,9 +7,17 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
+import com.google.common.collect.ImmutableList;
+
+import cpw.mods.fml.relauncher.FMLInjectionData;
+
 public class BetterFoliageTransformer extends EZTransformerBase {
 
 	public BetterFoliageTransformer() {
+		String mcVersion = FMLInjectionData.data()[4].toString();
+		if (!ImmutableList.<String>of("1.7.2", "1.7.10").contains(mcVersion))
+			logger.warn(String.format("Unsupported Minecraft version %s", mcVersion));
+		
 		DeobfHelper.init();
 	}
 	
