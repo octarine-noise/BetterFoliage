@@ -18,7 +18,6 @@ import mods.betterfoliage.client.resource.LeafTextureGenerator;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.IResource;
-import net.minecraft.init.Blocks;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.MinecraftForge;
@@ -71,6 +70,8 @@ public class BetterFoliageClient {
 		});
 
 		MinecraftForge.EVENT_BUS.register(new BetterFoliageClient());
+		
+		ShadersModIntegration.init();
 	}
 
 	public static boolean isLeafTexture(TextureAtlasSprite icon) {
@@ -87,14 +88,6 @@ public class BetterFoliageClient {
 			if (entry.getValue().isBlockAccepted(blockAccess, x, y, z, block, original))
 				return entry.getKey();
 		
-		return original;
-	}
-	
-	public static int getGLSLBlockIdOverride(int original, Block block) {
-		if (leaves.matchesID(original & 0xFFFF))
-			return Block.blockRegistry.getIDForObject(Blocks.leaves) & 0xFFFF | block.getRenderType() << 16;
-		if (crops.matchesID(original & 0xFFFF))
-			return Block.blockRegistry.getIDForObject(Blocks.tallgrass) & 0xFFFF | block.getRenderType() << 16;
 		return original;
 	}
 	

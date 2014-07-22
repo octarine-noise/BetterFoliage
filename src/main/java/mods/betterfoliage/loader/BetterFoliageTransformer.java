@@ -49,7 +49,7 @@ public class BetterFoliageTransformer extends EZTransformerBase {
 		AbstractInsnNode arrayStore = findNext(method.instructions.getFirst(), matchOpcode(Opcodes.IASTORE));
 		insertAfter(method.instructions, arrayStore.getPrevious(),
 			new VarInsnNode(Opcodes.ALOAD, 1),
-			new MethodInsnNode(Opcodes.INVOKESTATIC, "mods/betterfoliage/client/BetterFoliageClient", "getGLSLBlockIdOverride", signature("(ILnet/minecraft/block/Block;)I"))
+			new MethodInsnNode(Opcodes.INVOKESTATIC, "mods/betterfoliage/client/ShadersModIntegration", "getBlockIdOverride", signature("(ILnet/minecraft/block/Block;)I"))
 		);
 	}
 }

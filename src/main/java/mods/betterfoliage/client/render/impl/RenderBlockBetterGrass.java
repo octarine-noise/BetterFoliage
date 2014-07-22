@@ -1,6 +1,7 @@
 package mods.betterfoliage.client.render.impl;
 
 import mods.betterfoliage.BetterFoliage;
+import mods.betterfoliage.client.ShadersModIntegration;
 import mods.betterfoliage.client.render.IRenderBlockDecorator;
 import mods.betterfoliage.client.render.IconSet;
 import mods.betterfoliage.client.render.RenderBlockAOBase;
@@ -49,6 +50,9 @@ public class RenderBlockBetterGrass extends RenderBlockAOBase implements IRender
 		
 		double scale = BetterFoliage.config.grassSize.value * 0.5;
 		double halfHeight = 0.5 * (BetterFoliage.config.grassHeightMin.value + pRand[heightVariation] * (BetterFoliage.config.grassHeightMax.value - BetterFoliage.config.grassHeightMin.value));
+		
+		// render short grass
+		ShadersModIntegration.startGrassQuads();
 		Tessellator.instance.setBrightness(getBrightness(block, x, y + 1, z));
 		renderCrossedSideQuads(new Double3(x + 0.5, y + 1.0 - 0.125 * halfHeight, z + 0.5), ForgeDirection.UP, scale, halfHeight, pRot[variation], BetterFoliage.config.grassHOffset.value, renderIcon, 0, false);
 		

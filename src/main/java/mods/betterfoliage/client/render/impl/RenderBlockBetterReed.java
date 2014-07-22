@@ -3,6 +3,7 @@ package mods.betterfoliage.client.render.impl;
 import java.util.Random;
 
 import mods.betterfoliage.BetterFoliage;
+import mods.betterfoliage.client.ShadersModIntegration;
 import mods.betterfoliage.client.render.IRenderBlockDecorator;
 import mods.betterfoliage.client.render.IconSet;
 import mods.betterfoliage.client.render.RenderBlockAOBase;
@@ -59,6 +60,9 @@ public class RenderBlockBetterReed extends RenderBlockAOBase implements IRenderB
 		double quarterHeight = 0.25 * (BetterFoliage.config.reedHeightMin.value + pRand[heightVariation] * (BetterFoliage.config.reedHeightMax.value - BetterFoliage.config.reedHeightMin.value));
 		Tessellator.instance.setBrightness(getBrightness(block, x, y + 2, z));
 		Tessellator.instance.setColorOpaque(255, 255, 255);
+		
+		// render reeds
+		ShadersModIntegration.startGrassQuads();
 		renderCrossedSideQuads(new Double3(x + 0.5, y + 1.0, z + 0.5), ForgeDirection.UP, 0.5, quarterHeight, pRot[iconVariation], BetterFoliage.config.reedHOffset.value, bottomIcon, 0, true);
 		renderCrossedSideQuads(new Double3(x + 0.5, y + 1.0 + 2.0 * quarterHeight, z + 0.5), ForgeDirection.UP, 0.5, quarterHeight, pRot[iconVariation], BetterFoliage.config.reedHOffset.value, topIcon, 0, true);
 		
