@@ -2,10 +2,7 @@ package mods.betterfoliage.client;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -21,30 +18,22 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 public class BlockMatcher {
 
-	public Set<String> whiteList = Sets.newHashSet();
-	public Set<String> blackList = Sets.newHashSet();
+	public Set<Class<?>> whiteList = Sets.newHashSet();
+	public Set<Class<?>> blackList = Sets.newHashSet();
 	public Set<Integer> blockIDs = Sets.newHashSet();
 	
 	public void addClass(String className) {
-		if (className.startsWith("-"))
-			blackList.add(className.substring(1));
-		else
-			whiteList.add(className);
+		try {
+			if (className.startsWith("-"))
+				blackList.add(Class.forName(className.substring(1)));
+			else
+				whiteList.add(Class.forName(className));
+		} catch(ClassNotFoundException e) {}
 	}
 	
 	public boolean matchesClass(Block block) {
-		for (String className : blackList) {
-			try {
-				Class<?> clazz = Class.forName(className);
-				if (clazz.isAssignableFrom(block.getClass())) return false;
-			} catch(ClassNotFoundException e) {}
-		}
-		for (String className : whiteList) {
-			try {
-				Class<?> clazz = Class.forName(className);
-				if (clazz.isAssignableFrom(block.getClass())) return true;
-			} catch(ClassNotFoundException e) {}
-		}
+		for (Class<?> clazz : blackList) if (clazz.isAssignableFrom(block.getClass())) return false;
+		for (Class<?> clazz : whiteList) if (clazz.isAssignableFrom(block.getClass())) return true;
 		return false;
 	}
 	
@@ -70,31 +59,8 @@ public class BlockMatcher {
 				line = reader.readLine();
 			}
 			reader.close();
-		} catch (FileNotFoundException e) {
-			saveDefaults(file);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			BetterFoliage.log.warn(String.format("Error reading configuration: %s", file.getName()));
-		}
-	}
-	
-	public void saveDefaults(File file) {
-		FileWriter writer = null;
-		try {
-			writer = new FileWriter(file);
-			for (String className : whiteList) {
-				writer.write(className);
-				writer.write("\n");
-			}
-			for (String className : blackList) {
-				writer.write("-");
-				writer.write(className);
-				writer.write("\n");
-			}
-			writer.close();
-		} catch (FileNotFoundException e) {
-			saveDefaults(file);
-		} catch (IOException e) {
-			BetterFoliage.log.warn(String.format("Error writing default configuration: %s", file.getName()));
 		}
 	}
 	
