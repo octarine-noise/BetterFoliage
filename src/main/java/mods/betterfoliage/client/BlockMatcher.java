@@ -9,6 +9,7 @@ import java.util.Set;
 import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.common.util.Utils;
 import net.minecraft.block.Block;
+import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.world.WorldEvent;
 
@@ -70,6 +71,8 @@ public class BlockMatcher {
 	@SuppressWarnings("unchecked")
 	@SubscribeEvent
 	public void handleWorldLoad(WorldEvent.Load event) {
+		if (!(event.world instanceof WorldClient)) return;
+		
 		blockIDs.clear();
 		Iterator<Block> iter = Block.blockRegistry.iterator();
 		while (iter.hasNext()) {
