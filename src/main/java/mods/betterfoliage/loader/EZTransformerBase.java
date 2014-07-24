@@ -49,20 +49,33 @@ public class EZTransformerBase implements IClassTransformer {
         
 		for (Method classMethod : getClass().getMethods()) {
 			// check for annotated method with correct signature
-			MethodTransform annot = classMethod.getAnnotation(MethodTransform.class);
-			if (annot == null) continue;
+			String aClassName = null;
+			String aMethodName = null;
+			String aSignature = null;
+			String aLog = null;
+			synchronized (this) {
+				MethodTransform annotation = classMethod.getAnnotation(MethodTransform.class);
+				if (annotation != null) {
+					aClassName = annotation.className();
+					aMethodName = annotation.methodName();
+					aSignature = annotation.signature();
+					aLog = annotation.log();
+				}
+			}
+			
+			if (aClassName == null) continue;
 			if (classMethod.getParameterTypes().length != 1) continue;
 			if (!classMethod.getParameterTypes()[0].equals(MethodNode.class)) continue;
 			
 			// try to find specified method in class
-			if (!transformedName.equals(annot.className())) continue;
+			if (!transformedName.equals(aClassName)) continue;
 			logger.debug(String.format("Found class: %s -> %s", name, transformedName));
 			for (MethodNode methodNode : classNode.methods) {
 				logger.trace(String.format("Checking method: %s, sig: %s", methodNode.name, methodNode.desc));
 				isObfuscated = null;
-				if (methodNode.name.equals(DeobfHelper.transformElementName(annot.methodName())) && methodNode.desc.equals(DeobfHelper.transformSignature(annot.signature()))) {
+				if (methodNode.name.equals(DeobfHelper.transformElementName(aMethodName)) && methodNode.desc.equals(DeobfHelper.transformSignature(aSignature))) {
 					isObfuscated = true;
-				} else if (methodNode.name.equals(annot.methodName()) && methodNode.desc.equals(annot.signature())) {
+				} else if (methodNode.name.equals(aMethodName) && methodNode.desc.equals(aSignature)) {
 					isObfuscated = false;
 				}
 				
@@ -71,9 +84,9 @@ public class EZTransformerBase implements IClassTransformer {
 					hasTransformed = true;
 					try {
 						classMethod.invoke(this, new Object[] {methodNode});
-						logger.info(String.format("%s: SUCCESS", annot.log()));
+						logger.info(String.format("%s: SUCCESS", aLog));
 					} catch (Exception e) {
-						logger.info(String.format("%s: FAILURE", annot.log()));
+						logger.info(String.format("%s: FAILURE", aLog));
 					}
 					break;
 				}
