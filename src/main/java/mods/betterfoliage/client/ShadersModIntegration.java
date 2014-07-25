@@ -48,8 +48,8 @@ public class ShadersModIntegration {
 	}
 	
 	public static int getBlockIdOverride(int original, Block block) {
-		if (BetterFoliageClient.leaves.matchesID(original & 0xFFFF)) return tallGrassEntityData;
-		if (BetterFoliageClient.crops.matchesID(original & 0xFFFF)) return leavesEntityData;
+		if (BetterFoliageClient.leaves.matchesID(original & 0xFFFF)) return leavesEntityData;
+		if (BetterFoliageClient.crops.matchesID(original & 0xFFFF)) return tallGrassEntityData;
 		return original;
 	}
 }
