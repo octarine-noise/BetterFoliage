@@ -39,8 +39,14 @@ public class LeafTextureResource implements IResource {
 		
 		IResourceManager resourceManager = Minecraft.getMinecraft().getResourceManager();
 		try {
-			// load normal leaf texture
 			ResourceLocation origResource = new ResourceLocation(resLeaf.getResourceDomain(), "textures/blocks/" + resLeaf.getResourcePath());
+			if (origResource.getResourcePath().toLowerCase().endsWith("_n.png") || origResource.getResourcePath().toLowerCase().endsWith("_s.png")) {
+				// Don't alter ShaderMod normal and specular maps
+				fallbackResource = resourceManager.getResource(origResource);
+				return;
+			}
+			
+			// load normal leaf texture
 			BufferedImage origImage = ImageIO.read(resourceManager.getResource(origResource).getInputStream());
 			if (origImage.getWidth() != origImage.getHeight()) return;
 			int size = origImage.getWidth();
