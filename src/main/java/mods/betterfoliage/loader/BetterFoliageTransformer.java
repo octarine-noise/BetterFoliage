@@ -1,55 +1,78 @@
 package mods.betterfoliage.loader;
 
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.FieldInsnNode;
-import org.objectweb.asm.tree.MethodInsnNode;
+import net.minecraft.launchwrapper.IClassTransformer;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
-import org.objectweb.asm.tree.VarInsnNode;
 
 import com.google.common.collect.ImmutableList;
 
 import cpw.mods.fml.relauncher.FMLInjectionData;
 
-public class BetterFoliageTransformer extends EZTransformerBase {
+public class BetterFoliageTransformer implements IClassTransformer {
 
+	protected Iterable<MethodTransformerBase> transformers = ImmutableList.<MethodTransformerBase>of(
+		new TransformRenderBlockOverride(),
+		new TransformShaderModBlockOverride()
+	);
+	
+	protected Logger logger = LogManager.getLogger(getClass().getSimpleName());
+	
 	public BetterFoliageTransformer() {
 		String mcVersion = FMLInjectionData.data()[4].toString();
 		if (!ImmutableList.<String>of("1.7.2", "1.7.10").contains(mcVersion))
-			logger.warn(String.format("Unsupported Minecraft version %s", mcVersion));
+		logger.warn(String.format("Unsupported Minecraft version %s", mcVersion));
 		
 		DeobfHelper.init();
 	}
 	
-	@MethodTransform(className="net.minecraft.client.renderer.RenderBlocks",
-					 methodName="renderBlockByRenderType",
-					 signature="(Lnet/minecraft/block/Block;III)Z",
-					 log="Applying RenderBlocks.renderBlockByRenderType() render type ovverride")
-	public void handleRenderBlockOverride(MethodNode method) {
-		AbstractInsnNode invokeGetRenderType = findNext(method.instructions.getFirst(), matchInvokeAny());
-		AbstractInsnNode storeRenderType = findNext(invokeGetRenderType, matchOpcode(Opcodes.ISTORE));
-		insertAfter(method.instructions, storeRenderType,
-			new VarInsnNode(Opcodes.ALOAD, 0),
-			new FieldInsnNode(Opcodes.GETFIELD, className("net/minecraft/client/renderer/RenderBlocks"), element("blockAccess"), signature("Lnet/minecraft/world/IBlockAccess;")),
-			new VarInsnNode(Opcodes.ILOAD, 2),
-			new VarInsnNode(Opcodes.ILOAD, 3),
-			new VarInsnNode(Opcodes.ILOAD, 4),
-			new VarInsnNode(Opcodes.ALOAD, 1),
-			new VarInsnNode(Opcodes.ILOAD, 5),
-			new MethodInsnNode(Opcodes.INVOKESTATIC, "mods/betterfoliage/client/BetterFoliageClient", "getRenderTypeOverride", signature("(Lnet/minecraft/world/IBlockAccess;IIILnet/minecraft/block/Block;I)I")),
-			new VarInsnNode(Opcodes.ISTORE, 5)
-		);
+	@Override
+	public byte[] transform(String name, String transformedName, byte[] basicClass) {
+		// ???
+		if (basicClass == null) return null;
+		
+		// read class
+		ClassNode classNode = new ClassNode();
+        ClassReader classReader = new ClassReader(basicClass);
+        classReader.accept(classNode, 0);
+        boolean hasTransformed = false;
+        
+        for (MethodTransformerBase transformer : transformers) {
+        	// try to find specified method in class
+			if (!transformedName.equals(transformer.getClassName())) continue;
+			
+			logger.debug(String.format("Found class: %s -> %s", name, transformedName));
+			for (MethodNode methodNode : classNode.methods) {
+				logger.trace(String.format("Checking method: %s, sig: %s", methodNode.name, methodNode.desc));
+				Boolean isObfuscated = null;
+				if (methodNode.name.equals(DeobfHelper.transformElementName(transformer.getMethodName())) && methodNode.desc.equals(DeobfHelper.transformSignature(transformer.getSignature()))) {
+					isObfuscated = true;
+				} else if (methodNode.name.equals(transformer.getMethodName()) && methodNode.desc.equals(transformer.getSignature())) {
+					isObfuscated = false;
+				}
+				
+				if (isObfuscated != null) {
+					// transform
+					hasTransformed = true;
+					try {
+						transformer.transform(methodNode, isObfuscated);
+						logger.info(String.format("%s: SUCCESS", transformer.getLogMessage()));
+					} catch (Exception e) {
+						logger.info(String.format("%s: FAILURE", transformer.getLogMessage()));
+					}
+					break;
+				}
+			}
+        }
+        
+        // return result
+ 		ClassWriter writer = new ClassWriter(0);
+ 		if (hasTransformed) classNode.accept(writer);
+ 		return !hasTransformed ? basicClass : writer.toByteArray();
 	}
-	
-	@MethodTransform(className="shadersmodcore.client.Shaders",
-					 methodName="pushEntity",
-					 signature="(Lnet/minecraft/client/renderer/RenderBlocks;Lnet/minecraft/block/Block;III)V",
-					 log="Applying Shaders.pushEntity() block id ovverride")
-	public void handleGLSLBlockIDOverride(MethodNode method) {
-		AbstractInsnNode arrayStore = findNext(method.instructions.getFirst(), matchOpcode(Opcodes.IASTORE));
-		insertAfter(method.instructions, arrayStore.getPrevious(),
-			new VarInsnNode(Opcodes.ALOAD, 1),
-			new MethodInsnNode(Opcodes.INVOKESTATIC, "mods/betterfoliage/client/ShadersModIntegration", "getBlockIdOverride", signature("(ILnet/minecraft/block/Block;)I"))
-		);
-	}
+
 }
