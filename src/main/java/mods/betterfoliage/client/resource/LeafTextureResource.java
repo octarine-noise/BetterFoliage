@@ -4,7 +4,6 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -31,23 +30,10 @@ public class LeafTextureResource implements IResource {
 	/** Name of the default alpha mask to use */
 	public static String defaultMask = "rough";
 	
-	/** Resource to return if generation fails */
-	public IResource fallbackResource;
-	
-	public LeafTextureResource(ResourceLocation resLeaf, IResource fallbackResource) {
-		this.fallbackResource = fallbackResource;
-		
-		IResourceManager resourceManager = Minecraft.getMinecraft().getResourceManager();
+	public LeafTextureResource(IResource resLeaf) {
 		try {
-			ResourceLocation origResource = new ResourceLocation(resLeaf.getResourceDomain(), "textures/blocks/" + resLeaf.getResourcePath());
-			if (origResource.getResourcePath().toLowerCase().endsWith("_n.png") || origResource.getResourcePath().toLowerCase().endsWith("_s.png")) {
-				// Don't alter ShaderMod normal and specular maps
-				fallbackResource = resourceManager.getResource(origResource);
-				return;
-			}
-			
 			// load normal leaf texture
-			BufferedImage origImage = ImageIO.read(resourceManager.getResource(origResource).getInputStream());
+			BufferedImage origImage = ImageIO.read(resLeaf.getInputStream());
 			if (origImage.getWidth() != origImage.getHeight()) return;
 			int size = origImage.getWidth();
 
@@ -78,7 +64,6 @@ public class LeafTextureResource implements IResource {
 			data = baos.toByteArray();
 		} catch (Exception e) {
 			// stop log spam with GLSL installed
-			if (e instanceof FileNotFoundException) return;
 			BetterFoliage.log.info(String.format("Could not create leaf texture: %s, exception: %s", resLeaf.toString(), e.getClass().getSimpleName()));
 		}
 	}
@@ -108,7 +93,7 @@ public class LeafTextureResource implements IResource {
 	}
 	
 	public InputStream getInputStream() {
-		return data != null ? new ByteArrayInputStream(data) : fallbackResource.getInputStream();
+		return new ByteArrayInputStream(data);
 	}
 
 	public boolean hasMetadata() {

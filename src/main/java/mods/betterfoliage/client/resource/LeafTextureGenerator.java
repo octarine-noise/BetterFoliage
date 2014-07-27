@@ -14,6 +14,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.IResource;
+import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.TextureStitchEvent.Post;
@@ -39,19 +40,31 @@ public class LeafTextureGenerator extends BlockTextureGenerator implements IIcon
 	}
 
 	public IResource getResource(ResourceLocation resourceLocation) throws IOException {
-		ResourceLocation original = unwrapResource(resourceLocation);
+		IResourceManager resourceManager = Minecraft.getMinecraft().getResourceManager();
+		ResourceLocation originalNoDirs = unwrapResource(resourceLocation);
+		ResourceLocation originalWithDirs = new ResourceLocation(originalNoDirs.getResourceDomain(), "textures/blocks/" + originalNoDirs.getResourcePath());
 		
 		// check for provided texture
-		ResourceLocation handDrawnLocation = new ResourceLocation(nonGeneratedDomain, String.format("textures/blocks/%s/%s", original.getResourceDomain(), original.getResourcePath())); 
+		ResourceLocation handDrawnLocation = new ResourceLocation(nonGeneratedDomain, String.format("textures/blocks/%s/%s", originalNoDirs.getResourceDomain(), originalNoDirs.getResourcePath())); 
 		if (Utils.resourceExists(handDrawnLocation)) {
 			nonGeneratedCounter++;
-			return Minecraft.getMinecraft().getResourceManager().getResource(handDrawnLocation);
+			return resourceManager.getResource(handDrawnLocation);
+		}
+		
+		// Don't alter ShaderMod normal and specular maps
+		if (originalWithDirs.getResourcePath().toLowerCase().endsWith("_n.png") || originalWithDirs.getResourcePath().toLowerCase().endsWith("_s.png")) {
+			resourceManager.getResource(originalWithDirs);
 		}
 		
 		// generate our own
-		LeafTextureResource result = new LeafTextureResource(original, getMissingResource());
-		if (result.data != null) counter++;
-		return result;
+		if (!Utils.resourceExists(originalWithDirs)) return getMissingResource();
+		LeafTextureResource result = new LeafTextureResource(resourceManager.getResource(originalWithDirs));
+		if (result.data != null) {
+			counter++;
+			return result;
+		} else {
+			return getMissingResource();
+		}
 	}
 
 	/** Leaf blocks register their textures here. An extra texture will be registered in the atlas
