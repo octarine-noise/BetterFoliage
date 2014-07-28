@@ -37,6 +37,9 @@ public class RenderBlockAOBase extends RenderBlocks {
 		public float red;
 		public float green;
 		public float blue;
+		public void setGray(float value) {
+			red = value; green = value; blue = value;
+		}
 	}
 	
 	protected double[] uValues = new double[] {0.0, 16.0, 16.0, 0.0};

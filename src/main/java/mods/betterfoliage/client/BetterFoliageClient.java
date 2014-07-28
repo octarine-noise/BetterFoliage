@@ -74,10 +74,16 @@ public class BetterFoliageClient {
 		MinecraftForge.EVENT_BUS.register(new BlockTextureGenerator("bf_shortgrass", new ResourceLocation("betterfoliage", "textures/blocks/missing_leaf.png")) {
 			@Override
 			public IResource getResource(ResourceLocation var1) throws IOException {
-				return new ShortGrassTextureResource(unwrapResource(var1), getMissingResource());
+				return new ShortGrassTextureResource(unwrapResource(var1), false, getMissingResource());
 			}
 		});
-
+		MinecraftForge.EVENT_BUS.register(new BlockTextureGenerator("bf_shortgrass_snow", new ResourceLocation("betterfoliage", "textures/blocks/missing_leaf.png")) {
+			@Override
+			public IResource getResource(ResourceLocation var1) throws IOException {
+				return new ShortGrassTextureResource(unwrapResource(var1), true, getMissingResource());
+			}
+		});
+		
 		MinecraftForge.EVENT_BUS.register(new BetterFoliageClient());
 		
 		ShadersModIntegration.init();

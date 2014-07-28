@@ -23,13 +23,15 @@ import cpw.mods.fml.relauncher.SideOnly;
 public class RenderBlockBetterGrass extends RenderBlockAOBase implements IRenderBlockDecorator {
 
 	public IconSet grassIcons = new IconSet("bettergrassandleaves", "better_grass_long_%d");
+	public IconSet snowGrassIcons = new IconSet("bettergrassandleaves", "better_grass_snowed_%d");
 	public IconSet myceliumIcons = new IconSet("bettergrassandleaves", "better_mycel_%d");
 	public IIcon grassGenIcon;
+	public IIcon snowGrassGenIcon;
 	
 	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
 		if (!BetterFoliage.config.grassEnabled) return false;
 		if (!((block instanceof BlockGrass || block == Blocks.mycelium))) return false;
-		if (y == 255 || !blockAccess.isAirBlock(x, y + 1, z)) return false;
+		if (!blockAccess.isAirBlock(x, y + 1, z) && blockAccess.getBlock(x, y + 1, z) != Blocks.snow_layer) return false;
 		return true;
 	}
 	
@@ -44,19 +46,32 @@ public class RenderBlockBetterGrass extends RenderBlockAOBase implements IRender
 		
 		int variation = getSemiRandomFromPos(x, y, z, 0);
 		int heightVariation = getSemiRandomFromPos(x, y, z, 1);
+		boolean isSnowed = blockAccess.getBlock(x, y + 1, z) == Blocks.snow_layer;
 		
-		IIcon renderIcon = (block == Blocks.mycelium) ? 
-				myceliumIcons.get(variation) : 
-				(BetterFoliage.config.grassUseGenerated ? grassGenIcon : grassIcons.get(variation));
+		IIcon renderIcon = null;
+		if (block instanceof BlockGrass) {
+			if (BetterFoliage.config.grassUseGenerated) {
+				renderIcon = isSnowed ? snowGrassGenIcon : grassGenIcon;
+			} else {
+				renderIcon = isSnowed ? snowGrassIcons.get(variation) : grassIcons.get(variation);
+			}
+		} else if (block == Blocks.mycelium && !isSnowed) {
+			renderIcon = myceliumIcons.get(variation);
+		}
 		if (renderIcon == null) return true;
 		
 		double scale = BetterFoliage.config.grassSize.value * 0.5;
 		double halfHeight = 0.5 * (BetterFoliage.config.grassHeightMin.value + pRand[heightVariation] * (BetterFoliage.config.grassHeightMax.value - BetterFoliage.config.grassHeightMin.value));
 		
+		if (isSnowed) {
+			aoYPXZNN.setGray(0.9f); aoYPXZNP.setGray(0.9f); aoYPXZPN.setGray(0.9f); aoYPXZPP.setGray(0.9f);
+			Tessellator.instance.setColorOpaque(230, 230, 230);
+		}
+		
 		// render short grass
 		ShadersModIntegration.startGrassQuads();
 		Tessellator.instance.setBrightness(getBrightness(block, x, y + 1, z));
-		renderCrossedSideQuads(new Double3(x + 0.5, y + 1.0 - 0.125 * halfHeight, z + 0.5), ForgeDirection.UP, scale, halfHeight, pRot[variation], BetterFoliage.config.grassHOffset.value, renderIcon, 0, false);
+		renderCrossedSideQuads(new Double3(x + 0.5, y + 1.0 + (isSnowed ? 0.0625 : 0.0), z + 0.5), ForgeDirection.UP, scale, halfHeight, pRot[variation], BetterFoliage.config.grassHOffset.value, renderIcon, 0, false);
 		
 		return true;
 	}
@@ -66,9 +81,12 @@ public class RenderBlockBetterGrass extends RenderBlockAOBase implements IRender
 		if (event.map.getTextureType() != 0) return;
 		
 		grassIcons.registerIcons(event.map);
+		snowGrassIcons.registerIcons(event.map);
 		myceliumIcons.registerIcons(event.map);
 		grassGenIcon = event.map.registerIcon("bf_shortgrass:minecraft:tallgrass");
+		snowGrassGenIcon = event.map.registerIcon("bf_shortgrass_snow:minecraft:tallgrass");
 		BetterFoliage.log.info(String.format("Found %d short grass textures", grassIcons.numLoaded));
+		BetterFoliage.log.info(String.format("Found %d snowy grass textures", snowGrassIcons.numLoaded));
 		BetterFoliage.log.info(String.format("Found %d mycelium textures", myceliumIcons.numLoaded));
 	}
 
