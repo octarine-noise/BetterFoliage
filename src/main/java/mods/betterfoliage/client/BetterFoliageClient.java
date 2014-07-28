@@ -8,6 +8,7 @@ import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.render.IRenderBlockDecorator;
 import mods.betterfoliage.client.render.impl.RenderBlockBetterAlgae;
 import mods.betterfoliage.client.render.impl.RenderBlockBetterCactus;
+import mods.betterfoliage.client.render.impl.RenderBlockBetterCoral;
 import mods.betterfoliage.client.render.impl.RenderBlockBetterGrass;
 import mods.betterfoliage.client.render.impl.RenderBlockBetterLeaves;
 import mods.betterfoliage.client.render.impl.RenderBlockBetterLilypad;
@@ -46,6 +47,7 @@ public class BetterFoliageClient {
 		registerRenderer(new RenderBlockBetterLilypad());
 		registerRenderer(new RenderBlockBetterReed());
 		registerRenderer(new RenderBlockBetterAlgae());
+		registerRenderer(new RenderBlockBetterCoral());
 		
 		leaves.load(new File(BetterFoliage.configDir, "classesLeaves.cfg"), new ResourceLocation("betterfoliage:classesLeavesDefault.cfg"));
 		MinecraftForge.EVENT_BUS.register(leaves);

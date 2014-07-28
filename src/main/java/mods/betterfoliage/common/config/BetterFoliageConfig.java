@@ -26,6 +26,9 @@ public class BetterFoliageConfig extends ConfigBase {
 	@CfgElement(category="algae", key="enabled")
 	public boolean algaeEnabled = true;
 	
+	@CfgElement(category="coral", key="enabled")
+	public boolean coralEnabled = true;
+	
 	@CfgElement(category="leaves", key="horizontalOffset")
 	public OptionDouble leavesHOffset = new OptionDouble(0.0, 0.4, 0.025, 0.2);
 	
@@ -82,4 +85,22 @@ public class BetterFoliageConfig extends ConfigBase {
 	
 	@CfgElement(category="algae", key="chance")
 	public OptionInteger algaeChance = new OptionInteger(0, 64, 1, 48);
+	
+	@CfgElement(category="coral", key="population")
+	public OptionInteger coralPopulation = new OptionInteger(0, 64, 1, 32);
+	
+	@CfgElement(category="coral", key="chance")
+	public OptionInteger coralChance = new OptionInteger(0, 64, 1, 32);
+	
+	@CfgElement(category="coral", key="verticalOffset")
+	public OptionDouble coralVOffset = new OptionDouble(0.0, 0.25, 0.025, 0.1);
+	
+	@CfgElement(category="coral", key="horizontalOffset")
+	public OptionDouble coralHOffset = new OptionDouble(0.0, 0.4, 0.025, 0.2);
+	
+	@CfgElement(category="coral", key="crustSize")
+	public OptionDouble coralCrustSize = new OptionDouble(0.75, 1.75, 0.05, 1.4);
+	
+	@CfgElement(category="coral", key="size")
+	public OptionDouble coralSize = new OptionDouble(0.25, 1.0, 0.05, 0.7);
 }

@@ -18,7 +18,8 @@ public class ConfigGuiMain extends ConfigGuiScreenBase {
 						TOGGLE_CACTUS, CONFIG_CACTUS,
 						TOGGLE_LILYPAD, CONFIG_LILYPAD,
 						TOGGLE_REED, CONFIG_REED,
-						TOGGLE_ALGAE, CONFIG_ALGAE}
+						TOGGLE_ALGAE, CONFIG_ALGAE,
+						TOGGLE_CORAL, CONFIG_CORAL}
 	
 	public ConfigGuiMain(GuiScreen parent) {
 		super(parent);
@@ -28,7 +29,7 @@ public class ConfigGuiMain extends ConfigGuiScreenBase {
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void addButtons(int x, int y) {
-		buttonList.add(new GuiButton(Button.CLOSE.ordinal(), x - 50, y + 80, 100, 20, I18n.format("message.betterfoliage.close")));
+		buttonList.add(new GuiButton(Button.CLOSE.ordinal(), x - 50, y + 110, 100, 20, I18n.format("message.betterfoliage.close")));
 		
 		buttonList.add(new GuiButton(Button.TOGGLE_LEAVES.ordinal(), x - 100, y - 100, 150, 20, ""));
 		buttonList.add(new GuiButton(Button.CONFIG_LEAVES.ordinal(), x + 60, y - 100, 40, 20, I18n.format("message.betterfoliage.config")));
@@ -47,6 +48,9 @@ public class ConfigGuiMain extends ConfigGuiScreenBase {
 		
 		buttonList.add(new GuiButton(Button.TOGGLE_ALGAE.ordinal(), x - 100, y + 50, 150, 20, ""));
 		buttonList.add(new GuiButton(Button.CONFIG_ALGAE.ordinal(), x + 60, y + 50, 40, 20, I18n.format("message.betterfoliage.config")));
+		
+		buttonList.add(new GuiButton(Button.TOGGLE_CORAL.ordinal(), x - 100, y + 80, 150, 20, ""));
+		buttonList.add(new GuiButton(Button.CONFIG_CORAL.ordinal(), x + 60, y + 80, 40, 20, I18n.format("message.betterfoliage.config")));
 	}
 
 	protected void updateButtons() {
@@ -56,6 +60,7 @@ public class ConfigGuiMain extends ConfigGuiScreenBase {
 		setButtonOptionBoolean(Button.TOGGLE_LILYPAD.ordinal(), "message.betterfoliage.betterLilypad", BetterFoliage.config.lilypadEnabled);
 		setButtonOptionBoolean(Button.TOGGLE_REED.ordinal(), "message.betterfoliage.betterReed", BetterFoliage.config.reedEnabled);
 		setButtonOptionBoolean(Button.TOGGLE_ALGAE.ordinal(), "message.betterfoliage.betterAlgae", BetterFoliage.config.algaeEnabled);
+		setButtonOptionBoolean(Button.TOGGLE_CORAL.ordinal(), "message.betterfoliage.betterCoral", BetterFoliage.config.coralEnabled);
 		((GuiButton) buttonList.get(Button.CONFIG_CACTUS.ordinal())).enabled = false;
 	}
 	
@@ -72,12 +77,14 @@ public class ConfigGuiMain extends ConfigGuiScreenBase {
 		if (id == Button.TOGGLE_LILYPAD.ordinal()) BetterFoliage.config.lilypadEnabled = !BetterFoliage.config.lilypadEnabled;
 		if (id == Button.TOGGLE_REED.ordinal()) BetterFoliage.config.reedEnabled = !BetterFoliage.config.reedEnabled;
 		if (id == Button.TOGGLE_ALGAE.ordinal()) BetterFoliage.config.algaeEnabled = !BetterFoliage.config.algaeEnabled;
+		if (id == Button.TOGGLE_CORAL.ordinal()) BetterFoliage.config.coralEnabled = !BetterFoliage.config.coralEnabled;
 		
 		if (id== Button.CONFIG_LEAVES.ordinal()) FMLClientHandler.instance().showGuiScreen(new ConfigGuiLeaves(this));
 		if (id== Button.CONFIG_GRASS.ordinal()) FMLClientHandler.instance().showGuiScreen(new ConfigGuiGrass(this));
 		if (id== Button.CONFIG_LILYPAD.ordinal()) FMLClientHandler.instance().showGuiScreen(new ConfigGuiLilypad(this));
 		if (id== Button.CONFIG_REED.ordinal()) FMLClientHandler.instance().showGuiScreen(new ConfigGuiReed(this));
 		if (id== Button.CONFIG_ALGAE.ordinal()) FMLClientHandler.instance().showGuiScreen(new ConfigGuiAlgae(this));
+		if (id== Button.CONFIG_CORAL.ordinal()) FMLClientHandler.instance().showGuiScreen(new ConfigGuiCoral(this));
 	}
 
 }
