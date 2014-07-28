@@ -56,11 +56,13 @@ public class RenderBlockBetterCoral extends RenderBlockAOBase implements IRender
 				
 			int variation = getSemiRandomFromPos(x, y, z, dir.ordinal());
 			if (variation < BetterFoliage.config.coralChance.value) {
-				renderCoralCrust(blockCenter, dir, offset, halfCrustSize, coralCrustIcons.get(variation), variation);
-				renderCrossedSideQuads(blockCenter.add(new Double3(dir).scale(0.5)), dir, 
-									   halfSize, halfSize, 
-									   pRot[variation], BetterFoliage.config.coralHOffset.value,
-									   coralCrossIcons.get(variation), 0, false);
+				IIcon crustIcon = coralCrustIcons.get(variation);
+				IIcon coralIcon = coralCrossIcons.get(variation);
+				if (crustIcon != null) renderCoralCrust(blockCenter, dir, offset, halfCrustSize, crustIcon, variation);
+				if (coralIcon != null) renderCrossedSideQuads(blockCenter.add(new Double3(dir).scale(0.5)), dir, 
+														      halfSize, halfSize, 
+														      pRot[variation], BetterFoliage.config.coralHOffset.value,
+														      coralIcon, 0, false);
 			}
 		}
 		
