@@ -35,7 +35,7 @@ public class ShortGrassTextureResource implements IResource {
 			// draw bottom half of texture
 			BufferedImage result = new BufferedImage(origImage.getWidth(), origImage.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
 			Graphics2D graphics = result.createGraphics();
-			graphics.drawImage(origImage, 0, origImage.getHeight() / 2, null);
+			graphics.drawImage(origImage, 0, 3 * origImage.getHeight() / 8, null);
 
 			// create PNG image
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
