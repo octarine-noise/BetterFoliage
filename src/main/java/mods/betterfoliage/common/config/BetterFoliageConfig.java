@@ -11,6 +11,9 @@ public class BetterFoliageConfig extends ConfigBase {
 	@CfgElement(category="grass", key="enabled")
 	public boolean grassEnabled = true;
 	
+	@CfgElement(category="grass", key="useGenerated")
+	public boolean grassUseGenerated = false;
+	
 	@CfgElement(category="cactus", key="enabled")
 	public boolean cactusEnabled = true;
 	

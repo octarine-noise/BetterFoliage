@@ -15,6 +15,7 @@ import mods.betterfoliage.client.render.impl.RenderBlockBetterReed;
 import mods.betterfoliage.client.resource.BlockTextureGenerator;
 import mods.betterfoliage.client.resource.HalfTextureResource;
 import mods.betterfoliage.client.resource.LeafTextureGenerator;
+import mods.betterfoliage.client.resource.ShortGrassTextureResource;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.IResource;
@@ -66,6 +67,12 @@ public class BetterFoliageClient {
 			@Override
 			public IResource getResource(ResourceLocation var1) throws IOException {
 				return new HalfTextureResource(unwrapResource(var1), false, getMissingResource());
+			}
+		});
+		MinecraftForge.EVENT_BUS.register(new BlockTextureGenerator("bf_shortgrass", new ResourceLocation("betterfoliage", "textures/blocks/missing_leaf.png")) {
+			@Override
+			public IResource getResource(ResourceLocation var1) throws IOException {
+				return new ShortGrassTextureResource(unwrapResource(var1), getMissingResource());
 			}
 		});
 

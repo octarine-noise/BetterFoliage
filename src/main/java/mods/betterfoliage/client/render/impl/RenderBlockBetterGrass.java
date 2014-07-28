@@ -24,7 +24,7 @@ public class RenderBlockBetterGrass extends RenderBlockAOBase implements IRender
 
 	public IconSet grassIcons = new IconSet("bettergrassandleaves", "better_grass_long_%d");
 	public IconSet myceliumIcons = new IconSet("bettergrassandleaves", "better_mycel_%d");
-	
+	public IIcon grassGenIcon;
 	
 	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
 		if (!BetterFoliage.config.grassEnabled) return false;
@@ -45,7 +45,9 @@ public class RenderBlockBetterGrass extends RenderBlockAOBase implements IRender
 		int variation = getSemiRandomFromPos(x, y, z, 0);
 		int heightVariation = getSemiRandomFromPos(x, y, z, 1);
 		
-		IIcon renderIcon = (block == Blocks.mycelium) ? myceliumIcons.get(variation) : grassIcons.get(variation);
+		IIcon renderIcon = (block == Blocks.mycelium) ? 
+				myceliumIcons.get(variation) : 
+				(BetterFoliage.config.grassUseGenerated ? grassGenIcon : grassIcons.get(variation));
 		if (renderIcon == null) return true;
 		
 		double scale = BetterFoliage.config.grassSize.value * 0.5;
@@ -65,6 +67,7 @@ public class RenderBlockBetterGrass extends RenderBlockAOBase implements IRender
 		
 		grassIcons.registerIcons(event.map);
 		myceliumIcons.registerIcons(event.map);
+		grassGenIcon = event.map.registerIcon("bf_shortgrass:minecraft:tallgrass");
 		BetterFoliage.log.info(String.format("Found %d short grass textures", grassIcons.numLoaded));
 		BetterFoliage.log.info(String.format("Found %d mycelium textures", myceliumIcons.numLoaded));
 	}

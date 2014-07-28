@@ -21,6 +21,7 @@ message.betterfoliage.maxHeight=Max.Height
 message.betterfoliage.flowerChance=Flower Chance
 message.betterfoliage.reedChance=Reed Chance
 message.betterfoliage.leavesMode=Leaves Offset: %s
+message.betterfoliage.genShortgrass=Use generated: %s
 message.betterfoliage.leavesSkew=Skew
 message.betterfoliage.leavesTranslate=Translate
 message.betterfoliage.algaeChance=Algae Chance
