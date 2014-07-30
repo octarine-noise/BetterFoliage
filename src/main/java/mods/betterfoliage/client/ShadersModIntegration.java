@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.ResourceLocation;
 
 public class ShadersModIntegration {
 
@@ -51,5 +52,9 @@ public class ShadersModIntegration {
 		if (BetterFoliageClient.leaves.matchesID(original & 0xFFFF)) return leavesEntityData;
 		if (BetterFoliageClient.crops.matchesID(original & 0xFFFF)) return tallGrassEntityData;
 		return original;
+	}
+	
+	public static boolean isSpecialTexture(ResourceLocation resource) {
+		return resource.getResourcePath().toLowerCase().endsWith("_n.png") || resource.getResourcePath().toLowerCase().endsWith("_s.png");
 	}
 }

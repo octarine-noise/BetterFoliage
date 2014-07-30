@@ -33,32 +33,22 @@ public abstract class BlockTextureGenerator implements IResourceManager {
 	/** Texture atlas for block textures used in the current run */
 	public TextureMap blockTextures;
 	
-	/** Number of textures generated in the current run */
-	int counter = 0;
-	
 	public BlockTextureGenerator(String domainName, ResourceLocation missingResource) {
 		this.domainName = domainName;
 		this.missingResource = missingResource;
 	}
 	
-	public void onStitchStart(TextureStitchEvent.Pre event) {}
-	
-	public void onStitchEnd(TextureStitchEvent.Post event) {}
-	
 	@SubscribeEvent
 	public void handleTextureReload(TextureStitchEvent.Pre event) {
 		if (event.map.getTextureType() != 0) return;
-		
 		blockTextures = event.map;
-		counter = 0;
+
 		Map<String, IResourceManager> domainManagers = Utils.getDomainResourceManagers();
 		if (domainManagers == null) {
 			BetterFoliage.log.warn("Failed to inject texture generator");
 			return;
 		}
 		domainManagers.put(domainName, this);
-		
-		onStitchStart(event);
 	}
 	
 	@SubscribeEvent
@@ -69,8 +59,6 @@ public abstract class BlockTextureGenerator implements IResourceManager {
 		// don't leave a mess
 		Map<String, IResourceManager> domainManagers = Utils.getDomainResourceManagers();
 		if (domainManagers != null) domainManagers.remove(domainName);
-		
-		onStitchEnd(event);
 	}
 	
 	public Set<String> getResourceDomains() {
@@ -87,5 +75,14 @@ public abstract class BlockTextureGenerator implements IResourceManager {
 	
 	public ResourceLocation unwrapResource(ResourceLocation wrapped) {
 		return new ResourceLocation(wrapped.getResourcePath().substring(16));
+	}
+	
+	protected static int blendRGB(int rgbOrig, int rgbBlend, int weightOrig, int weightBlend) {
+		int r = ((rgbOrig & 0xFF) * weightOrig + (rgbBlend & 0xFF) * weightBlend) / (weightOrig + weightBlend);
+		int g = (((rgbOrig >> 8) & 0xFF) * weightOrig + ((rgbBlend >> 8) & 0xFF) * weightBlend) / (weightOrig + weightBlend);
+		int b = (((rgbOrig >> 16) & 0xFF) * weightOrig + ((rgbBlend >> 16) & 0xFF) * weightBlend) / (weightOrig + weightBlend);
+		int a = (rgbOrig >> 24) & 0xFF;
+		int result = (int) (a << 24 | b << 16 | g << 8 | r);
+		return result;
 	}
 }

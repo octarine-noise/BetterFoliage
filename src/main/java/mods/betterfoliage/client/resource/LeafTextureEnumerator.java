@@ -1,6 +1,5 @@
 package mods.betterfoliage.client.resource;
 
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -10,63 +9,29 @@ import mods.betterfoliage.client.BetterFoliageClient;
 import mods.betterfoliage.common.util.Utils;
 import mods.betterfoliage.loader.DeobfHelper;
 import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.IResource;
-import net.minecraft.client.resources.IResourceManager;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.event.TextureStitchEvent.Post;
-import net.minecraftforge.client.event.TextureStitchEvent.Pre;
+import net.minecraftforge.client.event.TextureStitchEvent;
 
 import com.google.common.collect.Sets;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
-/** Generates rounded crossleaf textures for all registered normal leaf textures at stitch time.
- * @author octarine-noise
- */
-@SideOnly(Side.CLIENT)
-public class LeafTextureGenerator extends BlockTextureGenerator implements IIconRegister {
+public class LeafTextureEnumerator implements IIconRegister {
 
-	public String nonGeneratedDomain = "betterfoliage";
+	/** Resource domain name of generated textures */
+	public String domainName;
 	
-	public int nonGeneratedCounter = 0;
+	/** Texture atlas for block textures used in the current run */
+	public TextureMap blockTextures;
 	
-	public LeafTextureGenerator() {
-		super("bf_leaves_autogen", new ResourceLocation("betterfoliage", "textures/blocks/missing_leaf.png"));
+	public LeafTextureEnumerator(String domainName) {
+		this.domainName = domainName;
 	}
-
-	public IResource getResource(ResourceLocation resourceLocation) throws IOException {
-		IResourceManager resourceManager = Minecraft.getMinecraft().getResourceManager();
-		ResourceLocation originalNoDirs = unwrapResource(resourceLocation);
-		ResourceLocation originalWithDirs = new ResourceLocation(originalNoDirs.getResourceDomain(), "textures/blocks/" + originalNoDirs.getResourcePath());
-		
-		// check for provided texture
-		ResourceLocation handDrawnLocation = new ResourceLocation(nonGeneratedDomain, String.format("textures/blocks/%s/%s", originalNoDirs.getResourceDomain(), originalNoDirs.getResourcePath())); 
-		if (Utils.resourceExists(handDrawnLocation)) {
-			nonGeneratedCounter++;
-			return resourceManager.getResource(handDrawnLocation);
-		}
-		
-		// Don't alter ShaderMod normal and specular maps
-		if (originalWithDirs.getResourcePath().toLowerCase().endsWith("_n.png") || originalWithDirs.getResourcePath().toLowerCase().endsWith("_s.png")) {
-			resourceManager.getResource(originalWithDirs);
-		}
-		
-		// generate our own
-		if (!Utils.resourceExists(originalWithDirs)) return getMissingResource();
-		LeafTextureResource result = new LeafTextureResource(resourceManager.getResource(originalWithDirs));
-		if (result.data != null) {
-			counter++;
-			return result;
-		} else {
-			return getMissingResource();
-		}
-	}
-
+	
 	/** Leaf blocks register their textures here. An extra texture will be registered in the atlas
 	 *  for each, with the resource domain of this generator.
 	 *  @return the originally registered {@link IIcon} already in the atlas
@@ -82,10 +47,12 @@ public class LeafTextureGenerator extends BlockTextureGenerator implements IIcon
 	 *  their textures to "sniff out" all leaf textures.
 	 * @param event
 	 */
+	@SubscribeEvent
 	@SuppressWarnings("unchecked")
-	@Override
-	public void onStitchStart(Pre event) {
-		nonGeneratedCounter = 0;
+	public void handleTextureReload(TextureStitchEvent.Pre event) {
+		if (event.map.getTextureType() != 0) return;
+		blockTextures = event.map;
+		
 		BetterFoliage.log.info("Reloading leaf textures");
 		
 		// register simple block textures
@@ -115,11 +82,11 @@ public class LeafTextureGenerator extends BlockTextureGenerator implements IIcon
 			}
 		}
 	}
-
-	@Override
-	public void onStitchEnd(Post event) {
-		BetterFoliage.log.info(String.format("Found %d pre-drawn leaf textures", nonGeneratedCounter));
-		BetterFoliage.log.info(String.format("Generated %d leaf textures", counter));
+	
+	@SubscribeEvent
+	public void endTextureReload(TextureStitchEvent.Post event) {
+		if (event.map.getTextureType() != 0) return;
+		blockTextures = null;
 	}
-
+	
 }

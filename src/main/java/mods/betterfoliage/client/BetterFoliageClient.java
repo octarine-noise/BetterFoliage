@@ -1,7 +1,6 @@
 package mods.betterfoliage.client;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Map;
 
 import mods.betterfoliage.BetterFoliage;
@@ -13,13 +12,12 @@ import mods.betterfoliage.client.render.impl.RenderBlockBetterGrass;
 import mods.betterfoliage.client.render.impl.RenderBlockBetterLeaves;
 import mods.betterfoliage.client.render.impl.RenderBlockBetterLilypad;
 import mods.betterfoliage.client.render.impl.RenderBlockBetterReed;
-import mods.betterfoliage.client.resource.BlockTextureGenerator;
-import mods.betterfoliage.client.resource.HalfTextureResource;
-import mods.betterfoliage.client.resource.LeafTextureGenerator;
-import mods.betterfoliage.client.resource.ShortGrassTextureResource;
+import mods.betterfoliage.client.resource.LeafGenerator;
+import mods.betterfoliage.client.resource.LeafTextureEnumerator;
+import mods.betterfoliage.client.resource.ReedGenerator;
+import mods.betterfoliage.client.resource.ShortGrassGenerator;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.IResource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.MinecraftForge;
@@ -32,10 +30,12 @@ import cpw.mods.fml.common.FMLCommonHandler;
 public class BetterFoliageClient {
 
 	public static Map<Integer, IRenderBlockDecorator> decorators = Maps.newHashMap();
-	public static LeafTextureGenerator leafGenerator;
+	public static LeafGenerator leafGenerator;
 	
 	public static BlockMatcher leaves = new BlockMatcher();
 	public static BlockMatcher crops = new BlockMatcher();
+	
+	public static ResourceLocation missingTexture = new ResourceLocation("betterfoliage", "textures/blocks/missing_leaf.png");
 	
 	public static void preInit() {
 		FMLCommonHandler.instance().bus().register(new KeyHandler());
@@ -55,36 +55,15 @@ public class BetterFoliageClient {
 		crops.load(new File(BetterFoliage.configDir, "classesCrops.cfg"), new ResourceLocation("betterfoliage:classesCropsDefault.cfg"));
 		MinecraftForge.EVENT_BUS.register(crops);
 		
-		BetterFoliage.log.info("Registering leaf texture generator");
-		leafGenerator = new LeafTextureGenerator();
+		MinecraftForge.EVENT_BUS.register(new LeafTextureEnumerator("bf_leaves"));
+		
+		BetterFoliage.log.info("Registering texture generators");
+		leafGenerator = new LeafGenerator("bf_leaves", missingTexture);
 		MinecraftForge.EVENT_BUS.register(leafGenerator);
-		
-		MinecraftForge.EVENT_BUS.register(new BlockTextureGenerator("bf_reed_bottom", new ResourceLocation("betterfoliage", "textures/blocks/missing_leaf.png")) {
-			@Override
-			public IResource getResource(ResourceLocation var1) throws IOException {
-				return new HalfTextureResource(unwrapResource(var1), true, getMissingResource());
-			}
-		});
-		MinecraftForge.EVENT_BUS.register(new BlockTextureGenerator("bf_reed_top", new ResourceLocation("betterfoliage", "textures/blocks/missing_leaf.png")) {
-			@Override
-			public IResource getResource(ResourceLocation var1) throws IOException {
-				return new HalfTextureResource(unwrapResource(var1), false, getMissingResource());
-			}
-		});
-		MinecraftForge.EVENT_BUS.register(new BlockTextureGenerator("bf_shortgrass", new ResourceLocation("betterfoliage", "textures/blocks/missing_leaf.png")) {
-			@Override
-			public IResource getResource(ResourceLocation var1) throws IOException {
-				return new ShortGrassTextureResource(unwrapResource(var1), false, getMissingResource());
-			}
-		});
-		MinecraftForge.EVENT_BUS.register(new BlockTextureGenerator("bf_shortgrass_snow", new ResourceLocation("betterfoliage", "textures/blocks/missing_leaf.png")) {
-			@Override
-			public IResource getResource(ResourceLocation var1) throws IOException {
-				return new ShortGrassTextureResource(unwrapResource(var1), true, getMissingResource());
-			}
-		});
-		
-		MinecraftForge.EVENT_BUS.register(new BetterFoliageClient());
+		MinecraftForge.EVENT_BUS.register(new ReedGenerator("bf_reed_bottom", missingTexture, true));
+		MinecraftForge.EVENT_BUS.register(new ReedGenerator("bf_reed_top", missingTexture, false));
+		MinecraftForge.EVENT_BUS.register(new ShortGrassGenerator("bf_shortgrass", missingTexture, false));
+		MinecraftForge.EVENT_BUS.register(new ShortGrassGenerator("bf_shortgrass_snow", missingTexture, true));
 		
 		ShadersModIntegration.init();
 	}
