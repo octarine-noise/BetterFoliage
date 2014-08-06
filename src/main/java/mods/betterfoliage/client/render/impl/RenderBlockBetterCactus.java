@@ -35,9 +35,14 @@ public class RenderBlockBetterCactus extends FakeRenderBlockAOBase implements IR
 		// store world for later use
 		blockAccess = world;
 		
+		// use original renderer for block breaking overlay
+		if (renderer.hasOverrideBlockTexture()) {
+			renderer.renderBlockCactus(block, x, y, z);
+			return true;
+		}
+		
 		// render cactus center
 		setPassCounters(1);
-		setRenderBoundsFromBlock(block);
 		
 		Double3 blockCenter = new Double3(x + 0.5, y + 0.5, z + 0.5);
 		renderStandardBlock(block, x, y, z);

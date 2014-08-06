@@ -31,6 +31,13 @@ public class RenderBlockBetterLeaves extends RenderBlockAOBase implements IRende
 		// store world for later use
 		blockAccess = world;
 		
+		// use original renderer for block breaking overlay
+		if (renderer.hasOverrideBlockTexture()) {
+			renderer.setRenderBoundsFromBlock(block);
+			renderer.renderStandardBlock(block, x, y, z);
+			return true;
+		}
+		
 		// render leaves center
 		setPassCounters(1);
 		setRenderBoundsFromBlock(block);

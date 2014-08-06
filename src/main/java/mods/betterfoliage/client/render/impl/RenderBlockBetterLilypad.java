@@ -30,6 +30,12 @@ public class RenderBlockBetterLilypad extends FakeRenderBlockAOBase implements I
 		// store world for later use
 		blockAccess = world;
 		
+		// use original renderer for block breaking overlay
+		if (renderer.hasOverrideBlockTexture()) {
+			renderer.renderBlockLilyPad(block, x, y, z);
+			return true;
+		}
+		
 		// render lilypad block
 		renderBlockLilyPad(block, x, y, z);
 		

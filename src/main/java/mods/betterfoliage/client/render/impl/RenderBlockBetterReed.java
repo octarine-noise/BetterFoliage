@@ -45,6 +45,13 @@ public class RenderBlockBetterReed extends RenderBlockAOBase implements IRenderB
 		// store world for later use
 		blockAccess = world;
 		
+		// use original renderer for block breaking overlay
+		if (renderer.hasOverrideBlockTexture()) {
+			renderer.setRenderBoundsFromBlock(block);
+			renderer.renderStandardBlock(block, x, y, z);
+			return true;
+		}
+		
 		// render dirt block
 		setPassCounters(1);
 		setRenderBoundsFromBlock(block);
