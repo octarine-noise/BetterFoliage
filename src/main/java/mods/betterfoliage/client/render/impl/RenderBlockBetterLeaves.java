@@ -7,10 +7,12 @@ import mods.betterfoliage.client.render.RenderBlockAOBase;
 import mods.betterfoliage.common.util.Double3;
 import mods.betterfoliage.common.util.Utils;
 import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -85,13 +87,16 @@ public class RenderBlockBetterLeaves extends RenderBlockAOBase implements IRende
 	}
 
 	protected boolean isBlockSurrounded(IBlockAccess blockAccess, int x, int y, int z) {
-		if (blockAccess.isAirBlock(x + 1, y, z)) return false;
-		if (blockAccess.isAirBlock(x - 1, y, z)) return false;
-		if (blockAccess.isAirBlock(x, y, z + 1)) return false;
-		if (blockAccess.isAirBlock(x, y, z - 1)) return false;
-		if (y == 255 || blockAccess.isAirBlock(x, y + 1, z)) return false;
-		if (y == 0 || blockAccess.isAirBlock(x, y - 1, z)) return false;
+		if (isBlockNonSurrounding(blockAccess.getBlock(x + 1, y, z))) return false;
+		if (isBlockNonSurrounding(blockAccess.getBlock(x - 1, y, z))) return false;
+		if (isBlockNonSurrounding(blockAccess.getBlock(x, y + 1, z))) return false;
+		if (isBlockNonSurrounding(blockAccess.getBlock(x, y - 1, z))) return false;
+		if (isBlockNonSurrounding(blockAccess.getBlock(x, y, z + 1))) return false;
+		if (isBlockNonSurrounding(blockAccess.getBlock(x, y, z - 1))) return false;
 		return true;
 	}
 	
+	protected boolean isBlockNonSurrounding(Block block) {
+		return block.getMaterial() == Material.air || block == Blocks.snow_layer;
+	}
 }
