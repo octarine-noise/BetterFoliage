@@ -1,6 +1,7 @@
 package mods.betterfoliage.client.render.impl;
 
 import mods.betterfoliage.BetterFoliage;
+import mods.betterfoliage.client.BetterFoliageClient;
 import mods.betterfoliage.client.ShadersModIntegration;
 import mods.betterfoliage.client.render.IRenderBlockDecorator;
 import mods.betterfoliage.client.render.IconSet;
@@ -30,7 +31,7 @@ public class RenderBlockBetterGrass extends RenderBlockAOBase implements IRender
 	
 	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
 		if (!BetterFoliage.config.grassEnabled) return false;
-		if (!((block instanceof BlockGrass || block == Blocks.mycelium))) return false;
+		if (!(BetterFoliageClient.grass.matchesID(block) || block == Blocks.mycelium)) return false;
 		if (!blockAccess.isAirBlock(x, y + 1, z) && blockAccess.getBlock(x, y + 1, z) != Blocks.snow_layer) return false;
 		return true;
 	}

@@ -3,12 +3,12 @@ package mods.betterfoliage.client.render.impl;
 import java.util.Random;
 
 import mods.betterfoliage.BetterFoliage;
+import mods.betterfoliage.client.BetterFoliageClient;
 import mods.betterfoliage.client.render.IRenderBlockDecorator;
 import mods.betterfoliage.client.render.IconSet;
 import mods.betterfoliage.client.render.RenderBlockAOBase;
 import mods.betterfoliage.common.util.Double3;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockDirt;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
@@ -31,7 +31,7 @@ public class RenderBlockBetterAlgae extends RenderBlockAOBase implements IRender
 	
 	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
 		if (!BetterFoliage.config.algaeEnabled) return false;
-		if (y >= 254 || !(block instanceof BlockDirt)) return false;
+		if (!(BetterFoliageClient.dirt.matchesID(block))) return false;
 		if (blockAccess.getBlock(x, y + 1, z).getMaterial() != Material.water) return false;
 		if (blockAccess.getBlock(x, y + 2, z).getMaterial() != Material.water) return false;
 		if (blockAccess.getBiomeGenForCoords(x, z).temperature < 0.4f) return false;

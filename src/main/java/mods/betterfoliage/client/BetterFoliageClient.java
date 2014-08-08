@@ -34,6 +34,8 @@ public class BetterFoliageClient {
 	
 	public static BlockMatcher leaves = new BlockMatcher();
 	public static BlockMatcher crops = new BlockMatcher();
+	public static BlockMatcher dirt = new BlockMatcher();
+	public static BlockMatcher grass = new BlockMatcher();
 	
 	public static ResourceLocation missingTexture = new ResourceLocation("betterfoliage", "textures/blocks/missing_leaf.png");
 	
@@ -54,6 +56,12 @@ public class BetterFoliageClient {
 		
 		crops.load(new File(BetterFoliage.configDir, "classesCrops.cfg"), new ResourceLocation("betterfoliage:classesCropsDefault.cfg"));
 		MinecraftForge.EVENT_BUS.register(crops);
+		
+		dirt.load(new File(BetterFoliage.configDir, "classesDirt.cfg"), new ResourceLocation("betterfoliage:classesDirtDefault.cfg"));
+		MinecraftForge.EVENT_BUS.register(dirt);
+		
+		grass.load(new File(BetterFoliage.configDir, "classesGrass.cfg"), new ResourceLocation("betterfoliage:classesGrassDefault.cfg"));
+		MinecraftForge.EVENT_BUS.register(grass);
 		
 		MinecraftForge.EVENT_BUS.register(new LeafTextureEnumerator("bf_leaves"));
 		
