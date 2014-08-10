@@ -6,7 +6,10 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
 import cpw.mods.fml.client.FMLClientHandler;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
+@SideOnly(Side.CLIENT)
 public class ConfigGuiGrass extends ConfigGuiScreenBase {
 
 	public enum Button {CLOSE, GRASS_USE_GENERATED}

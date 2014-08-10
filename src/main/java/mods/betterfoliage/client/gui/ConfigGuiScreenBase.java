@@ -10,6 +10,10 @@ import net.minecraft.util.EnumChatFormatting;
 
 import com.google.common.collect.Lists;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
+@SideOnly(Side.CLIENT)
 public class ConfigGuiScreenBase extends GuiScreen {
 
 	protected GuiScreen parent;

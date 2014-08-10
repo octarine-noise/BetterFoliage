@@ -17,11 +17,14 @@ import net.minecraftforge.client.event.TextureStitchEvent;
 import com.google.common.collect.Maps;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 /** Holds the texture for the falling leaf particles, and stores average texture color values for leaf textures
  * @author octarine-noise
  *
  */
+@SideOnly(Side.CLIENT)
 public class LeafParticleTextures {
 
 	/** Icon for leaf particles */

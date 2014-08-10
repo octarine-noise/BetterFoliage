@@ -2,10 +2,14 @@ package mods.betterfoliage.client;
 
 import java.lang.reflect.Field;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.ResourceLocation;
 
+@SideOnly(Side.CLIENT)
 public class ShadersModIntegration {
 
 	private static boolean hasShadersMod = false;
