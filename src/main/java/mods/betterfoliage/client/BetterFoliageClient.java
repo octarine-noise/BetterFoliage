@@ -63,11 +63,11 @@ public class BetterFoliageClient {
 		grass.load(new File(BetterFoliage.configDir, "classesGrass.cfg"), new ResourceLocation("betterfoliage:classesGrassDefault.cfg"));
 		MinecraftForge.EVENT_BUS.register(grass);
 		
-		MinecraftForge.EVENT_BUS.register(new LeafTextureEnumerator("bf_leaves"));
-		
 		BetterFoliage.log.info("Registering texture generators");
-		leafGenerator = new LeafGenerator("bf_leaves", missingTexture);
+		leafGenerator = new LeafGenerator();
 		MinecraftForge.EVENT_BUS.register(leafGenerator);
+		MinecraftForge.EVENT_BUS.register(new LeafTextureEnumerator());
+		
 		MinecraftForge.EVENT_BUS.register(new ReedGenerator("bf_reed_bottom", missingTexture, true));
 		MinecraftForge.EVENT_BUS.register(new ReedGenerator("bf_reed_top", missingTexture, false));
 		MinecraftForge.EVENT_BUS.register(new ShortGrassGenerator("bf_shortgrass", missingTexture, false));

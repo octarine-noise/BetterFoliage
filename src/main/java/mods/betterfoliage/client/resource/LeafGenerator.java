@@ -6,55 +6,28 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-
 import mods.betterfoliage.BetterFoliage;
+import mods.betterfoliage.client.BetterFoliageClient;
 import mods.betterfoliage.client.ShadersModIntegration;
-import mods.betterfoliage.common.util.Utils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.IResource;
-import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.TextureStitchEvent.Post;
-import net.minecraftforge.client.event.TextureStitchEvent.Pre;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
-public class LeafGenerator extends BlockTextureGenerator {
+public class LeafGenerator extends LeafGeneratorBase {
 
-	/** Resource domain name of pre-drawn textures */
-	public String nonGeneratedDomain = "betterfoliage";
-	
-	/** Number of textures generated in the current run */
-	public int generatedCounter = 0;
-	
-	/** Number of pre-drawn textures found in the current run */
-	public int drawnCounter = 0;
-	
 	/** Name of the default alpha mask to use */
-	public static String defaultMask = "rough";
+	public static String defaultMask = "default";
 	
-	public LeafGenerator(String domainName, ResourceLocation missingResource) {
-		super(domainName, missingResource);
+	public LeafGenerator() {
+		super("bf_leaves", "betterfoliage", "textures/blocks/%s/%s", "betterfoliage:textures/blocks/leafmask_%d_%s.png", BetterFoliageClient.missingTexture);
 	}
 
 	@Override
-	public IResource getResource(ResourceLocation resourceLocation) throws IOException {
-		IResourceManager resourceManager = Minecraft.getMinecraft().getResourceManager();
-		ResourceLocation originalNoDirs = unwrapResource(resourceLocation);
-		ResourceLocation originalWithDirs = new ResourceLocation(originalNoDirs.getResourceDomain(), "textures/blocks/" + originalNoDirs.getResourcePath());
-		
-		// check for provided texture
-		ResourceLocation handDrawnLocation = new ResourceLocation(nonGeneratedDomain, String.format("textures/blocks/%s/%s", originalNoDirs.getResourceDomain(), originalNoDirs.getResourcePath())); 
-		if (Utils.resourceExists(handDrawnLocation)) {
-			drawnCounter++;
-			return resourceManager.getResource(handDrawnLocation);
-		}
-		
-		// generate our own
-		if (!Utils.resourceExists(originalWithDirs)) return getMissingResource();
-		
+	protected BufferedImage generateLeaf(ResourceLocation originalWithDirs) throws IOException, TextureGenerationException {
 		// load normal leaf texture
-		BufferedImage origImage = ImageIO.read(resourceManager.getResource(originalWithDirs).getInputStream());
-		if (origImage.getWidth() != origImage.getHeight()) return getMissingResource();
+		BufferedImage origImage = ImageIO.read(Minecraft.getMinecraft().getResourceManager().getResource(originalWithDirs).getInputStream());
+		if (origImage.getWidth() != origImage.getHeight()) throw new TextureGenerationException();
 		int size = origImage.getWidth();
 
 		// tile leaf texture 2x2
@@ -80,51 +53,15 @@ public class LeafGenerator extends BlockTextureGenerator {
 			}
 		}
 		
-		generatedCounter++;
-		return new BufferedImageResource(overlayIcon);
+		return overlayIcon;
 	}
 	
-	/** Loads the alpha mask of the given type and size. If a mask of the exact size can not be found,
-	 *  will try to load progressively smaller masks down to 16x16
-	 * @param type mask type
-	 * @param size texture size
-	 * @return alpha mask
-	 */
-	protected BufferedImage loadLeafMaskImage(String type, int size) {
-		IResourceManager resourceManager = Minecraft.getMinecraft().getResourceManager();
-		IResource maskResource = null;
-		
-		while (maskResource == null && size >= 16) {
-			try {
-				maskResource = resourceManager.getResource(new ResourceLocation(String.format("betterfoliage:textures/blocks/leafmask_%d_%s.png", size, type)));
-			} catch (Exception e) {}
-			size /= 2;
-		}
-		
-		try {
-			return maskResource == null ? null : ImageIO.read(maskResource.getInputStream());
-		} catch (IOException e) {
-			return null;
-		}
-	}
-
-	@Override
-	@SubscribeEvent
-	public void handleTextureReload(Pre event) {
-		super.handleTextureReload(event);
-		if (event.map.getTextureType() != 0) return;
-		generatedCounter = 0;
-		drawnCounter = 0;
-	}
-
 	@Override
 	@SubscribeEvent
 	public void endTextureReload(Post event) {
 		super.endTextureReload(event);
 		if (event.map.getTextureType() != 0) return;
 		BetterFoliage.log.info(String.format("Found %d pre-drawn leaf textures", drawnCounter));
-		BetterFoliage.log.info(String.format("Found %d leaf textures", generatedCounter));
+		BetterFoliage.log.info(String.format("Generated %d leaf textures", generatedCounter));
 	}
-
-	
 }
