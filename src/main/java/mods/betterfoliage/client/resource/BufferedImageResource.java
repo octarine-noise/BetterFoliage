@@ -8,9 +8,13 @@ import java.io.InputStream;
 
 import javax.imageio.ImageIO;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
 import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.data.IMetadataSection;
 
+@SideOnly(Side.CLIENT)
 public class BufferedImageResource implements IResource {
 
 	/** Raw PNG data*/

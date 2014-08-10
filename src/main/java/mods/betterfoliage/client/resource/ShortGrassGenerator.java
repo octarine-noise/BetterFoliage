@@ -6,12 +6,16 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
 import mods.betterfoliage.client.ShadersModIntegration;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 
+@SideOnly(Side.CLIENT)
 public class ShortGrassGenerator extends BlockTextureGenerator {
 
 	protected boolean isSnowed = false;
