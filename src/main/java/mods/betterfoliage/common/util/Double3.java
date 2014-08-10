@@ -2,6 +2,9 @@ package mods.betterfoliage.common.util;
 
 import net.minecraftforge.common.util.ForgeDirection;
 
+/** Immutable 3D vector of double precision.
+ * @author octarine-noise
+ */
 public class Double3 {
 
 	public final double x;

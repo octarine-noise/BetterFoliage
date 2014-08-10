@@ -47,12 +47,10 @@ public class LeafGenerator extends LeafGeneratorBase {
 			BufferedImage maskImage = loadLeafMaskImage(defaultMask, size * 2);
 			int scale = size * 2 / maskImage.getWidth();
 			
-			for (int x = 0; x < overlayIcon.getWidth(); x++) {
-				for (int y = 0; y < overlayIcon.getHeight(); y++) {
-					long origPixel = overlayIcon.getRGB(x, y) & 0xFFFFFFFFl;
-					long maskPixel = maskImage.getRGB(x / scale, y / scale) & 0xFF000000l | 0x00FFFFFF;
-					overlayIcon.setRGB(x, y, (int) (origPixel & maskPixel));
-				}
+			for (int x = 0; x < overlayIcon.getWidth(); x++) for (int y = 0; y < overlayIcon.getHeight(); y++) {
+				long origPixel = overlayIcon.getRGB(x, y) & 0xFFFFFFFFl;
+				long maskPixel = maskImage.getRGB(x / scale, y / scale) & 0xFF000000l | 0x00FFFFFF;
+				overlayIcon.setRGB(x, y, (int) (origPixel & maskPixel));
 			}
 		}
 		

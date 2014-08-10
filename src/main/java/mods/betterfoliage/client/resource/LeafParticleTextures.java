@@ -22,7 +22,6 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 /** Holds the texture for the falling leaf particles, and stores average texture color values for leaf textures
  * @author octarine-noise
- *
  */
 @SideOnly(Side.CLIENT)
 public class LeafParticleTextures {
@@ -59,18 +58,16 @@ public class LeafParticleTextures {
 			float sumHueY = 0.0f;
 			float sumSaturation = 0.0f;
 			float sumBrightness = 0.0f;
-			for (int x = 0; x < image.getWidth(); x++) {
-				for (int y = 0; y < image.getHeight(); y++) {
-					int pixel = image.getRGB(x, y);
-					int alpha = (pixel >> 24) & 0xFF;
-					float[] hsbVals = Color.RGBtoHSB((pixel >> 16) & 0xFF, (pixel >> 8) & 0xFF, pixel & 0xFF, null);
-					if (alpha == 255) {
-						numOpaque++;
-						sumHueX += Math.cos((hsbVals[0] - 0.5) * 2.0 * Math.PI);
-						sumHueY += Math.sin((hsbVals[0] - 0.5) * 2.0 * Math.PI);
-						sumSaturation += hsbVals[1];
-						sumBrightness += hsbVals[2];
-					}
+			for (int x = 0; x < image.getWidth(); x++) for (int y = 0; y < image.getHeight(); y++) {
+				int pixel = image.getRGB(x, y);
+				int alpha = (pixel >> 24) & 0xFF;
+				float[] hsbVals = Color.RGBtoHSB((pixel >> 16) & 0xFF, (pixel >> 8) & 0xFF, pixel & 0xFF, null);
+				if (alpha == 255) {
+					numOpaque++;
+					sumHueX += Math.cos((hsbVals[0] - 0.5) * 2.0 * Math.PI);
+					sumHueY += Math.sin((hsbVals[0] - 0.5) * 2.0 * Math.PI);
+					sumSaturation += hsbVals[1];
+					sumBrightness += hsbVals[2];
 				}
 			}
 			

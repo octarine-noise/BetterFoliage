@@ -41,18 +41,34 @@ public class DeobfHelper {
 		}
 	}
 	
+	/** Transform a class name from MCP to obfuscated names.
+	 * @param className MCP name
+	 * @return obfuscated name
+	 */
 	public static String transformClassName(String className) {
 		return obfClasses.containsKey(className) ? obfClasses.get(className) : className;
 	}
 	
+	/** Transform a method or field name from MCP to obfuscated names.
+	 * @param elementName MCP name
+	 * @return obfuscated name
+	 */
 	public static String transformElementName(String elementName) {
 		return obfElements.containsKey(elementName) ? obfElements.get(elementName) : elementName;
 	}
 	
+	/** Transform a method or field name from MCP to SRG names.
+	 * @param elementName MCP name
+	 * @return SRG name
+	 */
 	public static String transformElementSearge(String elementName) {
 		return srgElements.containsKey(elementName) ? srgElements.get(elementName) : elementName;
 	}
 	
+	/** Transform an ASM signature from MCP to obfuscated names.
+	 * @param signature MCP signature
+	 * @return obfuscated signature
+	 */
 	public static String transformSignature(String signature) {
 		String result = signature;
 		boolean hasChanged = false;

@@ -7,7 +7,7 @@ import net.minecraft.util.ResourceLocation;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-/** Loads an indexed set of textures
+/** Holds an indexed set of textures
  * @author octarine-noise
  */
 @SideOnly(Side.CLIENT)

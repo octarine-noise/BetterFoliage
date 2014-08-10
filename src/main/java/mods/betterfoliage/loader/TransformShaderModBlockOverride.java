@@ -25,7 +25,7 @@ public class TransformShaderModBlockOverride extends MethodTransformerBase {
 
 	@Override
 	public String getLogMessage() {
-		return "Applying Shaders.pushEntity() block id ovverride";
+		return "Applying Shaders.pushEntity() block id override";
 	}
 
 	@Override

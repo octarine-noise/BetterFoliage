@@ -9,6 +9,9 @@ import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.ResourceLocation;
 
+/** Call hooks and helper methods for dealing with Shaders Mod.
+ * @author octarine-noise
+ */
 @SideOnly(Side.CLIENT)
 public class ShadersModIntegration {
 
@@ -18,6 +21,7 @@ public class ShadersModIntegration {
 	private static Field shadersEntityData;
 	private static Field shadersEntityDataIndex;
 	
+	/** Hide constructor */
 	private ShadersModIntegration() {}
 	
 	public static void init() {
@@ -33,16 +37,24 @@ public class ShadersModIntegration {
 		}
 	}
 	
+	/** Signal start of grass-type quads
+	 */
 	public static void startGrassQuads() {
 		if (!hasShadersMod) return;
 		setShadersEntityData(tallGrassEntityData);
 	}
 
+	/** Signal start of leaf-type quads
+	 */
 	public static void startLeavesQuads() {
 		if (!hasShadersMod) return;
 		setShadersEntityData(leavesEntityData);
 	}
 	
+	/** Change the entity data (containing block ID) for the currently rendered block.
+	 *  Quads drawn afterwards will have the altered data.
+	 * @param data
+	 */
 	private static void setShadersEntityData(int data) {
 		try {
 			int[] entityData = (int[]) shadersEntityData.get(null);
@@ -52,12 +64,21 @@ public class ShadersModIntegration {
 		}
 	}
 	
+	/** Call hook from transformed ShadersMod class
+	 * @param original entity data of currently rendered block
+	 * @param block the block
+	 * @return entity data to use
+	 */
 	public static int getBlockIdOverride(int original, Block block) {
 		if (BetterFoliageClient.leaves.matchesID(original & 0xFFFF)) return leavesEntityData;
 		if (BetterFoliageClient.crops.matchesID(original & 0xFFFF)) return tallGrassEntityData;
 		return original;
 	}
 	
+	/**
+	 * @param resource texture resource
+	 * @return true if texture is a normal or specular map
+	 */
 	public static boolean isSpecialTexture(ResourceLocation resource) {
 		return resource.getResourcePath().toLowerCase().endsWith("_n.png") || resource.getResourcePath().toLowerCase().endsWith("_s.png");
 	}

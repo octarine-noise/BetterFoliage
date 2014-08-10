@@ -23,12 +23,21 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
+/** Enumerates all leaf textures at stitch time and emits an event for each.
+ * @author octarine-noise
+ */
 @SideOnly(Side.CLIENT)
 public class LeafTextureEnumerator implements IIconRegister {
 
+	/**{@link Event} that is emitted for each texture belonging to a leaf block.
+	 * @author octarine-noise
+	 */
+	@SideOnly(Side.CLIENT)
 	public static class LeafTextureFoundEvent extends Event {
+		
 		public TextureMap blockTextures;
 		public TextureAtlasSprite icon;
+		
 		private LeafTextureFoundEvent(TextureMap blockTextures, TextureAtlasSprite icon) {
 			super();
 			this.blockTextures = blockTextures;
@@ -39,8 +48,7 @@ public class LeafTextureEnumerator implements IIconRegister {
 	/** Texture atlas for block textures used in the current run */
 	public TextureMap blockTextures;
 	
-	/** Leaf blocks register their textures here. An extra texture will be registered in the atlas
-	 *  for each, with the resource domain of this generator.
+	/** Leaf blocks register their textures here.
 	 *  @return the originally registered {@link IIcon} already in the atlas
 	 */
 	public IIcon registerIcon(String resourceLocation) {
@@ -76,6 +84,7 @@ public class LeafTextureEnumerator implements IIconRegister {
 		Map<String, TextureAtlasSprite> mapAtlas = null;
 		mapAtlas = Utils.getField(blockTextures, DeobfHelper.transformElementSearge("mapRegisteredSprites"), Map.class);
 		if (mapAtlas == null) mapAtlas = Utils.getField(blockTextures, "mapRegisteredSprites", Map.class);
+		
 		if (mapAtlas == null) {
 			BetterFoliage.log.warn("Failed to reflect texture atlas, textures may be missing");
 		} else {

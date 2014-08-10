@@ -16,9 +16,14 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
+/** Texture generator base class for textures based on leaf blocks.
+ * Supports loading from resource packs instead of generating if available.
+ * @author octarine-noise
+ */
 @SideOnly(Side.CLIENT)
 public abstract class LeafGeneratorBase extends BlockTextureGenerator {
 
+	@SideOnly(Side.CLIENT)
 	public static class TextureGenerationException extends Exception {
 		private static final long serialVersionUID = 7339757761980002651L;
 	};

@@ -14,6 +14,9 @@ import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.data.IMetadataSection;
 
+/** {@link IResource} for a {@link BufferedImage}
+ * @author octarine-noise
+ */
 @SideOnly(Side.CLIENT)
 public class BufferedImageResource implements IResource {
 

@@ -26,7 +26,7 @@ public class TransformRenderBlockOverride extends MethodTransformerBase {
 
 	@Override
 	public String getLogMessage() {
-		return "Applying RenderBlocks.renderBlockByRenderType() render type ovverride";
+		return "Applying RenderBlocks.renderBlockByRenderType() render type override";
 	}
 
 	@Override

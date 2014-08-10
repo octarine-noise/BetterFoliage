@@ -10,8 +10,14 @@ import java.lang.reflect.Field;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 
+/** Config base class using annotations
+ * @author octarine-noise
+ */
 public class ConfigBase {
 
+	/** Annotates a field linked to a config file property
+	 * @author octarine-noise
+	 */
 	@Target(ElementType.FIELD)
 	@Retention(RetentionPolicy.RUNTIME)
 	public static @interface CfgElement {
@@ -20,6 +26,9 @@ public class ConfigBase {
 		String comment() default "";
 	}
 	
+	/** Declares a min/max limit on another field
+	 * @author octarine-noise
+	 */
 	@Target(ElementType.FIELD)
 	@Retention(RetentionPolicy.RUNTIME)
 	public static @interface Limit {

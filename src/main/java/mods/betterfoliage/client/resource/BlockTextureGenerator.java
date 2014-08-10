@@ -21,6 +21,10 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
+/** Base class for texture generators. Registers itself as a domain resource manager for the duration of block texture stitching.
+ * @author octarine-noise
+ *
+ */
 @SideOnly(Side.CLIENT)
 public abstract class BlockTextureGenerator implements IResourceManager {
 

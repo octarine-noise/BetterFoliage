@@ -24,7 +24,10 @@ public class RenderBlockBetterCactus extends FakeRenderBlockAOBase implements IR
 	public IIcon cactusRoundIcon;
 	public IconSet cactusSideIcons = new IconSet("bettergrassandleaves", "better_cactus_arm_%d");
 	
+	/** Possible directions for cactus side growth*/
 	public static ForgeDirection[] cactusDirections = new ForgeDirection[] { ForgeDirection.NORTH, ForgeDirection.SOUTH, ForgeDirection.EAST, ForgeDirection.WEST};
+	
+	/** Inner radius of cactus stem */
 	public static double cactusRadius = 0.4375;
 	
 	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
@@ -43,9 +46,9 @@ public class RenderBlockBetterCactus extends FakeRenderBlockAOBase implements IR
 		
 		// render cactus center
 		setPassCounters(1);
+		renderStandardBlock(block, x, y, z);
 		
 		Double3 blockCenter = new Double3(x + 0.5, y + 0.5, z + 0.5);
-		renderStandardBlock(block, x, y, z);
 		Tessellator.instance.setBrightness(getBrightness(block,x, y, z));
 		renderCactusCore(block.getBlockTextureFromSide(ForgeDirection.UP.ordinal()),
 						 block.getBlockTextureFromSide(ForgeDirection.NORTH.ordinal()),
