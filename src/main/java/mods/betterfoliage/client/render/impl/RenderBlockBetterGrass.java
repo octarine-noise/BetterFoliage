@@ -79,6 +79,7 @@ public class RenderBlockBetterGrass extends RenderBlockAOBase implements IRender
 		// render short grass
 		ShadersModIntegration.startGrassQuads();
 		Tessellator.instance.setBrightness(getBrightness(block, x, y + 1, z));
+		Tessellator.instance.setColorOpaque_I(block.colorMultiplier(blockAccess, x, y, z));
 		renderCrossedSideQuads(new Double3(x + 0.5, y + 1.0 + (isSnowed ? 0.0625 : 0.0), z + 0.5), ForgeDirection.UP, scale, halfHeight, pRot[variation], BetterFoliage.config.grassHOffset.value, renderIcon, 0, false);
 		
 		return true;
