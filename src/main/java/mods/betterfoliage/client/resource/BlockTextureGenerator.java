@@ -78,11 +78,11 @@ public abstract class BlockTextureGenerator implements IResourceManager {
 	}
 	
 	protected static int blendRGB(int rgbOrig, int rgbBlend, int weightOrig, int weightBlend) {
-		int r = ((rgbOrig & 0xFF) * weightOrig + (rgbBlend & 0xFF) * weightBlend) / (weightOrig + weightBlend);
+		int r = (((rgbOrig >> 16) & 0xFF) * weightOrig + ((rgbBlend >> 16) & 0xFF) * weightBlend) / (weightOrig + weightBlend);
 		int g = (((rgbOrig >> 8) & 0xFF) * weightOrig + ((rgbBlend >> 8) & 0xFF) * weightBlend) / (weightOrig + weightBlend);
-		int b = (((rgbOrig >> 16) & 0xFF) * weightOrig + ((rgbBlend >> 16) & 0xFF) * weightBlend) / (weightOrig + weightBlend);
+		int b = ((rgbOrig & 0xFF) * weightOrig + (rgbBlend & 0xFF) * weightBlend) / (weightOrig + weightBlend);
 		int a = (rgbOrig >> 24) & 0xFF;
-		int result = (int) (a << 24 | b << 16 | g << 8 | r);
+		int result = (int) (a << 24 | r << 16 | g << 8 | b);
 		return result;
 	}
 }
