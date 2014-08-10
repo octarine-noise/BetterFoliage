@@ -20,18 +20,24 @@ public class DeobfHelper {
 			obfClasses.put("net/minecraft/client/renderer/RenderBlocks", "ble");
 			obfClasses.put("net/minecraft/world/IBlockAccess", "afx");
 			obfClasses.put("net/minecraft/block/Block", "ahu");
+			obfClasses.put("net/minecraft/client/multiplayer/WorldClient", "biz");
+			obfClasses.put("net/minecraft/world/World", "afn");
 			
 			obfElements.put("blockAccess", "a");
 			obfElements.put("renderBlockByRenderType", "b");
 			obfElements.put("mapRegisteredSprites", "bpr");
+			obfElements.put("doVoidFogParticles", "C");
 		} else if ("1.7.10".equals(mcVersion)) {
 			obfClasses.put("net/minecraft/client/renderer/RenderBlocks", "blm");
 			obfClasses.put("net/minecraft/world/IBlockAccess", "ahl");
 			obfClasses.put("net/minecraft/block/Block", "aji");
+			obfClasses.put("net/minecraft/client/multiplayer/WorldClient", "bjf");
+			obfClasses.put("net/minecraft/world/World", "ahb");
 			
 			obfElements.put("blockAccess", "a");
 			obfElements.put("renderBlockByRenderType", "b");
 			obfElements.put("mapRegisteredSprites", "bpr");
+			obfElements.put("doVoidFogParticles", "C");
 		}
 	}
 	

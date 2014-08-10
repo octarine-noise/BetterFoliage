@@ -5,6 +5,7 @@ import java.util.Map;
 
 import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.render.IRenderBlockDecorator;
+import mods.betterfoliage.client.render.impl.EntityFXFallingLeaves;
 import mods.betterfoliage.client.render.impl.RenderBlockBetterAlgae;
 import mods.betterfoliage.client.render.impl.RenderBlockBetterCactus;
 import mods.betterfoliage.client.render.impl.RenderBlockBetterCoral;
@@ -13,13 +14,17 @@ import mods.betterfoliage.client.render.impl.RenderBlockBetterLeaves;
 import mods.betterfoliage.client.render.impl.RenderBlockBetterLilypad;
 import mods.betterfoliage.client.render.impl.RenderBlockBetterReed;
 import mods.betterfoliage.client.resource.LeafGenerator;
+import mods.betterfoliage.client.resource.LeafParticleTextures;
 import mods.betterfoliage.client.resource.LeafTextureEnumerator;
 import mods.betterfoliage.client.resource.ReedGenerator;
 import mods.betterfoliage.client.resource.ShortGrassGenerator;
 import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 
 import com.google.common.collect.Maps;
@@ -31,6 +36,7 @@ public class BetterFoliageClient {
 
 	public static Map<Integer, IRenderBlockDecorator> decorators = Maps.newHashMap();
 	public static LeafGenerator leafGenerator;
+	public static LeafParticleTextures leafParticles;
 	
 	public static BlockMatcher leaves = new BlockMatcher();
 	public static BlockMatcher crops = new BlockMatcher();
@@ -66,6 +72,8 @@ public class BetterFoliageClient {
 		BetterFoliage.log.info("Registering texture generators");
 		leafGenerator = new LeafGenerator();
 		MinecraftForge.EVENT_BUS.register(leafGenerator);
+		leafParticles = new LeafParticleTextures(0);
+		MinecraftForge.EVENT_BUS.register(leafParticles);
 		MinecraftForge.EVENT_BUS.register(new LeafTextureEnumerator());
 		
 		MinecraftForge.EVENT_BUS.register(new ReedGenerator("bf_reed_bottom", missingTexture, true));
@@ -91,6 +99,12 @@ public class BetterFoliageClient {
 				return entry.getKey();
 		
 		return original;
+	}
+	
+	public static void onRandomDisplayTick(Block block, World world, int x, int y, int z) {
+		if (!leaves.matchesID(block)) return;
+		if (world.getBlock(x, y - 1, z).getMaterial() != Material.air) return;
+		Minecraft.getMinecraft().effectRenderer.addEffect(new EntityFXFallingLeaves(world, x, y, z));
 	}
 	
 	public static void registerRenderer(IRenderBlockDecorator decorator) {

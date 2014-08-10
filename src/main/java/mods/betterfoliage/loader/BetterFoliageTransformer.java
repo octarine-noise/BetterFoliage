@@ -17,7 +17,8 @@ public class BetterFoliageTransformer implements IClassTransformer {
 
 	protected Iterable<MethodTransformerBase> transformers = ImmutableList.<MethodTransformerBase>of(
 		new TransformRenderBlockOverride(),
-		new TransformShaderModBlockOverride()
+		new TransformShaderModBlockOverride(),
+		new TransformRandomDisplayTick()
 	);
 	
 	protected Logger logger = LogManager.getLogger(getClass().getSimpleName());

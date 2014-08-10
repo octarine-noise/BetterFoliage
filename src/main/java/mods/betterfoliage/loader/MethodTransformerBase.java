@@ -69,4 +69,10 @@ public abstract class MethodTransformerBase {
 		for (AbstractInsnNode inst : added) listAdd.add(inst);
 		insnList.insert(node, listAdd);
 	}
+	
+	protected void insertBefore(InsnList insnList, AbstractInsnNode node, AbstractInsnNode... added) {
+		InsnList listAdd = new InsnList();
+		for (AbstractInsnNode inst : added) listAdd.add(inst);
+		insnList.insertBefore(node, listAdd);
+	}
 }
