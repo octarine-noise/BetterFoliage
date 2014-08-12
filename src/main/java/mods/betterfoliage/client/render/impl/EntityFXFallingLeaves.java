@@ -1,6 +1,7 @@
 package mods.betterfoliage.client.render.impl;
 
 import java.awt.Color;
+import java.util.Random;
 
 import mods.betterfoliage.client.BetterFoliageClient;
 import net.minecraft.block.Block;
@@ -16,10 +17,18 @@ import cpw.mods.fml.relauncher.SideOnly;
 public class EntityFXFallingLeaves extends EntityFX {
 
 	public static float biomeBrightnessMultiplier = 0.5f;
+	public double motionJitterX;
+	public double motionJitterY;
+	public boolean wasOnGround = false;
 	
 	public EntityFXFallingLeaves(World world, int x, int y, int z) {
 		super(world, x + 0.5, y, z + 0.5);
-		motionY = -0.1d;
+		Random random = new Random();
+		motionJitterX = Math.abs(random.nextGaussian()) * 0.005;
+		motionJitterY = Math.abs(random.nextGaussian()) * 0.005;
+		particleMaxAge = 40 + random.nextInt(40);
+		motionY = -0.05d;
+		
 		particleScale = 0.75f;
 		particleIcon = BetterFoliageClient.leafParticles.icon;
 		
@@ -32,7 +41,20 @@ public class EntityFXFallingLeaves extends EntityFX {
 	@Override
 	public void onUpdate() {
 		super.onUpdate();
-		motionY = -0.1d;
+		
+		if (onGround || wasOnGround) {
+			wasOnGround = true;
+			motionX = 0.0;
+			motionZ = 0.0;
+			motionZ = 0.0;
+			if (!wasOnGround) {
+				particleAge = particleMaxAge - 10;
+			}
+		} else {
+			motionX = BetterFoliageClient.wind.currentX + motionJitterX;
+			motionZ = BetterFoliageClient.wind.currentZ + motionJitterY;
+			motionY = -0.05d;
+		}
 	}
 
 	@Override
