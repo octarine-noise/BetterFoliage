@@ -19,7 +19,6 @@ import mods.betterfoliage.client.resource.LeafTextureEnumerator;
 import mods.betterfoliage.client.resource.ReedGenerator;
 import mods.betterfoliage.client.resource.ShortGrassGenerator;
 import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.ResourceLocation;
@@ -34,16 +33,17 @@ import cpw.mods.fml.common.FMLCommonHandler;
 
 public class BetterFoliageClient {
 
+	public static ResourceLocation missingTexture = new ResourceLocation("betterfoliage", "textures/blocks/missing_leaf.png");
+	
 	public static Map<Integer, IRenderBlockDecorator> decorators = Maps.newHashMap();
-	public static LeafGenerator leafGenerator;
-	public static LeafParticleTextures leafParticles;
+	public static LeafGenerator leafGenerator = new LeafGenerator();
+	public static LeafParticleTextures leafParticles = new LeafParticleTextures(0);
+	public static WindTracker wind = new WindTracker();
 	
 	public static BlockMatcher leaves = new BlockMatcher();
 	public static BlockMatcher crops = new BlockMatcher();
 	public static BlockMatcher dirt = new BlockMatcher();
 	public static BlockMatcher grass = new BlockMatcher();
-	
-	public static ResourceLocation missingTexture = new ResourceLocation("betterfoliage", "textures/blocks/missing_leaf.png");
 	
 	public static void preInit() {
 		FMLCommonHandler.instance().bus().register(new KeyHandler());
@@ -56,6 +56,9 @@ public class BetterFoliageClient {
 		registerRenderer(new RenderBlockBetterReed());
 		registerRenderer(new RenderBlockBetterAlgae());
 		registerRenderer(new RenderBlockBetterCoral());
+
+		MinecraftForge.EVENT_BUS.register(wind);
+		FMLCommonHandler.instance().bus().register(wind);
 		
 		leaves.load(new File(BetterFoliage.configDir, "classesLeaves.cfg"), new ResourceLocation("betterfoliage:classesLeavesDefault.cfg"));
 		MinecraftForge.EVENT_BUS.register(leaves);
@@ -70,9 +73,7 @@ public class BetterFoliageClient {
 		MinecraftForge.EVENT_BUS.register(grass);
 		
 		BetterFoliage.log.info("Registering texture generators");
-		leafGenerator = new LeafGenerator();
 		MinecraftForge.EVENT_BUS.register(leafGenerator);
-		leafParticles = new LeafParticleTextures(0);
 		MinecraftForge.EVENT_BUS.register(leafParticles);
 		MinecraftForge.EVENT_BUS.register(new LeafTextureEnumerator());
 		
