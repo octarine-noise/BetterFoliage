@@ -7,8 +7,8 @@ import mods.betterfoliage.client.render.IRenderBlockDecorator;
 import mods.betterfoliage.client.render.IconSet;
 import mods.betterfoliage.client.render.RenderBlockAOBase;
 import mods.betterfoliage.common.util.Double3;
+import mods.betterfoliage.common.util.Utils;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockGrass;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.init.Blocks;
@@ -16,6 +16,7 @@ import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.util.ForgeDirection;
+import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -50,14 +51,19 @@ public class RenderBlockBetterGrass extends RenderBlockAOBase implements IRender
 		// render grass block
 		setPassCounters(1);
 		setRenderBoundsFromBlock(block);
-		renderStandardBlock(block, x, y, z);
+		if (block.getRenderType() == 0) {
+			renderStandardBlock(block, x, y, z);
+		} else {
+			ISimpleBlockRenderingHandler handler = Utils.getRenderingHandler(block.getRenderType());
+			handler.renderWorldBlock(world, x, y, z, block, block.getRenderType(), this);
+		}
 		
 		int variation = getSemiRandomFromPos(x, y, z, 0);
 		int heightVariation = getSemiRandomFromPos(x, y, z, 1);
 		boolean isSnowed = blockAccess.getBlock(x, y + 1, z) == Blocks.snow_layer;
 		
 		IIcon renderIcon = null;
-		if (block instanceof BlockGrass) {
+		if (BetterFoliageClient.grass.matchesID(block)) {
 			if (BetterFoliage.config.grassUseGenerated) {
 				renderIcon = isSnowed ? snowGrassGenIcon : grassGenIcon;
 			} else {
