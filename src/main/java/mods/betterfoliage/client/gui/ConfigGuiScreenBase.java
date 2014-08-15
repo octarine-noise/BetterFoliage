@@ -2,6 +2,8 @@ package mods.betterfoliage.client.gui;
 
 import java.util.List;
 
+import org.lwjgl.input.Keyboard;
+
 import mods.betterfoliage.client.gui.widget.IOptionWidget;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -51,7 +53,7 @@ public class ConfigGuiScreenBase extends GuiScreen {
 	@Override
 	protected void actionPerformed(GuiButton button) {
 		super.actionPerformed(button);
-		for (IOptionWidget widget : widgets) widget.onAction(button.id);
+		for (IOptionWidget widget : widgets) widget.onAction(button.id, Keyboard.isKeyDown(42));
 		onButtonPress(button.id);
 		updateButtons();
 	}

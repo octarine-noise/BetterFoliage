@@ -14,13 +14,13 @@ public class OptionDouble {
 		this.value = value;
 	}
 	
-	public void increment() {
-		value += step;
+	public void increment(int times) {
+		value += times * step;
 		if (value > max) value = max;
 	}
 	
-	public void decrement() {
-		value -= step;
+	public void decrement(int times) {
+		value -= times * step;
 		if (value < min) value = min;
 	}
 }

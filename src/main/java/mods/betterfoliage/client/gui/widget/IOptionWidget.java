@@ -14,6 +14,6 @@ public interface IOptionWidget {
 
 	public void addButtons(List<GuiButton> buttonList, int xOffset, int yOffset);
 	public void drawStrings(GuiScreen screen, FontRenderer fontRenderer, int xOffset, int yOffset, int labelColor, int numColor);
-	public void onAction(int buttonId);
+	public void onAction(int buttonId, boolean shiftPressed);
 
 }

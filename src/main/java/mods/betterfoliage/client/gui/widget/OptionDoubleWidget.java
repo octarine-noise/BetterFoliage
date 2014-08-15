@@ -46,8 +46,8 @@ public class OptionDoubleWidget implements IOptionWidget {
 		screen.drawCenteredString(fontRenderer, String.format(formatString, option.value), xOffset + x + width - 20 - numWidth / 2, yOffset + y + 5, numColor);
 	}
 
-	public void onAction(int buttonId) {
-		if (buttonId == idDecrement) option.decrement();
-		if (buttonId == idIncrement) option.increment();
+	public void onAction(int buttonId, boolean shiftPressed) {
+		if (buttonId == idDecrement) option.decrement(shiftPressed ? 5 :1);
+		if (buttonId == idIncrement) option.increment(shiftPressed ? 5 :1);
 	}
 }
