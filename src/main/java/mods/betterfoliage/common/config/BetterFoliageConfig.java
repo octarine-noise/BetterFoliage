@@ -29,6 +29,9 @@ public class BetterFoliageConfig extends ConfigBase {
 	@CfgElement(category="coral", key="enabled")
 	public boolean coralEnabled = true;
 	
+	@CfgElement(category="fallingLeaves", key="enabled")
+	public boolean fallingLeavesEnabled = true;
+	
 	@CfgElement(category="leaves", key="horizontalOffset")
 	public OptionDouble leavesHOffset = new OptionDouble(0.0, 0.4, 0.025, 0.2);
 	
@@ -43,7 +46,7 @@ public class BetterFoliageConfig extends ConfigBase {
 	
 	@CfgElement(category="grass", key="heightMin")
 	@Limit(max="grassHeightMax")
-	public OptionDouble grassHeightMin = new OptionDouble(0.1, 1.5, 0.05, 0.5);
+	public OptionDouble grassHeightMin = new OptionDouble(0.1, 1.5, 0.05, 0.8);
 	
 	@CfgElement(category="grass", key="heightMax") 
 	public OptionDouble grassHeightMax = new OptionDouble(0.1, 1.5, 0.05, 1.0);
@@ -103,4 +106,25 @@ public class BetterFoliageConfig extends ConfigBase {
 	
 	@CfgElement(category="coral", key="size")
 	public OptionDouble coralSize = new OptionDouble(0.25, 1.0, 0.05, 0.7);
+	
+	@CfgElement(category="fallingLeaves", key="speed")
+	public OptionDouble fallingLeavesSpeed = new OptionDouble(0.01, 0.15, 0.01, 0.05);
+	
+	@CfgElement(category="fallingLeaves", key="windStrength")
+	public OptionDouble fallingLeavesWindStrength = new OptionDouble(0.1, 2.0, 0.1, 0.5);
+	
+	@CfgElement(category="fallingLeaves", key="stormStrength")
+	public OptionDouble fallingLeavesStormStrength = new OptionDouble(0.1, 2.0, 0.1, 0.8);
+	
+	@CfgElement(category="fallingLeaves", key="size")
+	public OptionDouble fallingLeavesSize = new OptionDouble(0.25, 1.5, 0.05, 0.75);
+	
+	@CfgElement(category="fallingLeaves", key="chance")
+	public OptionDouble fallingLeavesChance = new OptionDouble(0.005, 1.0, 0.005, 0.05);
+	
+	@CfgElement(category="fallingLeaves", key="perturbation")
+	public OptionDouble fallingLeavesPerturb = new OptionDouble(0.05, 1.0, 0.05, 0.25);
+	
+	@CfgElement(category="fallingLeaves", key="lifetime")
+	public OptionDouble fallingLeavesLifetime = new OptionDouble(1.0, 10.0, 0.1, 5.0);
 }

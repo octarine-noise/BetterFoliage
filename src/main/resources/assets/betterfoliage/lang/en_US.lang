@@ -13,6 +13,7 @@ message.betterfoliage.betterLilypad=Better Lilypad: %s
 message.betterfoliage.betterReed=Reeds: %s
 message.betterfoliage.betterAlgae=Algae: %s
 message.betterfoliage.betterCoral=Coral: %s
+message.betterfoliage.fallingLeaves=Falling Leaves: %s
 
 message.betterfoliage.size=Size
 message.betterfoliage.hOffset=H.Offset
@@ -29,3 +30,10 @@ message.betterfoliage.algaeChance=Algae Population
 message.betterfoliage.crustSize=Crust Size
 message.betterfoliage.coralChance=Coral Chance
 message.betterfoliage.coralPopulation=Coral Population
+
+message.betterfoliage.speed=Speed
+message.betterfoliage.windStrength=Wind Strength
+message.betterfoliage.stormStrength=Storm Strength
+message.betterfoliage.fallingLeafChance=Particle Chance
+message.betterfoliage.fallingLeafPerturbation=Perturbation
+message.betterfoliage.fallingLeafLifetime=Max. lifetime
