@@ -103,6 +103,7 @@ public class BetterFoliageClient {
 	}
 	
 	public static void onRandomDisplayTick(Block block, World world, int x, int y, int z) {
+		if (!BetterFoliage.config.fallingLeavesEnabled) return;
 		if (!leaves.matchesID(block) || !world.isAirBlock(x, y - 1, z)) return;
 		if (Math.random() > BetterFoliage.config.fallingLeavesChance.value) return;
 		Minecraft.getMinecraft().effectRenderer.addEffect(new EntityFXFallingLeaves(world, x, y, z));
