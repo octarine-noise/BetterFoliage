@@ -27,6 +27,10 @@ public class Double3 {
 		return new Double3(x + other.x, y + other.y, z + other.z);
 	}
 	
+	public Double3 sub(Double3 other) {
+		return new Double3(x - other.x, y - other.y, z - other.z);
+	}
+	
 	public Double3 add(double x, double y, double z) {
 		return new Double3(this.x + x, this.y + y, this.z + z);
 	}

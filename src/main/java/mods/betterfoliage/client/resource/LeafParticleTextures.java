@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
+import mods.betterfoliage.client.render.IconSet;
 import mods.betterfoliage.client.resource.LeafTextureEnumerator.LeafTextureFoundEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -26,8 +27,8 @@ import cpw.mods.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class LeafParticleTextures {
 
-	/** Icon for leaf particles */
-	public IIcon icon;
+	/** Icons for leaf particles */
+	public IconSet icons = new IconSet("betterfoliage", "falling_leaf_default_%d");
 	
 	/** Map of average color values */
 	public Map<IIcon, Integer> colors = Maps.newHashMap();
@@ -82,7 +83,7 @@ public class LeafParticleTextures {
 	public void handleTextureReload(TextureStitchEvent.Pre event) {
 		if (event.map.getTextureType() != 0) return;
 		colors.clear();
-		icon = event.map.registerIcon("betterfoliage:falling_leaf");
+		icons.registerIcons(event.map);
 	}
 	
 	@SubscribeEvent

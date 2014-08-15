@@ -1,13 +1,15 @@
 package mods.betterfoliage.client.render.impl;
 
 import java.awt.Color;
-import java.util.Random;
 
+import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.BetterFoliageClient;
+import mods.betterfoliage.common.util.Double3;
 import net.minecraft.block.Block;
 import net.minecraft.client.particle.EntityFX;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.IIcon;
+import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import cpw.mods.fml.relauncher.Side;
@@ -16,52 +18,88 @@ import cpw.mods.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class EntityFXFallingLeaves extends EntityFX {
 
+	protected static double[] cos = new double[64];
+	protected static double[] sin = new double[64];
+	
+	static {
+		for (int idx = 0; idx < 64; idx++) {
+			cos[idx] = Math.cos(2.0 * Math.PI / 64.0 * idx);
+			sin[idx] = Math.sin(2.0 * Math.PI / 64.0 * idx);
+		}
+	}
+	
 	public static float biomeBrightnessMultiplier = 0.5f;
-	public double motionJitterX;
-	public double motionJitterY;
 	public boolean wasOnGround = false;
+	public boolean isMirrored;
+	public int particleRotation = 0;
+	public boolean rotationPositive = true;
 	
 	public EntityFXFallingLeaves(World world, int x, int y, int z) {
 		super(world, x + 0.5, y, z + 0.5);
-		Random random = new Random();
-		motionJitterX = Math.abs(random.nextGaussian()) * 0.005;
-		motionJitterY = Math.abs(random.nextGaussian()) * 0.005;
-		particleMaxAge = 40 + random.nextInt(40);
-		motionY = -0.05d;
+		particleMaxAge = MathHelper.floor_double((0.6 + 0.4 * rand.nextDouble()) * BetterFoliage.config.fallingLeavesLifetime.value * 20.0);
+		isMirrored = (rand.nextInt() & 1) == 1;
+		motionY = -BetterFoliage.config.fallingLeavesSpeed.value;
+		particleRotation = rand.nextInt(64);
 		
-		particleScale = 0.75f;
-		particleIcon = BetterFoliageClient.leafParticles.icon;
+		particleScale = (float) BetterFoliage.config.fallingLeavesSize.value;
+		particleIcon = BetterFoliageClient.leafParticles.icons.get(rand.nextInt(1024));
 		
 		Block block = world.getBlock(x, y, z);
 		IIcon blockIcon = block.getIcon(world, x, y, z, ForgeDirection.DOWN.ordinal());
 		calculateParticleColor(BetterFoliageClient.leafParticles.getColor(blockIcon), block.colorMultiplier(world, x, y, z));
-
 	}
 
 	@Override
 	public void onUpdate() {
 		super.onUpdate();
 		
+		particleScale = (float) BetterFoliage.config.fallingLeavesSize.value;
+		if (rand.nextFloat() > 0.95f) rotationPositive = !rotationPositive;
+		if (particleAge > particleMaxAge - 20) particleAlpha = 0.05f * (particleMaxAge - particleAge);
+		
 		if (onGround || wasOnGround) {
-			wasOnGround = true;
 			motionX = 0.0;
 			motionZ = 0.0;
 			motionZ = 0.0;
 			if (!wasOnGround) {
-				particleAge = particleMaxAge - 10;
+				particleAge = Math.max(particleAge, particleMaxAge - 20);
 			}
+			wasOnGround = true;
 		} else {
-			motionX = BetterFoliageClient.wind.currentX + motionJitterX;
-			motionZ = BetterFoliageClient.wind.currentZ + motionJitterY;
-			motionY = -0.05d;
+			motionX = (BetterFoliageClient.wind.currentX + cos[particleRotation] * BetterFoliage.config.fallingLeavesPerturb.value) * BetterFoliage.config.fallingLeavesSpeed.value;
+			motionZ = (BetterFoliageClient.wind.currentZ + sin[particleRotation] * BetterFoliage.config.fallingLeavesPerturb.value) * BetterFoliage.config.fallingLeavesSpeed.value;
+			motionY = -BetterFoliage.config.fallingLeavesSpeed.value;
+			particleRotation = (particleRotation + (rotationPositive ? 1 : -1)) & 63;
 		}
 	}
 
 	@Override
-	public void renderParticle(Tessellator tessellator, float partialTickTime, float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {
-		super.renderParticle(tessellator, partialTickTime, rotationX, rotationZ, rotationYZ, rotationXY, rotationXZ);
+    public void renderParticle(Tessellator tessellator, float partialTickTime, float rotX, float rotZ, float rotYZ, float rotXY, float rotXZ)
+    {
+        float minU = isMirrored ? particleIcon.getMinU() : particleIcon.getMaxU();
+        float maxU = isMirrored ? particleIcon.getMaxU() : particleIcon.getMinU();
+        float minV = particleIcon.getMinV();
+        float maxV = particleIcon.getMaxV();
+        float scale = 0.1F * this.particleScale;
+        
+        Double3 center = new Double3(prevPosX + (posX - prevPosX) * partialTickTime - interpPosX, 
+        							 prevPosY + (posY - prevPosY) * partialTickTime - interpPosY,
+        							 prevPosZ + (posZ - prevPosZ) * partialTickTime - interpPosZ);
+        Double3 vec1 = new Double3(rotX + rotXY, rotZ, rotYZ + rotXZ).scale(scale);
+        Double3 vec2 = new Double3(rotX - rotXY, -rotZ, rotYZ - rotXZ).scale(scale);
+        Double3 vec1Rot = vec1.scale(cos[particleRotation]).add(vec2.scale(sin[particleRotation]));
+        Double3 vec2Rot = vec1.scale(-sin[particleRotation]).add(vec2.scale(cos[particleRotation]));
+        
+        tessellator.setColorRGBA_F(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha);
+        addVertex(tessellator, center.sub(vec1Rot), maxU, maxV);
+        addVertex(tessellator, center.sub(vec2Rot), maxU, minV);
+        addVertex(tessellator, center.add(vec1Rot), minU, minV);
+        addVertex(tessellator, center.add(vec2Rot), minU, maxV);
+    }
+    
+	protected void addVertex(Tessellator tessellator, Double3 coord, double u, double v) {
+		tessellator.addVertexWithUV(coord.x, coord.y, coord.z, u, v);
 	}
-
 	/** Calculates and sets the color of the particle by blending the average color of the block texture with the current biome color
 	 *  Blending is done in HSB color space, weighted by the relative saturation of the colors
 	 * @param textureAvgColor average color of the block texture
