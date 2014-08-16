@@ -19,6 +19,7 @@ import net.minecraftforge.common.MinecraftForge;
 import com.google.common.collect.Sets;
 
 import cpw.mods.fml.common.eventhandler.Event;
+import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -62,7 +63,7 @@ public class LeafTextureEnumerator implements IIconRegister {
 	 *  their textures to "sniff out" all leaf textures.
 	 * @param event
 	 */
-	@SubscribeEvent
+	@SubscribeEvent(priority=EventPriority.LOWEST)
 	@SuppressWarnings("unchecked")
 	public void handleTextureReload(TextureStitchEvent.Pre event) {
 		if (event.map.getTextureType() != 0) return;
