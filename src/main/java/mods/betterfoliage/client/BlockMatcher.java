@@ -3,6 +3,7 @@ package mods.betterfoliage.client;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -47,7 +48,12 @@ public class BlockMatcher {
 	}
 	
 	public void load(File file, ResourceLocation defaults) {
-		if (!file.exists()) Utils.copyFromTextResource(defaults, file);
+		if (!file.exists()) try {
+			Utils.copyFromTextResource(defaults, file);
+		} catch (IOException e) {
+			BetterFoliage.log.error(String.format("Error copying default resource: %s", defaults.toString()));
+			e.printStackTrace();
+		}
 		
 		BufferedReader reader = null;
 		try {

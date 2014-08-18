@@ -8,14 +8,15 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.util.Map;
 
-import com.google.common.base.Charsets;
-
 import mods.betterfoliage.loader.DeobfHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.resources.SimpleReloadableResourceManager;
 import net.minecraft.util.ResourceLocation;
+
+import com.google.common.base.Charsets;
+
 import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
 import cpw.mods.fml.client.registry.RenderingRegistry;
 
@@ -91,21 +92,20 @@ public class Utils {
 	/** Copy a text file from a resource to the filesystem 
 	 * @param resourceLocation resource location of text file
 	 * @param target target file
+	 * @throws IOException 
 	 */
-	public static void copyFromTextResource(ResourceLocation resourceLocation, File target) {
-		try {
-			IResource defaults = Minecraft.getMinecraft().getResourceManager().getResource(resourceLocation);
-			BufferedReader reader = new BufferedReader(new InputStreamReader(defaults.getInputStream(), Charsets.UTF_8));
-			FileWriter writer = new FileWriter(target);
-			
-			String line = reader.readLine();
-			while(line != null) {
-				writer.write(line + System.lineSeparator());
-				line = reader.readLine();
-			}
-			reader.close();
-			writer.close();
-		} catch(IOException e) {
+	public static void copyFromTextResource(ResourceLocation resourceLocation, File target) throws IOException {
+		IResource defaults = Minecraft.getMinecraft().getResourceManager().getResource(resourceLocation);
+		BufferedReader reader = new BufferedReader(new InputStreamReader(defaults.getInputStream(), Charsets.UTF_8));
+		FileWriter writer = new FileWriter(target);
+		
+		String line = reader.readLine();
+		while(line != null) {
+			writer.write(line + System.lineSeparator());
+			line = reader.readLine();
 		}
+		
+		reader.close();
+		writer.close();
 	}
 }
