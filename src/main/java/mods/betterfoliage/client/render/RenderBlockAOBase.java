@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import mods.betterfoliage.common.util.Double3;
+import mods.betterfoliage.common.util.Utils;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderBlocks;
@@ -13,10 +14,12 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
+import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.util.ForgeDirection;
 
 import org.lwjgl.opengl.GL11;
 
+import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -122,6 +125,25 @@ public class RenderBlockAOBase extends RenderBlocks {
 	
 	public int getRenderId() {
 		return 0;
+	}
+	
+	protected void renderWorldBlockBase(int pass, IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer) {
+		// use original renderer for block breaking overlay
+		if (renderer.hasOverrideBlockTexture()) {
+			renderer.setRenderBoundsFromBlock(block);
+			renderer.renderStandardBlock(block, x, y, z);
+			return;
+		}
+		
+		// render block
+		setPassCounters(1);
+		setRenderBoundsFromBlock(block);
+		ISimpleBlockRenderingHandler handler = Utils.getRenderingHandler(block.getRenderType());
+		if (handler != null) {
+			handler.renderWorldBlock(world, x, y, z, block, block.getRenderType(), this);
+		} else {
+			renderStandardBlock(block, x, y, z);			
+		}
 	}
 	
 	protected void renderStandardBlockAsItem(RenderBlocks renderer, Block p_147800_1_, int p_147800_2_, float p_147800_3_) {

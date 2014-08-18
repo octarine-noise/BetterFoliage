@@ -36,20 +36,8 @@ public class RenderBlockBetterCoral extends RenderBlockAOBase implements IRender
 	}
 	
 	public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer) {
-		// store world for later use
 		blockAccess = world;
-		
-		// use original renderer for block breaking overlay
-		if (renderer.hasOverrideBlockTexture()) {
-			renderer.setRenderBoundsFromBlock(block);
-			renderer.renderStandardBlock(block, x, y, z);
-			return true;
-		}
-		
-		// render sand block
-		setPassCounters(1);
-		setRenderBoundsFromBlock(block);
-		renderStandardBlock(block, x, y, z);
+		renderWorldBlockBase(1, world, x, y, z, block, modelId, renderer);
 		
 		Double3 blockCenter = new Double3(x + 0.5, y + 0.5, z + 0.5);
 		double offset = pRand[getSemiRandomFromPos(x, y, z, 6)] * BetterFoliage.config.coralVOffset.value;

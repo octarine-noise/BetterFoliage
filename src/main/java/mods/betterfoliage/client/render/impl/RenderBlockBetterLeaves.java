@@ -5,7 +5,6 @@ import mods.betterfoliage.client.BetterFoliageClient;
 import mods.betterfoliage.client.render.IRenderBlockDecorator;
 import mods.betterfoliage.client.render.RenderBlockAOBase;
 import mods.betterfoliage.common.util.Double3;
-import mods.betterfoliage.common.util.Utils;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
@@ -16,7 +15,6 @@ import net.minecraft.init.Blocks;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.util.ForgeDirection;
-import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -30,25 +28,8 @@ public class RenderBlockBetterLeaves extends RenderBlockAOBase implements IRende
 	}
 	
 	public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer) {
-		// store world for later use
 		blockAccess = world;
-		
-		// use original renderer for block breaking overlay
-		if (renderer.hasOverrideBlockTexture()) {
-			renderer.setRenderBoundsFromBlock(block);
-			renderer.renderStandardBlock(block, x, y, z);
-			return true;
-		}
-		
-		// render leaves center
-		setPassCounters(1);
-		setRenderBoundsFromBlock(block);
-		if (block.getRenderType() == 0) {
-			renderStandardBlock(block, x, y, z);
-		} else {
-			ISimpleBlockRenderingHandler handler = Utils.getRenderingHandler(block.getRenderType());
-			handler.renderWorldBlock(world, x, y, z, block, block.getRenderType(), this);
-		}
+		renderWorldBlockBase(1, world, x, y, z, block, modelId, renderer);
 
 		// find generated texture to render with, assume the
 		// "true" texture of the block is the one on the north size
@@ -57,6 +38,7 @@ public class RenderBlockBetterLeaves extends RenderBlockAOBase implements IRende
 			blockLeafIcon = (TextureAtlasSprite) block.getIcon(world, x, y, z, ForgeDirection.NORTH.ordinal());
 		} catch (ClassCastException e) {
 		}
+		
 		if (blockLeafIcon == null) {
 			BetterFoliage.log.debug(String.format("null leaf texture, x:%d, y:%d, z:%d, meta:%d, block:%s", x, y, z, blockAccess.getBlockMetadata(x, y, z), block.getClass().getName()));
 			return true;

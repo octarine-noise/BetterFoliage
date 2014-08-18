@@ -29,6 +29,12 @@ public class BetterFoliageConfig extends ConfigBase {
 	@CfgElement(category="coral", key="enabled")
 	public boolean coralEnabled = true;
 	
+	@CfgElement(category="connectedGrass", key="classic")
+	public boolean ctxGrassClassicEnabled = true;
+	
+	@CfgElement(category="connectedGrass", key="aggressive")
+	public boolean ctxGrassAggressiveEnabled = true;
+	
 	@CfgElement(category="fallingLeaves", key="enabled")
 	public boolean fallingLeavesEnabled = true;
 	

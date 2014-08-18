@@ -12,7 +12,9 @@ import mods.betterfoliage.client.render.impl.RenderBlockBetterCoral;
 import mods.betterfoliage.client.render.impl.RenderBlockBetterGrass;
 import mods.betterfoliage.client.render.impl.RenderBlockBetterLeaves;
 import mods.betterfoliage.client.render.impl.RenderBlockBetterLilypad;
+import mods.betterfoliage.client.render.impl.RenderBlockBetterMycelium;
 import mods.betterfoliage.client.render.impl.RenderBlockBetterReed;
+import mods.betterfoliage.client.render.impl.RenderBlocksBetterGrassSide;
 import mods.betterfoliage.client.resource.LeafGenerator;
 import mods.betterfoliage.client.resource.LeafParticleTextures;
 import mods.betterfoliage.client.resource.LeafTextureEnumerator;
@@ -49,13 +51,15 @@ public class BetterFoliageClient {
 		FMLCommonHandler.instance().bus().register(new KeyHandler());
 		
 		BetterFoliage.log.info("Registering renderers");
-		registerRenderer(new RenderBlockBetterLeaves());
-		registerRenderer(new RenderBlockBetterGrass());
 		registerRenderer(new RenderBlockBetterCactus());
 		registerRenderer(new RenderBlockBetterLilypad());
+		registerRenderer(new RenderBlockBetterMycelium());
+		registerRenderer(new RenderBlockBetterLeaves());
+		registerRenderer(new RenderBlockBetterGrass());
 		registerRenderer(new RenderBlockBetterReed());
 		registerRenderer(new RenderBlockBetterAlgae());
 		registerRenderer(new RenderBlockBetterCoral());
+		registerRenderer(new RenderBlocksBetterGrassSide());
 
 		MinecraftForge.EVENT_BUS.register(wind);
 		FMLCommonHandler.instance().bus().register(wind);

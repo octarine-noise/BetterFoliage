@@ -42,20 +42,8 @@ public class RenderBlockBetterReed extends RenderBlockAOBase implements IRenderB
 	}
 	
 	public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer) {
-		// store world for later use
 		blockAccess = world;
-		
-		// use original renderer for block breaking overlay
-		if (renderer.hasOverrideBlockTexture()) {
-			renderer.setRenderBoundsFromBlock(block);
-			renderer.renderStandardBlock(block, x, y, z);
-			return true;
-		}
-		
-		// render dirt block
-		setPassCounters(1);
-		setRenderBoundsFromBlock(block);
-		renderStandardBlock(block, x, y, z);
+		renderWorldBlockBase(1, world, x, y, z, block, modelId, renderer);
 		
 		int iconVariation = getSemiRandomFromPos(x, y, z, 0);
 		int heightVariation = getSemiRandomFromPos(x, y, z, 1);
