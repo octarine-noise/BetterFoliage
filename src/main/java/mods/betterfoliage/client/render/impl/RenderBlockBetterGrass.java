@@ -6,6 +6,7 @@ import mods.betterfoliage.client.ShadersModIntegration;
 import mods.betterfoliage.client.render.IRenderBlockDecorator;
 import mods.betterfoliage.client.render.IconSet;
 import mods.betterfoliage.client.render.RenderBlockAOBase;
+import mods.betterfoliage.common.config.Config;
 import mods.betterfoliage.common.util.Double3;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
@@ -42,7 +43,7 @@ public class RenderBlockBetterGrass extends RenderBlockAOBase implements IRender
 		grassTopIcon = block.getIcon(blockAccess, x, y, z, ForgeDirection.UP.ordinal());
 		
 		renderWorldBlockBase(1, world, x, y, z, block, modelId, renderer);
-		if (!BetterFoliage.config.grassEnabled) return true;
+		if (!Config.grassEnabled) return true;
 		
 		boolean isSnowTop = blockAccess.getBlock(x, y + 1, z) == Blocks.snow_layer;
 		boolean isAirTop = blockAccess.isAirBlock(x, y + 1, z);
@@ -52,36 +53,36 @@ public class RenderBlockBetterGrass extends RenderBlockAOBase implements IRender
 			int iconVariation = getSemiRandomFromPos(x, y, z, 0);
 			int heightVariation = getSemiRandomFromPos(x, y, z, 1);
 			
-			double scale = BetterFoliage.config.grassSize.value * 0.5;
-			double halfHeight = 0.5 * (BetterFoliage.config.grassHeightMin.value + pRand[heightVariation] * (BetterFoliage.config.grassHeightMax.value - BetterFoliage.config.grassHeightMin.value));
+			double scale = Config.grassSize * 0.5;
+			double halfHeight = 0.5 * (Config.grassHeightMin + pRand[heightVariation] * (Config.grassHeightMax - Config.grassHeightMin));
 			
 			IIcon shortGrassIcon = null;
 			if (isSnowTop) {
 				// clear biome colors
 				aoYPXZNN.setGray(0.9f); aoYPXZNP.setGray(0.9f); aoYPXZPN.setGray(0.9f); aoYPXZPP.setGray(0.9f);
 				Tessellator.instance.setColorOpaque(230, 230, 230);
-				shortGrassIcon = BetterFoliage.config.grassUseGenerated ? snowGrassGenIcon : snowGrassIcons.get(iconVariation);
+				shortGrassIcon = Config.grassUseGenerated ? snowGrassGenIcon : snowGrassIcons.get(iconVariation);
 			} else {
 				Tessellator.instance.setColorOpaque_I(block.colorMultiplier(blockAccess, x, y, z));
-				shortGrassIcon = BetterFoliage.config.grassUseGenerated ? grassGenIcon : grassIcons.get(iconVariation);
+				shortGrassIcon = Config.grassUseGenerated ? grassGenIcon : grassIcons.get(iconVariation);
 			}
 			if (shortGrassIcon == null) return true;
 			
 			ShadersModIntegration.startGrassQuads();
 			Tessellator.instance.setBrightness(getBrightness(block, x, y + 1, z));
-			renderCrossedSideQuads(new Double3(x + 0.5, y + 1.0 + (isSnowTop ? 0.0625 : 0.0), z + 0.5), ForgeDirection.UP, scale, halfHeight, pRot[iconVariation], BetterFoliage.config.grassHOffset.value, shortGrassIcon, 0, false);
+			renderCrossedSideQuads(new Double3(x + 0.5, y + 1.0 + (isSnowTop ? 0.0625 : 0.0), z + 0.5), ForgeDirection.UP, scale, halfHeight, pRot[iconVariation], Config.grassHOffset, shortGrassIcon, 0, false);
 		}
 		return true;
 	}
 
 	protected void checkConnectedGrass(int x, int y, int z) {
 		Block blockBelow = blockAccess.getBlock(x, y - 1, z);
-		if (BetterFoliage.config.ctxGrassAggressiveEnabled && (BetterFoliageClient.grass.matchesID(blockBelow) || BetterFoliageClient.dirt.matchesID(blockBelow))) {
+		if (Config.ctxGrassAggressiveEnabled && (BetterFoliageClient.grass.matchesID(blockBelow) || BetterFoliageClient.dirt.matchesID(blockBelow))) {
 			connectXP = true;
 			connectXN = true;
 			connectZP = true;
 			connectZN = true;
-		} else if (BetterFoliage.config.ctxGrassClassicEnabled) {
+		} else if (Config.ctxGrassClassicEnabled) {
 			connectXP = BetterFoliageClient.grass.matchesID(blockAccess.getBlock(x + 1, y - 1, z));
 			connectXN = BetterFoliageClient.grass.matchesID(blockAccess.getBlock(x - 1, y - 1, z));
 			connectZP = BetterFoliageClient.grass.matchesID(blockAccess.getBlock(x, y - 1, z + 1));

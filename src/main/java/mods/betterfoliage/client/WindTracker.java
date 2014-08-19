@@ -2,7 +2,7 @@ package mods.betterfoliage.client;
 
 import java.util.Random;
 
-import mods.betterfoliage.BetterFoliage;
+import mods.betterfoliage.common.config.Config;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.World;
 import net.minecraftforge.event.world.WorldEvent;
@@ -27,8 +27,8 @@ public class WindTracker {
 		nextChange = world.getWorldInfo().getWorldTime() + changeTime;
 		
 		double direction = 2.0 * Math.PI * random.nextDouble();
-		double speed = Math.abs(random.nextGaussian()) * BetterFoliage.config.fallingLeavesWindStrength.value;
-		if (world.isRaining()) speed += Math.abs(random.nextGaussian()) * BetterFoliage.config.fallingLeavesStormStrength.value;
+		double speed = Math.abs(random.nextGaussian()) * Config.leafFXWindStrength;
+		if (world.isRaining()) speed += Math.abs(random.nextGaussian()) * Config.leafFXStormStrength;
 		
 		targetX = Math.cos(direction) * speed;
 		targetZ = Math.sin(direction) * speed;

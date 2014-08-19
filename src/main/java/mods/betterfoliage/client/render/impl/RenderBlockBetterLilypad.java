@@ -4,6 +4,7 @@ import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.render.FakeRenderBlockAOBase;
 import mods.betterfoliage.client.render.IRenderBlockDecorator;
 import mods.betterfoliage.client.render.IconSet;
+import mods.betterfoliage.common.config.Config;
 import mods.betterfoliage.common.util.Double3;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
@@ -23,7 +24,7 @@ public class RenderBlockBetterLilypad extends FakeRenderBlockAOBase implements I
 	public IconSet lilypadRoots = new IconSet("bettergrassandleaves", "better_lilypad_roots_%d");
 	
 	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
-		return BetterFoliage.config.lilypadEnabled && block == Blocks.waterlily;
+		return Config.lilypadEnabled && block == Blocks.waterlily;
 	}
 	
 	public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer) {
@@ -50,10 +51,10 @@ public class RenderBlockBetterLilypad extends FakeRenderBlockAOBase implements I
 														   	null, 0.0,
 														   	lilypadRoots.get(iconVariation), 2,
 														   	true);
-		if (chanceVariation < BetterFoliage.config.lilypadChance.value && lilypadFlowers.hasIcons())
+		if (chanceVariation < Config.lilypadChance && lilypadFlowers.hasIcons())
 			renderCrossedSideQuads(new Double3(x + 0.5, y + 0.02, z + 0.5), ForgeDirection.UP,
 					 			   0.2, 0.3, 
-					 			   pRot[offsetVariation], BetterFoliage.config.lilypadHOffset.value, 
+					 			   pRot[offsetVariation], Config.lilypadHOffset, 
 					 			   lilypadFlowers.get(iconVariation), 0,
 					 			   true);
 		

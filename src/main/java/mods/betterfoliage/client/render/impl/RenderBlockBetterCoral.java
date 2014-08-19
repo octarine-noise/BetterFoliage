@@ -6,6 +6,7 @@ import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.render.IRenderBlockDecorator;
 import mods.betterfoliage.client.render.IconSet;
 import mods.betterfoliage.client.render.RenderBlockAOBase;
+import mods.betterfoliage.common.config.Config;
 import mods.betterfoliage.common.util.Double3;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -29,10 +30,10 @@ public class RenderBlockBetterCoral extends RenderBlockAOBase implements IRender
 	public NoiseGeneratorSimplex noise;
 	
 	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
-		if (!BetterFoliage.config.coralEnabled) return false;
+		if (!Config.coralEnabled) return false;
 		if (block != Blocks.sand) return false;
 		int terrainVariation = MathHelper.floor_double((noise.func_151605_a(x * 0.1, z * 0.1) + 1.0) * 32.0);
-		return terrainVariation < BetterFoliage.config.coralPopulation.value;
+		return terrainVariation < Config.coralPopulation;
 	}
 	
 	public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer) {
@@ -40,9 +41,9 @@ public class RenderBlockBetterCoral extends RenderBlockAOBase implements IRender
 		renderWorldBlockBase(1, world, x, y, z, block, modelId, renderer);
 		
 		Double3 blockCenter = new Double3(x + 0.5, y + 0.5, z + 0.5);
-		double offset = pRand[getSemiRandomFromPos(x, y, z, 6)] * BetterFoliage.config.coralVOffset.value;
-		double halfSize = BetterFoliage.config.coralSize.value * 0.5;
-		double halfCrustSize = BetterFoliage.config.coralCrustSize.value * 0.5;
+		double offset = pRand[getSemiRandomFromPos(x, y, z, 6)] * Config.coralVOffset;
+		double halfSize = Config.coralSize * 0.5;
+		double halfCrustSize = Config.coralCrustSize * 0.5;
 		
 		Tessellator.instance.setBrightness(getBrightness(block, x, y, z));
 		for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
@@ -50,13 +51,13 @@ public class RenderBlockBetterCoral extends RenderBlockAOBase implements IRender
 			if (blockAccess.isAirBlock(x + dir.offsetX, y + dir.offsetY + 1, z + dir.offsetZ)) continue;
 				
 			int variation = getSemiRandomFromPos(x, y, z, dir.ordinal());
-			if (variation < BetterFoliage.config.coralChance.value) {
+			if (variation < Config.coralChance) {
 				IIcon crustIcon = coralCrustIcons.get(variation);
 				IIcon coralIcon = coralCrossIcons.get(variation);
 				if (crustIcon != null) renderCoralCrust(blockCenter, dir, offset, halfCrustSize, crustIcon, variation);
 				if (coralIcon != null) renderCrossedSideQuads(blockCenter.add(new Double3(dir).scale(0.5)), dir, 
 														      halfSize, halfSize, 
-														      pRot[variation], BetterFoliage.config.coralHOffset.value,
+														      pRot[variation], Config.coralHOffset,
 														      coralIcon, 0, false);
 			}
 		}

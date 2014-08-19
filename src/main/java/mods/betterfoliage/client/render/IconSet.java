@@ -16,7 +16,7 @@ public class IconSet {
 	/** Icon array */
 	public IIcon[] icons = new IIcon[16];
 	
-	/** Number of successfully loaded icons*/
+	/** Number of successfully loaded icons */
 	public int numLoaded = 0;
 	
 	/** Resource domain of icons */

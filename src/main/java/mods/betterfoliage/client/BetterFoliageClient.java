@@ -20,6 +20,7 @@ import mods.betterfoliage.client.resource.LeafParticleTextures;
 import mods.betterfoliage.client.resource.LeafTextureEnumerator;
 import mods.betterfoliage.client.resource.ReedGenerator;
 import mods.betterfoliage.client.resource.ShortGrassGenerator;
+import mods.betterfoliage.common.config.Config;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -49,6 +50,7 @@ public class BetterFoliageClient {
 	
 	public static void preInit() {
 		FMLCommonHandler.instance().bus().register(new KeyHandler());
+		FMLCommonHandler.instance().bus().register(new Config());
 		
 		BetterFoliage.log.info("Registering renderers");
 		registerRenderer(new RenderBlockBetterCactus());
@@ -107,9 +109,9 @@ public class BetterFoliageClient {
 	}
 	
 	public static void onRandomDisplayTick(Block block, World world, int x, int y, int z) {
-		if (!BetterFoliage.config.fallingLeavesEnabled) return;
+		if (!Config.leafFXEnabled) return;
 		if (!leaves.matchesID(block) || !world.isAirBlock(x, y - 1, z)) return;
-		if (Math.random() > BetterFoliage.config.fallingLeavesChance.value) return;
+		if (Math.random() > Config.leafFXChance) return;
 		Minecraft.getMinecraft().effectRenderer.addEffect(new EntityFXFallingLeaves(world, x, y, z));
 	}
 	

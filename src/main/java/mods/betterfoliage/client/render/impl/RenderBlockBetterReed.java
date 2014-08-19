@@ -8,6 +8,7 @@ import mods.betterfoliage.client.ShadersModIntegration;
 import mods.betterfoliage.client.render.IRenderBlockDecorator;
 import mods.betterfoliage.client.render.IconSet;
 import mods.betterfoliage.client.render.RenderBlockAOBase;
+import mods.betterfoliage.common.config.Config;
 import mods.betterfoliage.common.util.Double3;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -32,13 +33,13 @@ public class RenderBlockBetterReed extends RenderBlockAOBase implements IRenderB
 	public NoiseGeneratorSimplex noise;
 	
 	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
-		if (!BetterFoliage.config.reedEnabled) return false;
+		if (!Config.reedEnabled) return false;
 		if (!(BetterFoliageClient.dirt.matchesID(block))) return false;
 		if (blockAccess.getBlock(x, y + 1, z).getMaterial() != Material.water) return false;
 		if (!blockAccess.isAirBlock(x, y + 2, z)) return false;
 		if (blockAccess.getBiomeGenForCoords(x, z).temperature < 0.4f || blockAccess.getBiomeGenForCoords(x, z).rainfall < 0.4f) return false;
 		int terrainVariation = MathHelper.floor_double((noise.func_151605_a(x, z) + 1.0) * 32.0);
-		return terrainVariation < BetterFoliage.config.reedChance.value;
+		return terrainVariation < Config.reedChance;
 	}
 	
 	public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer) {
@@ -52,14 +53,14 @@ public class RenderBlockBetterReed extends RenderBlockAOBase implements IRenderB
 		IIcon topIcon = reedTopIcons.get(iconVariation);
 		if (bottomIcon == null || topIcon == null) return true;
 		
-		double quarterHeight = 0.25 * (BetterFoliage.config.reedHeightMin.value + pRand[heightVariation] * (BetterFoliage.config.reedHeightMax.value - BetterFoliage.config.reedHeightMin.value));
+		double quarterHeight = 0.25 * (Config.reedHeightMin + pRand[heightVariation] * (Config.reedHeightMax - Config.reedHeightMin));
 		Tessellator.instance.setBrightness(getBrightness(block, x, y + 2, z));
 		Tessellator.instance.setColorOpaque(255, 255, 255);
 		
 		// render reeds
 		ShadersModIntegration.startGrassQuads();
-		renderCrossedSideQuads(new Double3(x + 0.5, y + 1.0, z + 0.5), ForgeDirection.UP, 0.5, quarterHeight, pRot[iconVariation], BetterFoliage.config.reedHOffset.value, bottomIcon, 0, true);
-		renderCrossedSideQuads(new Double3(x + 0.5, y + 1.0 + 2.0 * quarterHeight, z + 0.5), ForgeDirection.UP, 0.5, quarterHeight, pRot[iconVariation], BetterFoliage.config.reedHOffset.value, topIcon, 0, true);
+		renderCrossedSideQuads(new Double3(x + 0.5, y + 1.0, z + 0.5), ForgeDirection.UP, 0.5, quarterHeight, pRot[iconVariation], Config.reedHOffset, bottomIcon, 0, true);
+		renderCrossedSideQuads(new Double3(x + 0.5, y + 1.0 + 2.0 * quarterHeight, z + 0.5), ForgeDirection.UP, 0.5, quarterHeight, pRot[iconVariation], Config.reedHOffset, topIcon, 0, true);
 		
 		return true;
 	}

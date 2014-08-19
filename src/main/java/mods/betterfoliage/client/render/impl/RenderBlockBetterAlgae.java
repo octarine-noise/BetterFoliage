@@ -7,6 +7,7 @@ import mods.betterfoliage.client.BetterFoliageClient;
 import mods.betterfoliage.client.render.IRenderBlockDecorator;
 import mods.betterfoliage.client.render.IconSet;
 import mods.betterfoliage.client.render.RenderBlockAOBase;
+import mods.betterfoliage.common.config.Config;
 import mods.betterfoliage.common.util.Double3;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -30,13 +31,13 @@ public class RenderBlockBetterAlgae extends RenderBlockAOBase implements IRender
 	public NoiseGeneratorSimplex noise;
 	
 	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
-		if (!BetterFoliage.config.algaeEnabled) return false;
+		if (!Config.algaeEnabled) return false;
 		if (!(BetterFoliageClient.dirt.matchesID(block))) return false;
 		if (blockAccess.getBlock(x, y + 1, z).getMaterial() != Material.water) return false;
 		if (blockAccess.getBlock(x, y + 2, z).getMaterial() != Material.water) return false;
 		if (blockAccess.getBiomeGenForCoords(x, z).temperature < 0.4f) return false;
 		int terrainVariation = MathHelper.floor_double((noise.func_151605_a(x, z) + 1.0) * 32.0);
-		return terrainVariation < BetterFoliage.config.algaeChance.value;
+		return terrainVariation < Config.algaePopulation;
 	}
 	
 	public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer) {
@@ -61,10 +62,10 @@ public class RenderBlockBetterAlgae extends RenderBlockAOBase implements IRender
 		IIcon renderIcon = algaeIcons.get(variation);
 		if (renderIcon == null) return true;
 		
-		double scale = BetterFoliage.config.algaeSize.value * 0.5;
-		double halfHeight = 0.5 * (BetterFoliage.config.algaeHeightMin.value + pRand[heightVariation] * (BetterFoliage.config.algaeHeightMax.value - BetterFoliage.config.algaeHeightMin.value));
+		double scale = Config.algaeSize * 0.5;
+		double halfHeight = 0.5 * (Config.algaeHeightMin + pRand[heightVariation] * (Config.algaeHeightMax - Config.algaeHeightMin));
 		Tessellator.instance.setBrightness(getBrightness(block, x, y + 1, z));
-		renderCrossedSideQuads(new Double3(x + 0.5, y + 1.0 - 0.125 * halfHeight, z + 0.5), ForgeDirection.UP, scale, halfHeight, pRot[variation], BetterFoliage.config.algaeHOffset.value, renderIcon, 0, false);
+		renderCrossedSideQuads(new Double3(x + 0.5, y + 1.0 - 0.125 * halfHeight, z + 0.5), ForgeDirection.UP, scale, halfHeight, pRot[variation], Config.algaeHOffset, renderIcon, 0, false);
 		
 		return true;
 	}

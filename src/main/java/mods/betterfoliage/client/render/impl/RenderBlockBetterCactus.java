@@ -4,6 +4,7 @@ import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.render.FakeRenderBlockAOBase;
 import mods.betterfoliage.client.render.IRenderBlockDecorator;
 import mods.betterfoliage.client.render.IconSet;
+import mods.betterfoliage.common.config.Config;
 import mods.betterfoliage.common.util.Double3;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
@@ -31,7 +32,7 @@ public class RenderBlockBetterCactus extends FakeRenderBlockAOBase implements IR
 	public static double cactusRadius = 0.4375;
 	
 	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
-		return BetterFoliage.config.cactusEnabled && block == Blocks.cactus;
+		return Config.cactusEnabled && block == Blocks.cactus;
 	}
 	
 	public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer) {

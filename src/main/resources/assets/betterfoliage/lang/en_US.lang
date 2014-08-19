@@ -1,39 +1,69 @@
 key.betterfoliage.gui=Open Settings
 
-message.betterfoliage.optionOn=ON
-message.betterfoliage.optionOff=OFF
-message.betterfoliage.config=Config
-message.betterfoliage.back=Back
-message.betterfoliage.close=Close
+betterfoliage.enabled=Enable
+betterfoliage.enabled.tooltip=Is this feature enabled?
+betterfoliage.hOffset=Horizontal offset
+betterfoliage.hOffset.tooltip=Distance feature is shifted horizontally, in blocks
+betterfoliage.vOffset=Vertical offset
+betterfoliage.vOffset.tooltip=Distance feature is shifted vertically, in blocks
+betterfoliage.size=Size
+betterfoliage.size.tooltip=Size of element
+betterfoliage.minHeight=Minimum height
+betterfoliage.minHeight.tooltip=Minimum height of element
+betterfoliage.minHeight=Maximum height
+betterfoliage.minHeight.tooltip=Maximum height of element
+betterfoliage.population=Population
+betterfoliage.population.tooltip=Chance (N in 64) that an eligible block will have this feature
 
-message.betterfoliage.betterLeaves=Extra Leaves: %s
-message.betterfoliage.betterGrass=Short Grass: %s
-message.betterfoliage.betterCactus=Better Cactus: %s
-message.betterfoliage.betterLilypad=Better Lilypad: %s
-message.betterfoliage.betterReed=Reeds: %s
-message.betterfoliage.betterAlgae=Algae: %s
-message.betterfoliage.betterCoral=Coral: %s
-message.betterfoliage.fallingLeaves=Falling Leaves: %s
+betterfoliage.extraLeaves=Extra Leaves
+betterfoliage.extraLeaves.tooltip=Extra round leaves on leaf blocks
+message.betterfoliage.leavesMode=Leaves offset mode
+message.betterfoliage.leavesMode.tooltip="true" means leaf quads are skewed, "false" means translated
 
-message.betterfoliage.size=Size
-message.betterfoliage.hOffset=H.Offset
-message.betterfoliage.vOffset=V.Offset
-message.betterfoliage.minHeight=Min.Height
-message.betterfoliage.maxHeight=Max.Height
-message.betterfoliage.flowerChance=Flower Chance
-message.betterfoliage.reedChance=Reed Population
-message.betterfoliage.leavesMode=Leaves Offset: %s
-message.betterfoliage.genShortgrass=Use generated: %s
-message.betterfoliage.leavesSkew=Skew
-message.betterfoliage.leavesTranslate=Translate
-message.betterfoliage.algaeChance=Algae Population
-message.betterfoliage.crustSize=Crust Size
-message.betterfoliage.coralChance=Coral Chance
-message.betterfoliage.coralPopulation=Coral Population
+betterfoliage.shortGrass=Short Grass
+betterfoliage.shortGrass.tooltip=Tufts of grass on top of grass blocks
+betterfoliage.shortGrass.useGenerated=Use generated texture
+betterfoliage.shortGrass.useGenerated.tooltip=Generated texture is made by slicing the tallgrass texture from the active resource pack set 
 
-message.betterfoliage.speed=Speed
-message.betterfoliage.windStrength=Wind Strength
-message.betterfoliage.stormStrength=Storm Strength
-message.betterfoliage.fallingLeafChance=Particle Chance
-message.betterfoliage.fallingLeafPerturbation=Perturbation
-message.betterfoliage.fallingLeafLifetime=Max. lifetime
+betterfoliage.cactus=Better Cactus
+betterfoliage.cactus.tooltip=Enhance cactus with extra bits and smooth shading
+
+betterfoliage.lilypad=Better Lilypad
+betterfoliage.lilypad.tooltip=Enhance lilypad with roots and occasional flowers
+betterfoliage.lilypad.flowerChance=Flower chance
+betterfoliage.lilypad.flowerChance.tooltip=Chance (N in 64) of a lilypad having a flower on it
+
+betterfoliage.reed=Reeds
+betterfoliage.reed.tooltip=Reeds on dirt blocks in shallow water
+
+betterfoliage.algae=Algae
+betterfoliage.algae.tooltip=Algae on dirt blocks in deep water
+
+betterfoliage.coral=Coral
+betterfoliage.coral.tooltip=Coral on sand blocks in deep water
+betterfoliage.coral.size=Coral size
+betterfoliage.coral.size.tooltip=Size of coral bits sticking out
+betterfoliage.coral.crustSize=Crust size
+betterfoliage.coral.crustSize.tooltip=Size of the flat coral part
+betterfoliage.coral.chance=Coral chance
+betterfoliage.coral.chance.tooltip=Chance (N in 64) of a specific face of the block to show coral
+
+betterfoliage.fallingLeaves=Falling leaves
+betterfoliage.fallingLeaves.tooltip=Falling leaf particle FX emitted from the bottom of leaf blocks
+betterfoliage.fallingLeaves.speed=Particle speed
+betterfoliage.fallingLeaves.speed.tooltip=Overall particle speed
+betterfoliage.fallingLeaves.windStrength=Wind strength
+betterfoliage.fallingLeaves.windStrength.tooltip=Magnitude of wind effects in good weather (spread of normal distribution centered on 0)
+betterfoliage.fallingLeaves.stormStrength=Storm strength
+betterfoliage.fallingLeaves.stormStrength.tooltip=Additional magnitude of wind effects in rainy weather (spread of normal distribution centered on 0)
+betterfoliage.fallingLeaves.size=Particle size
+betterfoliage.fallingLeaves.chance=Particle chance
+betterfoliage.fallingLeaves.chance.tooltip=Chance of each random render tick hitting a leaf block to spawn a particle
+betterfoliage.fallingLeaves.perturb=Perturbation
+betterfoliage.fallingLeaves.perturb.tooltip=Magnitude of perturbation effect. Adds a corkscrew-like motion to the particle synchronized to its rotation
+betterfoliage.fallingLeaves.lifetime=Maximum lifetime
+betterfoliage.fallingLeaves.lifetime.tooltip=Maximum lifetime of particle in seconds. Minimum lifetime is 60% of this value
+
+betterfoliage.connectedGrass=Connected grass textures
+betterfoliage.connectedGrass.classic=Classic connected grass
+betterfoliage.connectedGrass.aggressive=Aggressive connected grass

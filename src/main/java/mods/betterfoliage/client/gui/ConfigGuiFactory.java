@@ -2,11 +2,15 @@ package mods.betterfoliage.client.gui;
 
 import java.util.Set;
 
-import com.google.common.collect.ImmutableSet;
-
+import mods.betterfoliage.BetterFoliage;
+import mods.betterfoliage.common.config.Config;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
+
+import com.google.common.collect.ImmutableSet;
+
 import cpw.mods.fml.client.IModGuiFactory;
+import cpw.mods.fml.client.config.GuiConfig;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -18,7 +22,7 @@ public class ConfigGuiFactory implements IModGuiFactory {
 	}
 
 	public Class<? extends GuiScreen> mainConfigGuiClass() {
-		return ConfigGuiMain.class;
+		return ConfigGuiBetterFoliage.class;
 	}
 
 	public Set<RuntimeOptionCategoryElement> runtimeGuiCategories() {
@@ -29,4 +33,9 @@ public class ConfigGuiFactory implements IModGuiFactory {
 		return null;
 	}
 
+	public static class ConfigGuiBetterFoliage extends GuiConfig {
+		public ConfigGuiBetterFoliage(GuiScreen parentScreen) {
+			super(parentScreen, Config.getConfigRootCategories(), BetterFoliage.MOD_ID, null, false, false, BetterFoliage.MOD_NAME);
+		}
+	}
 }

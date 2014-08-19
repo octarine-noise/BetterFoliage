@@ -2,8 +2,8 @@ package mods.betterfoliage.client.render.impl;
 
 import java.awt.Color;
 
-import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.BetterFoliageClient;
+import mods.betterfoliage.common.config.Config;
 import mods.betterfoliage.common.util.Double3;
 import net.minecraft.block.Block;
 import net.minecraft.client.particle.EntityFX;
@@ -36,12 +36,12 @@ public class EntityFXFallingLeaves extends EntityFX {
 	
 	public EntityFXFallingLeaves(World world, int x, int y, int z) {
 		super(world, x + 0.5, y, z + 0.5);
-		particleMaxAge = MathHelper.floor_double((0.6 + 0.4 * rand.nextDouble()) * BetterFoliage.config.fallingLeavesLifetime.value * 20.0);
+		particleMaxAge = MathHelper.floor_double((0.6 + 0.4 * rand.nextDouble()) * Config.leafFXLifetime * 20.0);
 		isMirrored = (rand.nextInt() & 1) == 1;
-		motionY = -BetterFoliage.config.fallingLeavesSpeed.value;
+		motionY = -Config.leafFXSpeed;
 		particleRotation = rand.nextInt(64);
 		
-		particleScale = (float) BetterFoliage.config.fallingLeavesSize.value;
+		particleScale = (float) Config.leafFXSize;
 		particleIcon = BetterFoliageClient.leafParticles.icons.get(rand.nextInt(1024));
 		
 		Block block = world.getBlock(x, y, z);
@@ -53,7 +53,7 @@ public class EntityFXFallingLeaves extends EntityFX {
 	public void onUpdate() {
 		super.onUpdate();
 		
-		particleScale = (float) BetterFoliage.config.fallingLeavesSize.value;
+		particleScale = (float) Config.leafFXSize;
 		if (rand.nextFloat() > 0.95f) rotationPositive = !rotationPositive;
 		if (particleAge > particleMaxAge - 20) particleAlpha = 0.05f * (particleMaxAge - particleAge);
 		
@@ -66,9 +66,9 @@ public class EntityFXFallingLeaves extends EntityFX {
 			}
 			wasOnGround = true;
 		} else {
-			motionX = (BetterFoliageClient.wind.currentX + cos[particleRotation] * BetterFoliage.config.fallingLeavesPerturb.value) * BetterFoliage.config.fallingLeavesSpeed.value;
-			motionZ = (BetterFoliageClient.wind.currentZ + sin[particleRotation] * BetterFoliage.config.fallingLeavesPerturb.value) * BetterFoliage.config.fallingLeavesSpeed.value;
-			motionY = -BetterFoliage.config.fallingLeavesSpeed.value;
+			motionX = (BetterFoliageClient.wind.currentX + cos[particleRotation] * Config.leafFXPerturb) * Config.leafFXSpeed;
+			motionZ = (BetterFoliageClient.wind.currentZ + sin[particleRotation] * Config.leafFXPerturb) * Config.leafFXSpeed;
+			motionY = -Config.leafFXSpeed;
 			particleRotation = (particleRotation + (rotationPositive ? 1 : -1)) & 63;
 		}
 	}

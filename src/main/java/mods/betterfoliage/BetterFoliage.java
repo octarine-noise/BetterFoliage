@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.Map;
 
 import mods.betterfoliage.client.BetterFoliageClient;
-import mods.betterfoliage.common.config.BetterFoliageConfig;
+import mods.betterfoliage.common.config.Config;
 
 import org.apache.logging.log4j.Logger;
 
@@ -24,8 +24,6 @@ public class BetterFoliage {
 	@Mod.Instance
 	public static BetterFoliage instance;
 	
-	public static BetterFoliageConfig config = new BetterFoliageConfig();
-	
 	public static Logger log;
 	
 	public static File configDir;
@@ -36,7 +34,7 @@ public class BetterFoliage {
 		if (event.getSide() == Side.CLIENT) {
 			configDir = new File(event.getModConfigurationDirectory(), MOD_ID);
 			configDir.mkdir();
-			config.load(new File(configDir, "betterfoliage.cfg"));
+			Config.readConfig(new File(configDir, "betterfoliage.cfg"));
 			BetterFoliageClient.preInit();
 		}
 	}
