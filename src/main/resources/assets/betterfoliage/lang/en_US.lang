@@ -28,13 +28,13 @@ betterfoliage.blockTypes.cropWhitelist=Crop Whitelist
 betterfoliage.blockTypes.cropBlacklist=Crop Blacklist
 
 betterfoliage.blockTypes.dirtWhitelist.tooltip=Blocks recognized as Dirt. Has an impact on Reeds, Algae, Connected Grass
-betterfoliage.blockTypes.dirtBlacklist.tooltip=Blocks recognized as Dirt. Has an impact on Reeds, Algae, Connected Grass
+betterfoliage.blockTypes.dirtBlacklist.tooltip=Blocks never accepted as Dirt. Has an impact on Reeds, Algae, Connected Grass
 betterfoliage.blockTypes.grassWhitelist.tooltip=Blocks recognized as Grass. Has an impact on Short Grass, Connected Grass
-betterfoliage.blockTypes.grassBlacklist.tooltip=Blocks recognized as Grass. Has an impact on Short Grass, Connected Grass
-betterfoliage.blockTypes.leavesWhitelist.tooltip=Blocks recognized as Leaves. Has an impact on Extra Leaves, Falling Leaves. Blocks will render with leaves block ID in shader programs
-betterfoliage.blockTypes.leavesBlacklist.tooltip=Blocks recognized as Leaves. Has an impact on Extra Leaves, Falling Leaves. Blocks will render with leaves block ID in shader programs
-betterfoliage.blockTypes.cropWhitelist.tooltip=Blocks recognized as crops. Blocks will render with wheat block ID in shader programs
-betterfoliage.blockTypes.cropBlacklist.tooltip=Blocks recognized as crops. Blocks will render with wheat block ID in shader programs
+betterfoliage.blockTypes.grassBlacklist.tooltip=Blocks never accepted as Grass. Has an impact on Short Grass, Connected Grass
+betterfoliage.blockTypes.leavesWhitelist.tooltip=Blocks recognized as Leaves. Has an impact on Extra Leaves, Falling Leaves. Leaves will render with leaves block ID in shader programs
+betterfoliage.blockTypes.leavesBlacklist.tooltip=Blocks never accepted as Leaves. Has an impact on Extra Leaves, Falling Leaves. Leaves will render with leaves block ID in shader programs
+betterfoliage.blockTypes.cropWhitelist.tooltip=Blocks recognized as crops. Crops will render with tallgrass block ID in shader programs
+betterfoliage.blockTypes.cropBlacklist.tooltip=Blocks never accepted as crops. Crops will render with tallgrass block ID in shader programs
 
 betterfoliage.extraLeaves=Extra Leaves
 betterfoliage.extraLeaves.tooltip=Extra round leaves on leaf blocks
@@ -46,7 +46,7 @@ betterfoliage.leavesMode.false=Translate
 betterfoliage.shortGrass=Short Grass
 betterfoliage.shortGrass.tooltip=Tufts of grass on top of grass blocks
 betterfoliage.shortGrass.useGenerated=Use generated texture
-betterfoliage.shortGrass.useGenerated.tooltip=Generated texture is made by slicing the tallgrass texture from the active resource pack set 
+betterfoliage.shortGrass.useGenerated.tooltip=Generated texture is made by slicing the tallgrass texture from the active resource pack set in half
 
 betterfoliage.cactus=Better Cactus
 betterfoliage.cactus.tooltip=Enhance cactus with extra bits and smooth shading
