@@ -5,13 +5,21 @@ import java.util.List;
 
 import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.BlockMatcher;
+import mods.betterfoliage.client.gui.AlternateTextBooleanEntry;
+import mods.betterfoliage.client.gui.BiomeListConfigEntry;
+import mods.betterfoliage.client.gui.NonVerboseArrayEntry;
+import mods.betterfoliage.common.util.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.ConfigElement;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 
 import cpw.mods.fml.client.config.IConfigElement;
@@ -86,6 +94,10 @@ public class Config {
 	public static boolean ctxGrassClassicEnabled;
 	public static boolean ctxGrassAggressiveEnabled;
 	
+	public static List<Integer> reedBiomeList = Lists.newArrayList();
+	public static List<Integer> algaeBiomeList = Lists.newArrayList();
+	public static List<Integer> coralBiomeList = Lists.newArrayList();
+	
 	/** Read the config file
 	 * @param configFile
 	 */
@@ -123,7 +135,8 @@ public class Config {
         reedHeightMax = getDouble(Category.reed, "heightMax", 2.5, 1.5, 3.5, "betterfoliage.maxHeight");
         reedPopulation = getInt(Category.reed, "population", 32, 0, 64, "betterfoliage.population");
         reedHeightMin = clampDoubleToMax(Category.reed, "heightMin", "heightMax");
-
+        reedBiomeList = getIntList(Category.reed, "reedBiomeList", reedBiomeList, "betterfoliage.reed.biomeList");
+        
         algaeEnabled = getBoolean(Category.algae, "enabled", true, "betterfoliage.enabled");
         algaeHOffset = getDouble(Category.algae, "hOffset", 0.1, 0.0, 0.25, "betterfoliage.hOffset");
         algaeSize = getDouble(Category.algae, "size", 1.0, 0.5, 1.5, "betterfoliage.size");
@@ -131,6 +144,7 @@ public class Config {
         algaeHeightMax = getDouble(Category.algae, "heightMax", 1.0, 0.1, 1.5, "betterfoliage.maxHeight");
         algaePopulation = getInt(Category.algae, "population", 48, 0, 64, "betterfoliage.population");
         algaeHeightMin = clampDoubleToMax(Category.algae, "heightMin", "heightMax");
+        algaeBiomeList = getIntList(Category.algae, "algaeBiomeList", algaeBiomeList, "betterfoliage.algae.biomeList");
         
         coralEnabled = getBoolean(Category.coral, "enabled", true, "betterfoliage.enabled");
         coralHOffset = getDouble(Category.coral, "hOffset", 0.2, 0.0, 0.4, "betterfoliage.hOffset");
@@ -139,7 +153,8 @@ public class Config {
         coralCrustSize = getDouble(Category.coral, "crustSize", 1.4, 0.5, 1.5, "betterfoliage.coral.crustSize");
         coralChance = getInt(Category.coral, "chance", 32, 0, 64, "betterfoliage.coral.chance");
         coralPopulation = getInt(Category.coral, "population", 48, 0, 64, "betterfoliage.population");
-
+        coralBiomeList = getIntList(Category.coral, "coralBiomeList", coralBiomeList, "betterfoliage.coral.biomeList");
+        
         leafFXEnabled = getBoolean(Category.fallingLeaves, "enabled", true, "betterfoliage.enabled");
         leafFXSpeed = getDouble(Category.fallingLeaves, "speed", 0.05, 0.01, 0.15, "betterfoliage.fallingLeaves.speed");
         leafFXWindStrength = getDouble(Category.fallingLeaves, "windStrength", 0.5, 0.1, 2.0, "betterfoliage.fallingLeaves.windStrength");
@@ -158,16 +173,47 @@ public class Config {
         updateBlockMatcher(crops, Category.blockTypes, "cropWhitelist", "betterfoliage.blockTypes.cropWhitelist", "cropBlacklist", "betterfoliage.blockTypes.cropBlacklist", new ResourceLocation("betterfoliage:classesCropDefault.cfg"));
         
         rawConfig.getCategory(Category.extraLeaves.toString()).get("skewMode").setConfigEntryClass(AlternateTextBooleanEntry.class);
+        rawConfig.getCategory(Category.reed.toString()).get("reedBiomeList").setConfigEntryClass(BiomeListConfigEntry.class);
+        rawConfig.getCategory(Category.algae.toString()).get("algaeBiomeList").setConfigEntryClass(BiomeListConfigEntry.class);
+        rawConfig.getCategory(Category.coral.toString()).get("coralBiomeList").setConfigEntryClass(BiomeListConfigEntry.class);
+        
 		for (Category category : Category.values()) rawConfig.setCategoryLanguageKey(category.toString(), String.format("betterfoliage.%s", category.toString()));
 		
 		setOrder(Category.extraLeaves, "enabled", "skewMode", "hOffset", "vOffset", "size");
 		setOrder(Category.shortGrass, "enabled", "useGenerated", "hOffset", "heightMin", "heightMax", "size");
 		setOrder(Category.lilypad, "enabled", "hOffset", "flowerChance");
-		setOrder(Category.reed, "enabled", "hOffset", "heightMin", "heightMax", "population");
+		setOrder(Category.reed, "enabled", "hOffset", "heightMin", "heightMax", "population", "biomeList");
 		setOrder(Category.algae, "enabled", "hOffset", "heightMin", "heightMax", "population");
 		setOrder(Category.coral, "enabled", "hOffset", "vOffset", "size", "crustSize", "population", "chance");
 		setOrder(Category.fallingLeaves, "enabled", "size", "chance", "lifetime", "speed", "windStrength", "stormStrength", "perturb");
 		setOrder(Category.connectedGrass, "classic", "aggressive");
+	}
+	
+	public static void getDefaultBiomes() {
+	    for (BiomeGenBase biome : BiomeGenBase.getBiomeGenArray()) {
+	        if (biome == null) continue;
+	        if (Utils.biomeTempRainFilter(0.4f, null, 0.4f, null).apply(biome)) {
+	            reedBiomeList.add(biome.biomeID);
+	            BiomeListConfigEntry.reedBiomeList.add(biome);
+	        }
+	        if (Utils.biomeClassNameFilter("river", "ocean").apply(biome)) {
+	            algaeBiomeList.add(biome.biomeID);
+	            coralBiomeList.add(biome.biomeID);
+	            BiomeListConfigEntry.algaeBiomeList.add(biome);
+	            BiomeListConfigEntry.coralBiomeList.add(biome);
+	        }
+	    }
+	}
+	
+	protected static List<Integer> getFilteredBiomeIds(List<BiomeGenBase> biomes, Predicate<BiomeGenBase> filter) {
+	    return Lists.newArrayList(Collections2.transform(
+	        Collections2.filter(biomes, filter),
+	        new Function<BiomeGenBase, Integer>() {
+	            public Integer apply(BiomeGenBase input) {
+	                return input.biomeID;
+	            }
+            }
+	    ));
 	}
 	
 	@SuppressWarnings("rawtypes")
@@ -204,6 +250,23 @@ public class Config {
 		return prop.getInt();
 	}
 	
+	protected static List<Integer> getIntList(Category category, String key, List<Integer> defaultList, String langKey) {
+	    int[] defaults = new int[]{};
+	    if (defaultList != null) {
+	        defaults = new int[defaultList.size()];
+	        int idx = 0;
+	        for (Integer value : defaultList) defaults[idx++] = value;
+	    }
+	    
+	    Property prop = rawConfig.get(category.toString(), key, defaults);
+	    prop.setLanguageKey(langKey);
+	    
+	    int[] values = prop.getIntList();
+	    List<Integer> result = Lists.newArrayListWithCapacity(values.length);
+	    for (int value : values) result.add(value);
+	    return result;
+	}
+	    
     protected static boolean getBoolean(Category category, String key, boolean defaultValue, String langKey) {
         Property prop = rawConfig.get(category.toString(), key, defaultValue);
         prop.setLanguageKey(langKey);

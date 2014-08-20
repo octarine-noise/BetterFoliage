@@ -31,7 +31,8 @@ public class RenderBlockBetterAlgae extends RenderBlockAOBase implements IRender
 	
 	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
 		if (!Config.algaeEnabled) return false;
-		if (!(Config.dirt.matchesID(block))) return false;
+		if (!Config.dirt.matchesID(block)) return false;
+		if (!Config.algaeBiomeList.contains(blockAccess.getBiomeGenForCoords(x, z).biomeID)) return false;
 		if (blockAccess.getBlock(x, y + 1, z).getMaterial() != Material.water) return false;
 		if (blockAccess.getBlock(x, y + 2, z).getMaterial() != Material.water) return false;
 		int terrainVariation = MathHelper.floor_double((noise.func_151605_a(x, z) + 1.0) * 32.0);

@@ -42,7 +42,7 @@ public class BetterFoliageClient {
 	public static LeafParticleTextures leafParticles = new LeafParticleTextures(0);
 	public static WindTracker wind = new WindTracker();
 	
-	public static void preInit() {
+	public static void postInit() {
 		FMLCommonHandler.instance().bus().register(new KeyHandler());
 		FMLCommonHandler.instance().bus().register(new Config());
 		

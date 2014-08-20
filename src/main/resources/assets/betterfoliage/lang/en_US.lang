@@ -46,7 +46,7 @@ betterfoliage.leavesMode.false=Translate
 betterfoliage.shortGrass=Short Grass
 betterfoliage.shortGrass.tooltip=Tufts of grass on top of grass blocks
 betterfoliage.shortGrass.useGenerated=Use generated texture
-betterfoliage.shortGrass.useGenerated.tooltip=Generated texture is made by slicing the tallgrass texture from the active resource pack set in half
+betterfoliage.shortGrass.useGenerated.tooltip=Generated texture is made by slicing the tallgrass texture from the active resource pack in half
 
 betterfoliage.cactus=Better Cactus
 betterfoliage.cactus.tooltip=Enhance cactus with extra bits and smooth shading
@@ -58,9 +58,15 @@ betterfoliage.lilypad.flowerChance.tooltip=Chance (N in 64) of a lilypad having 
 
 betterfoliage.reed=Reeds
 betterfoliage.reed.tooltip=Reeds on dirt blocks in shallow water
+betterfoliage.reed.biomeList=Biome List
+betterfoliage.reed.biomeList.tooltip=Configure which biomes reeds are allowed to appear in
+betterfoliage.reeds.biomeSelectTooltip=Should reeds appear in the %s biome?
 
 betterfoliage.algae=Algae
 betterfoliage.algae.tooltip=Algae on dirt blocks in deep water
+betterfoliage.algae.biomeList=Biome List
+betterfoliage.algae.biomeList.tooltip=Configure which biomes algae is allowed to appear in
+betterfoliage.algae.biomeSelectTooltip=Should algae appear in the %s biome?
 
 betterfoliage.coral=Coral
 betterfoliage.coral.tooltip=Coral on sand blocks in deep water
@@ -70,6 +76,9 @@ betterfoliage.coral.crustSize=Crust size
 betterfoliage.coral.crustSize.tooltip=Size of the flat coral part
 betterfoliage.coral.chance=Coral chance
 betterfoliage.coral.chance.tooltip=Chance (N in 64) of a specific face of the block to show coral
+betterfoliage.coral.biomeList=Biome List
+betterfoliage.coral.biomeList.tooltip=Configure which biomes coral is allowed to appear in
+betterfoliage.coral.biomeSelectTooltip=Should coral appear in the %s biome?
 
 betterfoliage.fallingLeaves=Falling leaves
 betterfoliage.fallingLeaves.tooltip=Falling leaf particle FX emitted from the bottom of leaf blocks
@@ -88,7 +97,6 @@ betterfoliage.fallingLeaves.lifetime=Maximum lifetime
 betterfoliage.fallingLeaves.lifetime.tooltip=Maximum lifetime of particle in seconds. Minimum lifetime is 60%% of this value
 
 betterfoliage.connectedGrass=Connected grass textures
-betterfoliage.connectedGrass.tooltip=Connected grass textures
 betterfoliage.connectedGrass.classic=Classic connected grass
 betterfoliage.connectedGrass.classic.tooltip=Draw grass top texture on grass block face if there is a grass block diagonally under it
 betterfoliage.connectedGrass.aggressive=Aggressive connected grass

@@ -9,6 +9,7 @@ import mods.betterfoliage.common.config.Config;
 import org.apache.logging.log4j.Logger;
 
 import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkCheckHandler;
 import cpw.mods.fml.relauncher.Side;
@@ -31,12 +32,17 @@ public class BetterFoliage {
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event)  {
 		log = event.getModLog();
-		if (event.getSide() == Side.CLIENT) {
-			configDir = new File(event.getModConfigurationDirectory(), MOD_ID);
-			configDir.mkdir();
-			Config.readConfig(new File(configDir, "betterfoliage.cfg"));
-			BetterFoliageClient.preInit();
-		}
+		configDir = new File(event.getModConfigurationDirectory(), MOD_ID);
+		configDir.mkdir();
+	}
+	
+	@Mod.EventHandler
+	public void posInit(FMLPostInitializationEvent event)  {
+	    if (event.getSide() == Side.CLIENT) {
+	        Config.getDefaultBiomes();
+            Config.readConfig(new File(configDir, "betterfoliage.cfg"));
+            BetterFoliageClient.postInit();
+        }
 	}
 	
 	@NetworkCheckHandler

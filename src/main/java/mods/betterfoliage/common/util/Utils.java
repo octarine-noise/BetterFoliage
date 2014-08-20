@@ -6,6 +6,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import mods.betterfoliage.loader.DeobfHelper;
@@ -13,9 +15,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.resources.SimpleReloadableResourceManager;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.biome.BiomeGenBase;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Predicate;
 
 import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
 import cpw.mods.fml.client.registry.RenderingRegistry;
@@ -107,5 +112,46 @@ public class Utils {
 		
 		reader.close();
 		writer.close();
+	}
+	
+	public static void stripTooltipDefaultText(List<String> tooltip) {
+        boolean defaultRows = false;
+        Iterator<String> iter = tooltip.iterator();
+        while(iter.hasNext()) {
+            if (iter.next().startsWith(EnumChatFormatting.AQUA.toString())) defaultRows = true;
+            if (defaultRows) iter.remove();
+        }
+	}
+	
+	public static Predicate<BiomeGenBase> biomeTempRainFilter(final Float minTemp, final Float maxTemp, final Float minRain, final Float maxRain) {
+	    return new Predicate<BiomeGenBase>() {
+	        public boolean apply(BiomeGenBase biome) {
+	            if (minTemp != null && biome.temperature < minTemp) return false;
+	            if (maxTemp != null && biome.temperature > maxTemp) return false;
+                if (minRain != null && biome.rainfall < minRain) return false;
+                if (maxRain != null && biome.rainfall > maxRain) return false;
+                return true;
+	        }
+        };
+	}
+	
+	public static Predicate<BiomeGenBase> biomeClassFilter(final Class<?>... classList) {
+	    return new Predicate<BiomeGenBase>() {
+            public boolean apply(BiomeGenBase biome) {
+                for (Class<?> clazz : classList)
+                    if (clazz.isAssignableFrom(biome.getClass()) || clazz.equals(biome.getClass()))
+                        return true;
+                return false;
+            }
+	    };
+	}
+	
+	public static Predicate<BiomeGenBase> biomeClassNameFilter(final String... names) {
+	    return new Predicate<BiomeGenBase>() {
+            public boolean apply(BiomeGenBase biome) {
+                for (String name : names) if (biome.getClass().getName().toLowerCase().contains(name.toLowerCase())) return true;
+                return false;
+            }
+	    };
 	}
 }

@@ -1,4 +1,4 @@
-package mods.betterfoliage.common.config;
+package mods.betterfoliage.client.gui;
 
 import net.minecraft.client.resources.I18n;
 import cpw.mods.fml.client.config.GuiConfig;
@@ -24,7 +24,6 @@ public class AlternateTextBooleanEntry extends GuiConfigEntries.ButtonEntry {
     public void updateValueButtonText()
     {
         this.btnValue.displayString = I18n.format(configElement.getLanguageKey() + "." + String.valueOf(currentValue));
-//        btnValue.packedFGColour = currentValue ? GuiUtils.getColorCode('2', true) : GuiUtils.getColorCode('4', true);
     }
 
     @Override
