@@ -6,6 +6,7 @@ import java.util.Set;
 
 import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.BetterFoliageClient;
+import mods.betterfoliage.common.config.Config;
 import mods.betterfoliage.common.util.Utils;
 import mods.betterfoliage.loader.DeobfHelper;
 import net.minecraft.block.Block;
@@ -75,7 +76,7 @@ public class LeafTextureEnumerator implements IIconRegister {
 		Iterator<Block> iter = Block.blockRegistry.iterator();
 		while(iter.hasNext()) {
 			Block block = iter.next();
-			if (BetterFoliageClient.leaves.matchesClass(block)) {
+			if (Config.leaves.matchesClass(block)) {
 				BetterFoliage.log.debug(String.format("Inspecting leaf block: %s", block.getClass().getName()));
 				block.registerBlockIcons(this);
 			}

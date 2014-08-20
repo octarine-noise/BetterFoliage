@@ -1,6 +1,5 @@
 package mods.betterfoliage.client.render.impl;
 
-import mods.betterfoliage.client.BetterFoliageClient;
 import mods.betterfoliage.client.render.FakeRenderBlockAOBase;
 import mods.betterfoliage.client.render.IRenderBlockDecorator;
 import mods.betterfoliage.common.config.Config;
@@ -23,8 +22,8 @@ public class RenderBlocksBetterGrassSide extends FakeRenderBlockAOBase implement
 	@Override
 	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
 		return Config.ctxGrassAggressiveEnabled && 
-			   BetterFoliageClient.dirt.matchesID(block) &&
-			   BetterFoliageClient.grass.matchesID(blockAccess.getBlock(x, y + 1, z));
+			   Config.dirt.matchesID(block) &&
+			   Config.grass.matchesID(blockAccess.getBlock(x, y + 1, z));
 	}
 	
 	@Override

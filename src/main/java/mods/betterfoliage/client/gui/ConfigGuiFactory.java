@@ -35,7 +35,7 @@ public class ConfigGuiFactory implements IModGuiFactory {
 
 	public static class ConfigGuiBetterFoliage extends GuiConfig {
 		public ConfigGuiBetterFoliage(GuiScreen parentScreen) {
-			super(parentScreen, Config.getConfigRootCategories(), BetterFoliage.MOD_ID, null, false, false, BetterFoliage.MOD_NAME);
+			super(parentScreen, Config.getConfigRootElements(), BetterFoliage.MOD_ID, null, false, false, BetterFoliage.MOD_NAME);
 		}
 	}
 }

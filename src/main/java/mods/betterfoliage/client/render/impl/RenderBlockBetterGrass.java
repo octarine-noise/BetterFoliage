@@ -1,7 +1,6 @@
 package mods.betterfoliage.client.render.impl;
 
 import mods.betterfoliage.BetterFoliage;
-import mods.betterfoliage.client.BetterFoliageClient;
 import mods.betterfoliage.client.ShadersModIntegration;
 import mods.betterfoliage.client.render.IRenderBlockDecorator;
 import mods.betterfoliage.client.render.IconSet;
@@ -32,7 +31,7 @@ public class RenderBlockBetterGrass extends RenderBlockAOBase implements IRender
 	protected boolean connectXP, connectXN, connectZP, connectZN;
 	
 	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
-		return BetterFoliageClient.grass.matchesID(block);
+		return Config.grass.matchesID(block);
 	}
 	
 	public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer) {
@@ -77,16 +76,16 @@ public class RenderBlockBetterGrass extends RenderBlockAOBase implements IRender
 
 	protected void checkConnectedGrass(int x, int y, int z) {
 		Block blockBelow = blockAccess.getBlock(x, y - 1, z);
-		if (Config.ctxGrassAggressiveEnabled && (BetterFoliageClient.grass.matchesID(blockBelow) || BetterFoliageClient.dirt.matchesID(blockBelow))) {
+		if (Config.ctxGrassAggressiveEnabled && (Config.grass.matchesID(blockBelow) || Config.dirt.matchesID(blockBelow))) {
 			connectXP = true;
 			connectXN = true;
 			connectZP = true;
 			connectZN = true;
 		} else if (Config.ctxGrassClassicEnabled) {
-			connectXP = BetterFoliageClient.grass.matchesID(blockAccess.getBlock(x + 1, y - 1, z));
-			connectXN = BetterFoliageClient.grass.matchesID(blockAccess.getBlock(x - 1, y - 1, z));
-			connectZP = BetterFoliageClient.grass.matchesID(blockAccess.getBlock(x, y - 1, z + 1));
-			connectZN = BetterFoliageClient.grass.matchesID(blockAccess.getBlock(x, y - 1, z - 1));
+			connectXP = Config.grass.matchesID(blockAccess.getBlock(x + 1, y - 1, z));
+			connectXN = Config.grass.matchesID(blockAccess.getBlock(x - 1, y - 1, z));
+			connectZP = Config.grass.matchesID(blockAccess.getBlock(x, y - 1, z + 1));
+			connectZN = Config.grass.matchesID(blockAccess.getBlock(x, y - 1, z - 1));
 		} else {
 			connectXP = false;
 			connectXN = false;

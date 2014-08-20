@@ -1,24 +1,47 @@
 key.betterfoliage.gui=Open Settings
+betterfoliage.arrayEntryDisplay=%d entries
 
 betterfoliage.enabled=Enable
 betterfoliage.enabled.tooltip=Is this feature enabled?
 betterfoliage.hOffset=Horizontal offset
-betterfoliage.hOffset.tooltip=Distance feature is shifted horizontally, in blocks
+betterfoliage.hOffset.tooltip=The distance this element is shifted horizontally, in blocks
 betterfoliage.vOffset=Vertical offset
-betterfoliage.vOffset.tooltip=Distance feature is shifted vertically, in blocks
+betterfoliage.vOffset.tooltip=The distance this element is shifted vertically, in blocks
 betterfoliage.size=Size
-betterfoliage.size.tooltip=Size of element
+betterfoliage.size.tooltip=Size of this element
 betterfoliage.minHeight=Minimum height
 betterfoliage.minHeight.tooltip=Minimum height of element
-betterfoliage.minHeight=Maximum height
-betterfoliage.minHeight.tooltip=Maximum height of element
+betterfoliage.maxHeight=Maximum height
+betterfoliage.maxHeight.tooltip=Maximum height of element
 betterfoliage.population=Population
 betterfoliage.population.tooltip=Chance (N in 64) that an eligible block will have this feature
 
+betterfoliage.blockTypes=Block Types
+betterfoliage.blockTypes.tooltip=Configure lists of block classes that will have specific features applied to them
+betterfoliage.blockTypes.dirtWhitelist=Dirt Whitelist
+betterfoliage.blockTypes.dirtBlacklist=Dirt Blacklist
+betterfoliage.blockTypes.grassWhitelist=Grass Whitelist
+betterfoliage.blockTypes.grassBlacklist=Grass Blacklist
+betterfoliage.blockTypes.leavesWhitelist=Leaves Whitelist
+betterfoliage.blockTypes.leavesBlacklist=Leaves Blacklist
+betterfoliage.blockTypes.cropWhitelist=Crop Whitelist
+betterfoliage.blockTypes.cropBlacklist=Crop Blacklist
+
+betterfoliage.blockTypes.dirtWhitelist.tooltip=Blocks recognized as Dirt. Has an impact on Reeds, Algae, Connected Grass
+betterfoliage.blockTypes.dirtBlacklist.tooltip=Blocks recognized as Dirt. Has an impact on Reeds, Algae, Connected Grass
+betterfoliage.blockTypes.grassWhitelist.tooltip=Blocks recognized as Grass. Has an impact on Short Grass, Connected Grass
+betterfoliage.blockTypes.grassBlacklist.tooltip=Blocks recognized as Grass. Has an impact on Short Grass, Connected Grass
+betterfoliage.blockTypes.leavesWhitelist.tooltip=Blocks recognized as Leaves. Has an impact on Extra Leaves, Falling Leaves. Blocks will render with leaves block ID in shader programs
+betterfoliage.blockTypes.leavesBlacklist.tooltip=Blocks recognized as Leaves. Has an impact on Extra Leaves, Falling Leaves. Blocks will render with leaves block ID in shader programs
+betterfoliage.blockTypes.cropWhitelist.tooltip=Blocks recognized as crops. Blocks will render with wheat block ID in shader programs
+betterfoliage.blockTypes.cropBlacklist.tooltip=Blocks recognized as crops. Blocks will render with wheat block ID in shader programs
+
 betterfoliage.extraLeaves=Extra Leaves
 betterfoliage.extraLeaves.tooltip=Extra round leaves on leaf blocks
-message.betterfoliage.leavesMode=Leaves offset mode
-message.betterfoliage.leavesMode.tooltip="true" means leaf quads are skewed, "false" means translated
+betterfoliage.leavesMode=Leaves offset mode
+betterfoliage.leavesMode.tooltip=Translate draws the leaves off-center at a 45deg angle, Skew draws them dentered but with a slightly changed angle
+betterfoliage.leavesMode.true=Skew
+betterfoliage.leavesMode.false=Translate
 
 betterfoliage.shortGrass=Short Grass
 betterfoliage.shortGrass.tooltip=Tufts of grass on top of grass blocks
@@ -62,8 +85,11 @@ betterfoliage.fallingLeaves.chance.tooltip=Chance of each random render tick hit
 betterfoliage.fallingLeaves.perturb=Perturbation
 betterfoliage.fallingLeaves.perturb.tooltip=Magnitude of perturbation effect. Adds a corkscrew-like motion to the particle synchronized to its rotation
 betterfoliage.fallingLeaves.lifetime=Maximum lifetime
-betterfoliage.fallingLeaves.lifetime.tooltip=Maximum lifetime of particle in seconds. Minimum lifetime is 60% of this value
+betterfoliage.fallingLeaves.lifetime.tooltip=Maximum lifetime of particle in seconds. Minimum lifetime is 60%% of this value
 
 betterfoliage.connectedGrass=Connected grass textures
+betterfoliage.connectedGrass.tooltip=Connected grass textures
 betterfoliage.connectedGrass.classic=Classic connected grass
+betterfoliage.connectedGrass.classic.tooltip=Draw grass top texture on grass block face if there is a grass block diagonally under it
 betterfoliage.connectedGrass.aggressive=Aggressive connected grass
+betterfoliage.connectedGrass.aggressive.tooltip=If there is a grass block on top of a dirt block: draw grass top texture on all grass block sides, render dirt block as standard grass block

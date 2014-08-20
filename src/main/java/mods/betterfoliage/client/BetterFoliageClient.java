@@ -1,6 +1,5 @@
 package mods.betterfoliage.client;
 
-import java.io.File;
 import java.util.Map;
 
 import mods.betterfoliage.BetterFoliage;
@@ -43,11 +42,6 @@ public class BetterFoliageClient {
 	public static LeafParticleTextures leafParticles = new LeafParticleTextures(0);
 	public static WindTracker wind = new WindTracker();
 	
-	public static BlockMatcher leaves = new BlockMatcher();
-	public static BlockMatcher crops = new BlockMatcher();
-	public static BlockMatcher dirt = new BlockMatcher();
-	public static BlockMatcher grass = new BlockMatcher();
-	
 	public static void preInit() {
 		FMLCommonHandler.instance().bus().register(new KeyHandler());
 		FMLCommonHandler.instance().bus().register(new Config());
@@ -66,17 +60,10 @@ public class BetterFoliageClient {
 		MinecraftForge.EVENT_BUS.register(wind);
 		FMLCommonHandler.instance().bus().register(wind);
 		
-		leaves.load(new File(BetterFoliage.configDir, "classesLeaves.cfg"), new ResourceLocation("betterfoliage:classesLeavesDefault.cfg"));
-		MinecraftForge.EVENT_BUS.register(leaves);
-		
-		crops.load(new File(BetterFoliage.configDir, "classesCrops.cfg"), new ResourceLocation("betterfoliage:classesCropsDefault.cfg"));
-		MinecraftForge.EVENT_BUS.register(crops);
-		
-		dirt.load(new File(BetterFoliage.configDir, "classesDirt.cfg"), new ResourceLocation("betterfoliage:classesDirtDefault.cfg"));
-		MinecraftForge.EVENT_BUS.register(dirt);
-		
-		grass.load(new File(BetterFoliage.configDir, "classesGrass.cfg"), new ResourceLocation("betterfoliage:classesGrassDefault.cfg"));
-		MinecraftForge.EVENT_BUS.register(grass);
+		MinecraftForge.EVENT_BUS.register(Config.leaves);
+		MinecraftForge.EVENT_BUS.register(Config.crops);
+		MinecraftForge.EVENT_BUS.register(Config.dirt);
+		MinecraftForge.EVENT_BUS.register(Config.grass);
 		
 		BetterFoliage.log.info("Registering texture generators");
 		MinecraftForge.EVENT_BUS.register(leafGenerator);
@@ -110,7 +97,7 @@ public class BetterFoliageClient {
 	
 	public static void onRandomDisplayTick(Block block, World world, int x, int y, int z) {
 		if (!Config.leafFXEnabled) return;
-		if (!leaves.matchesID(block) || !world.isAirBlock(x, y - 1, z)) return;
+		if (!Config.leaves.matchesID(block) || !world.isAirBlock(x, y - 1, z)) return;
 		if (Math.random() > Config.leafFXChance) return;
 		Minecraft.getMinecraft().effectRenderer.addEffect(new EntityFXFallingLeaves(world, x, y, z));
 	}

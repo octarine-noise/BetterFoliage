@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
+import mods.betterfoliage.common.config.Config;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.ResourceLocation;
@@ -70,8 +71,8 @@ public class ShadersModIntegration {
 	 * @return entity data to use
 	 */
 	public static int getBlockIdOverride(int original, Block block) {
-		if (BetterFoliageClient.leaves.matchesID(original & 0xFFFF)) return leavesEntityData;
-		if (BetterFoliageClient.crops.matchesID(original & 0xFFFF)) return tallGrassEntityData;
+		if (Config.leaves.matchesID(original & 0xFFFF)) return leavesEntityData;
+		if (Config.crops.matchesID(original & 0xFFFF)) return tallGrassEntityData;
 		return original;
 	}
 	

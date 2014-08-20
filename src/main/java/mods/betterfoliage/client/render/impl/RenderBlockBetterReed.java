@@ -3,7 +3,6 @@ package mods.betterfoliage.client.render.impl;
 import java.util.Random;
 
 import mods.betterfoliage.BetterFoliage;
-import mods.betterfoliage.client.BetterFoliageClient;
 import mods.betterfoliage.client.ShadersModIntegration;
 import mods.betterfoliage.client.render.IRenderBlockDecorator;
 import mods.betterfoliage.client.render.IconSet;
@@ -34,12 +33,12 @@ public class RenderBlockBetterReed extends RenderBlockAOBase implements IRenderB
 	
 	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
 		if (!Config.reedEnabled) return false;
-		if (!(BetterFoliageClient.dirt.matchesID(block))) return false;
+		if (!(Config.dirt.matchesID(block))) return false;
 		if (blockAccess.getBlock(x, y + 1, z).getMaterial() != Material.water) return false;
 		if (!blockAccess.isAirBlock(x, y + 2, z)) return false;
 		if (blockAccess.getBiomeGenForCoords(x, z).temperature < 0.4f || blockAccess.getBiomeGenForCoords(x, z).rainfall < 0.4f) return false;
 		int terrainVariation = MathHelper.floor_double((noise.func_151605_a(x, z) + 1.0) * 32.0);
-		return terrainVariation < Config.reedChance;
+		return terrainVariation < Config.reedPopulation;
 	}
 	
 	public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer) {

@@ -3,7 +3,6 @@ package mods.betterfoliage.client.render.impl;
 import java.util.Random;
 
 import mods.betterfoliage.BetterFoliage;
-import mods.betterfoliage.client.BetterFoliageClient;
 import mods.betterfoliage.client.render.IRenderBlockDecorator;
 import mods.betterfoliage.client.render.IconSet;
 import mods.betterfoliage.client.render.RenderBlockAOBase;
@@ -32,7 +31,7 @@ public class RenderBlockBetterAlgae extends RenderBlockAOBase implements IRender
 	
 	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
 		if (!Config.algaeEnabled) return false;
-		if (!(BetterFoliageClient.dirt.matchesID(block))) return false;
+		if (!(Config.dirt.matchesID(block))) return false;
 		if (blockAccess.getBlock(x, y + 1, z).getMaterial() != Material.water) return false;
 		if (blockAccess.getBlock(x, y + 2, z).getMaterial() != Material.water) return false;
 		if (blockAccess.getBiomeGenForCoords(x, z).temperature < 0.4f) return false;
