@@ -198,10 +198,12 @@ public class Config {
 	        }
 	        if (Utils.biomeClassNameFilter("river", "ocean").apply(biome)) {
 	            algaeBiomeList.add(biome.biomeID);
-	            coralBiomeList.add(biome.biomeID);
 	            BiomeListConfigEntry.algaeBiomeList.add(biome);
-	            BiomeListConfigEntry.coralBiomeList.add(biome);
 	        }
+	        if (Utils.biomeClassNameFilter("river", "ocean", "beach").apply(biome)) {
+	            coralBiomeList.add(biome.biomeID);
+                BiomeListConfigEntry.coralBiomeList.add(biome);
+            }
 	    }
 	}
 	
