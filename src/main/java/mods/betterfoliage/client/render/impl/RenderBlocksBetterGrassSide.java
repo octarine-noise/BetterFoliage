@@ -4,8 +4,9 @@ import mods.betterfoliage.client.render.FakeRenderBlockAOBase;
 import mods.betterfoliage.client.render.IRenderBlockDecorator;
 import mods.betterfoliage.common.config.Config;
 import mods.betterfoliage.common.util.OffsetBlockAccess;
-import mods.betterfoliage.common.util.Utils;
+import mods.betterfoliage.common.util.RenderUtils;
 import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.world.IBlockAccess;
 import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
@@ -21,7 +22,10 @@ public class RenderBlocksBetterGrassSide extends FakeRenderBlockAOBase implement
 
 	@Override
 	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
-		return Config.ctxGrassAggressiveEnabled && 
+	    Material top2Material = blockAccess.getBlock(x, y + 2, z).getMaterial();
+		return Config.ctxGrassAggressiveEnabled &&
+		       top2Material != Material.snow &&
+		       top2Material != Material.craftedSnow &&
 			   Config.dirt.matchesID(block) &&
 			   Config.grass.matchesID(blockAccess.getBlock(x, y + 1, z));
 	}
@@ -34,7 +38,7 @@ public class RenderBlocksBetterGrassSide extends FakeRenderBlockAOBase implement
 		
 		Block renderBlock = renderer.blockAccess.getBlock(x, y, z);
 		boolean result;
-		ISimpleBlockRenderingHandler handler = Utils.getRenderingHandler(renderBlock.getRenderType());
+		ISimpleBlockRenderingHandler handler = RenderUtils.getRenderingHandler(renderBlock.getRenderType());
 		if (handler != null) {
 			result = handler.renderWorldBlock(renderer.blockAccess, x, y, z, renderBlock, renderBlock.getRenderType(), renderer);
 		} else {
