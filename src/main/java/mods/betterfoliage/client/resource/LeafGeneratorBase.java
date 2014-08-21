@@ -6,7 +6,7 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 import mods.betterfoliage.client.resource.LeafTextureEnumerator.LeafTextureFoundEvent;
-import mods.betterfoliage.common.util.Utils;
+import mods.betterfoliage.common.util.ResourceUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;
@@ -58,13 +58,13 @@ public abstract class LeafGeneratorBase extends BlockTextureGenerator {
 		
 		// check for provided texture
 		ResourceLocation handDrawnLocation = new ResourceLocation(nonGeneratedDomain, String.format(handDrawnLocationFormat, originalNoDirs.getResourceDomain(), originalNoDirs.getResourcePath())); 
-		if (Utils.resourceExists(handDrawnLocation)) {
+		if (ResourceUtils.resourceExists(handDrawnLocation)) {
 			drawnCounter++;
 			return resourceManager.getResource(handDrawnLocation);
 		}
 		
 		// generate our own
-		if (!Utils.resourceExists(originalWithDirs)) return getMissingResource();
+		if (!ResourceUtils.resourceExists(originalWithDirs)) return getMissingResource();
 		
 		BufferedImage result;
 		try {

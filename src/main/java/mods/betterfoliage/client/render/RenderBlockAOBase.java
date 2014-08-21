@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import mods.betterfoliage.common.util.Double3;
-import mods.betterfoliage.common.util.Utils;
+import mods.betterfoliage.common.util.RenderUtils;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderBlocks;
@@ -138,7 +138,7 @@ public class RenderBlockAOBase extends RenderBlocks {
 		// render block
 		setPassCounters(1);
 		setRenderBoundsFromBlock(block);
-		ISimpleBlockRenderingHandler handler = Utils.getRenderingHandler(block.getRenderType());
+		ISimpleBlockRenderingHandler handler = RenderUtils.getRenderingHandler(block.getRenderType());
 		if (handler != null) {
 			handler.renderWorldBlock(world, x, y, z, block, block.getRenderType(), this);
 		} else {

@@ -1,6 +1,6 @@
 package mods.betterfoliage.client.render;
 
-import mods.betterfoliage.common.util.Utils;
+import mods.betterfoliage.common.util.ResourceUtils;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
@@ -37,7 +37,7 @@ public class IconSet {
 			// if the path contains a domain, use that to check if the resource exists
 			String resolvedDomain = path.contains(":") ? new ResourceLocation(path).getResourceDomain() : domain;
 			String resolvedPath = String.format("textures/blocks/" + (path.contains(":") ? new ResourceLocation(path).getResourcePath() : path) + ".png", idx);
-			if (Utils.resourceExists(new ResourceLocation(resolvedDomain, resolvedPath)))
+			if (ResourceUtils.resourceExists(new ResourceLocation(resolvedDomain, resolvedPath)))
 				icons[numLoaded++] = register.registerIcon(domain + ":" + String.format(path, idx));
 		}
 	}

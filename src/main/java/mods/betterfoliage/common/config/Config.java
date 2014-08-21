@@ -8,7 +8,7 @@ import mods.betterfoliage.client.BlockMatcher;
 import mods.betterfoliage.client.gui.AlternateTextBooleanEntry;
 import mods.betterfoliage.client.gui.BiomeListConfigEntry;
 import mods.betterfoliage.client.gui.NonVerboseArrayEntry;
-import mods.betterfoliage.common.util.Utils;
+import mods.betterfoliage.common.util.BiomeUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.BiomeGenBase;
@@ -17,9 +17,6 @@ import net.minecraftforge.common.config.ConfigElement;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 
 import cpw.mods.fml.client.config.IConfigElement;
@@ -190,32 +187,10 @@ public class Config {
 	}
 	
 	public static void getDefaultBiomes() {
-	    for (BiomeGenBase biome : BiomeGenBase.getBiomeGenArray()) {
-	        if (biome == null) continue;
-	        if (Utils.biomeTempRainFilter(0.4f, null, 0.4f, null).apply(biome)) {
-	            reedBiomeList.add(biome.biomeID);
-	            BiomeListConfigEntry.reedBiomeList.add(biome);
-	        }
-	        if (Utils.biomeClassNameFilter("river", "ocean").apply(biome)) {
-	            algaeBiomeList.add(biome.biomeID);
-	            BiomeListConfigEntry.algaeBiomeList.add(biome);
-	        }
-	        if (Utils.biomeClassNameFilter("river", "ocean", "beach").apply(biome)) {
-	            coralBiomeList.add(biome.biomeID);
-                BiomeListConfigEntry.coralBiomeList.add(biome);
-            }
-	    }
-	}
-	
-	protected static List<Integer> getFilteredBiomeIds(List<BiomeGenBase> biomes, Predicate<BiomeGenBase> filter) {
-	    return Lists.newArrayList(Collections2.transform(
-	        Collections2.filter(biomes, filter),
-	        new Function<BiomeGenBase, Integer>() {
-	            public Integer apply(BiomeGenBase input) {
-	                return input.biomeID;
-	            }
-            }
-	    ));
+	    List<BiomeGenBase> biomes = BiomeUtils.getAllBiomes();
+	    reedBiomeList = BiomeUtils.getFilteredBiomeIds(biomes, BiomeUtils.biomeTempRainFilter(0.4f, null, 0.4f, null));
+	    algaeBiomeList = BiomeUtils.getFilteredBiomeIds(biomes, BiomeUtils.biomeClassNameFilter("river", "ocean"));
+	    algaeBiomeList = BiomeUtils.getFilteredBiomeIds(biomes, BiomeUtils.biomeClassNameFilter("river", "ocean", "beach"));
 	}
 	
 	@SuppressWarnings("rawtypes")

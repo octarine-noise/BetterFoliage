@@ -7,7 +7,6 @@ import java.util.Set;
 import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.BetterFoliageClient;
 import mods.betterfoliage.common.config.Config;
-import mods.betterfoliage.common.util.Utils;
 import mods.betterfoliage.loader.DeobfHelper;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -22,6 +21,8 @@ import com.google.common.collect.Sets;
 import cpw.mods.fml.common.eventhandler.Event;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.relauncher.ReflectionHelper;
+import cpw.mods.fml.relauncher.ReflectionHelper.UnableToAccessFieldException;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -83,21 +84,21 @@ public class LeafTextureEnumerator implements IIconRegister {
 		}
 		
 		// enumerate all registered textures, find leaf textures among them
-		Map<String, TextureAtlasSprite> mapAtlas = null;
-		mapAtlas = Utils.getField(blockTextures, DeobfHelper.transformElementSearge("mapRegisteredSprites"), Map.class);
-		if (mapAtlas == null) mapAtlas = Utils.getField(blockTextures, "mapRegisteredSprites", Map.class);
-		
-		if (mapAtlas == null) {
-			BetterFoliage.log.warn("Failed to reflect texture atlas, textures may be missing");
-		} else {
-			Set<TextureAtlasSprite> foundLeafTextures = Sets.newHashSet();
-			for (TextureAtlasSprite icon : mapAtlas.values())
-				if (BetterFoliageClient.isLeafTexture(icon)) foundLeafTextures.add(icon);
-			for (TextureAtlasSprite icon : foundLeafTextures) {
-				BetterFoliage.log.debug(String.format("Found non-block-registered leaf texture: %s", icon.getIconName()));
-				MinecraftForge.EVENT_BUS.post(new LeafTextureFoundEvent(blockTextures, icon));
-			}
-		}
+		try {
+		    Map<String, TextureAtlasSprite> mapAtlas = ReflectionHelper.<Map<String, TextureAtlasSprite>, TextureMap> getPrivateValue(
+		        TextureMap.class, blockTextures, DeobfHelper.transformElementSearge("mapRegisteredSprites"), "mapRegisteredSprites"
+		    );
+            
+            Set<TextureAtlasSprite> foundLeafTextures = Sets.newHashSet();
+            for (TextureAtlasSprite icon : mapAtlas.values())
+                if (BetterFoliageClient.isLeafTexture(icon)) foundLeafTextures.add(icon);
+            for (TextureAtlasSprite icon : foundLeafTextures) {
+                BetterFoliage.log.debug(String.format("Found non-block-registered leaf texture: %s", icon.getIconName()));
+                MinecraftForge.EVENT_BUS.post(new LeafTextureFoundEvent(blockTextures, icon));
+            }
+        } catch (UnableToAccessFieldException e) {
+            BetterFoliage.log.warn("Failed to reflect texture atlas, textures may be missing");
+        }
 	}
 	
 	@SubscribeEvent
