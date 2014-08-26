@@ -40,12 +40,12 @@ public class EntityFXFallingLeaves extends EntityFX {
 		isMirrored = (rand.nextInt() & 1) == 1;
 		motionY = -Config.leafFXSpeed;
 		particleRotation = rand.nextInt(64);
-		
 		particleScale = (float) Config.leafFXSize;
-		particleIcon = BetterFoliageClient.leafParticles.icons.get(rand.nextInt(1024));
+		
 		
 		Block block = world.getBlock(x, y, z);
 		IIcon blockIcon = block.getIcon(world, x, y, z, ForgeDirection.DOWN.ordinal());
+		particleIcon = BetterFoliageClient.leafParticles.getIconSet(blockIcon).get(rand.nextInt(1024));
 		calculateParticleColor(BetterFoliageClient.leafParticles.getColor(blockIcon), block.colorMultiplier(world, x, y, z));
 	}
 
