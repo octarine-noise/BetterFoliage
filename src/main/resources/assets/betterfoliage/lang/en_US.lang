@@ -80,6 +80,9 @@ betterfoliage.coral.biomeList=Biome List
 betterfoliage.coral.biomeList.tooltip=Configure which biomes coral is allowed to appear in
 betterfoliage.coral.biomeSelectTooltip=Should coral appear in the %s biome?
 
+betterfoliage.netherrack=Netherrack Vines
+betterfoliage.netherrack.tooltip=Hanging Vines under netherrack
+
 betterfoliage.fallingLeaves=Falling leaves
 betterfoliage.fallingLeaves.tooltip=Falling leaf particle FX emitted from the bottom of leaf blocks
 betterfoliage.fallingLeaves.speed=Particle speed

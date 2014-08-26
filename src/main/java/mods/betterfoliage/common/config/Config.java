@@ -26,7 +26,7 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 public class Config {
 
 	public enum Category {
-	    blockTypes, extraLeaves, shortGrass, cactus, lilypad, reed, algae, coral, fallingLeaves, connectedGrass;
+	    blockTypes, extraLeaves, shortGrass, cactus, lilypad, reed, algae, coral, netherrack, fallingLeaves, connectedGrass;
 	}
 	
 	/** {@link Configuration} object bound to the config file */
@@ -88,6 +88,12 @@ public class Config {
 	public static double leafFXPerturb;
 	public static double leafFXLifetime;
 	
+	public static boolean netherrackEnabled;
+    public static double netherrackHOffset;
+    public static double netherrackHeightMin;
+    public static double netherrackHeightMax;
+    public static double netherrackSize;
+	    
 	public static boolean ctxGrassClassicEnabled;
 	public static boolean ctxGrassAggressiveEnabled;
 	
@@ -161,6 +167,13 @@ public class Config {
         leafFXPerturb = getDouble(Category.fallingLeaves, "perturb", 0.25, 0.01, 1.0, "betterfoliage.fallingLeaves.perturb");
         leafFXLifetime = getDouble(Category.fallingLeaves, "lifetime", 5.0, 1.0, 15.0, "betterfoliage.fallingLeaves.lifetime");
         
+        netherrackEnabled = getBoolean(Category.netherrack, "enabled", true, "betterfoliage.enabled");
+        netherrackHOffset = getDouble(Category.netherrack, "hOffset", 0.2, 0.0, 0.4, "betterfoliage.hOffset");
+        netherrackHeightMin = getDouble(Category.netherrack, "heightMin", 0.6, 0.1, 1.5, "betterfoliage.minHeight");
+        netherrackHeightMax = getDouble(Category.netherrack, "heightMax", 0.8, 0.1, 1.5, "betterfoliage.maxHeight");
+        netherrackSize = getDouble(Category.netherrack, "size", 1.0, 0.5, 1.5, "betterfoliage.size");
+        netherrackHeightMin = clampDoubleToMax(Category.netherrack, "heightMin", "heightMax");
+        
         ctxGrassClassicEnabled = getBoolean(Category.connectedGrass, "classic", true, "betterfoliage.connectedGrass.classic");
         ctxGrassAggressiveEnabled= getBoolean(Category.connectedGrass, "aggressive", true, "betterfoliage.connectedGrass.aggressive");
 		
@@ -182,6 +195,7 @@ public class Config {
 		setOrder(Category.reed, "enabled", "hOffset", "heightMin", "heightMax", "population", "biomeList");
 		setOrder(Category.algae, "enabled", "hOffset", "heightMin", "heightMax", "population");
 		setOrder(Category.coral, "enabled", "hOffset", "vOffset", "size", "crustSize", "population", "chance");
+		setOrder(Category.netherrack, "enabled", "hOffset", "heightMin", "heightMax", "size");
 		setOrder(Category.fallingLeaves, "enabled", "size", "chance", "lifetime", "speed", "windStrength", "stormStrength", "perturb");
 		setOrder(Category.connectedGrass, "classic", "aggressive");
 	}

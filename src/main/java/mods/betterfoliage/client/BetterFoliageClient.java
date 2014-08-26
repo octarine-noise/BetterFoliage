@@ -12,6 +12,7 @@ import mods.betterfoliage.client.render.impl.RenderBlockBetterGrass;
 import mods.betterfoliage.client.render.impl.RenderBlockBetterLeaves;
 import mods.betterfoliage.client.render.impl.RenderBlockBetterLilypad;
 import mods.betterfoliage.client.render.impl.RenderBlockBetterMycelium;
+import mods.betterfoliage.client.render.impl.RenderBlockBetterNetherrack;
 import mods.betterfoliage.client.render.impl.RenderBlockBetterReed;
 import mods.betterfoliage.client.render.impl.RenderBlocksBetterGrassSide;
 import mods.betterfoliage.client.resource.LeafGenerator;
@@ -48,6 +49,7 @@ public class BetterFoliageClient {
 		
 		BetterFoliage.log.info("Registering renderers");
 		registerRenderer(new RenderBlockBetterCactus());
+		registerRenderer(new RenderBlockBetterNetherrack());
 		registerRenderer(new RenderBlockBetterLilypad());
 		registerRenderer(new RenderBlockBetterMycelium());
 		registerRenderer(new RenderBlockBetterLeaves());
