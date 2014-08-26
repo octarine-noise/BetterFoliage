@@ -5,8 +5,10 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.List;
 import java.util.Map;
 
+import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.loader.DeobfHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IResource;
@@ -15,6 +17,7 @@ import net.minecraft.client.resources.SimpleReloadableResourceManager;
 import net.minecraft.util.ResourceLocation;
 
 import com.google.common.base.Charsets;
+import com.google.common.collect.Lists;
 
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import cpw.mods.fml.relauncher.ReflectionHelper.UnableToAccessFieldException;
@@ -68,5 +71,24 @@ public class ResourceUtils {
 		
 		reader.close();
 		writer.close();
+	}
+	
+	public static Iterable<String> getLines(ResourceLocation resource) {
+	    BufferedReader reader = null;
+	    List<String> result = Lists.newArrayList();
+        try {
+            reader = new BufferedReader(new InputStreamReader(Minecraft.getMinecraft().getResourceManager().getResource(resource).getInputStream(), Charsets.UTF_8));
+            String line = reader.readLine();
+            while(line != null) {
+                line = line.trim();
+                if (!line.isEmpty() && !line.startsWith("//")) result.add(line);
+                line = reader.readLine();
+            }
+            reader.close();
+        } catch (Exception e) {
+            BetterFoliage.log.warn(String.format("Error reading resource %s", resource.toString()));
+            return Lists.newArrayList();
+        }
+        return result;
 	}
 }

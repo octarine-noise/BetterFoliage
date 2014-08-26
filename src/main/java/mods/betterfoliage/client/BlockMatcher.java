@@ -1,19 +1,15 @@
 package mods.betterfoliage.client;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
 
-import mods.betterfoliage.BetterFoliage;
+import mods.betterfoliage.common.util.ResourceUtils;
 import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.world.WorldEvent;
 
-import com.google.common.base.Charsets;
 import com.google.common.collect.Sets;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -63,24 +59,12 @@ public class BlockMatcher {
 	}
 	
 	public static void loadDefaultLists(ResourceLocation defaults, Collection<String> blacklist, Collection<String> whitelist) {
-	    BufferedReader reader = null;
-        try {
-            reader = new BufferedReader(new InputStreamReader(Minecraft.getMinecraft().getResourceManager().getResource(defaults).getInputStream(), Charsets.UTF_8));
-            String line = reader.readLine();
-            while(line != null) {
-                line = line.trim();
-                if (!line.isEmpty() && !line.startsWith("//")) {
-                    if (line.startsWith("-"))
-                        blacklist.add(line.substring(1));
-                    else
-                        whitelist.add(line);
-                }
-                line = reader.readLine();
-            }
-            reader.close();
-        } catch (Exception e) {
-            BetterFoliage.log.warn(String.format("Error reading configuration %s", defaults.toString()));
-        }
+	    for (String line : ResourceUtils.getLines(defaults)) {
+	        if (line.startsWith("-"))
+                blacklist.add(line.substring(1));
+            else
+                whitelist.add(line);
+	    }
 	}
 	
 	/** Caches block IDs on world load for fast lookup
