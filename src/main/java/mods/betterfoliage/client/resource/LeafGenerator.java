@@ -11,7 +11,7 @@ import mods.betterfoliage.client.BetterFoliageClient;
 import mods.betterfoliage.client.ShadersModIntegration;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.event.TextureStitchEvent.Post;
+import net.minecraftforge.client.event.TextureStitchEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -59,7 +59,7 @@ public class LeafGenerator extends LeafGeneratorBase {
 	
 	@Override
 	@SubscribeEvent
-	public void endTextureReload(Post event) {
+	public void endTextureReload(TextureStitchEvent.Post event) {
 		super.endTextureReload(event);
 		if (event.map.getTextureType() != 0) return;
 		BetterFoliage.log.info(String.format("Found %d pre-drawn leaf textures", drawnCounter));
