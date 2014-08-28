@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
+import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.TextureMatcher;
 import mods.betterfoliage.client.render.IconSet;
 import mods.betterfoliage.client.resource.LeafTextureEnumerator.LeafTextureFoundEvent;
@@ -40,6 +41,8 @@ public class LeafParticleTextures {
 	/** Default color value */
 	public int defaultColor = 0x208040;
 	
+	public int loadedSets;
+	
 	public LeafParticleTextures(int defaultColor) {
 		this.defaultColor = defaultColor;
 	}
@@ -54,16 +57,6 @@ public class LeafParticleTextures {
 	public int getColor(IIcon icon) {
 		Integer result = iconColors.get(icon);
 		return result == null ? defaultColor : result;
-	}
-	
-	protected void addAtlasTexture(TextureAtlasSprite icon) {
-	    Integer textureColor = calculateTextureColor(icon);
-	    if (textureColor != null) iconColors.put(icon, textureColor);
-	    
-	    String leafType = leafTypes.put(icon);
-	    if (leafType != null && !iconSets.keySet().contains(leafType)) {
-	        iconSets.put(leafType, new IconSet("betterfoliage", String.format("falling_leaf_%s_%%d", leafType)));
-	    }
 	}
 	
 	/** Calculate average color value (in HSB color space) for a texture.
@@ -104,6 +97,7 @@ public class LeafParticleTextures {
 	@SubscribeEvent
 	public void handleTextureReload(TextureStitchEvent.Pre event) {
 		if (event.map.getTextureType() != 0) return;
+		loadedSets = 1;
 		iconSets.clear();
 		iconColors.clear();
 		
@@ -113,9 +107,23 @@ public class LeafParticleTextures {
 		defaultIcons.registerIcons(event.map);
 	}
 	
+    @SubscribeEvent
+    public void endTextureReload(TextureStitchEvent.Post event) {
+        if (event.map.getTextureType() == 0) BetterFoliage.log.info(String.format("Loaded %d leaf particle sets", loadedSets));
+    }
+	
 	@SubscribeEvent
 	public void handleRegisterTexture(LeafTextureFoundEvent event) {
-		addAtlasTexture(event.icon);
+	    Integer textureColor = calculateTextureColor(event.icon);
+	    if (textureColor != null) iconColors.put(event.icon, textureColor);
+    
+	    String leafType = leafTypes.put(event.icon);
+	    if (leafType != null && !iconSets.keySet().contains(leafType)) {
+	        IconSet newSet = new IconSet("betterfoliage", String.format("falling_leaf_%s_%%d", leafType));
+	        newSet.registerIcons(event.blockTextures);
+	        iconSets.put(leafType, newSet);
+	        loadedSets++;
+	    }
 	}
 	
 }
