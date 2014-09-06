@@ -100,6 +100,7 @@ public class EntityFXFallingLeaves extends EntityFX {
 	protected void addVertex(Tessellator tessellator, Double3 coord, double u, double v) {
 		tessellator.addVertexWithUV(coord.x, coord.y, coord.z, u, v);
 	}
+	
 	/** Calculates and sets the color of the particle by blending the average color of the block texture with the current biome color
 	 *  Blending is done in HSB color space, weighted by the relative saturation of the colors
 	 * @param textureAvgColor average color of the block texture

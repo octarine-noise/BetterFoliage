@@ -37,7 +37,7 @@ public class BetterFoliage {
 	}
 	
 	@Mod.EventHandler
-	public void posInit(FMLPostInitializationEvent event)  {
+	public void postInit(FMLPostInitializationEvent event)  {
 	    if (event.getSide() == Side.CLIENT) {
 	        Config.getDefaultBiomes();
             Config.readConfig(new File(configDir, "betterfoliage.cfg"));
