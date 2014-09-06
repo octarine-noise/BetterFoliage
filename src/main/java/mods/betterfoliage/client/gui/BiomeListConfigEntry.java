@@ -2,7 +2,6 @@ package mods.betterfoliage.client.gui;
 
 import java.util.List;
 
-import mods.betterfoliage.common.config.Config;
 import mods.betterfoliage.common.util.BiomeUtils;
 import net.minecraft.world.biome.BiomeGenBase;
 
@@ -28,9 +27,9 @@ public class BiomeListConfigEntry extends SelectListConfigEntry<BiomeGenBase> {
 
     @Override
     protected List<BiomeGenBase> getDefaultSelected(String name) {
-        if (name.equals("reedBiomeList")) return Lists.newArrayList(Collections2.filter(getBaseSet(name), BiomeUtils.biomeIdFilter(Config.reedBiomeList)));
-        if (name.equals("algaeBiomeList")) return Lists.newArrayList(Collections2.filter(getBaseSet(name), BiomeUtils.biomeIdFilter(Config.algaeBiomeList)));
-        if (name.equals("coralBiomeList")) return Lists.newArrayList(Collections2.filter(getBaseSet(name), BiomeUtils.biomeIdFilter(Config.coralBiomeList)));
+        if (name.equals("reedBiomeList")) return Lists.newArrayList(Collections2.filter(getBaseSet(name), BiomeUtils.biomeTempRainFilter(0.4f, null, 0.4f, null)));
+        if (name.equals("algaeBiomeList")) return Lists.newArrayList(Collections2.filter(getBaseSet(name), BiomeUtils.biomeClassNameFilter("river", "ocean")));
+        if (name.equals("coralBiomeList")) return Lists.newArrayList(Collections2.filter(getBaseSet(name), BiomeUtils.biomeClassNameFilter("river", "ocean", "beach")));
         return ImmutableList.<BiomeGenBase>of();
     }
 
