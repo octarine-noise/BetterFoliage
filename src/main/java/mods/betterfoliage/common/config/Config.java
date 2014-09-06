@@ -193,10 +193,10 @@ public class Config {
 		setOrder(Category.shortGrass, "enabled", "useGenerated", "hOffset", "heightMin", "heightMax", "size");
 		setOrder(Category.lilypad, "enabled", "hOffset", "flowerChance");
 		setOrder(Category.reed, "enabled", "hOffset", "heightMin", "heightMax", "population", "biomeList");
-		setOrder(Category.algae, "enabled", "hOffset", "heightMin", "heightMax", "population");
-		setOrder(Category.coral, "enabled", "hOffset", "vOffset", "size", "crustSize", "population", "chance");
+		setOrder(Category.algae, "enabled", "hOffset", "heightMin", "heightMax", "population", "biomeList");
+		setOrder(Category.coral, "enabled", "hOffset", "vOffset", "size", "crustSize", "population", "chance", "biomeList");
 		setOrder(Category.netherrack, "enabled", "hOffset", "heightMin", "heightMax", "size");
-		setOrder(Category.fallingLeaves, "enabled", "size", "chance", "lifetime", "speed", "windStrength", "stormStrength", "perturb");
+		setOrder(Category.fallingLeaves, "enabled", "chance", "size", "lifetime", "speed", "windStrength", "stormStrength", "perturb");
 		setOrder(Category.connectedGrass, "classic", "aggressive");
 	}
 	
@@ -204,7 +204,7 @@ public class Config {
 	    List<BiomeGenBase> biomes = BiomeUtils.getAllBiomes();
 	    reedBiomeList = BiomeUtils.getFilteredBiomeIds(biomes, BiomeUtils.biomeTempRainFilter(0.4f, null, 0.4f, null));
 	    algaeBiomeList = BiomeUtils.getFilteredBiomeIds(biomes, BiomeUtils.biomeClassNameFilter("river", "ocean"));
-	    algaeBiomeList = BiomeUtils.getFilteredBiomeIds(biomes, BiomeUtils.biomeClassNameFilter("river", "ocean", "beach"));
+	    coralBiomeList = BiomeUtils.getFilteredBiomeIds(biomes, BiomeUtils.biomeClassNameFilter("river", "ocean", "beach"));
 	}
 	
 	@SuppressWarnings("rawtypes")
