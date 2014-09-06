@@ -3,6 +3,7 @@ package mods.betterfoliage.client.render.impl;
 import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.BetterFoliageClient;
 import mods.betterfoliage.client.render.IRenderBlockDecorator;
+import mods.betterfoliage.client.render.IconSet;
 import mods.betterfoliage.client.render.RenderBlockAOBase;
 import mods.betterfoliage.common.config.Config;
 import mods.betterfoliage.common.util.Double3;
@@ -15,13 +16,17 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
+import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.util.ForgeDirection;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class RenderBlockBetterLeaves extends RenderBlockAOBase implements IRenderBlockDecorator {
 	
+    public IconSet snowedLeavesIcons = new IconSet("bettergrassandleaves", "better_leaves_snowed_%d");
+    
 	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
 		if (!Config.leavesEnabled) return false;
 		if (original > 0 && original < 42) return false;
@@ -52,23 +57,35 @@ public class RenderBlockBetterLeaves extends RenderBlockAOBase implements IRende
 		int offsetVariation = getSemiRandomFromPos(x, y, z, 0);
 		int uvVariation = getSemiRandomFromPos(x, y, z, 1);
 		double halfSize = 0.5 * Config.leavesSize;
-		boolean isAirTop = y == 255 || blockAccess.isAirBlock(x, y + 1, z);
-		boolean isAirBottom = y == 0 || blockAccess.isAirBlock(x, y - 1, z);
+		boolean isAirTop = blockAccess.isAirBlock(x, y + 1, z);
+		boolean isAirBottom = blockAccess.isAirBlock(x, y - 1, z);
+		
+		boolean isSnowTop = blockAccess.getBlock(x, y + 1, z).getMaterial() == Material.snow;
 		
 		Tessellator.instance.setBrightness(isAirTop ? getBrightness(block, x, y + 1, z) : (isAirBottom ? getBrightness(block, x, y - 1, z) : getBrightness(block, x, y, z)));
 		Tessellator.instance.setColorOpaque_I(block.colorMultiplier(blockAccess, x, y, z));
 		
+		Double3 blockCenter = new Double3(x + 0.5, y + 0.5, z + 0.5);
+		Double3 offset1 = pRot[offsetVariation].scaleAxes(Config.leavesHOffset, Config.leavesVOffset, Config.leavesHOffset);
+		Double3 offset2 = pRot[(offsetVariation + 1) & 63].scaleAxes(Config.leavesHOffset, Config.leavesVOffset, Config.leavesHOffset);
+		
 		if (Config.leavesSkew) {
-			renderCrossedBlockQuadsSkew(new Double3(x + 0.5, y + 0.5, z + 0.5), halfSize, 
-										pRot[offsetVariation].scaleAxes(Config.leavesHOffset, Config.leavesVOffset, Config.leavesHOffset),
-										pRot[(offsetVariation + 1) & 63].scaleAxes(Config.leavesHOffset, Config.leavesVOffset, Config.leavesHOffset),
-										crossLeafIcon, uvVariation, isAirTop, isAirBottom);
+			renderCrossedBlockQuadsSkew(blockCenter, halfSize, offset1, offset2, crossLeafIcon, uvVariation, isAirTop, isAirBottom);
+			if (isSnowTop) {
+			    // clear biome colors
+                aoYPXZNN.setGray(0.9f); aoYPXZNP.setGray(0.9f); aoYPXZPN.setGray(0.9f); aoYPXZPP.setGray(0.9f);
+                Tessellator.instance.setColorOpaque(230, 230, 230);
+			    renderCrossedBlockQuadsSkew(blockCenter, halfSize, offset1, offset2, snowedLeavesIcons.get(uvVariation), 0, true, isAirBottom);
+			}
 		} else {
-			renderCrossedBlockQuadsTranslate(new Double3(x + 0.5, y + 0.5, z + 0.5), halfSize, 
-											 pRot[offsetVariation].scaleAxes(Config.leavesHOffset, Config.leavesVOffset, Config.leavesHOffset),
-											 crossLeafIcon, uvVariation, isAirTop, isAirBottom);
+			renderCrossedBlockQuadsTranslate(blockCenter, halfSize, offset1, crossLeafIcon, uvVariation, isAirTop, isAirBottom);
+			if (isSnowTop) {
+			    // clear biome colors
+                aoYPXZNN.setGray(0.9f); aoYPXZNP.setGray(0.9f); aoYPXZPN.setGray(0.9f); aoYPXZPP.setGray(0.9f);
+                Tessellator.instance.setColorOpaque(230, 230, 230);
+			    renderCrossedBlockQuadsTranslate(blockCenter, halfSize, offset1, snowedLeavesIcons.get(uvVariation), 0, true, isAirBottom);
+			}
 		}
-
 
 		return true;
 	}
@@ -86,4 +103,12 @@ public class RenderBlockBetterLeaves extends RenderBlockAOBase implements IRende
 	protected boolean isBlockNonSurrounding(Block block) {
 		return block.getMaterial() == Material.air || block == Blocks.snow_layer;
 	}
+	
+	@SubscribeEvent
+    public void handleTextureReload(TextureStitchEvent.Pre event) {
+	    if (event.map.getTextureType() != 0) return;
+        
+	    snowedLeavesIcons.registerIcons(event.map);
+        BetterFoliage.log.info(String.format("Found %d snowed leaves textures", snowedLeavesIcons.numLoaded));
+    }
 }
