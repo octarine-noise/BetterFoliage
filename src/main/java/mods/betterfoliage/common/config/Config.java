@@ -219,7 +219,7 @@ public class Config {
 		setOrder(Category.shortGrass, "enabled", "useGenerated", "hOffset", "heightMin", "heightMax", "size");
 		setOrder(Category.lilypad, "enabled", "hOffset", "flowerChance");
 		setOrder(Category.reed, "enabled", "hOffset", "heightMin", "heightMax", "population", "biomeList");
-		setOrder(Category.algae, "enabled", "hOffset", "heightMin", "heightMax", "population", "biomeList");
+		setOrder(Category.algae, "enabled", "hOffset", "heightMin", "heightMax", "size", "population", "biomeList");
 		setOrder(Category.coral, "enabled", "hOffset", "vOffset", "size", "crustSize", "population", "chance", "biomeList");
 		setOrder(Category.netherrack, "enabled", "hOffset", "heightMin", "heightMax", "size");
 		setOrder(Category.fallingLeaves, "enabled", "chance", "size", "lifetime", "speed", "windStrength", "stormStrength", "perturb");
