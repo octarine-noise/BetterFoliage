@@ -39,14 +39,13 @@ public class RenderBlockBetterGrass extends RenderBlockAOBase implements IRender
 		blockAccess = world;
 		
 		// check for connected grass
+		Material topMaterial = blockAccess.getBlock(x, y + 1, z).getMaterial();
+		isSnowTop = (topMaterial == Material.snow || topMaterial == Material.craftedSnow); 
 		checkConnectedGrass(x, y, z);
 		grassTopIcon = block.getIcon(blockAccess, x, y, z, ForgeDirection.UP.ordinal());
 		
 		renderWorldBlockBase(1, world, x, y, z, block, modelId, renderer);
 		if (!Config.grassEnabled) return true;
-		
-		Material topMaterial = blockAccess.getBlock(x, y + 1, z).getMaterial();
-		isSnowTop = (topMaterial == Material.snow || topMaterial == Material.craftedSnow); 
 		boolean isAirTop = blockAccess.isAirBlock(x, y + 1, z);
 		
 		if (isSnowTop || isAirTop) {
