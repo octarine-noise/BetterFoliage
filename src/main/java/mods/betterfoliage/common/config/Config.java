@@ -26,7 +26,7 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 public class Config {
 
 	public enum Category {
-	    blockTypes, extraLeaves, shortGrass, cactus, lilypad, reed, algae, coral, netherrack, fallingLeaves, connectedGrass;
+	    blockTypes, extraLeaves, shortGrass, cactus, lilypad, reed, algae, coral, netherrack, fallingLeaves, risingSoul, connectedGrass;
 	}
 	
 	/** {@link Configuration} object bound to the config file */
@@ -87,6 +87,19 @@ public class Config {
 	public static double leafFXChance;
 	public static double leafFXPerturb;
 	public static double leafFXLifetime;
+	
+	public static boolean soulFXEnabled;
+	public static double soulFXChance;
+	public static double soulFXSpeed;
+	public static double soulFXPerturb;
+	public static double soulFXHeadSize;
+	public static double soulFXTrailSize;
+	public static double soulFXOpacity;
+	public static double soulFXSizeDecay;
+	public static double soulFXOpacityDecay;
+	public static double soulFXLifetime;
+	public static int soulFXTrailLength;
+	public static int soulFXTrailDensity;
 	
 	public static boolean netherrackEnabled;
     public static double netherrackHOffset;
@@ -167,6 +180,19 @@ public class Config {
         leafFXPerturb = getDouble(Category.fallingLeaves, "perturb", 0.25, 0.01, 1.0, "betterfoliage.fallingLeaves.perturb");
         leafFXLifetime = getDouble(Category.fallingLeaves, "lifetime", 5.0, 1.0, 15.0, "betterfoliage.fallingLeaves.lifetime");
         
+        soulFXEnabled = getBoolean(Category.risingSoul, "enabled", true, "betterfoliage.enabled");
+        soulFXChance = getDouble(Category.risingSoul, "chance", 0.02, 0.001, 1.0, "betterfoliage.risingSoul.chance");
+        soulFXSpeed = getDouble(Category.risingSoul, "speed", 0.1, 0.025, 0.25, "betterfoliage.risingSoul.speed");
+        soulFXPerturb = getDouble(Category.risingSoul, "perturb", 0.05, 0.01, 0.25, "betterfoliage.risingSoul.perturb");
+        soulFXHeadSize = getDouble(Category.risingSoul, "headSize", 1.0, 0.25, 1.5, "betterfoliage.risingSoul.headSize");
+        soulFXTrailSize = getDouble(Category.risingSoul, "trailSize", 0.75, 0.25, 1.5, "betterfoliage.risingSoul.trailSize");
+        soulFXOpacity = getDouble(Category.risingSoul, "opacity", 0.5, 0.05, 1.0, "betterfoliage.risingSoul.opacity");
+        soulFXSizeDecay = getDouble(Category.risingSoul, "sizeDecay", 0.97, 0.5, 1.0, "betterfoliage.risingSoul.sizeDecay");
+        soulFXOpacityDecay = getDouble(Category.risingSoul, "opacityDecay", 0.97, 0.5, 1.0, "betterfoliage.risingSoul.opacityDecay");
+        soulFXLifetime = getDouble(Category.risingSoul, "lifetime", 4.0, 1.0, 15.0, "betterfoliage.risingSoul.lifetime");
+        soulFXTrailLength = getInt(Category.risingSoul, "trailLength", 48, 2, 128, "betterfoliage.risingSoul.trailLength");
+        soulFXTrailDensity = getInt(Category.risingSoul, "trailDensity", 3, 1, 16, "betterfoliage.risingSoul.trailDensity");
+        
         netherrackEnabled = getBoolean(Category.netherrack, "enabled", true, "betterfoliage.enabled");
         netherrackHOffset = getDouble(Category.netherrack, "hOffset", 0.2, 0.0, 0.4, "betterfoliage.hOffset");
         netherrackHeightMin = getDouble(Category.netherrack, "heightMin", 0.6, 0.1, 1.5, "betterfoliage.minHeight");
@@ -197,6 +223,7 @@ public class Config {
 		setOrder(Category.coral, "enabled", "hOffset", "vOffset", "size", "crustSize", "population", "chance", "biomeList");
 		setOrder(Category.netherrack, "enabled", "hOffset", "heightMin", "heightMax", "size");
 		setOrder(Category.fallingLeaves, "enabled", "chance", "size", "lifetime", "speed", "windStrength", "stormStrength", "perturb");
+		setOrder(Category.risingSoul, "enabled", "chance", "speed", "perturb", "headSize", "trailSize", "sizeDecay", "opacity", "opacityDecay", "lifetime", "trailLength", "trailDensity");
 		setOrder(Category.connectedGrass, "classic", "aggressive");
 	}
 	

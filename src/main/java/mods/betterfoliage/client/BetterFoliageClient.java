@@ -5,6 +5,7 @@ import java.util.Map;
 import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.render.IRenderBlockDecorator;
 import mods.betterfoliage.client.render.impl.EntityFXFallingLeaves;
+import mods.betterfoliage.client.render.impl.EntityFXRisingSoul;
 import mods.betterfoliage.client.render.impl.RenderBlockBetterAlgae;
 import mods.betterfoliage.client.render.impl.RenderBlockBetterCactus;
 import mods.betterfoliage.client.render.impl.RenderBlockBetterCoral;
@@ -20,10 +21,12 @@ import mods.betterfoliage.client.resource.LeafParticleTextures;
 import mods.betterfoliage.client.resource.LeafTextureEnumerator;
 import mods.betterfoliage.client.resource.ReedGenerator;
 import mods.betterfoliage.client.resource.ShortGrassGenerator;
+import mods.betterfoliage.client.resource.SoulParticleTextures;
 import mods.betterfoliage.common.config.Config;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -41,6 +44,7 @@ public class BetterFoliageClient {
 	public static Map<Integer, IRenderBlockDecorator> decorators = Maps.newHashMap();
 	public static LeafGenerator leafGenerator = new LeafGenerator();
 	public static LeafParticleTextures leafParticles = new LeafParticleTextures(0);
+	public static SoulParticleTextures soulParticles = new SoulParticleTextures();
 	public static WindTracker wind = new WindTracker();
 	
 	public static void postInit() {
@@ -68,6 +72,7 @@ public class BetterFoliageClient {
 		MinecraftForge.EVENT_BUS.register(Config.grass);
 		
 		BetterFoliage.log.info("Registering texture generators");
+		MinecraftForge.EVENT_BUS.register(soulParticles);
 		MinecraftForge.EVENT_BUS.register(leafGenerator);
 		MinecraftForge.EVENT_BUS.register(leafParticles);
 		MinecraftForge.EVENT_BUS.register(new LeafTextureEnumerator());
@@ -98,10 +103,18 @@ public class BetterFoliageClient {
 	}
 	
 	public static void onRandomDisplayTick(Block block, World world, int x, int y, int z) {
-		if (!Config.leafFXEnabled) return;
-		if (!Config.leaves.matchesID(block) || !world.isAirBlock(x, y - 1, z)) return;
-		if (Math.random() > Config.leafFXChance) return;
-		Minecraft.getMinecraft().effectRenderer.addEffect(new EntityFXFallingLeaves(world, x, y, z));
+	    if (Config.soulFXEnabled) {
+	        if (world.getBlock(x, y, z) == Blocks.soul_sand && Math.random() < Config.soulFXChance) {
+	            Minecraft.getMinecraft().effectRenderer.addEffect(new EntityFXRisingSoul(world, x, y, z));
+	            return;
+	        }
+	    }
+	    if (Config.leafFXEnabled) {
+	        if (Config.leaves.matchesID(block) && world.isAirBlock(x, y - 1, z) && Math.random() < Config.leafFXChance) {
+	            Minecraft.getMinecraft().effectRenderer.addEffect(new EntityFXFallingLeaves(world, x, y, z));
+	            return;
+	        }
+	    }
 	}
 	
 	public static void registerRenderer(IRenderBlockDecorator decorator) {
