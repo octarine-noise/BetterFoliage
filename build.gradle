@@ -24,6 +24,9 @@ jar.baseName = 'BetterFoliage'
 group = 'com.github.octarine-noise'
 version='1.0.0'
 
+targetCompatibility = 1.7
+sourceCompatibility = 1.7
+
 processResources {
 	inputs.property "version", project.version
 	inputs.property "mcversion", project.minecraft.version
@@ -40,6 +43,31 @@ processResources {
 
 jar {
 	manifest {
-		attributes("FMLCorePlugin": "mods.betterfoliage.loader.BetterFoliageLoader", "FMLCorePluginContainsFMLMod": "mods.betterfoliage.BetterFoliage")
+		attributes "FMLCorePlugin": "mods.betterfoliage.loader.BetterFoliageLoader"
+        attributes "FMLCorePluginContainsFMLMod": "mods.betterfoliage.BetterFoliage"
 	}
+}
+
+task srcJar(type: Jar, dependsOn: classes) {
+    classifier = 'src'
+    from sourceSets.main.allSource
+    manifest {
+        attributes "FMLCorePlugin": "mods.betterfoliage.loader.BetterFoliageLoader"
+        attributes "FMLCorePluginContainsFMLMod": "mods.betterfoliage.BetterFoliage"
+    }
+}
+
+task devJar(type: Jar, dependsOn: classes) {
+    classifier = 'dev'
+    from sourceSets.main.output
+    manifest {
+        attributes "FMLCorePlugin": "mods.betterfoliage.loader.BetterFoliageLoader"
+        attributes "FMLCorePluginContainsFMLMod": "mods.betterfoliage.BetterFoliage"
+    }
+}
+
+artifacts {
+    archives jar
+    archives srcJar
+    archives devJar
 }
