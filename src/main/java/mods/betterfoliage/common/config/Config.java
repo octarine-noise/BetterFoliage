@@ -134,7 +134,7 @@ public class Config {
         grassEnabled = getBoolean(Category.shortGrass, "enabled", true, "betterfoliage.enabled");
         grassHOffset = getDouble(Category.shortGrass, "hOffset", 0.2, 0.0, 0.4, "betterfoliage.hOffset");
         grassHeightMin = getDouble(Category.shortGrass, "heightMin", 0.6, 0.1, 1.5, "betterfoliage.minHeight");
-        grassHeightMax = getDouble(Category.shortGrass, "heightMax", 0.8, 0.1, 1.5, "betterfoliage.maxHeight");
+        grassHeightMax = getDouble(Category.shortGrass, "heightMax", 0.8, 0.1, 2.5, "betterfoliage.maxHeight");
         grassSize = getDouble(Category.shortGrass, "size", 1.0, 0.5, 1.5, "betterfoliage.size");
         grassUseGenerated = getBoolean(Category.shortGrass, "useGenerated", false, "betterfoliage.shortGrass.useGenerated");
         grassHeightMin = clampDoubleToMax(Category.shortGrass, "heightMin", "heightMax");
