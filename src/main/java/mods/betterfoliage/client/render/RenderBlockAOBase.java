@@ -465,19 +465,19 @@ public class RenderBlockAOBase extends RenderBlocks {
 	    float green = ((color >> 8) & 0xFF) / 255.0f;
 	    float blue = (color & 0xFF) / 255.0f;
 
-        this.colorRedTopLeft = red;
-        this.colorRedTopRight= red;
-        this.colorRedBottomLeft = red;
-        this.colorRedBottomRight= red;
+        colorRedTopLeft *= red;
+        colorRedTopRight *= red;
+        colorRedBottomLeft *= red;
+        colorRedBottomRight *= red;
 	    
-	    this.colorGreenTopLeft = green;
-	    this.colorGreenTopRight= green;
-	    this.colorGreenBottomLeft = green;
-	    this.colorGreenBottomRight= green;
+	    colorGreenTopLeft *= green;
+	    colorGreenTopRight *= green;
+	    colorGreenBottomLeft *= green;
+	    colorGreenBottomRight *= green;
 	        
-	    this.colorBlueTopLeft = blue;
-	    this.colorBlueTopRight= blue;
-	    this.colorBlueBottomLeft = blue;
-	    this.colorBlueBottomRight= blue;
+	    colorBlueTopLeft *= blue;
+	    colorBlueTopRight *= blue;
+	    colorBlueBottomLeft *= blue;
+	    colorBlueBottomRight *= blue;
     }
 }
