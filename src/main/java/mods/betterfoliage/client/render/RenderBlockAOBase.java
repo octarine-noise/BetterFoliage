@@ -459,4 +459,25 @@ public class RenderBlockAOBase extends RenderBlocks {
 	protected int getBrightness(Block block, int x, int y, int z) {
 		return block.getMixedBrightnessForBlock(blockAccess, x, y, z);
 	}
+	
+	protected void setAOColors(int color) {
+	    float red = ((color >> 16) & 0xFF) / 255.0f;
+	    float green = ((color >> 8) & 0xFF) / 255.0f;
+	    float blue = (color & 0xFF) / 255.0f;
+
+        this.colorRedTopLeft = red;
+        this.colorRedTopRight= red;
+        this.colorRedBottomLeft = red;
+        this.colorRedBottomRight= red;
+	    
+	    this.colorGreenTopLeft = green;
+	    this.colorGreenTopRight= green;
+	    this.colorGreenBottomLeft = green;
+	    this.colorGreenBottomRight= green;
+	        
+	    this.colorBlueTopLeft = blue;
+	    this.colorBlueTopRight= blue;
+	    this.colorBlueBottomLeft = blue;
+	    this.colorBlueBottomRight= blue;
+    }
 }

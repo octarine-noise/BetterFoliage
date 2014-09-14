@@ -29,6 +29,7 @@ public class RenderBlockBetterGrass extends RenderBlockAOBase implements IRender
 	
 	protected IIcon grassTopIcon;
 	boolean isSnowTop;
+	int biomeColor;
 	protected boolean connectXP, connectXN, connectZP, connectZN;
 	
 	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
@@ -43,6 +44,7 @@ public class RenderBlockBetterGrass extends RenderBlockAOBase implements IRender
 		isSnowTop = (topMaterial == Material.snow || topMaterial == Material.craftedSnow); 
 		checkConnectedGrass(x, y, z);
 		grassTopIcon = block.getIcon(blockAccess, x, y, z, ForgeDirection.UP.ordinal());
+		biomeColor = block.colorMultiplier(blockAccess, x, y, z);
 		
 		renderWorldBlockBase(1, world, x, y, z, block, modelId, renderer);
 		if (!Config.grassEnabled) return true;
@@ -104,21 +106,37 @@ public class RenderBlockBetterGrass extends RenderBlockAOBase implements IRender
 	
 	@Override
 	public void renderFaceZNeg(Block block, double x, double y, double z, IIcon icon) {
+	    if (connectZN && !fancyGrass) {
+	        Tessellator.instance.setColorOpaque_I(biomeColor);
+	        if (enableAO) setAOColors(biomeColor);
+	    }
 		super.renderFaceZNeg(block, x, y, z, connectZN ? grassTopIcon : icon);
 	}
 
 	@Override
 	public void renderFaceZPos(Block block, double x, double y, double z, IIcon icon) {
+	    if (connectZP && !fancyGrass) {
+	        Tessellator.instance.setColorOpaque_I(biomeColor);
+	        if (enableAO) setAOColors(biomeColor);
+	    }
 		super.renderFaceZPos(block, x, y, z, connectZP ? grassTopIcon : icon);
 	}
 
 	@Override
 	public void renderFaceXNeg(Block block, double x, double y, double z, IIcon icon) {
+	    if (connectXN && !fancyGrass) {
+            Tessellator.instance.setColorOpaque_I(biomeColor);
+            if (enableAO) setAOColors(biomeColor);
+	    }
 		super.renderFaceXNeg(block, x, y, z, connectXN ? grassTopIcon : icon);
 	}
 
 	@Override
 	public void renderFaceXPos(Block block, double x, double y, double z, IIcon icon) {
+	    if (connectXP && !fancyGrass) {
+	        Tessellator.instance.setColorOpaque_I(biomeColor);
+            if (enableAO) setAOColors(biomeColor);
+	    }
 		super.renderFaceXPos(block, x, y, z, connectXP ? grassTopIcon : icon);
 	}
 
