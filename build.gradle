@@ -21,7 +21,7 @@ minecraft {
 }
 
 group = 'com.github.octarine-noise'
-version = '1.0.0'
+version = "1.0.${System.getenv().BUILD_NUMBER}"
 
 targetCompatibility = 1.7
 sourceCompatibility = 1.7
