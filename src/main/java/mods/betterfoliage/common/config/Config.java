@@ -129,11 +129,11 @@ public class Config {
         leavesSkew = getBoolean(Category.extraLeaves, "skewMode", false, "betterfoliage.leavesMode");
         leavesHOffset = getDouble(Category.extraLeaves, "hOffset", 0.2, 0.0, 0.4, "betterfoliage.hOffset");
         leavesVOffset = getDouble(Category.extraLeaves, "vOffset", 0.1, 0.0, 0.4, "betterfoliage.vOffset");
-        leavesSize = getDouble(Category.extraLeaves, "size", 1.4, 0.75, 1.8, "betterfoliage.size");
+        leavesSize = getDouble(Category.extraLeaves, "size", 1.4, 0.75, 2.5, "betterfoliage.size");
 
         grassEnabled = getBoolean(Category.shortGrass, "enabled", true, "betterfoliage.enabled");
         grassHOffset = getDouble(Category.shortGrass, "hOffset", 0.2, 0.0, 0.4, "betterfoliage.hOffset");
-        grassHeightMin = getDouble(Category.shortGrass, "heightMin", 0.6, 0.1, 1.5, "betterfoliage.minHeight");
+        grassHeightMin = getDouble(Category.shortGrass, "heightMin", 0.6, 0.1, 2.5, "betterfoliage.minHeight");
         grassHeightMax = getDouble(Category.shortGrass, "heightMax", 0.8, 0.1, 2.5, "betterfoliage.maxHeight");
         grassSize = getDouble(Category.shortGrass, "size", 1.0, 0.5, 1.5, "betterfoliage.size");
         grassUseGenerated = getBoolean(Category.shortGrass, "useGenerated", false, "betterfoliage.shortGrass.useGenerated");
