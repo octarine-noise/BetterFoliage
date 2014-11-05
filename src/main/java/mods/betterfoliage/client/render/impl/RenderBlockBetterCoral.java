@@ -49,7 +49,7 @@ public class RenderBlockBetterCoral extends RenderBlockAOBase implements IRender
 		Tessellator.instance.setBrightness(getBrightness(block, x, y, z));
 		for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
 			if (blockAccess.getBlock(x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ).getMaterial() != Material.water) continue;
-			if (blockAccess.isAirBlock(x + dir.offsetX, y + dir.offsetY + 1, z + dir.offsetZ)) continue;
+			if (!Config.coralShallowWater && blockAccess.isAirBlock(x + dir.offsetX, y + dir.offsetY + 1, z + dir.offsetZ)) continue;
 				
 			int variation = getSemiRandomFromPos(x, y, z, dir.ordinal());
 			if (variation < Config.coralChance) {

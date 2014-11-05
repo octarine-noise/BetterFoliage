@@ -15,6 +15,8 @@ betterfoliage.maxHeight=Maximum height
 betterfoliage.maxHeight.tooltip=Maximum height of element
 betterfoliage.population=Population
 betterfoliage.population.tooltip=Chance (N in 64) that an eligible block will have this feature
+betterfoliage.shaderWind=Shader wind effects
+betterfoliage.shaderWind.tooltip=Apply wind effects from ShaderMod shaders to this element?
 
 betterfoliage.blockTypes=Block Types
 betterfoliage.blockTypes.tooltip=Configure lists of block classes that will have specific features applied to them
@@ -79,6 +81,8 @@ betterfoliage.coral.chance.tooltip=Chance (N in 64) of a specific face of the bl
 betterfoliage.coral.biomeList=Biome List
 betterfoliage.coral.biomeList.tooltip=Configure which biomes coral is allowed to appear in
 betterfoliage.coral.biomeSelectTooltip=Should coral appear in the %s biome?
+betterfoliage.coral.shallowWater=Shallow water coral
+betterfoliage.coral.shallowWater.tooltip=Should coral appear in 1 block deep water?
 
 betterfoliage.netherrack=Netherrack Vines
 betterfoliage.netherrack.tooltip=Hanging Vines under netherrack

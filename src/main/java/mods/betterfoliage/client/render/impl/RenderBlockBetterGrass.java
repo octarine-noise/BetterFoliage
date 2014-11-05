@@ -70,7 +70,7 @@ public class RenderBlockBetterGrass extends RenderBlockAOBase implements IRender
 			}
 			if (shortGrassIcon == null) return true;
 			
-			ShadersModIntegration.startGrassQuads();
+			if (Config.grassShaderWind) ShadersModIntegration.startGrassQuads();
 			Tessellator.instance.setBrightness(getBrightness(block, x, y + 1, z));
 			renderCrossedSideQuads(new Double3(x + 0.5, y + 1.0 + (isSnowTop ? 0.0625 : 0.0), z + 0.5), ForgeDirection.UP, scale, halfHeight, pRot[iconVariation], Config.grassHOffset, shortGrassIcon, 0, false);
 		}

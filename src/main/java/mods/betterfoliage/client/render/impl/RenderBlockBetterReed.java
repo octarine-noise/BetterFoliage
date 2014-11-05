@@ -57,7 +57,7 @@ public class RenderBlockBetterReed extends RenderBlockAOBase implements IRenderB
 		Tessellator.instance.setColorOpaque(255, 255, 255);
 		
 		// render reeds
-		ShadersModIntegration.startGrassQuads();
+		if (Config.reedShaderWind) ShadersModIntegration.startGrassQuads();
 		renderCrossedSideQuads(new Double3(x + 0.5, y + 1.0, z + 0.5), ForgeDirection.UP, 0.5, quarterHeight, pRot[iconVariation], Config.reedHOffset, bottomIcon, 0, true);
 		renderCrossedSideQuads(new Double3(x + 0.5, y + 1.0 + 2.0 * quarterHeight, z + 0.5), ForgeDirection.UP, 0.5, quarterHeight, pRot[iconVariation], Config.reedHOffset, topIcon, 0, true);
 		

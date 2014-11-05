@@ -51,6 +51,7 @@ public class Config {
 	public static double grassHeightMin;
 	public static double grassHeightMax;
 	public static double grassSize;
+	public static boolean grassShaderWind;
 	
 	public static boolean cactusEnabled;
 	
@@ -63,6 +64,7 @@ public class Config {
 	public static double reedHeightMin;
 	public static double reedHeightMax;
 	public static int reedPopulation;
+	public static boolean reedShaderWind;
 	
 	public static boolean algaeEnabled;
 	public static double algaeHOffset;
@@ -72,6 +74,7 @@ public class Config {
 	public static int algaePopulation;
 	
 	public static boolean coralEnabled;
+	public static boolean coralShallowWater;
 	public static int coralPopulation;
 	public static int coralChance;
 	public static double coralVOffset;
@@ -138,7 +141,8 @@ public class Config {
         grassSize = getDouble(Category.shortGrass, "size", 1.0, 0.5, 1.5, "betterfoliage.size");
         grassUseGenerated = getBoolean(Category.shortGrass, "useGenerated", false, "betterfoliage.shortGrass.useGenerated");
         grassHeightMin = clampDoubleToMax(Category.shortGrass, "heightMin", "heightMax");
-
+        grassShaderWind = getBoolean(Category.shortGrass, "shaderWind", true, "betterfoliage.shaderWind");
+        
         cactusEnabled = getBoolean(Category.cactus, "enabled", true, "betterfoliage.enabled");
 
         lilypadEnabled = getBoolean(Category.lilypad, "enabled", true, "betterfoliage.enabled");
@@ -152,6 +156,7 @@ public class Config {
         reedPopulation = getInt(Category.reed, "population", 32, 0, 64, "betterfoliage.population");
         reedHeightMin = clampDoubleToMax(Category.reed, "heightMin", "heightMax");
         reedBiomeList = getIntList(Category.reed, "reedBiomeList", reedBiomeList, "betterfoliage.reed.biomeList");
+        reedShaderWind = getBoolean(Category.reed, "shaderWind", true, "betterfoliage.shaderWind");
         
         algaeEnabled = getBoolean(Category.algae, "enabled", true, "betterfoliage.enabled");
         algaeHOffset = getDouble(Category.algae, "hOffset", 0.1, 0.0, 0.25, "betterfoliage.hOffset");
@@ -163,6 +168,7 @@ public class Config {
         algaeBiomeList = getIntList(Category.algae, "algaeBiomeList", algaeBiomeList, "betterfoliage.algae.biomeList");
         
         coralEnabled = getBoolean(Category.coral, "enabled", true, "betterfoliage.enabled");
+        coralShallowWater = getBoolean(Category.coral, "shallowWater", false, "betterfoliage.coral.shallowWater");
         coralHOffset = getDouble(Category.coral, "hOffset", 0.2, 0.0, 0.4, "betterfoliage.hOffset");
         coralVOffset = getDouble(Category.coral, "vOffset", 0.1, 0.0, 0.4, "betterfoliage.vOffset");
         coralSize = getDouble(Category.coral, "size", 0.7, 0.5, 1.5, "betterfoliage.coral.size");
@@ -216,11 +222,11 @@ public class Config {
 		for (Category category : Category.values()) rawConfig.setCategoryLanguageKey(category.toString(), String.format("betterfoliage.%s", category.toString()));
 		
 		setOrder(Category.extraLeaves, "enabled", "skewMode", "hOffset", "vOffset", "size");
-		setOrder(Category.shortGrass, "enabled", "useGenerated", "hOffset", "heightMin", "heightMax", "size");
+		setOrder(Category.shortGrass, "enabled", "useGenerated", "hOffset", "heightMin", "heightMax", "size", "shaderWind");
 		setOrder(Category.lilypad, "enabled", "hOffset", "flowerChance");
-		setOrder(Category.reed, "enabled", "hOffset", "heightMin", "heightMax", "population", "biomeList");
+		setOrder(Category.reed, "enabled", "hOffset", "heightMin", "heightMax", "population", "biomeList", "shaderWind");
 		setOrder(Category.algae, "enabled", "hOffset", "heightMin", "heightMax", "size", "population", "biomeList");
-		setOrder(Category.coral, "enabled", "hOffset", "vOffset", "size", "crustSize", "population", "chance", "biomeList");
+		setOrder(Category.coral, "enabled", "shallowWater", "hOffset", "vOffset", "size", "crustSize", "population", "chance", "biomeList");
 		setOrder(Category.netherrack, "enabled", "hOffset", "heightMin", "heightMax", "size");
 		setOrder(Category.fallingLeaves, "enabled", "chance", "size", "lifetime", "speed", "windStrength", "stormStrength", "perturb");
 		setOrder(Category.risingSoul, "enabled", "chance", "speed", "perturb", "headSize", "trailSize", "sizeDecay", "opacity", "opacityDecay", "lifetime", "trailLength", "trailDensity");
