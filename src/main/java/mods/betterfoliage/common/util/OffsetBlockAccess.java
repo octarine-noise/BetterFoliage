@@ -4,7 +4,6 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Vec3Pool;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -79,11 +78,6 @@ public class OffsetBlockAccess implements IBlockAccess {
 	@SideOnly(Side.CLIENT)
 	public boolean extendedLevelsInChunkCache() {
 		return source.extendedLevelsInChunkCache();
-	}
-
-	@Deprecated
-	public Vec3Pool getWorldVec3Pool() {
-		return source.getWorldVec3Pool();
 	}
 
 	public int isBlockProvidingPowerTo(int x, int y, int z, int dir) {
