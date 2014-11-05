@@ -45,6 +45,8 @@ public class RenderBlockAOBase extends RenderBlocks {
 		}
 	}
 	
+	protected int drawPass = 0;
+	
 	protected double[] uValues = new double[] {0.0, 16.0, 16.0, 0.0};
 	protected double[] vValues = new double[] {0.0, 0.0, 16.0, 16.0};
 	
@@ -136,7 +138,8 @@ public class RenderBlockAOBase extends RenderBlocks {
 		}
 		
 		// render block
-		setPassCounters(1);
+		drawPass = 0;
+		setAOPassCounters(1);
 		setRenderBoundsFromBlock(block);
 		ISimpleBlockRenderingHandler handler = RenderUtils.getRenderingHandler(block.getRenderType());
 		if (handler != null) {
@@ -387,7 +390,7 @@ public class RenderBlockAOBase extends RenderBlocks {
 	 *  if the underlying renderer draws overlays 
 	 * @param value pass counter
 	 */
-	protected void setPassCounters(int value) {
+	protected void setAOPassCounters(int value) {
 		aoXPYZPP.passCounter = value;
 		aoXPYZPN.passCounter = value;
 		aoXPYZNP.passCounter = value;
@@ -480,4 +483,12 @@ public class RenderBlockAOBase extends RenderBlocks {
 	    colorBlueBottomLeft *= blue;
 	    colorBlueBottomRight *= blue;
     }
+
+    @Override
+    public boolean renderStandardBlock(Block p_147784_1_, int p_147784_2_, int p_147784_3_, int p_147784_4_) {
+        drawPass++;
+        return super.renderStandardBlock(p_147784_1_, p_147784_2_, p_147784_3_, p_147784_4_);
+    }
+	
+	
 }

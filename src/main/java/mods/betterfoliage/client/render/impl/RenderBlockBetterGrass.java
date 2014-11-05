@@ -110,6 +110,7 @@ public class RenderBlockBetterGrass extends RenderBlockAOBase implements IRender
 	        Tessellator.instance.setColorOpaque_I(biomeColor);
 	        if (enableAO) setAOColors(biomeColor);
 	    }
+	    if (connectZN && drawPass > 1) return;
 		super.renderFaceZNeg(block, x, y, z, connectZN ? grassTopIcon : icon);
 	}
 
@@ -119,6 +120,7 @@ public class RenderBlockBetterGrass extends RenderBlockAOBase implements IRender
 	        Tessellator.instance.setColorOpaque_I(biomeColor);
 	        if (enableAO) setAOColors(biomeColor);
 	    }
+	    if (connectZP && drawPass > 1) return;
 		super.renderFaceZPos(block, x, y, z, connectZP ? grassTopIcon : icon);
 	}
 
@@ -128,6 +130,7 @@ public class RenderBlockBetterGrass extends RenderBlockAOBase implements IRender
             Tessellator.instance.setColorOpaque_I(biomeColor);
             if (enableAO) setAOColors(biomeColor);
 	    }
+	    if (connectXN && drawPass > 1) return;
 		super.renderFaceXNeg(block, x, y, z, connectXN ? grassTopIcon : icon);
 	}
 
@@ -137,6 +140,7 @@ public class RenderBlockBetterGrass extends RenderBlockAOBase implements IRender
 	        Tessellator.instance.setColorOpaque_I(biomeColor);
             if (enableAO) setAOColors(biomeColor);
 	    }
+	    if (connectXP && drawPass > 1) return;
 		super.renderFaceXPos(block, x, y, z, connectXP ? grassTopIcon : icon);
 	}
 

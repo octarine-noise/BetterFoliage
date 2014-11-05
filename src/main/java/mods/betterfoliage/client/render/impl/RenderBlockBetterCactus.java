@@ -46,7 +46,7 @@ public class RenderBlockBetterCactus extends FakeRenderBlockAOBase implements IR
 		}
 		
 		// render cactus center
-		setPassCounters(1);
+		setAOPassCounters(1);
 		renderStandardBlock(block, x, y, z);
 		
 		Double3 blockCenter = new Double3(x + 0.5, y + 0.5, z + 0.5);

@@ -51,7 +51,7 @@ public class RenderBlockBetterAlgae extends RenderBlockAOBase implements IRender
 		}
 		
 		// render dirt block
-		setPassCounters(1);
+		setAOPassCounters(1);
 		setRenderBoundsFromBlock(block);
 		renderStandardBlock(block, x, y, z);
 		
