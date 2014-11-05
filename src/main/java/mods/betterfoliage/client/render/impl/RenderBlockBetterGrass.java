@@ -2,6 +2,7 @@ package mods.betterfoliage.client.render.impl;
 
 import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.ShadersModIntegration;
+import mods.betterfoliage.client.TerraFirmaCraftIntegration;
 import mods.betterfoliage.client.render.IRenderBlockDecorator;
 import mods.betterfoliage.client.render.IconSet;
 import mods.betterfoliage.client.render.RenderBlockAOBase;
@@ -22,14 +23,17 @@ import cpw.mods.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class RenderBlockBetterGrass extends RenderBlockAOBase implements IRenderBlockDecorator {
 
+    public enum RenderMode { DEFAULT, TFC };
+    
 	public IconSet grassIcons = new IconSet("bettergrassandleaves", "better_grass_long_%d");
 	public IconSet snowGrassIcons = new IconSet("bettergrassandleaves", "better_grass_snowed_%d");
 	public IIcon grassGenIcon;
 	public IIcon snowGrassGenIcon;
 	
+	protected RenderMode currentMode;
 	protected IIcon grassTopIcon;
-	boolean isSnowTop;
-	int biomeColor;
+	protected boolean isSnowTop;
+	protected int biomeColor;
 	protected boolean connectXP, connectXN, connectZP, connectZN;
 	
 	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
@@ -39,6 +43,10 @@ public class RenderBlockBetterGrass extends RenderBlockAOBase implements IRender
 	public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer) {
 		blockAccess = world;
 		
+		// check for special case rendering
+		currentMode = RenderMode.DEFAULT;
+		if (TerraFirmaCraftIntegration.isTFCGrass(block)) currentMode = RenderMode.TFC;
+		
 		// check for connected grass
 		Material topMaterial = blockAccess.getBlock(x, y + 1, z).getMaterial();
 		isSnowTop = (topMaterial == Material.snow || topMaterial == Material.craftedSnow); 
@@ -46,7 +54,7 @@ public class RenderBlockBetterGrass extends RenderBlockAOBase implements IRender
 		grassTopIcon = block.getIcon(blockAccess, x, y, z, ForgeDirection.UP.ordinal());
 		biomeColor = block.colorMultiplier(blockAccess, x, y, z);
 		
-		renderWorldBlockBase(1, world, x, y, z, block, modelId, renderer);
+		renderWorldBlockBase(2, world, x, y, z, block, modelId, renderer);
 		if (!Config.grassEnabled) return true;
 		boolean isAirTop = blockAccess.isAirBlock(x, y + 1, z);
 		
@@ -105,45 +113,57 @@ public class RenderBlockBetterGrass extends RenderBlockAOBase implements IRender
 	}
 	
 	@Override
+    public void renderFaceYPos(Block block, double x, double y, double z, IIcon icon) {
+	    if (currentMode == RenderMode.TFC && Config.grass.matchesID(block)) grassTopIcon = icon;
+        super.renderFaceYPos(block, x, y, z, icon);
+    }
+
+    @Override
 	public void renderFaceZNeg(Block block, double x, double y, double z, IIcon icon) {
-	    if (connectZN && !fancyGrass) {
-	        Tessellator.instance.setColorOpaque_I(biomeColor);
-	        if (enableAO) setAOColors(biomeColor);
-	    }
-	    if (connectZN && drawPass > 1) return;
-		super.renderFaceZNeg(block, x, y, z, connectZN ? grassTopIcon : icon);
+	    if (shouldSkipPass(block, connectZN, drawPass)) return;
+	    setBiomeColors();
+		super.renderFaceZNeg(block, x, y, z, getDrawTexture(block, icon, grassTopIcon, connectZN, drawPass));
 	}
 
 	@Override
 	public void renderFaceZPos(Block block, double x, double y, double z, IIcon icon) {
-	    if (connectZP && !fancyGrass) {
-	        Tessellator.instance.setColorOpaque_I(biomeColor);
-	        if (enableAO) setAOColors(biomeColor);
-	    }
-	    if (connectZP && drawPass > 1) return;
-		super.renderFaceZPos(block, x, y, z, connectZP ? grassTopIcon : icon);
+	    if (shouldSkipPass(block, connectZP, drawPass)) return;
+	    setBiomeColors();
+	    super.renderFaceZPos(block, x, y, z, getDrawTexture(block, icon, grassTopIcon, connectZP, drawPass));
 	}
 
 	@Override
 	public void renderFaceXNeg(Block block, double x, double y, double z, IIcon icon) {
-	    if (connectXN && !fancyGrass) {
-            Tessellator.instance.setColorOpaque_I(biomeColor);
-            if (enableAO) setAOColors(biomeColor);
-	    }
-	    if (connectXN && drawPass > 1) return;
-		super.renderFaceXNeg(block, x, y, z, connectXN ? grassTopIcon : icon);
+        if (shouldSkipPass(block, connectXN, drawPass)) return;
+        setBiomeColors();
+        super.renderFaceXNeg(block, x, y, z, getDrawTexture(block, icon, grassTopIcon, connectXN, drawPass));
 	}
 
 	@Override
 	public void renderFaceXPos(Block block, double x, double y, double z, IIcon icon) {
-	    if (connectXP && !fancyGrass) {
-	        Tessellator.instance.setColorOpaque_I(biomeColor);
-            if (enableAO) setAOColors(biomeColor);
-	    }
-	    if (connectXP && drawPass > 1) return;
-		super.renderFaceXPos(block, x, y, z, connectXP ? grassTopIcon : icon);
+        if (shouldSkipPass(block, connectXP, drawPass)) return;
+        setBiomeColors();
+        super.renderFaceXPos(block, x, y, z, getDrawTexture(block, icon, grassTopIcon, connectXP, drawPass));
 	}
 
+	protected boolean shouldSkipPass(Block block, boolean connected, int pass) {
+	    return currentMode != RenderMode.TFC && connected && pass > 1;
+	}
+	
+	protected void setBiomeColors() {
+	    if (fancyGrass) return;
+	    Tessellator.instance.setColorOpaque_I(biomeColor);
+        if (enableAO) setAOColors(biomeColor);
+	}
+	
+	protected IIcon getDrawTexture(Block block, IIcon original, IIcon grassTop, boolean connected, int pass) {
+	    if (currentMode == RenderMode.TFC) {
+	        return connected && Config.grass.matchesID(block) ? grassTop : original;
+	    } else {
+	        return connected ? grassTop : original;
+	    }
+	}
+	
 	@SubscribeEvent
 	public void handleTextureReload(TextureStitchEvent.Pre event) {
 		if (event.map.getTextureType() != 0) return;

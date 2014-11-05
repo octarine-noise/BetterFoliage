@@ -139,7 +139,7 @@ public class RenderBlockAOBase extends RenderBlocks {
 		
 		// render block
 		drawPass = 0;
-		setAOPassCounters(1);
+		setAOPassCounters(pass);
 		setRenderBoundsFromBlock(block);
 		ISimpleBlockRenderingHandler handler = RenderUtils.getRenderingHandler(block.getRenderType());
 		if (handler != null) {
@@ -354,7 +354,7 @@ public class RenderBlockAOBase extends RenderBlocks {
 	}
 	
 	protected void saveShadingTopLeft(ShadingValues values) {
-		if (--values.passCounter != 0) return;
+		if (--values.passCounter < 0) return;
 		values.brightness = brightnessTopLeft;
 		values.red = colorRedTopLeft;
 		values.green = colorGreenTopLeft;
@@ -362,7 +362,7 @@ public class RenderBlockAOBase extends RenderBlocks {
 	}
 	
 	protected void saveShadingTopRight(ShadingValues values) {
-		if (--values.passCounter != 0) return;
+		if (--values.passCounter < 0) return;
 		values.brightness = brightnessTopRight;
 		values.red = colorRedTopRight;
 		values.green = colorGreenTopRight;
@@ -370,7 +370,7 @@ public class RenderBlockAOBase extends RenderBlocks {
 	}
 	
 	protected void saveShadingBottomLeft(ShadingValues values) {
-		if (--values.passCounter != 0) return;
+		if (--values.passCounter < 0) return;
 		values.brightness = brightnessBottomLeft;
 		values.red = colorRedBottomLeft;
 		values.green = colorGreenBottomLeft;
@@ -378,7 +378,7 @@ public class RenderBlockAOBase extends RenderBlocks {
 	}
 	
 	protected void saveShadingBottomRight(ShadingValues values) {
-		if (--values.passCounter != 0) return;
+		if (--values.passCounter < 0) return;
 		values.brightness = brightnessBottomRight;
 		values.red = colorRedBottomRight;
 		values.green = colorGreenBottomRight;

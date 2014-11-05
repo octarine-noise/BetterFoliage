@@ -83,6 +83,7 @@ public class BetterFoliageClient {
 		MinecraftForge.EVENT_BUS.register(new ShortGrassGenerator("bf_shortgrass_snow", missingTexture, true));
 		
 		ShadersModIntegration.init();
+		TerraFirmaCraftIntegration.init();
 	}
 
 	public static boolean isLeafTexture(TextureAtlasSprite icon) {
