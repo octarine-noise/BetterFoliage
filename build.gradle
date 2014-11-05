@@ -17,7 +17,7 @@ buildscript {
 apply plugin: 'forge'
 
 minecraft {
-	version = '1.7.10-10.13.2.1235'
+	version = '1.7.2-10.12.2.1147'
 }
 
 group = 'com.github.octarine-noise'
