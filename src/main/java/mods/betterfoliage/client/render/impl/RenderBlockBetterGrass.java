@@ -121,28 +121,28 @@ public class RenderBlockBetterGrass extends RenderBlockAOBase implements IRender
     @Override
 	public void renderFaceZNeg(Block block, double x, double y, double z, IIcon icon) {
 	    if (shouldSkipPass(block, connectZN, drawPass)) return;
-	    setBiomeColors();
+	    if (connectZN) setBiomeColors();
 		super.renderFaceZNeg(block, x, y, z, getDrawTexture(block, icon, grassTopIcon, connectZN, drawPass));
 	}
 
 	@Override
 	public void renderFaceZPos(Block block, double x, double y, double z, IIcon icon) {
 	    if (shouldSkipPass(block, connectZP, drawPass)) return;
-	    setBiomeColors();
+	    if (connectZP) setBiomeColors();
 	    super.renderFaceZPos(block, x, y, z, getDrawTexture(block, icon, grassTopIcon, connectZP, drawPass));
 	}
 
 	@Override
 	public void renderFaceXNeg(Block block, double x, double y, double z, IIcon icon) {
         if (shouldSkipPass(block, connectXN, drawPass)) return;
-        setBiomeColors();
+        if (connectXN) setBiomeColors();
         super.renderFaceXNeg(block, x, y, z, getDrawTexture(block, icon, grassTopIcon, connectXN, drawPass));
 	}
 
 	@Override
 	public void renderFaceXPos(Block block, double x, double y, double z, IIcon icon) {
         if (shouldSkipPass(block, connectXP, drawPass)) return;
-        setBiomeColors();
+        if (connectXP) setBiomeColors();
         super.renderFaceXPos(block, x, y, z, getDrawTexture(block, icon, grassTopIcon, connectXP, drawPass));
 	}
 
