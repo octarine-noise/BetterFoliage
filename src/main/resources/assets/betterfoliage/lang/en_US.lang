@@ -102,6 +102,8 @@ betterfoliage.fallingLeaves.perturb=Perturbation
 betterfoliage.fallingLeaves.perturb.tooltip=Magnitude of perturbation effect. Adds a corkscrew-like motion to the particle synchronized to its rotation
 betterfoliage.fallingLeaves.lifetime=Maximum lifetime
 betterfoliage.fallingLeaves.lifetime.tooltip=Maximum lifetime of particle in seconds. Minimum lifetime is 60%% of this value
+betterfoliage.enabled.fallingLeaves.opacityHack=Opaque particles
+betterfoliage.enabled.fallingLeaves.opacityHack.tooltip=Stop transparent blocks obscuring particles even when particle is in front. WARNING: may cause glitches.
 
 betterfoliage.risingSoul=Rising souls
 betterfoliage.risingSoul.tooltip=Rising soul particle FX emitted from the top of soulsand blocks

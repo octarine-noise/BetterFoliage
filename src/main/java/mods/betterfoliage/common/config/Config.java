@@ -90,6 +90,7 @@ public class Config {
 	public static double leafFXChance;
 	public static double leafFXPerturb;
 	public static double leafFXLifetime;
+	public static boolean leafFXOpacityHack;
 	
 	public static boolean soulFXEnabled;
 	public static double soulFXChance;
@@ -185,6 +186,7 @@ public class Config {
         leafFXChance = getDouble(Category.fallingLeaves, "chance", 0.05, 0.001, 1.0, "betterfoliage.fallingLeaves.chance");
         leafFXPerturb = getDouble(Category.fallingLeaves, "perturb", 0.25, 0.01, 1.0, "betterfoliage.fallingLeaves.perturb");
         leafFXLifetime = getDouble(Category.fallingLeaves, "lifetime", 5.0, 1.0, 15.0, "betterfoliage.fallingLeaves.lifetime");
+        leafFXOpacityHack = getBoolean(Category.fallingLeaves, "opacityHack", true, "betterfoliage.enabled.fallingLeaves.opacityHack");
         
         soulFXEnabled = getBoolean(Category.risingSoul, "enabled", true, "betterfoliage.enabled");
         soulFXChance = getDouble(Category.risingSoul, "chance", 0.02, 0.001, 1.0, "betterfoliage.risingSoul.chance");
@@ -228,7 +230,7 @@ public class Config {
 		setOrder(Category.algae, "enabled", "hOffset", "heightMin", "heightMax", "size", "population", "biomeList");
 		setOrder(Category.coral, "enabled", "shallowWater", "hOffset", "vOffset", "size", "crustSize", "population", "chance", "biomeList");
 		setOrder(Category.netherrack, "enabled", "hOffset", "heightMin", "heightMax", "size");
-		setOrder(Category.fallingLeaves, "enabled", "chance", "size", "lifetime", "speed", "windStrength", "stormStrength", "perturb");
+		setOrder(Category.fallingLeaves, "enabled", "chance", "size", "lifetime", "speed", "windStrength", "stormStrength", "perturb", "opacityHack");
 		setOrder(Category.risingSoul, "enabled", "chance", "speed", "perturb", "headSize", "trailSize", "sizeDecay", "opacity", "opacityDecay", "lifetime", "trailLength", "trailDensity");
 		setOrder(Category.connectedGrass, "classic", "aggressive");
 	}

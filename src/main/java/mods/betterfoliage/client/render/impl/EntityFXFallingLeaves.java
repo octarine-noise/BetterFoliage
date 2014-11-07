@@ -2,6 +2,8 @@ package mods.betterfoliage.client.render.impl;
 
 import java.awt.Color;
 
+import org.lwjgl.opengl.GL11;
+
 import mods.betterfoliage.client.BetterFoliageClient;
 import mods.betterfoliage.common.config.Config;
 import mods.betterfoliage.common.util.Double3;
@@ -91,6 +93,8 @@ public class EntityFXFallingLeaves extends EntityFX {
         Double3 vec2Rot = vec1.scale(-sin[particleRotation]).add(vec2.scale(cos[particleRotation]));
         
         tessellator.setColorRGBA_F(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha);
+        
+        if (Config.leafFXOpacityHack) GL11.glDepthMask(true);
         addVertex(tessellator, center.sub(vec1Rot), maxU, maxV);
         addVertex(tessellator, center.sub(vec2Rot), maxU, minV);
         addVertex(tessellator, center.add(vec1Rot), minU, minV);
