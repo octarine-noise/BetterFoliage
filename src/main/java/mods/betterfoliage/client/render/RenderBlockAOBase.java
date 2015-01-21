@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.common.util.Double3;
 import mods.betterfoliage.common.util.RenderUtils;
 import net.minecraft.block.Block;
@@ -487,7 +488,12 @@ public class RenderBlockAOBase extends RenderBlocks {
     @Override
     public boolean renderStandardBlock(Block p_147784_1_, int p_147784_2_, int p_147784_3_, int p_147784_4_) {
         drawPass++;
-        return super.renderStandardBlock(p_147784_1_, p_147784_2_, p_147784_3_, p_147784_4_);
+        try {
+            return super.renderStandardBlock(p_147784_1_, p_147784_2_, p_147784_3_, p_147784_4_);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            BetterFoliage.log.warn(String.format("ArrayIndexOutOfBounds when rendering block: %s, meta: %d"), p_147784_1_.getClass().getName(), blockAccess.getBlockMetadata(p_147784_2_, p_147784_3_, p_147784_4_));
+            return true;
+        }
     }
 	
 	
