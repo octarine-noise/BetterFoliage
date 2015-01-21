@@ -50,7 +50,7 @@ public class ShortGrassGenerator extends BlockTextureGenerator {
 			}
 		}
 		
-		return new BufferedImageResource(result);
+		return new BufferedImageResource(result, originalWithDirs);
 	}
 
 }

@@ -29,32 +29,44 @@ public class LeafGenerator extends LeafGeneratorBase {
 	@Override
 	protected BufferedImage generateLeaf(ResourceLocation originalWithDirs) throws IOException, TextureGenerationException {
 		// load normal leaf texture
-		BufferedImage origImage = ImageIO.read(Minecraft.getMinecraft().getResourceManager().getResource(originalWithDirs).getInputStream());
-		if (origImage.getWidth() != origImage.getHeight()) throw new TextureGenerationException();
-		int size = origImage.getWidth();
+		BufferedImage origFullIcon = ImageIO.read(Minecraft.getMinecraft().getResourceManager().getResource(originalWithDirs).getInputStream());
+		int size = origFullIcon.getWidth();
+		int frames = origFullIcon.getHeight() / origFullIcon.getWidth();
+		if (origFullIcon.getHeight() % origFullIcon.getWidth() != 0) throw new TextureGenerationException();
+		
+		BufferedImage genFullIcon = new BufferedImage(size * 2, size * frames * 2, BufferedImage.TYPE_4BYTE_ABGR);
+        Graphics2D genFullGraphics = genFullIcon.createGraphics();
 
-		// tile leaf texture 2x2
-		BufferedImage overlayIcon = new BufferedImage(size * 2, size * 2, BufferedImage.TYPE_4BYTE_ABGR);
-		Graphics2D graphics = overlayIcon.createGraphics();
-		graphics.drawImage(origImage, 0, 0, null);
-		graphics.drawImage(origImage, 0, size, null);
-		graphics.drawImage(origImage, size, 0, null);
-		graphics.drawImage(origImage, size, size, null);
+        // iterate all frames
+        for (int frame = 0; frame < frames; frame++) {
+            BufferedImage origIcon = origFullIcon.getSubimage(0, size * frame, size, size);
+            
+    		// tile leaf texture 2x2
+    		BufferedImage genIcon = new BufferedImage(size * 2, size * 2, BufferedImage.TYPE_4BYTE_ABGR);
+    		Graphics2D genGraphics = genIcon.createGraphics();
+    		genGraphics.drawImage(origIcon, 0, 0, null);
+    		genGraphics.drawImage(origIcon, 0, size, null);
+    		genGraphics.drawImage(origIcon, size, 0, null);
+    		genGraphics.drawImage(origIcon, size, size, null);
+    		
+    		// overlay mask alpha on texture
+    		if (!ShadersModIntegration.isSpecialTexture(originalWithDirs)) {
+    			// load alpha mask of appropriate size
+    			BufferedImage maskImage = loadLeafMaskImage(defaultMask, size * 2);
+    			int scale = size * 2 / maskImage.getWidth();
+    			
+    			for (int x = 0; x < genIcon.getWidth(); x++) for (int y = 0; y < genIcon.getHeight(); y++) {
+    				long origPixel = genIcon.getRGB(x, y) & 0xFFFFFFFFl;
+    				long maskPixel = maskImage.getRGB(x / scale, y / scale) & 0xFF000000l | 0x00FFFFFF;
+    				genIcon.setRGB(x, y, (int) (origPixel & maskPixel));
+    			}
+    		}
 		
-		// overlay mask alpha on texture
-		if (!ShadersModIntegration.isSpecialTexture(originalWithDirs)) {
-			// load alpha mask of appropriate size
-			BufferedImage maskImage = loadLeafMaskImage(defaultMask, size * 2);
-			int scale = size * 2 / maskImage.getWidth();
-			
-			for (int x = 0; x < overlayIcon.getWidth(); x++) for (int y = 0; y < overlayIcon.getHeight(); y++) {
-				long origPixel = overlayIcon.getRGB(x, y) & 0xFFFFFFFFl;
-				long maskPixel = maskImage.getRGB(x / scale, y / scale) & 0xFF000000l | 0x00FFFFFF;
-				overlayIcon.setRGB(x, y, (int) (origPixel & maskPixel));
-			}
-		}
-		
-		return overlayIcon;
+    		// add to animated png
+    		genFullGraphics.drawImage(genIcon, 0, size * frame * 2, null);
+        }
+        
+        return genFullIcon;
 	}
 	
 	@Override
