@@ -74,7 +74,6 @@ public class LeafGenerator extends LeafGeneratorBase {
 	public void endTextureReload(TextureStitchEvent.Post event) {
 		super.endTextureReload(event);
 		if (event.map.getTextureType() != 0) return;
-		BetterFoliage.log.info(String.format("Found %d pre-drawn leaf textures", drawnCounter));
-		BetterFoliage.log.info(String.format("Generated %d leaf textures", generatedCounter));
+		BetterFoliage.log.info(String.format("Loaded leaf textures: %d generated, %d pre-drawn", generatedCounter, drawnCounter));
 	}
 }
