@@ -17,11 +17,13 @@ buildscript {
 apply plugin: 'forge'
 
 minecraft {
-	version = '1.7.2-10.12.2.1147'
+	version = '1.8-11.14.0.1296'
+    mappings = 'stable_16'
 }
 
 group = 'com.github.octarine-noise'
-version = "1.0.${System.getenv().BUILD_NUMBER}"
+version = "1.0.3"
+archivesBaseName = rootProject.name + '-mc' + project.minecraft.version
 
 targetCompatibility = 1.6
 sourceCompatibility = 1.6
@@ -41,27 +43,33 @@ processResources {
 }
 
 jar {
+    from 'LICENSE'
 	manifest {
 		attributes "FMLCorePlugin": "mods.betterfoliage.loader.BetterFoliageLoader"
         attributes "FMLCorePluginContainsFMLMod": "mods.betterfoliage.BetterFoliage"
+        attributes "FMLAT": "bf_at.cfg"
 	}
 }
 
 task srcJar(type: Jar, dependsOn: classes) {
     classifier = 'src'
+    from 'LICENSE'
     from sourceSets.main.allSource
     manifest {
         attributes "FMLCorePlugin": "mods.betterfoliage.loader.BetterFoliageLoader"
         attributes "FMLCorePluginContainsFMLMod": "mods.betterfoliage.BetterFoliage"
+        attributes "FMLAT": "bf_at.cfg"
     }
 }
 
 task devJar(type: Jar, dependsOn: classes) {
     classifier = 'dev'
+    from 'LICENSE'
     from sourceSets.main.output
     manifest {
         attributes "FMLCorePlugin": "mods.betterfoliage.loader.BetterFoliageLoader"
         attributes "FMLCorePluginContainsFMLMod": "mods.betterfoliage.BetterFoliage"
+        attributes "FMLAT": "bf_at.cfg"
     }
 }
 

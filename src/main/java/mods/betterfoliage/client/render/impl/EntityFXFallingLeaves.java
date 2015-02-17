@@ -2,25 +2,28 @@ package mods.betterfoliage.client.render.impl;
 
 import java.awt.Color;
 
-import org.lwjgl.opengl.GL11;
-
 import mods.betterfoliage.client.BetterFoliageClient;
+import mods.betterfoliage.client.render.impl.primitives.Color4;
+import mods.betterfoliage.client.resource.LeafTextureRegistry.LeafInfo;
 import mods.betterfoliage.common.config.Config;
 import mods.betterfoliage.common.util.Double3;
-import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.particle.EntityFX;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.util.IIcon;
+import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class EntityFXFallingLeaves extends EntityFX {
 
+    /** Quick <b>cos</b> lookup for <b>particleRotation</b> */
 	protected static double[] cos = new double[64];
+	
+	/** Quick <b>sin</b> lookup for <b>particleRotation</b> */
 	protected static double[] sin = new double[64];
 	
 	static {
@@ -30,25 +33,37 @@ public class EntityFXFallingLeaves extends EntityFX {
 		}
 	}
 	
+	/** Chance each tick that the particle will change its direction of rotation */
+	public static float rotationFlipChance = 0.05f;
+	
+	/** Flat brightness multiplier for particles (empirically determined magic number) */
 	public static float biomeBrightnessMultiplier = 0.5f;
+	
+	/** Value of <b>isOnGround</b> for the last tick */
 	public boolean wasOnGround = false;
+	
+	/** Mirror texture */
 	public boolean isMirrored;
+	
+	/** Rotation of particle around screen normal axis. Integer value between [0,64). */
 	public int particleRotation = 0;
+	
+	/** Particle is currently rotating in CCW direction */
 	public boolean rotationPositive = true;
 	
-	public EntityFXFallingLeaves(World world, int x, int y, int z) {
-		super(world, x + 0.5, y, z + 0.5);
+	public EntityFXFallingLeaves(World world, IBlockState blockState, BlockPos pos) {
+		super(world, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
 		particleMaxAge = MathHelper.floor_double((0.6 + 0.4 * rand.nextDouble()) * Config.leafFXLifetime * 20.0);
 		isMirrored = (rand.nextInt() & 1) == 1;
 		motionY = -Config.leafFXSpeed;
 		particleRotation = rand.nextInt(64);
 		particleScale = (float) Config.leafFXSize;
 		
-		
-		Block block = world.getBlock(x, y, z);
-		IIcon blockIcon = block.getIcon(world, x, y, z, ForgeDirection.DOWN.ordinal());
-		particleIcon = BetterFoliageClient.leafParticles.getIconSet(blockIcon).get(rand.nextInt(1024));
-		calculateParticleColor(BetterFoliageClient.leafParticles.getColor(blockIcon), block.colorMultiplier(world, x, y, z));
+		LeafInfo leafInfo = BetterFoliageClient.leafRegistry.leafInfoMap.get(blockState);
+		if (leafInfo == null || leafInfo.particleType == null) return;
+		particleIcon = BetterFoliageClient.leafRegistry.particleTextures.get(leafInfo.particleType).get(rand.nextInt(1024));
+		Color4 blockColor = Color4.fromARGB(blockState.getBlock().colorMultiplier(world, pos, 0)).opaque();
+		calculateParticleColor(leafInfo.averageColor, blockColor);
 	}
 
 	@Override
@@ -56,7 +71,7 @@ public class EntityFXFallingLeaves extends EntityFX {
 		super.onUpdate();
 		
 		particleScale = (float) Config.leafFXSize;
-		if (rand.nextFloat() > 0.95f) rotationPositive = !rotationPositive;
+		if (rand.nextFloat() < rotationFlipChance) rotationPositive = !rotationPositive;
 		if (particleAge > particleMaxAge - 20) particleAlpha = 0.05f * (particleMaxAge - particleAge);
 		
 		if (onGround || wasOnGround) {
@@ -76,8 +91,7 @@ public class EntityFXFallingLeaves extends EntityFX {
 	}
 
 	@Override
-    public void renderParticle(Tessellator tessellator, float partialTickTime, float rotX, float rotZ, float rotYZ, float rotXY, float rotXZ)
-    {
+    public void renderParticle(WorldRenderer renderer, Entity entity, float partialTickTime, float rotX, float rotZ, float rotYZ, float rotXY, float rotXZ) {
         float minU = isMirrored ? particleIcon.getMinU() : particleIcon.getMaxU();
         float maxU = isMirrored ? particleIcon.getMaxU() : particleIcon.getMinU();
         float minV = particleIcon.getMinV();
@@ -92,27 +106,26 @@ public class EntityFXFallingLeaves extends EntityFX {
         Double3 vec1Rot = vec1.scale(cos[particleRotation]).add(vec2.scale(sin[particleRotation]));
         Double3 vec2Rot = vec1.scale(-sin[particleRotation]).add(vec2.scale(cos[particleRotation]));
         
-        tessellator.setColorRGBA_F(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha);
+        renderer.setColorRGBA_F(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha);
         
-        if (Config.leafFXOpacityHack) GL11.glDepthMask(true);
-        addVertex(tessellator, center.sub(vec1Rot), maxU, maxV);
-        addVertex(tessellator, center.sub(vec2Rot), maxU, minV);
-        addVertex(tessellator, center.add(vec1Rot), minU, minV);
-        addVertex(tessellator, center.add(vec2Rot), minU, maxV);
+        addVertex(renderer, center.sub(vec1Rot), maxU, maxV);
+        addVertex(renderer, center.sub(vec2Rot), maxU, minV);
+        addVertex(renderer, center.add(vec1Rot), minU, minV);
+        addVertex(renderer, center.add(vec2Rot), minU, maxV);
     }
     
-	protected void addVertex(Tessellator tessellator, Double3 coord, double u, double v) {
-		tessellator.addVertexWithUV(coord.x, coord.y, coord.z, u, v);
+	protected void addVertex(WorldRenderer renderer, Double3 coord, double u, double v) {
+	    renderer.addVertexWithUV(coord.x, coord.y, coord.z, u, v);
 	}
 	
-	/** Calculates and sets the color of the particle by blending the average color of the block texture with the current biome color
-	 *  Blending is done in HSB color space, weighted by the relative saturation of the colors
+	/** Calculates and sets the color of the particle by blending the average color of the block texture with the current biome color.
+	 *  Blending is done in HSB color space, weighted by the relative saturation of the colors.
 	 * @param textureAvgColor average color of the block texture
 	 * @param blockColor biome color at the spawning block
 	 */
-	public void calculateParticleColor(int textureAvgColor, int blockColor) {
-		float[] hsbTexture = Color.RGBtoHSB((textureAvgColor >> 16) & 0xFF, (textureAvgColor >> 8) & 0xFF, textureAvgColor & 0xFF, null);
-		float[] hsbBlock = Color.RGBtoHSB((blockColor >> 16) & 0xFF, (blockColor >> 8) & 0xFF, blockColor & 0xFF, null);
+	public void calculateParticleColor(Color4 textureAvgColor, Color4 blockColor) {
+		float[] hsbTexture = Color.RGBtoHSB(textureAvgColor.R, textureAvgColor.G, textureAvgColor.B, null);
+		float[] hsbBlock = Color.RGBtoHSB(blockColor.R, blockColor.G, blockColor.B, null);
 		
 		float weightTex = hsbTexture[1] / (hsbTexture[1] + hsbBlock[1]);
 		float weightBlock = 1.0f - weightTex;

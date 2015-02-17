@@ -1,6 +1,7 @@
 package mods.betterfoliage.common.util;
 
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 
 /** Immutable 3D vector of double precision.
  * @author octarine-noise
@@ -11,16 +12,22 @@ public class Double3 {
 	public final double y;
 	public final double z;
 	
+	public Double3(BlockPos pos) {
+	    this.x = pos.getX();
+	    this.y = pos.getY();
+	    this.z = pos.getZ();
+	}
+	
 	public Double3(double x, double y, double z) {
 		this.x = x;
 		this.y = y;
 		this.z = z;
 	}
 	
-	public Double3(ForgeDirection dir) {
-		this.x = dir.offsetX;
-		this.y = dir.offsetY;
-		this.z = dir.offsetZ;
+	public Double3(EnumFacing dir) {
+		this.x = dir.getFrontOffsetX();
+		this.y = dir.getFrontOffsetY();
+		this.z = dir.getFrontOffsetZ();
 	}
 	
 	public Double3 add(Double3 other) {

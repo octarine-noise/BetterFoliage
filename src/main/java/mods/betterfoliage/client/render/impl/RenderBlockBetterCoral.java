@@ -3,93 +3,76 @@ package mods.betterfoliage.client.render.impl;
 import java.util.Random;
 
 import mods.betterfoliage.BetterFoliage;
-import mods.betterfoliage.client.render.IRenderBlockDecorator;
-import mods.betterfoliage.client.render.IconSet;
-import mods.betterfoliage.client.render.RenderBlockAOBase;
+import mods.betterfoliage.client.render.TextureSet;
+import mods.betterfoliage.client.render.impl.primitives.Color4;
+import mods.betterfoliage.client.render.impl.primitives.FaceCrossedQuads;
+import mods.betterfoliage.client.render.impl.primitives.SimpleOrientedQuad;
 import mods.betterfoliage.common.config.Config;
 import mods.betterfoliage.common.util.Double3;
-import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.renderer.BFAbstractRenderer;
+import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.IIcon;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.gen.NoiseGeneratorSimplex;
 import net.minecraftforge.client.event.TextureStitchEvent;
-import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.event.world.WorldEvent;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-public class RenderBlockBetterCoral extends RenderBlockAOBase implements IRenderBlockDecorator {
+public class RenderBlockBetterCoral extends BFAbstractRenderer {
 
-	public IconSet coralCrustIcons = new IconSet("bettergrassandleaves", "better_crust_%d");
-	public IconSet coralCrossIcons = new IconSet("bettergrassandleaves", "better_coral_%d");
+    public static int seedOffset = 2;
+    
+	public TextureSet coralCrustIcons = new TextureSet("bettergrassandleaves", "blocks/better_crust_%d");
+	public TextureSet coralCrossIcons = new TextureSet("bettergrassandleaves", "blocks/better_coral_%d");
 	public NoiseGeneratorSimplex noise;
 	
-	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
-		if (!Config.coralEnabled) return false;
-		if (block != Blocks.sand) return false;
-		if (!Config.coralBiomeList.contains(blockAccess.getBiomeGenForCoords(x, z).biomeID)) return false;
-		int terrainVariation = MathHelper.floor_double((noise.func_151605_a(x * 0.1, z * 0.1) + 1.0) * 32.0);
-		return terrainVariation < Config.coralPopulation;
-	}
-	
-	public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer) {
-		blockAccess = world;
-		renderWorldBlockBase(1, world, x, y, z, block, modelId, renderer);
-		
-		Double3 blockCenter = new Double3(x + 0.5, y + 0.5, z + 0.5);
-		double offset = pRand[getSemiRandomFromPos(x, y, z, 6)] * Config.coralVOffset;
+	@Override
+    public boolean renderFeatureForBlock(IBlockAccess blockAccess, IBlockState blockState, BlockPos pos, WorldRenderer worldRenderer, boolean useAO) {
+	    if (!Config.coralEnabled) return false;
+	    if (blockState.getBlock() != Blocks.sand) return false;
+	    if (!Config.coralBiomeList.contains(blockAccess.getBiomeGenForCoords(pos).biomeID)) return false;
+	    int terrainVariation = MathHelper.floor_double((noise.func_151605_a(pos.getX() * 0.1, pos.getZ() * 0.1) + 1.0) * 32.0);
+	    if (terrainVariation >= Config.coralPopulation) return false;
+	        
+		Double3 blockCenter = new Double3(pos).add(0.5, 0.5, 0.5);
+		double offset = random.getRange(0.0, Config.coralVOffset, getSemiRandomFromPos(pos, 1));
+		int textureVariation = getSemiRandomFromPos(pos, 2);
 		double halfSize = Config.coralSize * 0.5;
 		double halfCrustSize = Config.coralCrustSize * 0.5;
 		
-		Tessellator.instance.setBrightness(getBrightness(block, x, y, z));
-		for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
-			if (blockAccess.getBlock(x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ).getMaterial() != Material.water) continue;
-			if (!Config.coralShallowWater && blockAccess.isAirBlock(x + dir.offsetX, y + dir.offsetY + 1, z + dir.offsetZ)) continue;
+		shadingData.update(blockAccess, blockState.getBlock(), pos, useAO);
+		for (EnumFacing face : EnumFacing.values()) {
+			if (blockAccess.getBlockState(pos.offset(face)).getBlock().getMaterial() != Material.water) continue;
+			if (!Config.coralShallowWater && blockAccess.isAirBlock(pos.offset(face).up())) continue;
 				
-			int variation = getSemiRandomFromPos(x, y, z, dir.ordinal());
-			if (variation < Config.coralChance) {
-				IIcon crustIcon = coralCrustIcons.get(variation);
-				IIcon coralIcon = coralCrossIcons.get(variation);
-				if (crustIcon != null) renderCoralCrust(blockCenter, dir, offset, halfCrustSize, crustIcon, variation);
-				if (coralIcon != null) renderCrossedSideQuads(blockCenter.add(new Double3(dir).scale(0.5)), dir, 
-														      halfSize, halfSize, 
-														      pRot[variation], Config.coralHOffset,
-														      coralIcon, 0, false);
+			
+			if (textureVariation < Config.coralChance) {
+			    SimpleOrientedQuad coralCrust = SimpleOrientedQuad.create(blockCenter.add(new Double3(face).scale(0.5 + offset)), face, halfCrustSize);
+			    FaceCrossedQuads coral = FaceCrossedQuads.createTranslated(blockCenter.add(new Double3(face).scale(0.5)), face, random.getCircleXZ(Config.coralHOffset, textureVariation), halfSize, halfSize);
+			    
+			    coralCrust.setTexture(coralCrustIcons.get(textureVariation + face.ordinal()), textureVariation + face.ordinal()).setBrightness(shadingData).setColor(shadingData, Color4.opaqueWhite).render(worldRenderer);
+			    coral.setTexture(coralCrossIcons.get(textureVariation + face.ordinal()), 0).setBrightness(shadingData).setColor(shadingData, Color4.opaqueWhite).render(worldRenderer);
 			}
 		}
-		
 		return true;
 	}
 	
-	protected void renderCoralCrust(Double3 blockCenter, ForgeDirection dir, double offset, double scale, IIcon icon, int uvRot) {
-		Double3 face1 = new Double3(faceDir1[dir.ordinal()]).scale(scale);
-		Double3 face2 = new Double3(faceDir2[dir.ordinal()]).scale(scale);
-		Double3 drawCenter = blockCenter.add(new Double3(dir).scale(0.5 + offset));
-		if (Minecraft.isAmbientOcclusionEnabled()) {
-			setShadingForFace(dir);
-			renderQuadWithShading(icon, drawCenter, face1, face2, uvRot, faceAOPP, faceAONP, faceAONN, faceAOPN);
-		} else {
-			renderQuad(icon, drawCenter, face1, face2, uvRot);
-		}
-	}
-	
-	@SubscribeEvent
-	public void handleTextureReload(TextureStitchEvent.Pre event) {
-		if (event.map.getTextureType() != 0) return;
-		
-		coralCrustIcons.registerIcons(event.map);
-		coralCrossIcons.registerIcons(event.map);
-		BetterFoliage.log.info(String.format("Found %d coral crust textures", coralCrustIcons.numLoaded));
-		BetterFoliage.log.info(String.format("Found %d coral textures", coralCrossIcons.numLoaded));
-	}
-	
-	@SubscribeEvent
-	public void handleWorldLoad(WorldEvent.Load event) {
-		noise = new NoiseGeneratorSimplex(new Random(event.world.getWorldInfo().getSeed() + 2));
-	}
+    @SubscribeEvent
+    public void handleTextureReload(TextureStitchEvent.Pre event) {
+        coralCrustIcons.registerSprites(event.map);
+        coralCrossIcons.registerSprites(event.map);
+        BetterFoliage.log.info(String.format("Found %d coral crust textures", coralCrustIcons.numLoaded));
+        BetterFoliage.log.info(String.format("Found %d coral textures", coralCrossIcons.numLoaded));
+    }
+    
+    @SubscribeEvent
+    public void handleWorldLoad(WorldEvent.Load event) {
+        noise = new NoiseGeneratorSimplex(new Random(event.world.getWorldInfo().getSeed() + seedOffset));
+    }
+    
 }

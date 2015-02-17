@@ -6,13 +6,13 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class ReedGenerator extends BlockTextureGenerator {
@@ -28,7 +28,7 @@ public class ReedGenerator extends BlockTextureGenerator {
 	public IResource getResource(ResourceLocation resourceLocation) throws IOException {
 		IResourceManager resourceManager = Minecraft.getMinecraft().getResourceManager();
 		ResourceLocation originalNoDirs = unwrapResource(resourceLocation);
-		ResourceLocation originalWithDirs = new ResourceLocation(originalNoDirs.getResourceDomain(), "textures/blocks/" + originalNoDirs.getResourcePath());
+		ResourceLocation originalWithDirs = new ResourceLocation(originalNoDirs.getResourceDomain(), "textures/" + originalNoDirs.getResourcePath());
 		
 		// load full texture
 		BufferedImage origImage = ImageIO.read(resourceManager.getResource(originalWithDirs).getInputStream());
@@ -38,7 +38,7 @@ public class ReedGenerator extends BlockTextureGenerator {
 		Graphics2D graphics = result.createGraphics();
 		graphics.drawImage(origImage, 0, isBottom ? -origImage.getHeight() / 2 : 0, null);
 		
-		return new BufferedImageResource(result);
+		return new BufferedImageResource(resourceLocation, result);
 	}
 
 }

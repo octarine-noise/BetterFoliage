@@ -2,69 +2,56 @@ package mods.betterfoliage.client.render.impl;
 
 import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.ShadersModIntegration;
-import mods.betterfoliage.client.render.IRenderBlockDecorator;
-import mods.betterfoliage.client.render.IconSet;
-import mods.betterfoliage.client.render.RenderBlockAOBase;
+import mods.betterfoliage.client.render.TextureSet;
+import mods.betterfoliage.client.render.impl.primitives.Color4;
+import mods.betterfoliage.client.render.impl.primitives.FaceCrossedQuads;
 import mods.betterfoliage.common.config.Config;
 import mods.betterfoliage.common.util.Double3;
-import net.minecraft.block.Block;
-import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.renderer.BFAbstractRenderer;
+import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.IIcon;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.client.event.TextureStitchEvent;
-import net.minecraftforge.common.util.ForgeDirection;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class RenderBlockBetterMycelium extends RenderBlockAOBase implements IRenderBlockDecorator {
+public class RenderBlockBetterMycelium extends BFAbstractRenderer {
 
-	public IconSet myceliumIcons = new IconSet("bettergrassandleaves", "better_mycel_%d");
-	
-	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
-		if (!Config.grassEnabled) return false;
-		if (block != Blocks.mycelium) return false;
-		if (!blockAccess.isAirBlock(x, y + 1, z) && blockAccess.getBlock(x, y + 1, z) != Blocks.snow_layer) return false;
-		return true;
-	}
-	
-	public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer) {
-		blockAccess = world;
-		renderWorldBlockBase(1, world, x, y, z, block, modelId, renderer);
-		
-		boolean isSnowed = blockAccess.getBlock(x, y + 1, z) == Blocks.snow_layer;
-		int iconVariation = getSemiRandomFromPos(x, y, z, 0);
-		IIcon renderIcon = myceliumIcons.get(iconVariation);
-		
-		if (isSnowed || renderIcon == null) return true;
-		
-		int heightVariation = getSemiRandomFromPos(x, y, z, 1);
-		double scale = Config.grassSize * 0.5;
-		double halfHeight = 0.5 * (Config.grassHeightMin + pRand[heightVariation] * (Config.grassHeightMax - Config.grassHeightMin));
-		
-		if (isSnowed) {
-			aoYPXZNN.setGray(0.9f); aoYPXZNP.setGray(0.9f); aoYPXZPN.setGray(0.9f); aoYPXZPP.setGray(0.9f);
-			Tessellator.instance.setColorOpaque(230, 230, 230);
-		}
-		
-		// render mycelium
-		ShadersModIntegration.startGrassQuads();
-		Tessellator.instance.setBrightness(getBrightness(block, x, y + 1, z));
-		Tessellator.instance.setColorOpaque_I(block.colorMultiplier(blockAccess, x, y, z));
-		renderCrossedSideQuads(new Double3(x + 0.5, y + 1.0 + (isSnowed ? 0.0625 : 0.0), z + 0.5), ForgeDirection.UP, scale, halfHeight, pRot[iconVariation], Config.grassHOffset, renderIcon, 0, false);
-		
-		return true;
-	}
-
-	@SubscribeEvent
-	public void handleTextureReload(TextureStitchEvent.Pre event) {
-		if (event.map.getTextureType() != 0) return;
-		
-		myceliumIcons.registerIcons(event.map);
-		BetterFoliage.log.info(String.format("Found %d mycelium textures", myceliumIcons.numLoaded));
-	}
-
+    public TextureSet myceliumIcons = new TextureSet("bettergrassandleaves", "blocks/better_mycel_%d");
+    
+    @Override
+    public boolean renderFeatureForBlock(IBlockAccess blockAccess, IBlockState blockState, BlockPos pos, WorldRenderer worldRenderer, boolean useAO) {
+        if (!Config.grassEnabled) return false;
+        if (blockAccess.getBlockState(pos.up()).getBlock().isOpaqueCube()) return false;
+        if (blockState.getBlock() != Blocks.mycelium) return false;
+        
+        boolean isSnowTop = blockAccess.getBlockState(pos.offset(EnumFacing.UP)).getBlock().getMaterial() == Material.snow;
+        int offsetVariation = getSemiRandomFromPos(pos, 0);
+        int textureVariation = getSemiRandomFromPos(pos, 1);
+        double halfSize = 0.5 * Config.grassSize;
+        double halfHeight = 0.5 * random.getRange(Config.grassHeightMin, Config.grassHeightMax, offsetVariation);
+        Double3 offset = random.getCircleXZ(Config.grassHOffset, offsetVariation);
+        Double3 faceCenter = new Double3(pos).add(0.5, 1.0, 0.5);
+        
+        ShadersModIntegration.startGrassQuads(worldRenderer);
+        shadingData.update(blockAccess, blockState.getBlock(), pos, useAO);
+        FaceCrossedQuads mycelium = FaceCrossedQuads.createTranslated(faceCenter.add(0, isSnowTop ? 0.1 : 0, 0), EnumFacing.UP, offset, halfSize, halfHeight);
+        mycelium.setTexture(myceliumIcons.get(textureVariation), 0).setBrightness(shadingData).setColor(shadingData, Color4.opaqueWhite).render(worldRenderer);
+        ShadersModIntegration.finish(worldRenderer);
+        
+        return true;
+    }
+    
+    @SubscribeEvent
+    public void handleTextureReload(TextureStitchEvent.Pre event) {
+        myceliumIcons.registerSprites(event.map);
+        BetterFoliage.log.info(String.format("Found %d mycelium textures", myceliumIcons.numLoaded));
+    }
+    
 }

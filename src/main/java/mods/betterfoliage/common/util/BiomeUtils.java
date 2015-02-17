@@ -7,6 +7,8 @@ import java.util.Comparator;
 import java.util.List;
 
 import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
@@ -14,7 +16,7 @@ import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 
-
+@SideOnly(Side.CLIENT)
 public class BiomeUtils {
 
     /** Hide constructor */

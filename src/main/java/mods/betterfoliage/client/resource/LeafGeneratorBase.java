@@ -5,16 +5,15 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import mods.betterfoliage.client.resource.LeafTextureEnumerator.LeafTextureFoundEvent;
 import mods.betterfoliage.common.util.ResourceUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.event.TextureStitchEvent.Pre;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.client.event.TextureStitchEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 /** Texture generator base class for textures based on leaf blocks.
  * Supports loading from resource packs instead of generating if available.
@@ -54,10 +53,10 @@ public abstract class LeafGeneratorBase extends BlockTextureGenerator {
 	public IResource getResource(ResourceLocation resourceLocation) throws IOException {
 		IResourceManager resourceManager = Minecraft.getMinecraft().getResourceManager();
 		ResourceLocation originalNoDirs = unwrapResource(resourceLocation);
-		ResourceLocation originalWithDirs = new ResourceLocation(originalNoDirs.getResourceDomain(), "textures/blocks/" + originalNoDirs.getResourcePath());
+		ResourceLocation originalWithDirs = new ResourceLocation(originalNoDirs.getResourceDomain(), "textures/" + originalNoDirs.getResourcePath());
 		
 		// check for provided texture
-		ResourceLocation handDrawnLocation = new ResourceLocation(nonGeneratedDomain, String.format(handDrawnLocationFormat, originalNoDirs.getResourceDomain(), originalNoDirs.getResourcePath())); 
+		ResourceLocation handDrawnLocation = new ResourceLocation(nonGeneratedDomain, String.format(handDrawnLocationFormat, originalNoDirs.getResourceDomain(), originalNoDirs.getResourcePath().substring(7))); 
 		if (ResourceUtils.resourceExists(handDrawnLocation)) {
 			drawnCounter++;
 			return resourceManager.getResource(handDrawnLocation);
@@ -73,7 +72,7 @@ public abstract class LeafGeneratorBase extends BlockTextureGenerator {
 			return getMissingResource();
 		}
 		generatedCounter++;
-		return new BufferedImageResource(result);
+		return new BufferedImageResource(resourceLocation, result);
 	}
 	
 	protected abstract BufferedImage generateLeaf(ResourceLocation originalWithDirs) throws IOException, TextureGenerationException;
@@ -104,16 +103,10 @@ public abstract class LeafGeneratorBase extends BlockTextureGenerator {
 	
 	@Override
 	@SubscribeEvent
-	public void handleTextureReload(Pre event) {
+	public void handleTextureReload(TextureStitchEvent.Pre event) {
 		super.handleTextureReload(event);
-		if (event.map.getTextureType() != 0) return;
 		generatedCounter = 0;
 		drawnCounter = 0;
-	}
-
-	@SubscribeEvent
-	public void handleRegisterTexture(LeafTextureFoundEvent event) {
-		event.blockTextures.registerIcon(new ResourceLocation(domainName, event.icon.getIconName()).toString());
 	}
 
 }

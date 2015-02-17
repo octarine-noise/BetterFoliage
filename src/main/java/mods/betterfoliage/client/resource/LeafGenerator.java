@@ -12,9 +12,9 @@ import mods.betterfoliage.client.ShadersModIntegration;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.TextureStitchEvent;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class LeafGenerator extends LeafGeneratorBase {
@@ -22,8 +22,10 @@ public class LeafGenerator extends LeafGeneratorBase {
 	/** Name of the default alpha mask to use */
 	public static String defaultMask = "default";
 	
+	public static final String DOMAIN = "bf_leaves";
+	
 	public LeafGenerator() {
-		super("bf_leaves", "betterfoliage", "textures/blocks/%s/%s", "betterfoliage:textures/blocks/leafmask_%d_%s.png", BetterFoliageClient.missingTexture);
+		super(DOMAIN, BetterFoliage.DOMAIN, "textures/blocks/%s/%s", "betterfoliage:textures/blocks/leafmask_%d_%s.png", BetterFoliageClient.missingTexture);
 	}
 
 	@Override
@@ -61,8 +63,6 @@ public class LeafGenerator extends LeafGeneratorBase {
 	@SubscribeEvent
 	public void endTextureReload(TextureStitchEvent.Post event) {
 		super.endTextureReload(event);
-		if (event.map.getTextureType() != 0) return;
-		BetterFoliage.log.info(String.format("Found %d pre-drawn leaf textures", drawnCounter));
-		BetterFoliage.log.info(String.format("Generated %d leaf textures", generatedCounter));
+		BetterFoliage.log.info(String.format("Loaded leaf textures: %d generated, %d pre-drawn", generatedCounter, drawnCounter));
 	}
 }

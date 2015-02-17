@@ -4,78 +4,72 @@ import java.util.Random;
 
 import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.ShadersModIntegration;
-import mods.betterfoliage.client.render.IRenderBlockDecorator;
-import mods.betterfoliage.client.render.IconSet;
-import mods.betterfoliage.client.render.RenderBlockAOBase;
+import mods.betterfoliage.client.render.TextureSet;
+import mods.betterfoliage.client.render.impl.primitives.Color4;
+import mods.betterfoliage.client.render.impl.primitives.FaceCrossedQuads;
 import mods.betterfoliage.common.config.Config;
 import mods.betterfoliage.common.util.Double3;
-import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.util.IIcon;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.renderer.BFAbstractRenderer;
+import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.gen.NoiseGeneratorSimplex;
 import net.minecraftforge.client.event.TextureStitchEvent;
-import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.event.world.WorldEvent;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class RenderBlockBetterReed extends RenderBlockAOBase implements IRenderBlockDecorator {
+public class RenderBlockBetterReed extends BFAbstractRenderer {
 
-	public IconSet reedBottomIcons = new IconSet("bf_reed_bottom", "bettergrassandleaves:better_reed_%d");
-	public IconSet reedTopIcons = new IconSet("bf_reed_top", "bettergrassandleaves:better_reed_%d");
-	public NoiseGeneratorSimplex noise;
-	
-	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
-		if (!Config.reedEnabled) return false;
-		if (!(Config.dirt.matchesID(block))) return false;
-		if (!Config.reedBiomeList.contains(blockAccess.getBiomeGenForCoords(x, z).biomeID)) return false;
-		if (blockAccess.getBlock(x, y + 1, z).getMaterial() != Material.water) return false;
-		if (!blockAccess.isAirBlock(x, y + 2, z)) return false;
-		int terrainVariation = MathHelper.floor_double((noise.func_151605_a(x, z) + 1.0) * 32.0);
-		return terrainVariation < Config.reedPopulation;
-	}
-	
-	public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer) {
-		blockAccess = world;
-		renderWorldBlockBase(1, world, x, y, z, block, modelId, renderer);
-		
-		int iconVariation = getSemiRandomFromPos(x, y, z, 0);
-		int heightVariation = getSemiRandomFromPos(x, y, z, 1);
-		
-		IIcon bottomIcon = reedBottomIcons.get(iconVariation);
-		IIcon topIcon = reedTopIcons.get(iconVariation);
-		if (bottomIcon == null || topIcon == null) return true;
-		
-		double quarterHeight = 0.25 * (Config.reedHeightMin + pRand[heightVariation] * (Config.reedHeightMax - Config.reedHeightMin));
-		Tessellator.instance.setBrightness(getBrightness(block, x, y + 2, z));
-		Tessellator.instance.setColorOpaque(255, 255, 255);
-		
-		// render reeds
-		if (Config.reedShaderWind) ShadersModIntegration.startGrassQuads();
-		renderCrossedSideQuads(new Double3(x + 0.5, y + 1.0, z + 0.5), ForgeDirection.UP, 0.5, quarterHeight, pRot[iconVariation], Config.reedHOffset, bottomIcon, 0, true);
-		renderCrossedSideQuads(new Double3(x + 0.5, y + 1.0 + 2.0 * quarterHeight, z + 0.5), ForgeDirection.UP, 0.5, quarterHeight, pRot[iconVariation], Config.reedHOffset, topIcon, 0, true);
-		
-		return true;
-	}
-	
-	@SubscribeEvent
-	public void handleTextureReload(TextureStitchEvent.Pre event) {
-		if (event.map.getTextureType() != 0) return;
-		
-		reedBottomIcons.registerIcons(event.map);
-		reedTopIcons.registerIcons(event.map);
-		BetterFoliage.log.info(String.format("Found %d reed textures", reedBottomIcons.numLoaded));
-	}
-	
-	@SubscribeEvent
-	public void handleWorldLoad(WorldEvent.Load event) {
-		noise = new NoiseGeneratorSimplex(new Random(event.world.getWorldInfo().getSeed()));
-	}
-	
+    public static int seedOffset = 0;
+    
+    public TextureSet reedBottomIcons = new TextureSet("bf_reed_bottom", "bettergrassandleaves:blocks/better_reed_%d");
+    public TextureSet reedTopIcons = new TextureSet("bf_reed_top", "bettergrassandleaves:blocks/better_reed_%d");
+    public NoiseGeneratorSimplex noise;
+    
+    @Override
+    public boolean renderFeatureForBlock(IBlockAccess blockAccess, IBlockState blockState, BlockPos pos, WorldRenderer worldRenderer, boolean useAO) {
+        if (!Config.reedEnabled) return false;
+        if (!Config.dirt.matchesID(blockState.getBlock())) return false;
+        if (!Config.reedBiomeList.contains(blockAccess.getBiomeGenForCoords(pos).biomeID)) return false;
+        if (blockAccess.getBlockState(pos.up()).getBlock().getMaterial() != Material.water) return false;
+        if (!blockAccess.isAirBlock(pos.up(2))) return false;
+        int terrainVariation = MathHelper.floor_double((noise.func_151605_a(pos.getX(), pos.getZ()) + 1.0) * 32.0);
+        if (terrainVariation >= Config.reedPopulation) return false;
+        
+        int offsetVariation = getSemiRandomFromPos(pos, 0);
+        int textureVariation = getSemiRandomFromPos(pos, 1);
+        double halfSize = 0.5;
+        double quarterHeight = 0.25 * random.getRange(Config.reedHeightMin, Config.reedHeightMax, offsetVariation);
+        Double3 offset = random.getCircleXZ(Config.algaeHOffset, offsetVariation);
+        Double3 faceCenter = new Double3(pos).add(0.5, 1.0, 0.5);
+        
+        ShadersModIntegration.startGrassQuads(worldRenderer);
+        shadingData.update(blockAccess, blockState.getBlock(), pos.up(), useAO);
+        FaceCrossedQuads reedBottom = FaceCrossedQuads.createTranslated(faceCenter, EnumFacing.UP, offset, halfSize, quarterHeight);
+        FaceCrossedQuads reedTop = FaceCrossedQuads.createTranslated(faceCenter.add(0, 2 * quarterHeight, 0), EnumFacing.UP, offset, halfSize, quarterHeight);
+        reedBottom.setTexture(reedBottomIcons.get(textureVariation), 0).setBrightness(shadingData).setColor(shadingData, Color4.opaqueWhite).render(worldRenderer);
+        reedTop.setTexture(reedTopIcons.get(textureVariation), 0).setBrightness(shadingData).setColor(shadingData, Color4.opaqueWhite).render(worldRenderer);
+        ShadersModIntegration.finish(worldRenderer);
+        
+        return true;
+    }
+    
+    @SubscribeEvent
+    public void handleTextureReload(TextureStitchEvent.Pre event) {
+        reedBottomIcons.registerSprites(event.map);
+        reedTopIcons.registerSprites(event.map);
+        BetterFoliage.log.info(String.format("Found %d reed textures", reedBottomIcons.numLoaded));
+    }
+    
+    @SubscribeEvent
+    public void handleWorldLoad(WorldEvent.Load event) {
+        noise = new NoiseGeneratorSimplex(new Random(event.world.getWorldInfo().getSeed() + seedOffset));
+    }
 }

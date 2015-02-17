@@ -6,8 +6,8 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import mods.betterfoliage.client.ShadersModIntegration;
 import net.minecraft.client.Minecraft;
@@ -21,7 +21,6 @@ public class ShortGrassGenerator extends BlockTextureGenerator {
 	protected boolean isSnowed = false;
 	
 	protected int snowOriginalWeight = 2;
-	
 	protected int snowWhiteWeight = 3;
 	
 	public ShortGrassGenerator(String domainName, ResourceLocation missingResource, boolean isSnowed) {
@@ -33,7 +32,7 @@ public class ShortGrassGenerator extends BlockTextureGenerator {
 	public IResource getResource(ResourceLocation resourceLocation) throws IOException {
 		IResourceManager resourceManager = Minecraft.getMinecraft().getResourceManager();
 		ResourceLocation originalNoDirs = unwrapResource(resourceLocation);
-		ResourceLocation originalWithDirs = new ResourceLocation(originalNoDirs.getResourceDomain(), "textures/blocks/" + originalNoDirs.getResourcePath());
+		ResourceLocation originalWithDirs = new ResourceLocation(originalNoDirs.getResourceDomain(), "textures/" + originalNoDirs.getResourcePath());
 		
 		// load full texture
 		BufferedImage origImage = ImageIO.read(resourceManager.getResource(originalWithDirs).getInputStream());
@@ -50,7 +49,7 @@ public class ShortGrassGenerator extends BlockTextureGenerator {
 			}
 		}
 		
-		return new BufferedImageResource(result);
+		return new BufferedImageResource(resourceLocation, result);
 	}
 
 }

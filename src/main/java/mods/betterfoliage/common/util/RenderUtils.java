@@ -1,45 +1,60 @@
 package mods.betterfoliage.common.util;
 
-import java.lang.reflect.Field;
+import java.nio.ByteOrder;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import net.minecraft.util.EnumChatFormatting;
-import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
-import cpw.mods.fml.client.registry.RenderingRegistry;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
-
+@SideOnly(Side.CLIENT)
 public class RenderUtils {
 
     /** Hide constructor */
     private RenderUtils() {}
 
-    /** Retrieve a specific rendering handler from the registry
-     * @param renderType render type of block
-     * @return {@link ISimpleBlockRenderingHandler} if defined, null otherwise
-     */
-    @SuppressWarnings("unchecked")
-    public static ISimpleBlockRenderingHandler getRenderingHandler(int renderType) {
-    	try {
-    		Field field = RenderingRegistry.class.getDeclaredField("INSTANCE");
-    		field.setAccessible(true);
-    		RenderingRegistry inst = (RenderingRegistry) field.get(null);
-    		field = RenderingRegistry.class.getDeclaredField("blockRenderers");
-    		field.setAccessible(true);
-    		return ((Map<Integer, ISimpleBlockRenderingHandler>) field.get(inst)).get(renderType);
-    	} catch (Exception e) {
-    		return null;
-    	}
-    }
 
     public static void stripTooltipDefaultText(List<String> tooltip) {
         boolean defaultRows = false;
         Iterator<String> iter = tooltip.iterator();
         while(iter.hasNext()) {
-            if (iter.next().startsWith(EnumChatFormatting.AQUA.toString())) defaultRows = true;
+            defaultRows |= iter.next().startsWith(EnumChatFormatting.AQUA.toString());
             if (defaultRows) iter.remove();
         }
     }
     
+    public static int getColorI(int r, int g, int b, int a) {
+        if (ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN)
+        {
+            return a << 24 | b << 16 | g << 8 | r;
+        }
+        else
+        {
+            return r << 24 | g << 16 | b << 8 | a;
+        }
+    }
+    
+    public static int getColorOpaque(int color) {
+        if (ByteOrder.nativeOrder() == ByteOrder.LITTLE_ENDIAN)
+        {
+            return color | 0xff000000;
+        }
+        else
+        {
+            return color | 0xff;
+        }
+    }
+    
+    public static int getMaxInt(int... nums) {
+        int result = Integer.MIN_VALUE;
+        for (int num : nums) if (num > result) result = num;
+        return result;
+    }
+    
+    public static float getMaxFloat(float... nums) {
+        float result = Float.MIN_VALUE;
+        for (float num : nums) if (num > result) result = num;
+        return result;
+    }
 }

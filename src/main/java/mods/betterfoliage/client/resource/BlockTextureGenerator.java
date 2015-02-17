@@ -17,9 +17,9 @@ import net.minecraftforge.client.event.TextureStitchEvent;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 /** Base class for texture generators. Registers itself as a domain resource manager for the duration of block texture stitching.
  * @author octarine-noise
@@ -44,7 +44,6 @@ public abstract class BlockTextureGenerator implements IResourceManager {
 	
 	@SubscribeEvent
 	public void handleTextureReload(TextureStitchEvent.Pre event) {
-		if (event.map.getTextureType() != 0) return;
 		blockTextures = event.map;
 
 		Map<String, IResourceManager> domainManagers = ResourceUtils.getDomainResourceManagers();
@@ -58,7 +57,6 @@ public abstract class BlockTextureGenerator implements IResourceManager {
 	@SubscribeEvent
 	public void endTextureReload(TextureStitchEvent.Post event) {
 		blockTextures = null;
-		if (event.map.getTextureType() != 0) return;
 		
 		// don't leave a mess
 		Map<String, IResourceManager> domainManagers = ResourceUtils.getDomainResourceManagers();
@@ -78,7 +76,7 @@ public abstract class BlockTextureGenerator implements IResourceManager {
 	}
 	
 	public ResourceLocation unwrapResource(ResourceLocation wrapped) {
-		return new ResourceLocation(wrapped.getResourcePath().substring(16));
+		return new ResourceLocation(wrapped.getResourcePath().substring(9));
 	}
 	
 	protected static int blendRGB(int rgbOrig, int rgbBlend, int weightOrig, int weightBlend) {

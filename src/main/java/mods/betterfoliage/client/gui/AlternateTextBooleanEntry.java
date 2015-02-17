@@ -1,17 +1,19 @@
 package mods.betterfoliage.client.gui;
 
 import net.minecraft.client.resources.I18n;
-import cpw.mods.fml.client.config.GuiConfig;
-import cpw.mods.fml.client.config.GuiConfigEntries;
-import cpw.mods.fml.client.config.IConfigElement;
+import net.minecraftforge.fml.client.config.GuiConfig;
+import net.minecraftforge.fml.client.config.GuiConfigEntries;
+import net.minecraftforge.fml.client.config.IConfigElement;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
-
+@SideOnly(Side.CLIENT)
 public class AlternateTextBooleanEntry extends GuiConfigEntries.ButtonEntry {
 
     protected final boolean beforeValue;
     protected boolean       currentValue;
     
-    public AlternateTextBooleanEntry(GuiConfig owningScreen, GuiConfigEntries owningEntryList, IConfigElement<Boolean> configElement)
+    public AlternateTextBooleanEntry(GuiConfig owningScreen, GuiConfigEntries owningEntryList, IConfigElement configElement)
     {
         super(owningScreen, owningEntryList, configElement);
         this.beforeValue = Boolean.valueOf(configElement.get().toString());
@@ -65,7 +67,6 @@ public class AlternateTextBooleanEntry extends GuiConfigEntries.ButtonEntry {
         }
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public boolean saveConfigElement()
     {

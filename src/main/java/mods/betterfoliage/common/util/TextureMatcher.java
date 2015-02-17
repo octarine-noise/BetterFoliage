@@ -1,17 +1,18 @@
-package mods.betterfoliage.client;
+package mods.betterfoliage.common.util;
 
 import java.util.List;
-import java.util.Map;
 
-import mods.betterfoliage.common.util.ResourceUtils;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
+@SideOnly(Side.CLIENT)
 public class TextureMatcher {
+    
+    public static final String DEFAULT_NAME = "default";
     
     public static class TextureMapping {
         public String matchDomain;
@@ -33,19 +34,9 @@ public class TextureMatcher {
     
     public List<TextureMapping> mappings = Lists.newLinkedList();
     
-    public Map<IIcon, String> types = Maps.newHashMap();
-
-    public String put(TextureAtlasSprite icon) {
-        if (types.keySet().contains(icon)) return types.get(icon);
-        for (TextureMapping mapping : mappings) if (mapping.matches(icon)) {
-            types.put(icon, mapping.textureType);
-            return mapping.textureType;
-        }
-        return null;
-    }
-    
-    public String get(IIcon icon) {
-        return types.get(icon);
+    public String get(TextureAtlasSprite icon) {
+        for (TextureMapping mapping : mappings) if (mapping.matches(icon)) return mapping.textureType;
+        return DEFAULT_NAME;
     }
     
     public void loadMappings(ResourceLocation resource) {

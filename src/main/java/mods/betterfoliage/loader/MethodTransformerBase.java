@@ -4,6 +4,7 @@ import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.VarInsnNode;
 
 /** Base class for class transformers operating on a single method.
  * @author octarine-noise
@@ -110,6 +111,27 @@ public abstract class MethodTransformerBase {
 	}
 	
 	/**
+     * @return an instruction node filter matching an invoke instruction to a specified method name
+     */
+    protected IInstructionMatch matchInvokeMethod(final String methodName) {
+        return new IInstructionMatch() {
+            public boolean matches(AbstractInsnNode node) {
+                return (node instanceof MethodInsnNode) && methodName.equals(((MethodInsnNode) node).name);
+            }
+        };
+    }
+    
+     /**
+      * @return an instruction node filter matching an invoke instruction to a specified owner/method name
+      */
+     protected IInstructionMatch matchInvokeMethod(final String owner, final String methodName) {
+         return new IInstructionMatch() {
+             public boolean matches(AbstractInsnNode node) {
+                 return (node instanceof MethodInsnNode) && methodName.equals( ((MethodInsnNode) node).name ) && owner.equals( ((MethodInsnNode) node).owner );
+             }
+         };
+     }
+	/**
 	 * @return an instruction node filter matching the given opcode
 	 */
 	protected IInstructionMatch matchOpcode(final int opcode) {
@@ -120,6 +142,17 @@ public abstract class MethodTransformerBase {
 		};
 	}
 	
+	   /**
+     * @return an instruction node filter matching a store instruction
+     */
+    protected IInstructionMatch matchStore(final int opcode, final int num) {
+        return new IInstructionMatch() {
+            public boolean matches(AbstractInsnNode node) {
+                return (node instanceof VarInsnNode) && num == ((VarInsnNode) node).var;
+            }
+        };
+    }
+    
 	/** Insert a list of instruction nodes in a list after a given node
 	 * @param insnList instruction list
 	 * @param node start node

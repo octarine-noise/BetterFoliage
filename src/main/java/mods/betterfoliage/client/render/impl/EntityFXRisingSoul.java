@@ -7,15 +7,16 @@ import mods.betterfoliage.client.BetterFoliageClient;
 import mods.betterfoliage.common.config.Config;
 import mods.betterfoliage.common.util.Double3;
 import net.minecraft.client.particle.EntityFX;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.util.IIcon;
+import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import com.google.common.collect.Lists;
-
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class EntityFXRisingSoul extends EntityFX {
@@ -34,8 +35,8 @@ public class EntityFXRisingSoul extends EntityFX {
     
     public Deque<Double3> particleTrail = Lists.newLinkedList();
     
-    public EntityFXRisingSoul(World world, int x, int y, int z) {
-        super(world, x + 0.5, y + 1.0, z + 0.5);
+    public EntityFXRisingSoul(World world, BlockPos pos) {
+        super(world, pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5);
         
         motionY = 0.1f;
         particleGravity = 0.0f;
@@ -60,14 +61,13 @@ public class EntityFXRisingSoul extends EntityFX {
     }
     
     @Override
-    public void renderParticle(Tessellator tessellator, float partialTickTime, float rotX, float rotZ, float rotYZ, float rotXY, float rotXZ)
-    {
+    public void renderParticle(WorldRenderer renderer, Entity entity, float partialTickTime, float rotX, float rotZ, float rotYZ, float rotXY, float rotXZ) {
         Double3 vec1 = new Double3(rotX + rotXY, rotZ, rotYZ + rotXZ);
         Double3 vec2 = new Double3(rotX - rotXY, -rotZ, rotYZ - rotXZ);
         
         Iterator<Double3> iter = particleTrail.iterator();
         Double3 current, previous;
-        IIcon renderIcon = particleIcon;
+        TextureAtlasSprite renderIcon = particleIcon;
         double scale = Config.soulFXHeadSize * 0.25;
         float alpha = (float) Config.soulFXOpacity;
         if (particleAge > particleMaxAge - 40) alpha *= (particleMaxAge - particleAge) / 40.0f;
@@ -80,8 +80,8 @@ public class EntityFXRisingSoul extends EntityFX {
                 previous = iter.next();
                 
                 if (idx++ % Config.soulFXTrailDensity == 0) {
-                    tessellator.setColorRGBA_F(this.particleRed, this.particleGreen, this.particleBlue, alpha);
-                    renderParticleQuad(tessellator, partialTickTime, current, previous, vec1, vec2, renderIcon, scale);
+                    renderer.setColorRGBA_F(this.particleRed, this.particleGreen, this.particleBlue, alpha);
+                    renderParticleQuad(renderer, partialTickTime, current, previous, vec1, vec2, renderIcon, scale);
                 }
                 if (idx == 1) {
                     // set initial trail particle size and icon after rendering head
@@ -94,24 +94,24 @@ public class EntityFXRisingSoul extends EntityFX {
         }
     }
     
-    protected void renderParticleQuad(Tessellator tessellator, float partialTickTime, Double3 currentPos, Double3 previousPos, Double3 vec1, Double3 vec2, IIcon icon, double scale) {
-        float minU = icon.getMinU();
-        float maxU = icon.getMaxU();
-        float minV = icon.getMinV();
-        float maxV = icon.getMaxV();
+    protected void renderParticleQuad(WorldRenderer renderer, float partialTickTime, Double3 currentPos, Double3 previousPos, Double3 vec1, Double3 vec2, TextureAtlasSprite texture, double scale) {
+        float minU = texture.getMinU();
+        float maxU = texture.getMaxU();
+        float minV = texture.getMinV();
+        float maxV = texture.getMaxV();
         
         Double3 center = new Double3(previousPos.x + (currentPos.x - previousPos.x) * partialTickTime - interpPosX, 
                                      previousPos.y + (currentPos.y - previousPos.y) * partialTickTime - interpPosY,
                                      previousPos.z + (currentPos.z - previousPos.z) * partialTickTime - interpPosZ);
         
-        addVertex(tessellator, center.sub(vec1.scale(scale)), maxU, maxV);
-        addVertex(tessellator, center.sub(vec2.scale(scale)), maxU, minV);
-        addVertex(tessellator, center.add(vec1.scale(scale)), minU, minV);
-        addVertex(tessellator, center.add(vec2.scale(scale)), minU, maxV);
+        addVertex(renderer, center.sub(vec1.scale(scale)), maxU, maxV);
+        addVertex(renderer, center.sub(vec2.scale(scale)), maxU, minV);
+        addVertex(renderer, center.add(vec1.scale(scale)), minU, minV);
+        addVertex(renderer, center.add(vec2.scale(scale)), minU, maxV);
     }
     
-    protected void addVertex(Tessellator tessellator, Double3 coord, double u, double v) {
-        tessellator.addVertexWithUV(coord.x, coord.y, coord.z, u, v);
+    protected void addVertex(WorldRenderer renderer, Double3 coord, double u, double v) {
+        renderer.addVertexWithUV(coord.x, coord.y, coord.z, u, v);
     }
     
     @Override

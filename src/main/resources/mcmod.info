@@ -4,5 +4,5 @@
   "version": "$version",
   "mcversion": "$mcversion",
   "description": "Leafier leaves and grassier grass",
-  "authorList" : ["§6octarine-noise §7(code)", "§6Meringue §7(textures)"]
+  "authorList" : ["octarine-noise (code)", "Meringue (textures)"]
 }]

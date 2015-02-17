@@ -1,19 +1,20 @@
-package mods.betterfoliage.client;
+package mods.betterfoliage.common.util;
 
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
 
-import mods.betterfoliage.common.util.ResourceUtils;
 import net.minecraft.block.Block;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import com.google.common.collect.Sets;
 
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-
+@SideOnly(Side.CLIENT)
 public class BlockMatcher {
 
 	public Set<Class<?>> whiteList = Sets.newHashSet();

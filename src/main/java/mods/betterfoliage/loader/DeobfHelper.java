@@ -2,9 +2,9 @@ package mods.betterfoliage.loader;
 
 import java.util.Map;
 
-import com.google.common.collect.Maps;
+import net.minecraftforge.fml.relauncher.FMLInjectionData;
 
-import cpw.mods.fml.relauncher.FMLInjectionData;
+import com.google.common.collect.Maps;
 
 public class DeobfHelper {
 
@@ -15,29 +15,33 @@ public class DeobfHelper {
 	public static void init() {
 		String mcVersion = FMLInjectionData.data()[4].toString();
 		srgElements.put("domainResourceManagers", "field_110548_a");
-		srgElements.put("mapRegisteredSprites", "field_110574_e");
-		if ("1.7.2".equals(mcVersion)) {
-			obfClasses.put("net/minecraft/client/renderer/RenderBlocks", "ble");
-			obfClasses.put("net/minecraft/world/IBlockAccess", "afx");
-			obfClasses.put("net/minecraft/block/Block", "ahu");
-			obfClasses.put("net/minecraft/client/multiplayer/WorldClient", "biz");
-			obfClasses.put("net/minecraft/world/World", "afn");
-			
-			obfElements.put("blockAccess", "a");
-			obfElements.put("renderBlockByRenderType", "b");
-			obfElements.put("mapRegisteredSprites", "bpr");
-			obfElements.put("doVoidFogParticles", "C");
-		} else if ("1.7.10".equals(mcVersion)) {
-			obfClasses.put("net/minecraft/client/renderer/RenderBlocks", "blm");
-			obfClasses.put("net/minecraft/world/IBlockAccess", "ahl");
-			obfClasses.put("net/minecraft/block/Block", "aji");
-			obfClasses.put("net/minecraft/client/multiplayer/WorldClient", "bjf");
-			obfClasses.put("net/minecraft/world/World", "ahb");
-			
-			obfElements.put("blockAccess", "a");
-			obfElements.put("renderBlockByRenderType", "b");
-			obfElements.put("mapRegisteredSprites", "bpr");
-			obfElements.put("doVoidFogParticles", "C");
+		srgElements.put("variants", "field_177612_i");
+		srgElements.put("models", "field_177611_h");
+		srgElements.put("textureMap", "field_177609_j");
+
+		if ("1.8".equals(mcVersion)) {
+		    obfClasses.put("net/minecraft/block/Block", "atr");
+		    obfClasses.put("net/minecraft/world/IBlockAccess", "ard");
+		    obfClasses.put("net/minecraft/util/BlockPos", "dt");
+		    obfClasses.put("net/minecraft/block/state/IBlockState", "bec");
+		    obfClasses.put("net/minecraft/world/World", "aqu");
+		    obfClasses.put("net/minecraft/client/multiplayer/WorldClient", "cen");
+		    obfClasses.put("net/minecraft/client/renderer/BlockRendererDispatcher", "cll");
+		    obfClasses.put("net/minecraft/client/renderer/BlockModelRenderer", "cln");
+		    obfClasses.put("net/minecraft/block/Block;Lnet/minecraft/util/EnumWorldBlockLayer", "aql");
+		    obfClasses.put("net/minecraft/client/renderer/chunk/RenderChunk", "cop");
+		    obfClasses.put("net/minecraft/client/renderer/chunk/ChunkCompileTaskGenerator", "coa");
+		    obfClasses.put("net/minecraft/client/renderer/WorldRenderer", "civ");
+		    obfClasses.put("net/minecraft/client/resources/model/IBakedModel", "cxe");
+		    obfClasses.put("net/minecraft/util/IRegistry", "ez");
+		    obfClasses.put("net/minecraft/client/resources/model/ModelBakery", "cxh");
+		    
+		    obfElements.put("mapRegisteredSprites", "j");
+		    obfElements.put("doVoidFogParticles", "b");
+		    obfElements.put("setupModelRegistry", "a");
+		    obfElements.put("loadModelsCheck", "h");
+	        obfElements.put("renderBlock", "a");
+	        obfElements.put("rebuildChunk", "b");
 		}
 	}
 	

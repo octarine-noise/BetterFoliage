@@ -1,12 +1,13 @@
 package mods.betterfoliage.client.resource;
 
 import mods.betterfoliage.BetterFoliage;
-import mods.betterfoliage.client.render.IconSet;
-import net.minecraft.util.IIcon;
+import mods.betterfoliage.client.render.TextureSet;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.TextureStitchEvent;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 /** Holds the textures for the rising soul particles
  * @author octarine-noise
@@ -14,20 +15,18 @@ import cpw.mods.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class SoulParticleTextures {
 
-    public IIcon soulTrackIcon;
+    public TextureAtlasSprite soulTrackIcon;
     
-    public IconSet soulHeadIcons = new IconSet("bettergrassandleaves", "rising_soul_%d");
+    public TextureSet soulHeadIcons = new TextureSet("bettergrassandleaves", "blocks/rising_soul_%d");
     
     @SubscribeEvent
     public void handleTextureReload(TextureStitchEvent.Pre event) {
-        if (event.map.getTextureType() != 0) return;
-        
-        soulTrackIcon = event.map.registerIcon("bettergrassandleaves:soul_track");
-        soulHeadIcons.registerIcons(event.map);
+        soulTrackIcon = event.map.registerSprite(new ResourceLocation("bettergrassandleaves:blocks/soul_track"));
+        soulHeadIcons.registerSprites(event.map);
     }
     
     @SubscribeEvent
     public void endTextureReload(TextureStitchEvent.Post event) {
-        if (event.map.getTextureType() == 0) BetterFoliage.log.info(String.format("Found %d soul particle textures", soulHeadIcons.numLoaded));
+        BetterFoliage.log.info(String.format("Found %d soul particle textures", soulHeadIcons.numLoaded));
     }
 }

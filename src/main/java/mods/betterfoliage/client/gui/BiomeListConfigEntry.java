@@ -2,21 +2,27 @@ package mods.betterfoliage.client.gui;
 
 import java.util.List;
 
+import mods.betterfoliage.common.config.Config;
 import mods.betterfoliage.common.util.BiomeUtils;
 import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraftforge.fml.client.config.GuiConfig;
+import net.minecraftforge.fml.client.config.GuiConfigEntries;
+import net.minecraftforge.fml.client.config.IConfigElement;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
-import cpw.mods.fml.client.config.GuiConfig;
-import cpw.mods.fml.client.config.GuiConfigEntries;
-import cpw.mods.fml.client.config.IConfigElement;
-
-
+@SideOnly(Side.CLIENT)
 public class BiomeListConfigEntry extends SelectListConfigEntry<BiomeGenBase> {
 
-    public BiomeListConfigEntry(GuiConfig owningScreen, GuiConfigEntries owningEntryList, IConfigElement<?> configElement) {
+    public String tooltipKey = "";
+    public List<BiomeGenBase> defaultSelected = null;
+    
+    public BiomeListConfigEntry(GuiConfig owningScreen, GuiConfigEntries owningEntryList, IConfigElement configElement) {
         super(owningScreen, owningEntryList, configElement);
     }
 
@@ -27,10 +33,23 @@ public class BiomeListConfigEntry extends SelectListConfigEntry<BiomeGenBase> {
 
     @Override
     protected List<BiomeGenBase> getDefaultSelected(String name) {
-        if (name.equals("reedBiomeList")) return Lists.newArrayList(Collections2.filter(getBaseSet(name), BiomeUtils.biomeTempRainFilter(0.4f, null, 0.4f, null)));
-        if (name.equals("algaeBiomeList")) return Lists.newArrayList(Collections2.filter(getBaseSet(name), BiomeUtils.biomeClassNameFilter("river", "ocean")));
-        if (name.equals("coralBiomeList")) return Lists.newArrayList(Collections2.filter(getBaseSet(name), BiomeUtils.biomeClassNameFilter("river", "ocean", "beach")));
-        return ImmutableList.<BiomeGenBase>of();
+        if (defaultSelected == null) {
+            Predicate<BiomeGenBase> defaultFilter = Predicates.alwaysFalse();
+            if (configElement.getName().equals("reedBiomeList")) {
+                defaultFilter = Config.reedBiomeDefaults;
+                tooltipKey = "betterfoliage.reeds.biomeSelectTooltip";
+            }
+            if (configElement.getName().equals("algaeBiomeList")) {
+                defaultFilter = Config.algaeBiomeDefaults;
+                tooltipKey = "betterfoliage.algae.biomeSelectTooltip";
+            }
+            if (configElement.getName().equals("coralBiomeList")) {
+                defaultFilter = Config.coralBiomeDefaults;
+                tooltipKey = "betterfoliage.coral.biomeSelectTooltip";
+            }
+            defaultSelected = Lists.newArrayList(Collections2.filter(BiomeUtils.getAllBiomes(), defaultFilter));
+        }
+        return defaultSelected;
     }
 
     @Override
@@ -45,10 +64,7 @@ public class BiomeListConfigEntry extends SelectListConfigEntry<BiomeGenBase> {
 
     @Override
     protected String getTooltipLangKey(String name) {
-        if (name.equals("reedBiomeList")) return "betterfoliage.reeds.biomeSelectTooltip";
-        if (name.equals("algaeBiomeList")) return "betterfoliage.algae.biomeSelectTooltip";
-        if (name.equals("coralBiomeList")) return "betterfoliage.coral.biomeSelectTooltip";
-        return "";
+        return tooltipKey;
     }
 
 }

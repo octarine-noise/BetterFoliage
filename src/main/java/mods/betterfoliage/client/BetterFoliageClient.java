@@ -1,9 +1,9 @@
 package mods.betterfoliage.client;
 
-import java.util.Map;
+import java.util.List;
 
 import mods.betterfoliage.BetterFoliage;
-import mods.betterfoliage.client.render.IRenderBlockDecorator;
+import mods.betterfoliage.client.event.PostLoadModelDefinitionsEvent;
 import mods.betterfoliage.client.render.impl.EntityFXFallingLeaves;
 import mods.betterfoliage.client.render.impl.EntityFXRisingSoul;
 import mods.betterfoliage.client.render.impl.RenderBlockBetterAlgae;
@@ -15,35 +15,39 @@ import mods.betterfoliage.client.render.impl.RenderBlockBetterLilypad;
 import mods.betterfoliage.client.render.impl.RenderBlockBetterMycelium;
 import mods.betterfoliage.client.render.impl.RenderBlockBetterNetherrack;
 import mods.betterfoliage.client.render.impl.RenderBlockBetterReed;
-import mods.betterfoliage.client.render.impl.RenderBlocksBetterGrassSide;
 import mods.betterfoliage.client.resource.LeafGenerator;
-import mods.betterfoliage.client.resource.LeafParticleTextures;
-import mods.betterfoliage.client.resource.LeafTextureEnumerator;
+import mods.betterfoliage.client.resource.LeafTextureRegistry;
 import mods.betterfoliage.client.resource.ReedGenerator;
 import mods.betterfoliage.client.resource.ShortGrassGenerator;
 import mods.betterfoliage.client.resource.SoulParticleTextures;
 import mods.betterfoliage.common.config.Config;
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.client.renderer.BFAbstractRenderer;
+import net.minecraft.client.renderer.BlockRendererDispatcher;
+import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumWorldBlockLayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 
-import com.google.common.collect.Maps;
-
-import cpw.mods.fml.client.registry.RenderingRegistry;
-import cpw.mods.fml.common.FMLCommonHandler;
+import com.google.common.collect.Lists;
 
 public class BetterFoliageClient {
 
-	public static ResourceLocation missingTexture = new ResourceLocation("betterfoliage", "textures/blocks/missing_leaf.png");
+	public static ResourceLocation missingTexture = new ResourceLocation(BetterFoliage.DOMAIN, "textures/blocks/missing_leaf.png");
 	
-	public static Map<Integer, IRenderBlockDecorator> decorators = Maps.newHashMap();
+	public static List<BFAbstractRenderer> renderers = Lists.newLinkedList();
+	
+	public static LeafTextureRegistry leafRegistry = new LeafTextureRegistry();
 	public static LeafGenerator leafGenerator = new LeafGenerator();
-	public static LeafParticleTextures leafParticles = new LeafParticleTextures(0);
 	public static SoulParticleTextures soulParticles = new SoulParticleTextures();
 	public static WindTracker wind = new WindTracker();
 	
@@ -51,18 +55,19 @@ public class BetterFoliageClient {
 		FMLCommonHandler.instance().bus().register(new KeyHandler());
 		FMLCommonHandler.instance().bus().register(new Config());
 		
+		ShadersModIntegration.init();
+		
 		BetterFoliage.log.info("Registering renderers");
-		registerRenderer(new RenderBlockBetterCactus());
-		registerRenderer(new RenderBlockBetterNetherrack());
-		registerRenderer(new RenderBlockBetterLilypad());
-		registerRenderer(new RenderBlockBetterMycelium());
 		registerRenderer(new RenderBlockBetterLeaves());
 		registerRenderer(new RenderBlockBetterGrass());
-		registerRenderer(new RenderBlockBetterReed());
+		registerRenderer(new RenderBlockBetterCactus());
+		registerRenderer(new RenderBlockBetterMycelium());
+		registerRenderer(new RenderBlockBetterLilypad());
 		registerRenderer(new RenderBlockBetterAlgae());
 		registerRenderer(new RenderBlockBetterCoral());
-		registerRenderer(new RenderBlocksBetterGrassSide());
-
+		registerRenderer(new RenderBlockBetterReed());
+		registerRenderer(new RenderBlockBetterNetherrack());
+		
 		MinecraftForge.EVENT_BUS.register(wind);
 		FMLCommonHandler.instance().bus().register(wind);
 		
@@ -74,56 +79,66 @@ public class BetterFoliageClient {
 		BetterFoliage.log.info("Registering texture generators");
 		MinecraftForge.EVENT_BUS.register(soulParticles);
 		MinecraftForge.EVENT_BUS.register(leafGenerator);
-		MinecraftForge.EVENT_BUS.register(leafParticles);
-		MinecraftForge.EVENT_BUS.register(new LeafTextureEnumerator());
+		MinecraftForge.EVENT_BUS.register(leafRegistry);
+		leafRegistry.leafMappings.add(new VanillaMapping("minecraft:models/block/leaves", "all"));
 		
 		MinecraftForge.EVENT_BUS.register(new ReedGenerator("bf_reed_bottom", missingTexture, true));
 		MinecraftForge.EVENT_BUS.register(new ReedGenerator("bf_reed_top", missingTexture, false));
 		MinecraftForge.EVENT_BUS.register(new ShortGrassGenerator("bf_shortgrass", missingTexture, false));
 		MinecraftForge.EVENT_BUS.register(new ShortGrassGenerator("bf_shortgrass_snow", missingTexture, true));
 		
-		ShadersModIntegration.init();
-		TerraFirmaCraftIntegration.init();
+		
 	}
 
-	public static boolean isLeafTexture(TextureAtlasSprite icon) {
-		String resourceLocation = icon.getIconName();
-		if (resourceLocation.startsWith("forestry:leaves/")) return true;
-		return false;
-	}
-	
-	public static int getRenderTypeOverride(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
-		// universal sign for DON'T RENDER ME!
-		if (original == -1) return original;
-		
-		for (Map.Entry<Integer, IRenderBlockDecorator> entry : decorators.entrySet())
-			if (entry.getValue().isBlockAccepted(blockAccess, x, y, z, block, original))
-				return entry.getKey();
-		
-		return original;
-	}
-	
-	public static void onRandomDisplayTick(Block block, World world, int x, int y, int z) {
+	/** Called from transformed {@link WorldClient#doVoidFogParticles(int, int, int)} method right before the end of the <b>for</b> loop.
+	 * @param world
+	 * @param blockState
+	 * @param pos
+	 */
+	public static void onRandomDisplayTick(World world, IBlockState blockState, BlockPos pos) {
+	    Block block = blockState.getBlock();
 	    if (Config.soulFXEnabled) {
-	        if (world.getBlock(x, y, z) == Blocks.soul_sand && Math.random() < Config.soulFXChance) {
-	            Minecraft.getMinecraft().effectRenderer.addEffect(new EntityFXRisingSoul(world, x, y, z));
+	        if (block == Blocks.soul_sand && Math.random() < Config.soulFXChance) {
+	            Minecraft.getMinecraft().effectRenderer.addEffect(new EntityFXRisingSoul(world, pos));
 	            return;
 	        }
 	    }
 	    if (Config.leafFXEnabled) {
-	        if (Config.leaves.matchesID(block) && world.isAirBlock(x, y - 1, z) && Math.random() < Config.leafFXChance) {
-	            Minecraft.getMinecraft().effectRenderer.addEffect(new EntityFXFallingLeaves(world, x, y, z));
+	        if (Config.leaves.matchesID(block) && world.isAirBlock(pos.add(0, -1, 0)) && Math.random() < Config.leafFXChance) {
+	            Minecraft.getMinecraft().effectRenderer.addEffect(new EntityFXFallingLeaves(world, blockState, pos));
 	            return;
 	        }
 	    }
 	}
 	
-	public static void registerRenderer(IRenderBlockDecorator decorator) {
-		int renderId = RenderingRegistry.getNextAvailableRenderId();
-		decorators.put(renderId, decorator);
-		RenderingRegistry.registerBlockHandler(renderId, decorator);
-		MinecraftForge.EVENT_BUS.register(decorator);
-		decorator.init();
+	public static boolean canRenderBlockInLayer(Block block, EnumWorldBlockLayer layer) {
+	    if (block.canRenderInLayer(layer)) return true;
+	    
+	    // enable CUTOUT_MIPPED layer for blocks where needed
+	    if (block == Blocks.sand && Config.coralEnabled) return layer == EnumWorldBlockLayer.CUTOUT_MIPPED;
+	    if (block == Blocks.mycelium && Config.grassEnabled) return layer == EnumWorldBlockLayer.CUTOUT_MIPPED;
+	    if (block == Blocks.cactus && Config.cactusEnabled) return layer == EnumWorldBlockLayer.CUTOUT_MIPPED;
+	    if (block == Blocks.waterlily && Config.lilypadEnabled) return layer == EnumWorldBlockLayer.CUTOUT_MIPPED;
+	    if (block == Blocks.netherrack && Config.netherrackEnabled) return layer == EnumWorldBlockLayer.CUTOUT_MIPPED;
+	    if (Config.dirt.matchesID(block) && (Config.algaeEnabled || Config.reedEnabled)) return layer == EnumWorldBlockLayer.CUTOUT_MIPPED;
+	    return false;
 	}
-
+	
+	public static boolean renderWorldBlock(BlockRendererDispatcher dispatcher, IBlockState state, BlockPos pos, IBlockAccess blockAccess, WorldRenderer worldRenderer, EnumWorldBlockLayer layer) {
+	    boolean result = state.getBlock().canRenderInLayer(layer) ? dispatcher.renderBlock(state, pos, blockAccess, worldRenderer) : false;
+	    if (layer == EnumWorldBlockLayer.CUTOUT_MIPPED) {
+	        boolean useAO = Minecraft.isAmbientOcclusionEnabled() && state.getBlock().getLightValue() == 0;
+	        for(BFAbstractRenderer renderer : renderers) result |= renderer.renderFeatureForBlock(blockAccess, state, pos, worldRenderer, useAO);
+	    }
+	    return result;
+	}
+	
+    public static void onAfterLoadModelDefinitions(ModelLoader loader) {
+        MinecraftForge.EVENT_BUS.post(new PostLoadModelDefinitionsEvent(loader));
+    }
+	   
+    public static void registerRenderer(BFAbstractRenderer renderer) {
+        MinecraftForge.EVENT_BUS.register(renderer);
+        renderers.add(renderer);
+    }
 }

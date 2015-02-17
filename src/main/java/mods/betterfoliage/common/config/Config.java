@@ -4,11 +4,11 @@ import java.io.File;
 import java.util.List;
 
 import mods.betterfoliage.BetterFoliage;
-import mods.betterfoliage.client.BlockMatcher;
 import mods.betterfoliage.client.gui.AlternateTextBooleanEntry;
 import mods.betterfoliage.client.gui.BiomeListConfigEntry;
 import mods.betterfoliage.client.gui.NonVerboseArrayEntry;
 import mods.betterfoliage.common.util.BiomeUtils;
+import mods.betterfoliage.common.util.BlockMatcher;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.BiomeGenBase;
@@ -16,12 +16,12 @@ import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.ConfigElement;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
+import net.minecraftforge.fml.client.config.IConfigElement;
+import net.minecraftforge.fml.client.event.ConfigChangedEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
+import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
-
-import cpw.mods.fml.client.config.IConfigElement;
-import cpw.mods.fml.client.event.ConfigChangedEvent;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 public class Config {
 
@@ -90,7 +90,6 @@ public class Config {
 	public static double leafFXChance;
 	public static double leafFXPerturb;
 	public static double leafFXLifetime;
-	public static boolean leafFXOpacityHack;
 	
 	public static boolean soulFXEnabled;
 	public static double soulFXChance;
@@ -117,6 +116,9 @@ public class Config {
 	public static List<Integer> reedBiomeList = Lists.newArrayList();
 	public static List<Integer> algaeBiomeList = Lists.newArrayList();
 	public static List<Integer> coralBiomeList = Lists.newArrayList();
+	public static Predicate<BiomeGenBase> reedBiomeDefaults = BiomeUtils.biomeTempRainFilter(0.4f, null, 0.4f, null);
+	public static Predicate<BiomeGenBase> algaeBiomeDefaults = BiomeUtils.biomeClassNameFilter("river", "ocean"); 
+	public static Predicate<BiomeGenBase> coralBiomeDefaults = BiomeUtils.biomeClassNameFilter("river", "ocean", "beach");
 	
 	/** Read the config file
 	 * @param configFile
@@ -127,7 +129,7 @@ public class Config {
 		if (rawConfig.hasChanged()) rawConfig.save();
 	}
 	
-	/** Extract the config properties to static value fields for quick access */
+	/** Extract the config properties to static fields for quick access */
 	public static void updateValues() {
         leavesEnabled = getBoolean(Category.extraLeaves, "enabled", true, "betterfoliage.enabled");
         leavesSkew = getBoolean(Category.extraLeaves, "skewMode", false, "betterfoliage.leavesMode");
@@ -186,7 +188,7 @@ public class Config {
         leafFXChance = getDouble(Category.fallingLeaves, "chance", 0.05, 0.001, 1.0, "betterfoliage.fallingLeaves.chance");
         leafFXPerturb = getDouble(Category.fallingLeaves, "perturb", 0.25, 0.01, 1.0, "betterfoliage.fallingLeaves.perturb");
         leafFXLifetime = getDouble(Category.fallingLeaves, "lifetime", 5.0, 1.0, 15.0, "betterfoliage.fallingLeaves.lifetime");
-        leafFXOpacityHack = getBoolean(Category.fallingLeaves, "opacityHack", true, "betterfoliage.enabled.fallingLeaves.opacityHack");
+        deleteKey(Category.fallingLeaves, "opacityHack");
         
         soulFXEnabled = getBoolean(Category.risingSoul, "enabled", true, "betterfoliage.enabled");
         soulFXChance = getDouble(Category.risingSoul, "chance", 0.02, 0.001, 1.0, "betterfoliage.risingSoul.chance");
@@ -230,23 +232,23 @@ public class Config {
 		setOrder(Category.algae, "enabled", "hOffset", "heightMin", "heightMax", "size", "population", "biomeList");
 		setOrder(Category.coral, "enabled", "shallowWater", "hOffset", "vOffset", "size", "crustSize", "population", "chance", "biomeList");
 		setOrder(Category.netherrack, "enabled", "hOffset", "heightMin", "heightMax", "size");
-		setOrder(Category.fallingLeaves, "enabled", "chance", "size", "lifetime", "speed", "windStrength", "stormStrength", "perturb", "opacityHack");
+		setOrder(Category.fallingLeaves, "enabled", "chance", "size", "lifetime", "speed", "windStrength", "stormStrength", "perturb");
 		setOrder(Category.risingSoul, "enabled", "chance", "speed", "perturb", "headSize", "trailSize", "sizeDecay", "opacity", "opacityDecay", "lifetime", "trailLength", "trailDensity");
 		setOrder(Category.connectedGrass, "classic", "aggressive");
 	}
 	
-	public static void getDefaultBiomes() {
+	public static void setupDefaultBiomes() {
 	    List<BiomeGenBase> biomes = BiomeUtils.getAllBiomes();
-	    reedBiomeList = BiomeUtils.getFilteredBiomeIds(biomes, BiomeUtils.biomeTempRainFilter(0.4f, null, 0.4f, null));
-	    algaeBiomeList = BiomeUtils.getFilteredBiomeIds(biomes, BiomeUtils.biomeClassNameFilter("river", "ocean"));
-	    coralBiomeList = BiomeUtils.getFilteredBiomeIds(biomes, BiomeUtils.biomeClassNameFilter("river", "ocean", "beach"));
+	    reedBiomeList = BiomeUtils.getFilteredBiomeIds(biomes, reedBiomeDefaults);
+	    algaeBiomeList = BiomeUtils.getFilteredBiomeIds(biomes, algaeBiomeDefaults);
+	    coralBiomeList = BiomeUtils.getFilteredBiomeIds(biomes, coralBiomeDefaults);
 	}
 	
-	@SuppressWarnings("rawtypes")
 	public static List<IConfigElement> getConfigRootElements() {
 		List<IConfigElement> result = Lists.newLinkedList();
 		for (Category category : Category.values()) {
-			ConfigElement<?> element = new ConfigElement(rawConfig.getCategory(category.toString()));
+		    if (category == Category.connectedGrass) continue;
+			ConfigElement element = new ConfigElement(rawConfig.getCategory(category.toString()));
 			result.add(element);
 		}
 		return result;
@@ -319,6 +321,10 @@ public class Config {
 		rawConfig.setCategoryPropertyOrder(category.toString(), Lists.newArrayList(properties));
 	}
 
+	protected static void deleteKey(Category category, String key) {
+	    rawConfig.getCategory(category.toString()).remove(key);
+	}
+	
 	@SubscribeEvent
 	public void handleConfigChange(ConfigChangedEvent.OnConfigChangedEvent event) {
 	    if (event.modID.equals(BetterFoliage.MOD_ID)) {

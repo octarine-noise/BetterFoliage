@@ -2,7 +2,7 @@ package mods.betterfoliage.loader;
 
 import java.util.Map;
 
-import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
+import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 
 @IFMLLoadingPlugin.TransformerExclusions({"mods.betterfoliage.loader"})
 public class BetterFoliageLoader implements IFMLLoadingPlugin {

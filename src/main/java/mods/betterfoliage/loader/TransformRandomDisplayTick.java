@@ -28,16 +28,14 @@ public class TransformRandomDisplayTick extends MethodTransformerBase {
 		return "Applying random display tick call hook";
 	}
 
-	@Override
+    @Override
 	public void transform(MethodNode method, boolean obf) {
 		AbstractInsnNode endLoop = findNext(method.instructions.getFirst(), matchOpcode(Opcodes.IINC));
 		insertBefore(method.instructions, endLoop,
-			new VarInsnNode(Opcodes.ALOAD, 10),
 			new VarInsnNode(Opcodes.ALOAD, 0),
-			new VarInsnNode(Opcodes.ILOAD, 7),
-			new VarInsnNode(Opcodes.ILOAD, 8),
-			new VarInsnNode(Opcodes.ILOAD, 9),
-			new MethodInsnNode(Opcodes.INVOKESTATIC, "mods/betterfoliage/client/BetterFoliageClient", "onRandomDisplayTick", signature("(Lnet/minecraft/block/Block;Lnet/minecraft/world/World;III)V", obf))
+			new VarInsnNode(Opcodes.ALOAD, 13),
+			new VarInsnNode(Opcodes.ALOAD, 12),
+			new MethodInsnNode(Opcodes.INVOKESTATIC, "mods/betterfoliage/client/BetterFoliageClient", "onRandomDisplayTick", signature("(Lnet/minecraft/world/World;Lnet/minecraft/block/state/IBlockState;Lnet/minecraft/util/BlockPos;)V", obf), false)
 		);
 	}
 }

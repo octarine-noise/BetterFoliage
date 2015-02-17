@@ -8,11 +8,12 @@ import java.io.InputStream;
 
 import javax.imageio.ImageIO;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.data.IMetadataSection;
+import net.minecraft.util.ResourceLocation;
 
 /** {@link IResource} for a {@link BufferedImage}
  * @author octarine-noise
@@ -23,7 +24,12 @@ public class BufferedImageResource implements IResource {
 	/** Raw PNG data*/
 	protected byte[] data = null;
 	
-	public BufferedImageResource(BufferedImage image) {
+	/** location **/
+	protected ResourceLocation resourceLocation;
+	
+	public BufferedImageResource(ResourceLocation resourceLocation, BufferedImage image) {
+	    this.resourceLocation = resourceLocation;
+	    
 		// create PNG image
 		try {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -47,5 +53,15 @@ public class BufferedImageResource implements IResource {
 	public IMetadataSection getMetadata(String var1) {
 		return null;
 	}
+
+    @Override
+    public ResourceLocation getResourceLocation() {
+        return resourceLocation;
+    }
+
+    @Override
+    public String getResourcePackName() {
+        return resourceLocation.toString();
+    }
 
 }

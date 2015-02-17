@@ -1,6 +1,7 @@
 package mods.betterfoliage.loader;
 
 import net.minecraft.launchwrapper.IClassTransformer;
+import net.minecraftforge.fml.relauncher.FMLInjectionData;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -11,21 +12,20 @@ import org.objectweb.asm.tree.MethodNode;
 
 import com.google.common.collect.ImmutableList;
 
-import cpw.mods.fml.relauncher.FMLInjectionData;
-
 public class BetterFoliageTransformer implements IClassTransformer {
 
 	protected Iterable<MethodTransformerBase> transformers = ImmutableList.<MethodTransformerBase>of(
-		new TransformRenderBlockOverride(),
-		new TransformShaderModBlockOverride(),
-		new TransformRandomDisplayTick()
+		new TransformModelLoader(),
+		new TransformShaderModBlockIdOverride(),
+		new TransformRandomDisplayTick(),
+		new TransformRenderChunk()
 	);
 	
 	protected Logger logger = LogManager.getLogger(getClass().getSimpleName());
 	
 	public BetterFoliageTransformer() {
 		String mcVersion = FMLInjectionData.data()[4].toString();
-		if (!ImmutableList.<String>of("1.7.2", "1.7.10").contains(mcVersion))
+		if (!ImmutableList.<String>of("1.8").contains(mcVersion))
 		logger.warn(String.format("Unsupported Minecraft version %s", mcVersion));
 		
 		DeobfHelper.init();
@@ -47,14 +47,15 @@ public class BetterFoliageTransformer implements IClassTransformer {
 			if (!transformedName.equals(transformer.getClassName())) continue;
 			
 			logger.debug(String.format("Found class: %s -> %s", name, transformedName));
+			logger.debug(String.format("Searching signature: OBF = %s, MCP = %s", DeobfHelper.transformSignature(transformer.getSignature()), transformer.getSignature()));
 			for (MethodNode methodNode : classNode.methods) {
 				logger.trace(String.format("Checking method: %s, sig: %s", methodNode.name, methodNode.desc));
 				Boolean isObfuscated = null;
-				if (methodNode.name.equals(DeobfHelper.transformElementName(transformer.getMethodName())) && methodNode.desc.equals(DeobfHelper.transformSignature(transformer.getSignature()))) {
-					isObfuscated = true;
-				} else if (methodNode.name.equals(transformer.getMethodName()) && methodNode.desc.equals(transformer.getSignature())) {
+				if (methodNode.name.equals(transformer.getMethodName()) && methodNode.desc.equals(transformer.getSignature())) {
 					isObfuscated = false;
-				}
+				} else if (methodNode.name.equals(DeobfHelper.transformElementName(transformer.getMethodName())) && methodNode.desc.equals(DeobfHelper.transformSignature(transformer.getSignature()))) {
+                    isObfuscated = true;
+                }
 				
 				if (isObfuscated != null) {
 					// transform

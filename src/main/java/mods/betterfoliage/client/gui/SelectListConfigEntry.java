@@ -8,25 +8,26 @@ import mods.betterfoliage.common.util.RenderUtils;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.EnumChatFormatting;
+import net.minecraftforge.fml.client.config.ConfigGuiType;
+import net.minecraftforge.fml.client.config.DummyConfigElement;
+import net.minecraftforge.fml.client.config.GuiConfig;
+import net.minecraftforge.fml.client.config.GuiConfigEntries;
+import net.minecraftforge.fml.client.config.GuiConfigEntries.CategoryEntry;
+import net.minecraftforge.fml.client.config.IConfigElement;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import cpw.mods.fml.client.config.ConfigGuiType;
-import cpw.mods.fml.client.config.DummyConfigElement;
-import cpw.mods.fml.client.config.GuiConfig;
-import cpw.mods.fml.client.config.GuiConfigEntries;
-import cpw.mods.fml.client.config.GuiConfigEntries.CategoryEntry;
-import cpw.mods.fml.client.config.IConfigElement;
-
-
+@SideOnly(Side.CLIENT)
 public abstract class SelectListConfigEntry<T> extends CategoryEntry {
 
     List<ItemWrapperElement> children;
     List<Integer> notFoundIdList;
     
     @SuppressWarnings("unchecked")
-    public SelectListConfigEntry(GuiConfig owningScreen, GuiConfigEntries owningEntryList, IConfigElement<?> configElement) {
+    public SelectListConfigEntry(GuiConfig owningScreen, GuiConfigEntries owningEntryList, IConfigElement configElement) {
         super(owningScreen, owningEntryList, configElement);
         RenderUtils.stripTooltipDefaultText(toolTip);
     }
@@ -46,7 +47,6 @@ public abstract class SelectListConfigEntry<T> extends CategoryEntry {
     protected abstract String getItemName(T item);
     protected abstract String getTooltipLangKey(String qualifiedName);
     
-    @SuppressWarnings("rawtypes")
     protected List<IConfigElement> createChildElements() {
         children = Lists.newArrayList();
         
@@ -65,15 +65,12 @@ public abstract class SelectListConfigEntry<T> extends CategoryEntry {
         return result;
     }
     
-    @SuppressWarnings("unchecked")
     @Override
     public boolean saveConfigElement() {
         boolean requiresRestart = ((GuiConfig) childScreen).entryList.saveConfigElements();
         
         Set<Integer> idSet = Sets.newHashSet();
-        for (ItemWrapperElement child : children)
-            if (Boolean.TRUE.equals(child.getCurrentValue()))
-                idSet.add(getItemId(child.item));
+        for (ItemWrapperElement child : children) if (child.isSelected()) idSet.add(getItemId(child.item));
         
         idSet.addAll(notFoundIdList);
         List<Integer> result = Lists.newArrayList(idSet);
@@ -83,7 +80,7 @@ public abstract class SelectListConfigEntry<T> extends CategoryEntry {
         return requiresRestart;
     }
 
-    public class ItemWrapperElement extends DummyConfigElement<Boolean> implements IConfigElement<Boolean> {
+    public class ItemWrapperElement extends DummyConfigElement implements IConfigElement {
 
         public T item;
         
@@ -98,17 +95,14 @@ public abstract class SelectListConfigEntry<T> extends CategoryEntry {
             return I18n.format(getTooltipLangKey(configElement.getQualifiedName()), EnumChatFormatting.GOLD + getItemName(item) + EnumChatFormatting.YELLOW);
         }
         
-        public Boolean getCurrentValue() {
+        public Boolean isSelected() {
             return (Boolean) value;
         }
 
         @Override
-        public void set(Boolean value) {
+        public void set(Object value) {
             this.value = value;
         }
         
-        public void setDefault(Boolean value) {
-            this.defaultValue = value;
-        }
     }
 }

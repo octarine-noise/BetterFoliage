@@ -1,64 +1,52 @@
 package mods.betterfoliage.client.render.impl;
 
 import mods.betterfoliage.BetterFoliage;
-import mods.betterfoliage.client.ShadersModIntegration;
-import mods.betterfoliage.client.render.IRenderBlockDecorator;
-import mods.betterfoliage.client.render.IconSet;
-import mods.betterfoliage.client.render.RenderBlockAOBase;
+import mods.betterfoliage.client.render.TextureSet;
+import mods.betterfoliage.client.render.impl.primitives.Color4;
+import mods.betterfoliage.client.render.impl.primitives.FaceCrossedQuads;
 import mods.betterfoliage.common.config.Config;
 import mods.betterfoliage.common.util.Double3;
-import net.minecraft.block.Block;
-import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.renderer.BFAbstractRenderer;
+import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.IIcon;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.client.event.TextureStitchEvent;
-import net.minecraftforge.common.util.ForgeDirection;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class RenderBlockBetterNetherrack extends RenderBlockAOBase implements IRenderBlockDecorator {
+public class RenderBlockBetterNetherrack extends BFAbstractRenderer {
 
-	public IconSet netherrackVineIcons = new IconSet("bettergrassandleaves", "better_netherrack_%d");
-	
-	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
-		if (!Config.netherrackEnabled) return false;
-		if (block != Blocks.netherrack) return false;
-		if (!blockAccess.isAirBlock(x, y - 1, z)) return false;
-		return true;
-	}
-	
-	public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer) {
-		blockAccess = world;
-		renderWorldBlockBase(1, world, x, y, z, block, modelId, renderer);
-		
-		int iconVariation = getSemiRandomFromPos(x, y, z, 0);
-		IIcon renderIcon = netherrackVineIcons.get(iconVariation);
-		
-		if (renderIcon == null) return true;
-		
-		int heightVariation = getSemiRandomFromPos(x, y, z, 1);
-		double scale = Config.netherrackSize * 0.5;
-		double halfHeight = 0.5 * (Config.netherrackHeightMin + pRand[heightVariation] * (Config.netherrackHeightMax - Config.netherrackHeightMin));
-		
-		// render netherrack vines
-		ShadersModIntegration.startGrassQuads();
-		Tessellator.instance.setBrightness(getBrightness(block, x, y - 1, z));
-		Tessellator.instance.setColorOpaque_I(block.colorMultiplier(blockAccess, x, y, z));
-		renderCrossedSideQuads(new Double3(x + 0.5, y, z + 0.5), ForgeDirection.DOWN, scale, halfHeight, pRot[iconVariation], Config.netherrackHOffset, renderIcon, 2, false);
-		
-		return true;
-	}
-
-	@SubscribeEvent
-	public void handleTextureReload(TextureStitchEvent.Pre event) {
-		if (event.map.getTextureType() != 0) return;
-		
-		netherrackVineIcons.registerIcons(event.map);
-		BetterFoliage.log.info(String.format("Found %d netherrack vine textures", netherrackVineIcons.numLoaded));
-	}
-
+    public TextureSet netherrackVineIcons = new TextureSet("bettergrassandleaves", "blocks/better_netherrack_%d");
+    
+    @Override
+    public boolean renderFeatureForBlock(IBlockAccess blockAccess, IBlockState blockState, BlockPos pos, WorldRenderer worldRenderer, boolean useAO) {
+        if (!Config.netherrackEnabled) return false;
+        if (blockState.getBlock() != Blocks.netherrack) return false;
+        if (blockAccess.getBlockState(pos.down()).getBlock().isOpaqueCube()) return false;
+        
+        int offsetVariation = getSemiRandomFromPos(pos, 0);
+        int textureVariation = getSemiRandomFromPos(pos, 1);
+        double halfSize = 0.5 * Config.netherrackSize;
+        double halfHeight = 0.5 * random.getRange(Config.netherrackHeightMin, Config.netherrackHeightMax, offsetVariation);
+        Double3 offset = random.getCircleXZ(Config.netherrackHOffset, offsetVariation);
+        Double3 faceCenter = new Double3(pos).add(0.5, 0.0, 0.5);
+        
+        shadingData.update(blockAccess, blockState.getBlock(), pos, useAO);
+        FaceCrossedQuads vines = FaceCrossedQuads.createTranslated(faceCenter, EnumFacing.DOWN, offset, halfSize, halfHeight);
+        vines.setTexture(netherrackVineIcons.get(textureVariation), 2).setBrightness(shadingData).setColor(shadingData, Color4.opaqueWhite).render(worldRenderer);
+        
+        return true;
+    }
+    
+    @SubscribeEvent
+    public void handleTextureReload(TextureStitchEvent.Pre event) {
+        netherrackVineIcons.registerSprites(event.map);
+        BetterFoliage.log.info(String.format("Found %d netherrack vine textures", netherrackVineIcons.numLoaded));
+    }
+    
 }

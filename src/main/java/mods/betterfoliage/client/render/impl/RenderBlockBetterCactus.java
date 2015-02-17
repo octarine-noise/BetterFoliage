@@ -1,96 +1,71 @@
 package mods.betterfoliage.client.render.impl;
 
 import mods.betterfoliage.BetterFoliage;
-import mods.betterfoliage.client.render.FakeRenderBlockAOBase;
-import mods.betterfoliage.client.render.IRenderBlockDecorator;
-import mods.betterfoliage.client.render.IconSet;
+import mods.betterfoliage.client.render.TextureSet;
+import mods.betterfoliage.client.render.impl.primitives.BlockCrossedQuads;
+import mods.betterfoliage.client.render.impl.primitives.Color4;
+import mods.betterfoliage.client.render.impl.primitives.FaceCrossedQuads;
 import mods.betterfoliage.common.config.Config;
 import mods.betterfoliage.common.util.Double3;
-import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.renderer.BFAbstractRenderer;
+import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.IIcon;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.client.event.TextureStitchEvent;
-import net.minecraftforge.common.util.ForgeDirection;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class RenderBlockBetterCactus extends FakeRenderBlockAOBase implements IRenderBlockDecorator {
+public class RenderBlockBetterCactus extends BFAbstractRenderer {
 
-	public IIcon cactusRoundIcon;
-	public IconSet cactusSideIcons = new IconSet("bettergrassandleaves", "better_cactus_arm_%d");
-	
-	/** Possible directions for cactus side growth*/
-	public static ForgeDirection[] cactusDirections = new ForgeDirection[] { ForgeDirection.NORTH, ForgeDirection.SOUTH, ForgeDirection.EAST, ForgeDirection.WEST};
-	
-	/** Inner radius of cactus stem */
-	public static double cactusRadius = 0.4375;
-	
-	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
-		return Config.cactusEnabled && block == Blocks.cactus;
-	}
-	
-	public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer) {
-		// store world for later use
-		blockAccess = world;
-		
-		// use original renderer for block breaking overlay
-		if (renderer.hasOverrideBlockTexture()) {
-			renderer.renderBlockCactus(block, x, y, z);
-			return true;
-		}
-		
-		// render cactus center
-		setAOPassCounters(1);
-		renderStandardBlock(block, x, y, z);
-		
-		Double3 blockCenter = new Double3(x + 0.5, y + 0.5, z + 0.5);
-		Tessellator.instance.setBrightness(getBrightness(block,x, y, z));
-		renderCactusCore(block.getBlockTextureFromSide(ForgeDirection.UP.ordinal()),
-						 block.getBlockTextureFromSide(ForgeDirection.NORTH.ordinal()),
-						 blockCenter, 0);
-		
-		// render side growth
-		ForgeDirection drawDirection = cactusDirections[getSemiRandomFromPos(x, y, z, 0) % 4];
-		int iconVariation = getSemiRandomFromPos(x, y, z, 1);
-		Double3 drawBase = blockCenter.add(new Double3(drawDirection).scale(cactusRadius));
-		
-		Tessellator.instance.setBrightness(getBrightness(block, x, y, z));
-		if (cactusSideIcons.hasIcons()) renderCrossedSideQuads(drawBase, drawDirection, 0.5, 0.5, pRot[iconVariation], 0.2, cactusSideIcons.get(iconVariation), 0, false);
-		renderCrossedBlockQuadsSkew(blockCenter, 0.65,
-									pRot[iconVariation].scaleAxes(0.1, 0.0, 0.1),
-									pRot[(iconVariation + 1) & 63].scaleAxes(0.1, 0.0, 0.1),
-									cactusRoundIcon, iconVariation, false, false);
-		return true;
-	}
+    /** Valid directions of cactus arm */
+    public static EnumFacing[] cactusDirections = new EnumFacing[]{ EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.WEST, EnumFacing.EAST };
+    
+    /** Inner radius of cactus stem */
+    public static double cactusRadius = 0.4375;
+    
+    /** Texture of cactus middle */
+    public TextureAtlasSprite cactusRoundIcon;
+    
+    /** Texture set of cactus arms */
+    public TextureSet cactusSideIcons = new TextureSet("bettergrassandleaves", "blocks/better_cactus_arm_%d");
+    
+    @Override
+    public boolean renderFeatureForBlock(IBlockAccess blockAccess, IBlockState blockState, BlockPos pos, WorldRenderer worldRenderer, boolean useAO) {
+        if (!Config.cactusEnabled) return false;
+        if (blockState.getBlock() != Blocks.cactus) return false;
+        
+        int offsetVariation = getSemiRandomFromPos(pos, 0);
+        int uvVariation = getSemiRandomFromPos(pos, 1);
+        int iconVariation = getSemiRandomFromPos(pos, 2);
+        double halfSize = 0.65;
+        Double3 blockCenter = new Double3(pos).add(0.5, 0.5, 0.5);
+        
+        // render cactus center
+        shadingData.update(blockAccess, blockState.getBlock(), pos, useAO);
+        BlockCrossedQuads cactusCenter = BlockCrossedQuads.createSkewed(blockCenter, random.getCircleXZ(0.1, offsetVariation), random.getCircleXZ(0.1, offsetVariation + 1), halfSize);
+        cactusCenter.setTexture(cactusRoundIcon, uvVariation).setBrightness(shadingData).setColor(shadingData, Color4.opaqueWhite).render(worldRenderer);
+        
+        // render cactus arm
+        EnumFacing sideFacing = cactusDirections[offsetVariation % 4];
+        halfSize = 0.5;
+        FaceCrossedQuads cactusArm = FaceCrossedQuads.createTranslated(blockCenter.add(new Double3(sideFacing).scale(cactusRadius)), sideFacing, random.getCircleXZ(0.2, offsetVariation), halfSize, halfSize);
+        cactusArm.setTexture(cactusSideIcons.get(iconVariation), 0).setBrightness(shadingData).setColor(shadingData, Color4.opaqueWhite).render(worldRenderer);
+        
+        return true;
+    }
+    
+    @SubscribeEvent
+    public void handleTextureReload(TextureStitchEvent.Pre event) {
+        cactusSideIcons.registerSprites(event.map);
+        cactusRoundIcon = event.map.registerSprite(new ResourceLocation("bettergrassandleaves:blocks/better_cactus"));
+        BetterFoliage.log.info(String.format("Found %d cactus side textures", cactusSideIcons.numLoaded));
+    }
 
-	protected void renderCactusCore(IIcon topIcon, IIcon sideIcon, Double3 blockCenter, int sideUvRot) {
-		if (Minecraft.isAmbientOcclusionEnabled()) {
-			renderQuadWithShading(sideIcon, blockCenter.add(cactusRadius, 0.0, 0.0), new Double3(0.0, 0.0, -0.5), new Double3(0.0, 0.5, 0.0), sideUvRot, aoXPYZPN, aoXPYZPP, aoXPYZNP, aoXPYZNN);
-			renderQuadWithShading(sideIcon, blockCenter.add(-cactusRadius, 0.0, 0.0), new Double3(0.0, 0.0, 0.5), new Double3(0.0, 0.5, 0.0), sideUvRot, aoXNYZPP, aoXNYZPN, aoXNYZNN, aoXNYZNP);
-			renderQuadWithShading(sideIcon, blockCenter.add(0.0, 0.0, cactusRadius), new Double3(0.5, 0.0, 0.0), new Double3(0.0, 0.5, 0.0), sideUvRot, aoZPXYPP, aoZPXYNP, aoZPXYNN, aoZPXYPN);
-			renderQuadWithShading(sideIcon, blockCenter.add(0.0, 0.0, -cactusRadius), new Double3(-0.5, 0.0, 0.0), new Double3(0.0, 0.5, 0.0), sideUvRot, aoZNXYNP, aoZNXYPP, aoZNXYPN, aoZNXYNN);
-			renderQuadWithShading(topIcon, blockCenter.add(0.0, 0.5, 0.0), new Double3(-0.5, 0.0, 0.0), new Double3(0.0, 0.0, 0.5), 0, aoYPXZNP, aoYPXZPP, aoYPXZPN, aoYPXZNN);
-		} else {
-			renderQuad(sideIcon, blockCenter.add(cactusRadius, 0.0, 0.0), new Double3(0.0, 0.0, -0.5), new Double3(0.0, 0.5, 0.0), sideUvRot);
-			renderQuad(sideIcon, blockCenter.add(-cactusRadius, 0.0, 0.0), new Double3(0.0, 0.0, 0.5), new Double3(0.0, 0.5, 0.0), sideUvRot);
-			renderQuad(sideIcon, blockCenter.add(0.0, 0.0, cactusRadius), new Double3(0.5, 0.0, 0.0), new Double3(0.0, 0.5, 0.0), sideUvRot);
-			renderQuad(sideIcon, blockCenter.add(0.0, 0.0, -cactusRadius), new Double3(-0.5, 0.0, 0.0), new Double3(0.0, 0.5, 0.0), sideUvRot);
-			renderQuad(topIcon, blockCenter.add(0.0, 0.5, 0.0), new Double3(-0.5, 0.0, 0.0), new Double3(0.0, 0.0, 0.5), 0);
-		}
-	}
-	
-	@SubscribeEvent
-	public void handleTextureReload(TextureStitchEvent.Pre event) {
-		if (event.map.getTextureType() != 0) return;
-		
-		cactusRoundIcon = event.map.registerIcon("bettergrassandleaves:better_cactus");
-		cactusSideIcons.registerIcons(event.map);
-		BetterFoliage.log.info(String.format("Found %d cactus arm textures", cactusSideIcons.numLoaded));
-	}
 }

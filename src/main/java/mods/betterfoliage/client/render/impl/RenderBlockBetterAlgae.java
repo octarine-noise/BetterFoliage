@@ -3,83 +3,69 @@ package mods.betterfoliage.client.render.impl;
 import java.util.Random;
 
 import mods.betterfoliage.BetterFoliage;
-import mods.betterfoliage.client.render.IRenderBlockDecorator;
-import mods.betterfoliage.client.render.IconSet;
-import mods.betterfoliage.client.render.RenderBlockAOBase;
+import mods.betterfoliage.client.ShadersModIntegration;
+import mods.betterfoliage.client.render.TextureSet;
+import mods.betterfoliage.client.render.impl.primitives.Color4;
+import mods.betterfoliage.client.render.impl.primitives.FaceCrossedQuads;
 import mods.betterfoliage.common.config.Config;
 import mods.betterfoliage.common.util.Double3;
-import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.RenderBlocks;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.util.IIcon;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.renderer.BFAbstractRenderer;
+import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.gen.NoiseGeneratorSimplex;
 import net.minecraftforge.client.event.TextureStitchEvent;
-import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.event.world.WorldEvent;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class RenderBlockBetterAlgae extends RenderBlockAOBase implements IRenderBlockDecorator {
+public class RenderBlockBetterAlgae extends BFAbstractRenderer {
 
-	public IconSet algaeIcons = new IconSet("bettergrassandleaves", "better_algae_%d");
-	public NoiseGeneratorSimplex noise;
-	
-	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
-		if (!Config.algaeEnabled) return false;
-		if (!Config.dirt.matchesID(block)) return false;
-		if (!Config.algaeBiomeList.contains(blockAccess.getBiomeGenForCoords(x, z).biomeID)) return false;
-		if (blockAccess.getBlock(x, y + 1, z).getMaterial() != Material.water) return false;
-		if (blockAccess.getBlock(x, y + 2, z).getMaterial() != Material.water) return false;
-		int terrainVariation = MathHelper.floor_double((noise.func_151605_a(x, z) + 1.0) * 32.0);
-		return terrainVariation < Config.algaePopulation;
-	}
-	
-	public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer) {
-		// store world for later use
-		blockAccess = world;
-		
-		// use original renderer for block breaking overlay
-		if (renderer.hasOverrideBlockTexture()) {
-			renderer.setRenderBoundsFromBlock(block);
-			renderer.renderStandardBlock(block, x, y, z);
-			return true;
-		}
-		
-		// render dirt block
-		setAOPassCounters(1);
-		setRenderBoundsFromBlock(block);
-		renderStandardBlock(block, x, y, z);
-		
-		int variation = getSemiRandomFromPos(x, y, z, 0);
-		int heightVariation = getSemiRandomFromPos(x, y, z, 1);
-		
-		IIcon renderIcon = algaeIcons.get(variation);
-		if (renderIcon == null) return true;
-		
-		double scale = Config.algaeSize * 0.5;
-		double halfHeight = 0.5 * (Config.algaeHeightMin + pRand[heightVariation] * (Config.algaeHeightMax - Config.algaeHeightMin));
-		Tessellator.instance.setBrightness(getBrightness(block, x, y + 1, z));
-		renderCrossedSideQuads(new Double3(x + 0.5, y + 1.0 - 0.125 * halfHeight, z + 0.5), ForgeDirection.UP, scale, halfHeight, pRot[variation], Config.algaeHOffset, renderIcon, 0, false);
-		
-		return true;
-	}
-	
-	@SubscribeEvent
-	public void handleTextureReload(TextureStitchEvent.Pre event) {
-		if (event.map.getTextureType() != 0) return;
-		
-		algaeIcons.registerIcons(event.map);
-		BetterFoliage.log.info(String.format("Found %d algae textures", algaeIcons.numLoaded));
-	}
-	
-	@SubscribeEvent
-	public void handleWorldLoad(WorldEvent.Load event) {
-		noise = new NoiseGeneratorSimplex(new Random(event.world.getWorldInfo().getSeed() + 1));
-	}
-	
+    public static int seedOffset = 1;
+    
+    public TextureSet algaeIcons = new TextureSet("bettergrassandleaves", "blocks/better_algae_%d");
+    public NoiseGeneratorSimplex noise;
+    
+    @Override
+    public boolean renderFeatureForBlock(IBlockAccess blockAccess, IBlockState blockState, BlockPos pos, WorldRenderer worldRenderer, boolean useAO) {
+        if (!Config.algaeEnabled) return false;
+        if (!Config.dirt.matchesID(blockState.getBlock())) return false;
+        if (!Config.algaeBiomeList.contains(blockAccess.getBiomeGenForCoords(pos).biomeID)) return false;
+        if (blockAccess.getBlockState(pos.up()).getBlock().getMaterial() != Material.water) return false;
+        if (blockAccess.getBlockState(pos.up(2)).getBlock().getMaterial() != Material.water) return false;
+        int terrainVariation = MathHelper.floor_double((noise.func_151605_a(pos.getX(), pos.getZ()) + 1.0) * 32.0);
+        if (terrainVariation >= Config.algaePopulation) return false;
+        
+        int offsetVariation = getSemiRandomFromPos(pos, 0);
+        int textureVariation = getSemiRandomFromPos(pos, 1);
+        double halfSize = 0.5 * Config.algaeSize;
+        double halfHeight = 0.5 * random.getRange(Config.algaeHeightMin, Config.algaeHeightMax, offsetVariation);
+        Double3 offset = random.getCircleXZ(Config.algaeHOffset, offsetVariation);
+        Double3 faceCenter = new Double3(pos).add(0.5, 1.0, 0.5);
+        
+        ShadersModIntegration.startGrassQuads(worldRenderer);
+        shadingData.update(blockAccess, blockState.getBlock(), pos, useAO);
+        FaceCrossedQuads algae = FaceCrossedQuads.createTranslated(faceCenter, EnumFacing.UP, offset, halfSize, halfHeight);
+        algae.setTexture(algaeIcons.get(textureVariation), 0).setBrightness(shadingData).setColor(shadingData, Color4.opaqueWhite).render(worldRenderer);
+        ShadersModIntegration.finish(worldRenderer);
+        
+        return true;
+    }
+    
+    @SubscribeEvent
+    public void handleTextureReload(TextureStitchEvent.Pre event) {
+        algaeIcons.registerSprites(event.map);
+        BetterFoliage.log.info(String.format("Found %d algae textures", algaeIcons.numLoaded));
+    }
+    
+    @SubscribeEvent
+    public void handleWorldLoad(WorldEvent.Load event) {
+        noise = new NoiseGeneratorSimplex(new Random(event.world.getWorldInfo().getSeed() + seedOffset));
+    }
 }
