@@ -38,7 +38,7 @@ public class ReedGenerator extends BlockTextureGenerator {
 		Graphics2D graphics = result.createGraphics();
 		graphics.drawImage(origImage, 0, isBottom ? -origImage.getHeight() / 2 : 0, null);
 		
-		return new BufferedImageResource(resourceLocation, result);
+		return new BufferedImageResource(resourceLocation, originalWithDirs, result);
 	}
 
 }

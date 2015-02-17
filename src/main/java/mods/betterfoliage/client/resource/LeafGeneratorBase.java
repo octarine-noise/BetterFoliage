@@ -55,6 +55,9 @@ public abstract class LeafGeneratorBase extends BlockTextureGenerator {
 		ResourceLocation originalNoDirs = unwrapResource(resourceLocation);
 		ResourceLocation originalWithDirs = new ResourceLocation(originalNoDirs.getResourceDomain(), "textures/" + originalNoDirs.getResourcePath());
 		
+		// use animation metadata as-is
+		if (resourceLocation.getResourcePath().toLowerCase().endsWith(".mcmeta")) return resourceManager.getResource(originalWithDirs);
+		
 		// check for provided texture
 		ResourceLocation handDrawnLocation = new ResourceLocation(nonGeneratedDomain, String.format(handDrawnLocationFormat, originalNoDirs.getResourceDomain(), originalNoDirs.getResourcePath().substring(7))); 
 		if (ResourceUtils.resourceExists(handDrawnLocation)) {
@@ -72,7 +75,7 @@ public abstract class LeafGeneratorBase extends BlockTextureGenerator {
 			return getMissingResource();
 		}
 		generatedCounter++;
-		return new BufferedImageResource(resourceLocation, result);
+		return new BufferedImageResource(resourceLocation, originalWithDirs, result);
 	}
 	
 	protected abstract BufferedImage generateLeaf(ResourceLocation originalWithDirs) throws IOException, TextureGenerationException;
