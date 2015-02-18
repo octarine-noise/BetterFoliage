@@ -28,7 +28,7 @@ public class DeobfHelper {
 		    obfClasses.put("net/minecraft/client/multiplayer/WorldClient", "cen");
 		    obfClasses.put("net/minecraft/client/renderer/BlockRendererDispatcher", "cll");
 		    obfClasses.put("net/minecraft/client/renderer/BlockModelRenderer", "cln");
-		    obfClasses.put("net/minecraft/block/Block;Lnet/minecraft/util/EnumWorldBlockLayer", "aql");
+		    obfClasses.put("net/minecraft/util/EnumWorldBlockLayer", "aql");
 		    obfClasses.put("net/minecraft/client/renderer/chunk/RenderChunk", "cop");
 		    obfClasses.put("net/minecraft/client/renderer/chunk/ChunkCompileTaskGenerator", "coa");
 		    obfClasses.put("net/minecraft/client/renderer/WorldRenderer", "civ");

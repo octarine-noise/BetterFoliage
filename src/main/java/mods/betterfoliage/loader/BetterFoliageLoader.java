@@ -4,7 +4,7 @@ import java.util.Map;
 
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 
-@IFMLLoadingPlugin.TransformerExclusions({"mods.betterfoliage.loader"})
+@IFMLLoadingPlugin.TransformerExclusions({"mods.betterfoliage.loader", "optifine"})
 public class BetterFoliageLoader implements IFMLLoadingPlugin {
 
 	public String[] getASMTransformerClass() {
