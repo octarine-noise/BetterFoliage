@@ -1,4 +1,4 @@
-package mods.betterfoliage.loader;
+package mods.betterfoliage.loader.impl;
 
 import java.util.Map;
 
@@ -8,7 +8,7 @@ import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 public class BetterFoliageLoader implements IFMLLoadingPlugin {
 
 	public String[] getASMTransformerClass() {
-		return new String[] {"mods.betterfoliage.loader.BetterFoliageTransformer"};
+		return new String[] {"mods.betterfoliage.loader.impl.BetterFoliageTransformer"};
 	}
 
 	public String getModContainerClass() {

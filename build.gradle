@@ -43,7 +43,7 @@ processResources {
 
 jar {
 	manifest {
-		attributes "FMLCorePlugin": "mods.betterfoliage.loader.BetterFoliageLoader"
+		attributes "FMLCorePlugin": "mods.betterfoliage.loader.impl.BetterFoliageLoader"
         attributes "FMLCorePluginContainsFMLMod": "mods.betterfoliage.BetterFoliage"
 	}
 }
@@ -52,7 +52,7 @@ task srcJar(type: Jar, dependsOn: classes) {
     classifier = 'src'
     from sourceSets.main.allSource
     manifest {
-        attributes "FMLCorePlugin": "mods.betterfoliage.loader.BetterFoliageLoader"
+        attributes "FMLCorePlugin": "mods.betterfoliage.loader.impl.BetterFoliageLoader"
         attributes "FMLCorePluginContainsFMLMod": "mods.betterfoliage.BetterFoliage"
     }
 }
@@ -61,7 +61,7 @@ task devJar(type: Jar, dependsOn: classes) {
     classifier = 'dev'
     from sourceSets.main.output
     manifest {
-        attributes "FMLCorePlugin": "mods.betterfoliage.loader.BetterFoliageLoader"
+        attributes "FMLCorePlugin": "mods.betterfoliage.loader.impl.BetterFoliageLoader"
         attributes "FMLCorePluginContainsFMLMod": "mods.betterfoliage.BetterFoliage"
     }
 }

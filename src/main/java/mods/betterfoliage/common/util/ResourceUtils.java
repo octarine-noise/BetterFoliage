@@ -6,39 +6,19 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
-import java.util.Map;
 
 import mods.betterfoliage.BetterFoliage;
-import mods.betterfoliage.loader.DeobfHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IResource;
-import net.minecraft.client.resources.IResourceManager;
-import net.minecraft.client.resources.SimpleReloadableResourceManager;
 import net.minecraft.util.ResourceLocation;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 
-import cpw.mods.fml.relauncher.ReflectionHelper;
-import cpw.mods.fml.relauncher.ReflectionHelper.UnableToAccessFieldException;
-
 public class ResourceUtils {
 
 	/** Hide constructor */
 	private ResourceUtils() {}
-	
-	/** 
-	 * @return (({@link SimpleReloadableResourceManager}) Minecraft.getMinecraft().getResourceManager()).domainResourceManagers
-	 */
-	public static Map<String, IResourceManager> getDomainResourceManagers() {
-        try {
-            return ReflectionHelper.<Map<String, IResourceManager>, SimpleReloadableResourceManager> getPrivateValue(
-                SimpleReloadableResourceManager.class, (SimpleReloadableResourceManager) Minecraft.getMinecraft().getResourceManager(), DeobfHelper.transformElementSearge("domainResourceManagers"), "domainResourceManagers"
-            );
-        } catch (UnableToAccessFieldException e) {
-            return null;
-        }
-	}
 	
 	/** Check for the existence of a {@link IResource}
 	 * @param resourceLocation

@@ -7,7 +7,7 @@ import java.util.Set;
 import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.BetterFoliageClient;
 import mods.betterfoliage.common.config.Config;
-import mods.betterfoliage.loader.DeobfHelper;
+import mods.betterfoliage.loader.impl.CodeRefs;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -21,7 +21,6 @@ import com.google.common.collect.Sets;
 import cpw.mods.fml.common.eventhandler.Event;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.relauncher.ReflectionHelper;
 import cpw.mods.fml.relauncher.ReflectionHelper.UnableToAccessFieldException;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -85,9 +84,7 @@ public class LeafTextureEnumerator implements IIconRegister {
 		
 		// enumerate all registered textures, find leaf textures among them
 		try {
-		    Map<String, TextureAtlasSprite> mapAtlas = ReflectionHelper.<Map<String, TextureAtlasSprite>, TextureMap> getPrivateValue(
-		        TextureMap.class, blockTextures, DeobfHelper.transformElementSearge("mapRegisteredSprites"), "mapRegisteredSprites"
-		    );
+		    Map<String, TextureAtlasSprite> mapAtlas = CodeRefs.fMapRegisteredSprites.getInstanceField(blockTextures);
             
             Set<TextureAtlasSprite> foundLeafTextures = Sets.newHashSet();
             for (TextureAtlasSprite icon : mapAtlas.values())

@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Set;
 
 import mods.betterfoliage.BetterFoliage;
-import mods.betterfoliage.common.util.ResourceUtils;
+import mods.betterfoliage.loader.impl.CodeRefs;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.resources.IResource;
@@ -47,7 +47,7 @@ public abstract class BlockTextureGenerator implements IResourceManager {
 		if (event.map.getTextureType() != 0) return;
 		blockTextures = event.map;
 
-		Map<String, IResourceManager> domainManagers = ResourceUtils.getDomainResourceManagers();
+		Map<String, IResourceManager> domainManagers = CodeRefs.fDomainResourceManagers.getInstanceField(Minecraft.getMinecraft().getResourceManager());
 		if (domainManagers == null) {
 			BetterFoliage.log.warn("Failed to inject texture generator");
 			return;
@@ -61,7 +61,7 @@ public abstract class BlockTextureGenerator implements IResourceManager {
 		if (event.map.getTextureType() != 0) return;
 		
 		// don't leave a mess
-		Map<String, IResourceManager> domainManagers = ResourceUtils.getDomainResourceManagers();
+		Map<String, IResourceManager> domainManagers = CodeRefs.fDomainResourceManagers.getInstanceField(Minecraft.getMinecraft().getResourceManager());
 		if (domainManagers != null) domainManagers.remove(domainName);
 	}
 	
