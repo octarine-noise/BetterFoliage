@@ -18,8 +18,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelBlock;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.IResource;
-import net.minecraft.client.resources.IResourceManager;
-import net.minecraft.client.resources.SimpleReloadableResourceManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -32,14 +30,6 @@ public class ResourceUtils {
 
 	/** Hide constructor */
 	private ResourceUtils() {}
-	
-	/** 
-	 * @return (({@link SimpleReloadableResourceManager}) Minecraft.getMinecraft().getResourceManager()).domainResourceManagers
-	 */
-	@SuppressWarnings("unchecked")
-    public static Map<String, IResourceManager> getDomainResourceManagers() {
-	    return ((SimpleReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).domainResourceManagers;
-	}
 	
 	/** Check for the existence of a {@link IResource}
 	 * @param resourceLocation

@@ -1,10 +1,8 @@
 package mods.betterfoliage.client;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-
 import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.common.config.Config;
+import mods.betterfoliage.loader.impl.CodeRefs;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.WorldRenderer;
@@ -22,9 +20,6 @@ public class ShadersModIntegration {
 	private static boolean hasShadersMod = false;
 	private static int tallGrassEntityData;
 	private static int leavesEntityData;
-	private static Method pushEntity;
-	private static Method popEntity;
-	private static Field vertexBuilder;
 	
 	/** Hide constructor */
 	private ShadersModIntegration() {}
@@ -32,17 +27,17 @@ public class ShadersModIntegration {
 	public static void init() {
         tallGrassEntityData = Block.blockRegistry.getIDForObject(Blocks.tallgrass) & 0xFFFF | Blocks.tallgrass.getRenderType() << 16;
         leavesEntityData = Block.blockRegistry.getIDForObject(Blocks.leaves) & 0xFFFF | Blocks.leaves.getRenderType() << 16;
-		try {
-			Class<?> classSVertexBuilder = Class.forName("shadersmod.client.SVertexBuilder");
-			pushEntity = classSVertexBuilder.getMethod("pushEntity", long.class);
-			popEntity = classSVertexBuilder.getMethod("popEntity", WorldRenderer.class);
-			vertexBuilder = WorldRenderer.class.getDeclaredField("sVertexBuilder");
-			hasShadersMod = true;
-			BetterFoliage.log.info("ShadersMod found, integration enabled");
-		} catch(Exception e) {
-		    BetterFoliage.log.info("ShadersMod not found, integration disabled");
-		}
-		
+        
+        if (CodeRefs.cSVertexBuilder.resolve() == null ||
+            CodeRefs.fSVertexBuilder.resolve() == null ||
+            CodeRefs.mPushEntity_S.resolve() == null ||
+            CodeRefs.mPushEntity_I.resolve() == null ||
+            CodeRefs.mPopEntity.resolve() == null) {
+            BetterFoliage.log.info("ShadersMod not found, integration disabled");
+        } else {
+            hasShadersMod = true;
+            BetterFoliage.log.info("ShadersMod found, integration enabled");
+        }
 	}
 	
 	/** Signal start of grass-type quads
@@ -89,8 +84,8 @@ public class ShadersModIntegration {
 	 */
 	protected static void pushEntity(WorldRenderer renderer, long data) {
 	    try {
-	        Object builder = vertexBuilder.get(renderer);
-            pushEntity.invoke(builder, data);
+	        Object builder = CodeRefs.fSVertexBuilder.getInstanceField(renderer);
+	        CodeRefs.mPushEntity_I.invokeInstanceMethod(builder, data);
         } catch (Exception e) {
         }
 	}
@@ -100,7 +95,8 @@ public class ShadersModIntegration {
 	 */
 	protected static void popEntity(WorldRenderer renderer) {
 	    try {
-            popEntity.invoke(null, renderer);
+	        Object builder = CodeRefs.fSVertexBuilder.getInstanceField(renderer);
+	        CodeRefs.mPopEntity.invokeInstanceMethod(builder);
         } catch (Exception e) {
         }
 	}

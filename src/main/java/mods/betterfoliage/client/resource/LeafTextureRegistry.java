@@ -12,6 +12,7 @@ import mods.betterfoliage.common.config.Config;
 import mods.betterfoliage.common.util.BFFunctions;
 import mods.betterfoliage.common.util.ResourceUtils;
 import mods.betterfoliage.common.util.TextureMatcher;
+import mods.betterfoliage.loader.impl.CodeRefs;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -23,7 +24,6 @@ import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -76,7 +76,7 @@ public class LeafTextureRegistry {
         loadedParticles = 0;
         particleTypes.loadMappings(new ResourceLocation(BetterFoliage.DOMAIN, "leafParticleMappings.cfg"));
         
-        Map<ModelResourceLocation, IModel> stateModels = ReflectionHelper.getPrivateValue(ModelLoader.class, event.loader, "stateModels");
+        Map<ModelResourceLocation, IModel> stateModels = CodeRefs.fStateModels.getInstanceField(event.loader);
         
         Iterable<Map.Entry<IBlockState, ModelResourceLocation>> stateMappings =
         Iterables.concat(
