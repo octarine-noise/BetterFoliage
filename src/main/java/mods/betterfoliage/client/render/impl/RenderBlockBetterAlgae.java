@@ -35,6 +35,7 @@ public class RenderBlockBetterAlgae extends BFAbstractRenderer {
     @Override
     public boolean renderFeatureForBlock(IBlockAccess blockAccess, IBlockState blockState, BlockPos pos, WorldRenderer worldRenderer, boolean useAO) {
         if (!Config.algaeEnabled) return false;
+        if (noise == null) return false;
         if (!Config.dirt.matchesID(blockState.getBlock())) return false;
         if (!Config.algaeBiomeList.contains(blockAccess.getBiomeGenForCoords(pos).biomeID)) return false;
         if (blockAccess.getBlockState(pos.up()).getBlock().getMaterial() != Material.water) return false;

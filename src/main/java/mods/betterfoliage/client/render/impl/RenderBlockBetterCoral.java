@@ -34,6 +34,7 @@ public class RenderBlockBetterCoral extends BFAbstractRenderer {
 	@Override
     public boolean renderFeatureForBlock(IBlockAccess blockAccess, IBlockState blockState, BlockPos pos, WorldRenderer worldRenderer, boolean useAO) {
 	    if (!Config.coralEnabled) return false;
+	    if (noise == null) return false;
 	    if (blockState.getBlock() != Blocks.sand) return false;
 	    if (!Config.coralBiomeList.contains(blockAccess.getBiomeGenForCoords(pos).biomeID)) return false;
 	    int terrainVariation = MathHelper.floor_double((noise.func_151605_a(pos.getX() * 0.1, pos.getZ() * 0.1) + 1.0) * 32.0);
