@@ -85,7 +85,7 @@ public class BetterFoliageTransformer extends AbstractClassTransformer {
         methodTransformers.put(CodeRefs.mGetUseNeighborBrightness, new AbstractMethodTransformer() {
             @Override
             public void transform() {
-                log.info("Applying Block.getAmbientOcclusionLightValue() override");
+                log.info("Applying Block.getUseNeighborBrightness() override");
                 insertBefore(matchOpcode(Opcodes.IRETURN),
                              new VarInsnNode(Opcodes.ALOAD, 0),
                              createInvokeStatic(CodeRefs.mGetUseNeighborBrightnessOverride));
