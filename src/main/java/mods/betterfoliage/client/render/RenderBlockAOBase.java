@@ -208,10 +208,10 @@ public class RenderBlockAOBase extends RenderBlocks {
 	protected void setShadingForFace(ForgeDirection dir) {
 		if (dir == ForgeDirection.DOWN) {
 			// dir1 WEST, dir2 NORTH
-			faceAOPP = aoYNXZPP; faceAOPN = aoYNXZPN; faceAONN = aoYNXZNN; faceAONP = aoYNXZNP;
+			faceAOPP = aoYNXZNN; faceAOPN = aoYNXZNP; faceAONN = aoYNXZPP; faceAONP = aoYNXZPN;
 		} else if (dir == ForgeDirection.UP) {
 			// dir1 WEST, dir2 SOUTH
-			faceAOPP = aoYPXZPP; faceAOPN = aoYPXZPN; faceAONN = aoYPXZNN; faceAONP = aoYPXZNP;
+			faceAOPP = aoYPXZNP; faceAOPN = aoYPXZNN; faceAONN = aoYPXZPN; faceAONP = aoYPXZPP;
 		} else if (dir == ForgeDirection.NORTH) {
 			// dir1 WEST, dir2 UP
 			faceAOPP = aoZNXYNP; faceAOPN = aoZNXYNN; faceAONN = aoZNXYPN; faceAONP = aoZNXYPP;
