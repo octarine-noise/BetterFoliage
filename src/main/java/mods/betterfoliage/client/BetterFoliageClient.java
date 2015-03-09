@@ -12,6 +12,7 @@ import mods.betterfoliage.client.render.impl.RenderBlockBetterCoral;
 import mods.betterfoliage.client.render.impl.RenderBlockBetterGrass;
 import mods.betterfoliage.client.render.impl.RenderBlockBetterLeaves;
 import mods.betterfoliage.client.render.impl.RenderBlockBetterLilypad;
+import mods.betterfoliage.client.render.impl.RenderBlockBetterLogs;
 import mods.betterfoliage.client.render.impl.RenderBlockBetterMycelium;
 import mods.betterfoliage.client.render.impl.RenderBlockBetterNetherrack;
 import mods.betterfoliage.client.render.impl.RenderBlockBetterReed;
@@ -62,6 +63,7 @@ public class BetterFoliageClient {
 		registerRenderer(new RenderBlockBetterAlgae());
 		registerRenderer(new RenderBlockBetterCoral());
 		registerRenderer(new RenderBlocksBetterGrassSide());
+		registerRenderer(new RenderBlockBetterLogs());
 
 		MinecraftForge.EVENT_BUS.register(wind);
 		FMLCommonHandler.instance().bus().register(wind);
@@ -70,6 +72,7 @@ public class BetterFoliageClient {
 		MinecraftForge.EVENT_BUS.register(Config.crops);
 		MinecraftForge.EVENT_BUS.register(Config.dirt);
 		MinecraftForge.EVENT_BUS.register(Config.grass);
+		MinecraftForge.EVENT_BUS.register(Config.logs);
 		
 		BetterFoliage.log.info("Registering texture generators");
 		MinecraftForge.EVENT_BUS.register(soulParticles);
@@ -103,6 +106,19 @@ public class BetterFoliageClient {
 		return original;
 	}
 	
+	public static boolean shouldRenderBlockSideOverride(boolean original, IBlockAccess blockAccess, int x, int y, int z, int side) {
+	    return original || (Config.logsEnabled && Config.logs.matchesID(blockAccess.getBlock(x, y, z)));
+	}
+	
+	public static float getAmbientOcclusionLightValueOverride(float original, Block block) {
+	    if (Config.logsEnabled && Config.logs.matchesID(block)) return 1.0f;
+	    return original;
+	}
+	
+    public static boolean getUseNeighborBrightnessOverride(boolean original, Block block) {
+        return original || (Config.logsEnabled && Config.logs.matchesID(block));
+    }
+	   
 	public static void onRandomDisplayTick(Block block, World world, int x, int y, int z) {
 	    if (Config.soulFXEnabled) {
 	        if (world.getBlock(x, y, z) == Blocks.soul_sand && Math.random() < Config.soulFXChance) {

@@ -19,6 +19,9 @@ public class CodeRefs {
     
     public static MethodRef mRenderBlockByRenderType, mDoVoidFogParticles;
     public static MethodRef mGetRenderTypeOverride, mOnRandomDisplayTick, mPushEntity, mGetBlockIdOverride;
+    public static MethodRef mGetAmbientOcclusionLightValue, mGetAmbientOcclusionLightValueOverride;
+    public static MethodRef mGetUseNeighborBrightness, mGetUseNeighborBrightnessOverride;
+    public static MethodRef mShouldSideBeRendered, mShouldRenderBlockSideOverride;
     
     static {
         String mcVersion = FMLInjectionData.data()[4].toString();
@@ -52,6 +55,16 @@ public class CodeRefs {
         mDoVoidFogParticles = new MethodRef(cWorldClient, "doVoidFogParticles", null, "C", ClassRef.VOID, ClassRef.INT, ClassRef.INT, ClassRef.INT);
         mGetRenderTypeOverride = new MethodRef(cBetterFoliageClient, "getRenderTypeOverride", ClassRef.INT, cIBlockAccess, ClassRef.INT, ClassRef.INT, ClassRef.INT, cBlock, ClassRef.INT);
         mOnRandomDisplayTick = new MethodRef(cBetterFoliageClient, "onRandomDisplayTick", ClassRef.VOID, cBlock, cWorld, ClassRef.INT, ClassRef.INT, ClassRef.INT);
+        
+        mGetAmbientOcclusionLightValue = new MethodRef(cBlock, "getAmbientOcclusionLightValue", "func_149685_I", "I", ClassRef.FLOAT);
+        mGetAmbientOcclusionLightValueOverride = new MethodRef(cBetterFoliageClient, "getAmbientOcclusionLightValueOverride", ClassRef.FLOAT, ClassRef.FLOAT, cBlock);
+        
+        mGetUseNeighborBrightness = new MethodRef(cBlock, "getUseNeighborBrightness", "func_149710_n", "n", ClassRef.BOOLEAN);
+        mGetUseNeighborBrightnessOverride = new MethodRef(cBetterFoliageClient, "getUseNeighborBrightnessOverride", ClassRef.BOOLEAN, ClassRef.BOOLEAN, cBlock);
+        
+        mShouldSideBeRendered = new MethodRef(cBlock, "shouldSideBeRendered", "func_149646_a", "a", ClassRef.BOOLEAN, cIBlockAccess, ClassRef.INT, ClassRef.INT, ClassRef.INT, ClassRef.INT);
+        mShouldRenderBlockSideOverride = new MethodRef(cBetterFoliageClient, "shouldRenderBlockSideOverride", ClassRef.BOOLEAN, ClassRef.BOOLEAN, cIBlockAccess, ClassRef.INT, ClassRef.INT, ClassRef.INT, ClassRef.INT);
+        
         mGetBlockIdOverride = new MethodRef(new ClassRef("mods.betterfoliage.client.ShadersModIntegration"), "getBlockIdOverride", ClassRef.INT, ClassRef.INT, cBlock);
         mPushEntity = new MethodRef(new ClassRef("shadersmodcore.client.Shaders"), "pushEntity", ClassRef.VOID, cRenderBlocks, cBlock, ClassRef.INT, ClassRef.INT, ClassRef.INT);
     }

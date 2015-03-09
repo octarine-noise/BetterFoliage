@@ -21,7 +21,12 @@ minecraft {
 }
 
 group = 'com.github.octarine-noise'
-version = "1.0.${System.getenv().BUILD_NUMBER}"
+version = "1.0."
+if (System.getenv().BUILD_NUMBER) {
+    version += "${System.getenv().BUILD_NUMBER}"
+} else {
+    version += "local"
+}
 archivesBaseName = rootProject.name + '-mc1.7'
 
 targetCompatibility = 1.6

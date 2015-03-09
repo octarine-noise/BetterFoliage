@@ -460,6 +460,34 @@ public class RenderBlockAOBase extends RenderBlocks {
 		tessellator.addVertexWithUV(center.x + vec1.x - vec2.x, center.y + vec1.y - vec2.y, center.z + vec1.z - vec2.z, icon.getInterpolatedU(uValues[(uvRot + 3) & 3]), icon.getInterpolatedV(vValues[(uvRot + 3) & 3]));
 	}
 	
+	protected void renderQuad(IIcon icon, Double3 vert1, Double3 vert2, Double3 vert3, Double3 vert4, double[] uValues, double[] vValues, ShadingValues shading1, ShadingValues shading2, ShadingValues shading3, ShadingValues shading4) {
+	    Tessellator tessellator = Tessellator.instance;
+	    
+	    if (shading1 != null) {
+    	    tessellator.setBrightness(shading1.brightness);
+    	    tessellator.setColorOpaque_F(shading1.red, shading1.green, shading1.blue);
+	    }
+	    tessellator.addVertexWithUV(vert1.x, vert1.y, vert1.z, icon.getInterpolatedU(uValues[0]), icon.getInterpolatedV(vValues[0]));
+	    
+	    if (shading2 != null) {
+            tessellator.setBrightness(shading2.brightness);
+            tessellator.setColorOpaque_F(shading2.red, shading2.green, shading2.blue);
+	    }
+        tessellator.addVertexWithUV(vert2.x, vert2.y, vert2.z, icon.getInterpolatedU(uValues[1]), icon.getInterpolatedV(vValues[1]));
+        
+        if (shading3 != null) {
+            tessellator.setBrightness(shading3.brightness);
+            tessellator.setColorOpaque_F(shading3.red, shading3.green, shading3.blue);
+        }
+        tessellator.addVertexWithUV(vert3.x, vert3.y, vert3.z, icon.getInterpolatedU(uValues[2]), icon.getInterpolatedV(vValues[2]));
+        
+        if (shading4 != null) {
+            tessellator.setBrightness(shading4.brightness);
+            tessellator.setColorOpaque_F(shading4.red, shading4.green, shading4.blue);
+        }
+        tessellator.addVertexWithUV(vert4.x, vert4.y, vert4.z, icon.getInterpolatedU(uValues[3]), icon.getInterpolatedV(vValues[3]));
+	}
+	
 	protected int getBrightness(Block block, int x, int y, int z) {
 		return block.getMixedBrightnessForBlock(blockAccess, x, y, z);
 	}
