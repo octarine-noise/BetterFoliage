@@ -95,18 +95,15 @@ public class RenderBlockBetterLogs extends FakeRenderBlockAOBase implements IRen
 	}
 
     protected ForgeDirection getLogVerticalDir(IBlockAccess blockAccess, int x, int y, int z) {
-        Block block = blockAccess.getBlock(x, y, z);
-        if (block instanceof BlockRotatedPillar) {
-            switch((blockAccess.getBlockMetadata(x, y, z) >> 2) & 3) {
-                case 0: return ForgeDirection.UP;
-                case 1: return ForgeDirection.EAST;
-                case 2: return ForgeDirection.SOUTH;
-            }
+    	// standard way as done by BlockRotatedPillar
+        switch((blockAccess.getBlockMetadata(x, y, z) >> 2) & 3) {
+            case 0: return ForgeDirection.UP;
+            case 1: return ForgeDirection.EAST;
+            case 2: return ForgeDirection.SOUTH;
         }
         return ForgeDirection.UNKNOWN;
     }
     
-	
 	/** Draw one corner of the log
 	 * @param origin corner vertex of block
 	 * @param horz1Dir one of the log-perpendicular directions
