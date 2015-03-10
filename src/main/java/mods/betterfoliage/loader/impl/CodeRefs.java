@@ -3,6 +3,7 @@ package mods.betterfoliage.loader.impl;
 import cpw.mods.fml.relauncher.FMLInjectionData;
 import mods.betterfoliage.loader.ClassRef;
 import mods.betterfoliage.loader.FieldRef;
+import mods.betterfoliage.loader.IResolvable;
 import mods.betterfoliage.loader.MethodRef;
 
 /** Static helper class holding constants referencing Minecraft code.<br/>
@@ -12,16 +13,28 @@ import mods.betterfoliage.loader.MethodRef;
  */
 public class CodeRefs {
     
-    public static ClassRef cBlock, cRenderBlocks, cIBlockAccess, cWorldClient, cWorld, cTextureMap, cSimpleReloadableResourceManager;
-    public static ClassRef cMap, cBetterFoliageClient;
-    
+	// Java
+	public static ClassRef cMap;
+	
+	// Minecraft
+    public static ClassRef cBlock, cRenderBlocks, cIBlockAccess, cWorldClient, cWorld, cTextureMap, cSimpleReloadableResourceManager, cIIcon, cTextureAtlasSprite;
     public static FieldRef fBlockAccess, fMapRegisteredSprites, fDomainResourceManagers;
+    public static MethodRef mRenderBlockByRenderType, mDoVoidFogParticles, mGetAmbientOcclusionLightValue, mGetUseNeighborBrightness, mShouldSideBeRendered;
     
-    public static MethodRef mRenderBlockByRenderType, mDoVoidFogParticles;
-    public static MethodRef mGetRenderTypeOverride, mOnRandomDisplayTick, mPushEntity, mGetBlockIdOverride;
-    public static MethodRef mGetAmbientOcclusionLightValue, mGetAmbientOcclusionLightValueOverride;
-    public static MethodRef mGetUseNeighborBrightness, mGetUseNeighborBrightnessOverride;
-    public static MethodRef mShouldSideBeRendered, mShouldRenderBlockSideOverride;
+    // BetterFoliage classes
+    public static ClassRef cBetterFoliageClient;
+    public static MethodRef mGetRenderTypeOverride, mOnRandomDisplayTick, mGetAmbientOcclusionLightValueOverride, mGetBlockIdOverride, mGetUseNeighborBrightnessOverride, mShouldRenderBlockSideOverride;
+
+    // ShadersMod
+    public static MethodRef mPushEntity;
+    
+    // Optifine
+    public static ClassRef cConnectedTextures, cConnectedProperties;
+    public static MethodRef mGetConnectedTexture, mGetIndexInMap;
+    public static FieldRef fCTBlockProperties, fCTTileProperties,fCPTileIcons;
+    
+    // Feature sets
+    public static IResolvable<?>[] optifineCTF;
     
     static {
         String mcVersion = FMLInjectionData.data()[4].toString();
@@ -33,6 +46,8 @@ public class CodeRefs {
             cWorld = new ClassRef("net.minecraft.world.World", "afn");
             cTextureMap = new ClassRef("net.minecraft.client.renderer.texture.TextureMap", "bpz");
             cSimpleReloadableResourceManager = new ClassRef("net.minecraft.client.resources.SimpleReloadableResourceManager", "bqx");
+            cIIcon =  new ClassRef("net.minecraft.util.IIcon", "ps");
+            cTextureAtlasSprite = new ClassRef("net.minecraft.client.renderer.texture.TextureAtlasSprite", "bpv");
         } else if ("1.7.10".equals(mcVersion)) {
             cRenderBlocks = new ClassRef("net.minecraft.client.renderer.RenderBlocks", "blm");
             cIBlockAccess = new ClassRef("net.minecraft.world.IBlockAccess", "ahl");
@@ -41,9 +56,10 @@ public class CodeRefs {
             cWorld =  new ClassRef("net.minecraft.world.World", "ahb");
             cTextureMap = new ClassRef("net.minecraft.client.renderer.texture.TextureMap", "bpr");
             cSimpleReloadableResourceManager = new ClassRef("net.minecraft.client.resources.SimpleReloadableResourceManager", "brg");
+            cIIcon =  new ClassRef("net.minecraft.util.IIcon", "rf");
+            cTextureAtlasSprite = new ClassRef("net.minecraft.client.renderer.texture.TextureAtlasSprite", "bqd");
         }
         
-        // version-independent
         cMap = new ClassRef("java.util.Map");
         cBetterFoliageClient = new ClassRef("mods.betterfoliage.client.BetterFoliageClient");
         
@@ -67,5 +83,21 @@ public class CodeRefs {
         
         mGetBlockIdOverride = new MethodRef(new ClassRef("mods.betterfoliage.client.ShadersModIntegration"), "getBlockIdOverride", ClassRef.INT, ClassRef.INT, cBlock);
         mPushEntity = new MethodRef(new ClassRef("shadersmodcore.client.Shaders"), "pushEntity", ClassRef.VOID, cRenderBlocks, cBlock, ClassRef.INT, ClassRef.INT, ClassRef.INT);
+        
+        cConnectedTextures = new ClassRef("ConnectedTextures");
+        cConnectedProperties = new ClassRef("ConnectedProperties");
+        
+        mGetConnectedTexture = new MethodRef(cConnectedTextures, "getConnectedTexture", cIIcon, cIBlockAccess, cBlock, ClassRef.INT, ClassRef.INT, ClassRef.INT, ClassRef.INT, cIIcon);
+        mGetIndexInMap = new MethodRef(cTextureAtlasSprite, "getIndexInMap", ClassRef.INT);
+        
+        // array types not supported but unnecessary anyway
+        fCTBlockProperties = new FieldRef(cConnectedTextures, "blockProperties", null);
+        fCTTileProperties = new FieldRef(cConnectedTextures, "tileProperties", null);
+        
+        fCPTileIcons = new FieldRef(cConnectedProperties, "tileIcons", null);
+        
+        optifineCTF = new IResolvable<?>[] {
+        	cConnectedTextures, cConnectedProperties, mGetConnectedTexture, mGetIndexInMap, fCTBlockProperties, fCTTileProperties, fCPTileIcons
+        };
     }
 }
