@@ -4,19 +4,19 @@ package mods.betterfoliage.loader;
 /** Reference to a class. Contains information to locate the class regardless of environment.
  * @author octarine-noise
  */
-public class ClassRef {
+public class ClassRef implements IResolvable<Class<?>> {
     
     /** Reference to primitive <b>int</b> type */
-    public static final ClassRef INT = primitive("I");
+    public static final ClassRef INT = primitive("I", int.class);
     
     /** Reference to primitive <b>float</b> type */
-    public static final ClassRef FLOAT = primitive("F");
+    public static final ClassRef FLOAT = primitive("F", float.class);
     
     /** Reference to primitive <b>boolean</b> type */
-    public static final ClassRef BOOLEAN = primitive("Z");
+    public static final ClassRef BOOLEAN = primitive("Z", boolean.class);
     
     /** Reference to primitive <b>void</b> type */
-    public static final ClassRef VOID = primitive("V");
+    public static final ClassRef VOID = primitive("V", Void.class);
     
     /** True for primitive types */
     public boolean isPrimitive = false;
@@ -44,9 +44,10 @@ public class ClassRef {
      * @param special
      * @return
      */
-    protected static ClassRef primitive(String name) {
+    protected static ClassRef primitive(String name, Class<?> classObj) {
         ClassRef result = new ClassRef(name);
         result.isPrimitive = true;
+        result.classObj = classObj;
         return result;
     }
     
