@@ -18,7 +18,7 @@ import cpw.mods.fml.relauncher.SideOnly;
  * @author octarine-noise
  */
 @SideOnly(Side.CLIENT)
-public class RenderBlocksBetterGrassSide extends FakeRenderBlockAOBase implements IRenderBlockDecorator {
+public class RenderBlocksDirtWithGrassSide extends FakeRenderBlockAOBase implements IRenderBlockDecorator {
 
 	@Override
 	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
