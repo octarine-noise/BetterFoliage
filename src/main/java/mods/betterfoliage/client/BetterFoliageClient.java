@@ -87,6 +87,7 @@ public class BetterFoliageClient {
 		
 		ShadersModIntegration.init();
 		TerraFirmaCraftIntegration.init();
+		OptifineIntegration.init();
 	}
 
 	public static boolean isLeafTexture(TextureAtlasSprite icon) {

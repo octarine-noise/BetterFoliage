@@ -1,11 +1,13 @@
 package mods.betterfoliage.client.resource;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
 import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.BetterFoliageClient;
+import mods.betterfoliage.client.OptifineIntegration;
 import mods.betterfoliage.common.config.Config;
 import mods.betterfoliage.loader.impl.CodeRefs;
 import net.minecraft.block.Block;
@@ -57,6 +59,14 @@ public class LeafTextureEnumerator implements IIconRegister {
 		TextureAtlasSprite original = blockTextures.getTextureExtry(resourceLocation);
 		MinecraftForge.EVENT_BUS.post(new LeafTextureFoundEvent(blockTextures, original));
 		BetterFoliage.log.debug(String.format("Found leaf texture: %s", resourceLocation));
+		
+		Collection<IIcon> ctmIcons = OptifineIntegration.getAllCTMForIcon(original);
+		if (!ctmIcons.isEmpty()) {
+			BetterFoliage.log.info(String.format("Found %d CTM variants for texture %s", ctmIcons.size(), original.getIconName()));
+			for (IIcon ctmIcon : ctmIcons) {
+				MinecraftForge.EVENT_BUS.post(new LeafTextureFoundEvent(blockTextures, (TextureAtlasSprite) ctmIcon));
+			}
+		}
 		return original;
 	}
 
@@ -79,6 +89,14 @@ public class LeafTextureEnumerator implements IIconRegister {
 			if (Config.leaves.matchesClass(block)) {
 				BetterFoliage.log.debug(String.format("Inspecting leaf block: %s", block.getClass().getName()));
 				block.registerBlockIcons(this);
+				
+				Collection<IIcon> ctmIcons = OptifineIntegration.getAllCTMForBlock(block);
+				if (!ctmIcons.isEmpty()) {
+					BetterFoliage.log.info(String.format("Found %d CTM texture variants for block: id=%d class=%s", ctmIcons.size(), Block.getIdFromBlock(block), block.getClass().getName()));
+					for (IIcon ctmIcon : ctmIcons) {
+						MinecraftForge.EVENT_BUS.post(new LeafTextureFoundEvent(blockTextures, (TextureAtlasSprite) ctmIcon));
+					}
+				}
 			}
 		}
 		

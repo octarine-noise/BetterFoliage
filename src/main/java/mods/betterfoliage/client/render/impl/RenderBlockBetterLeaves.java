@@ -2,6 +2,7 @@ package mods.betterfoliage.client.render.impl;
 
 import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.BetterFoliageClient;
+import mods.betterfoliage.client.OptifineIntegration;
 import mods.betterfoliage.client.render.IRenderBlockDecorator;
 import mods.betterfoliage.client.render.IconSet;
 import mods.betterfoliage.client.render.RenderBlockAOBase;
@@ -42,6 +43,10 @@ public class RenderBlockBetterLeaves extends RenderBlockAOBase implements IRende
 		TextureAtlasSprite blockLeafIcon = null;
 		try {
 			blockLeafIcon = (TextureAtlasSprite) block.getIcon(world, x, y, z, ForgeDirection.NORTH.ordinal());
+			IIcon ctmIcon = OptifineIntegration.getConnectedTexture(blockAccess, block, x, y, z, ForgeDirection.NORTH.ordinal(), blockLeafIcon);
+			if (ctmIcon != null && ctmIcon != blockLeafIcon && ctmIcon instanceof TextureAtlasSprite) {
+				blockLeafIcon = (TextureAtlasSprite) ctmIcon;
+			}
 		} catch (ClassCastException e) {
 		}
 		
