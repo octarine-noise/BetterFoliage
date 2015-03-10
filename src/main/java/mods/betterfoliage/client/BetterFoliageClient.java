@@ -17,6 +17,7 @@ import mods.betterfoliage.client.render.impl.RenderBlockBetterMycelium;
 import mods.betterfoliage.client.render.impl.RenderBlockBetterNetherrack;
 import mods.betterfoliage.client.render.impl.RenderBlockBetterReed;
 import mods.betterfoliage.client.render.impl.RenderBlocksDirtWithGrassSide;
+import mods.betterfoliage.client.render.impl.RenderBlocksDirtWithGrassTop;
 import mods.betterfoliage.client.resource.LeafGenerator;
 import mods.betterfoliage.client.resource.LeafParticleTextures;
 import mods.betterfoliage.client.resource.LeafTextureEnumerator;
@@ -63,6 +64,7 @@ public class BetterFoliageClient {
 		registerRenderer(new RenderBlockBetterAlgae());
 		registerRenderer(new RenderBlockBetterCoral());
 		registerRenderer(new RenderBlocksDirtWithGrassSide());
+		registerRenderer(new RenderBlocksDirtWithGrassTop());
 		registerRenderer(new RenderBlockBetterLogs());
 
 		MinecraftForge.EVENT_BUS.register(wind);

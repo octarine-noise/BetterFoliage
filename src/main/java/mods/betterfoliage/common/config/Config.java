@@ -119,6 +119,7 @@ public class Config {
 	public static double logsSmallRadius;
 	public static double logsLargeRadius;
 	public static boolean logsConnect;
+	public static boolean logsConnectGrass;
 	
 	public static List<Integer> reedBiomeList = Lists.newArrayList();
 	public static List<Integer> algaeBiomeList = Lists.newArrayList();
@@ -221,6 +222,7 @@ public class Config {
         logsSmallRadius = getDouble(Category.roundLogs, "smallRadius", 0.25, 0.0, 0.5, "betterfoliage.roundLogs.smallRadius");
         logsLargeRadius = getDouble(Category.roundLogs, "largeRadius", 0.45, 0.0, 0.5, "betterfoliage.roundLogs.largeRadius");
         logsConnect = getBoolean(Category.roundLogs, "connect", true, "betterfoliage.roundLogs.connect");
+        logsConnectGrass = getBoolean(Category.roundLogs, "connectGrass", true, "betterfoliage.roundLogs.connectGrass");
         
         updateBlockMatcher(dirt, Category.blockTypes, "dirtWhitelist", "betterfoliage.blockTypes.dirtWhitelist", "dirtBlacklist", "betterfoliage.blockTypes.dirtBlacklist", new ResourceLocation("betterfoliage:classesDirtDefault.cfg"));
         updateBlockMatcher(grass, Category.blockTypes, "grassWhitelist", "betterfoliage.blockTypes.grassWhitelist", "grassBlacklist", "betterfoliage.blockTypes.grassBlacklist", new ResourceLocation("betterfoliage:classesGrassDefault.cfg"));
@@ -245,7 +247,7 @@ public class Config {
 		setOrder(Category.fallingLeaves, "enabled", "chance", "size", "lifetime", "speed", "windStrength", "stormStrength", "perturb", "opacityHack");
 		setOrder(Category.risingSoul, "enabled", "chance", "speed", "perturb", "headSize", "trailSize", "sizeDecay", "opacity", "opacityDecay", "lifetime", "trailLength", "trailDensity");
 		setOrder(Category.connectedGrass, "classic", "aggressive");
-		setOrder(Category.roundLogs, "enabled", "connect", "smallRadius", "largeRadius");
+		setOrder(Category.roundLogs, "enabled", "connect", "connectGrass", "smallRadius", "largeRadius");
 	}
 	
 	public static void getDefaultBiomes() {
