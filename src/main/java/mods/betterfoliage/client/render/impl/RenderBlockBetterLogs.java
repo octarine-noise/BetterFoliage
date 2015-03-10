@@ -4,8 +4,8 @@ import mods.betterfoliage.client.render.FakeRenderBlockAOBase;
 import mods.betterfoliage.client.render.IRenderBlockDecorator;
 import mods.betterfoliage.common.config.Config;
 import mods.betterfoliage.common.util.Double3;
+import mods.betterfoliage.common.util.RenderUtils;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockRotatedPillar;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.util.IIcon;
@@ -71,13 +71,13 @@ public class RenderBlockBetterLogs extends FakeRenderBlockAOBase implements IRen
         boolean bottomBlocked = isBlocked(world, x, y, z, logVertDir.getOpposite());
         
 		// get icons
-		IIcon iconTop = topBlocked ? null : block.getIcon(world, x, y, z,  logVertDir.ordinal());
-		IIcon iconBottom = bottomBlocked ? null : block.getIcon(world, x, y, z, logVertDir.ordinal());
-		IIcon iconP1 = block.getIcon(world, x, y, z,  logHorzDir1.ordinal());
-		IIcon iconN1 = block.getIcon(world, x, y, z,  logHorzDir1.getOpposite().ordinal());
-        IIcon iconP2 = block.getIcon(world, x, y, z,  logHorzDir2.ordinal());
-        IIcon iconN2 = block.getIcon(world, x, y, z,  logHorzDir2.getOpposite().ordinal());
-		
+		IIcon iconTop = topBlocked ? null : RenderUtils.getIcon(world, block, x, y, z,  logVertDir);
+		IIcon iconBottom = bottomBlocked ? null : RenderUtils.getIcon(world, block, x, y, z, logVertDir);
+		IIcon iconP1 = RenderUtils.getIcon(world, block, x, y, z,  logHorzDir1);
+		IIcon iconN1 = RenderUtils.getIcon(world, block, x, y, z,  logHorzDir1.getOpposite());
+        IIcon iconP2 = RenderUtils.getIcon(world, block, x, y, z,  logHorzDir2);
+        IIcon iconN2 = RenderUtils.getIcon(world, block, x, y, z,  logHorzDir2.getOpposite());
+        
         // draw log
 		drawQuarterLog(blockPos,logHorzDir1, logHorzDir2, logVertDir,
 		               connectNN || connectNP || connectPN ? null : (connectPP ? Config.logsLargeRadius : Config.logsSmallRadius),
