@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.resource.LeafTextureEnumerator.LeafTextureFoundEvent;
 import mods.betterfoliage.common.util.ResourceUtils;
 import net.minecraft.client.Minecraft;
@@ -53,30 +54,33 @@ public abstract class LeafGeneratorBase extends BlockTextureGenerator {
 	@Override
 	public IResource getResource(ResourceLocation resourceLocation) throws IOException {
 		IResourceManager resourceManager = Minecraft.getMinecraft().getResourceManager();
-		ResourceLocation originalNoDirs = unwrapResource(resourceLocation);
-		ResourceLocation originalWithDirs = new ResourceLocation(originalNoDirs.getResourceDomain(), "textures/blocks/" + originalNoDirs.getResourcePath());
+		ResourceLocation originalResource = unwrapResource(resourceLocation);
 		
 		// use animation metadata as-is
-		if (resourceLocation.getResourcePath().toLowerCase().endsWith(".mcmeta")) return resourceManager.getResource(originalWithDirs);
+		if (resourceLocation.getResourcePath().toLowerCase().endsWith(".mcmeta")) return resourceManager.getResource(originalResource);
 		
 		// check for provided texture
-		ResourceLocation handDrawnLocation = new ResourceLocation(nonGeneratedDomain, String.format(handDrawnLocationFormat, originalNoDirs.getResourceDomain(), originalNoDirs.getResourcePath())); 
+		ResourceLocation handDrawnLocation = new ResourceLocation(nonGeneratedDomain, String.format(handDrawnLocationFormat, originalResource.getResourceDomain(), originalResource.getResourcePath())); 
 		if (ResourceUtils.resourceExists(handDrawnLocation)) {
 			drawnCounter++;
 			return resourceManager.getResource(handDrawnLocation);
 		}
 		
 		// generate our own
-		if (!ResourceUtils.resourceExists(originalWithDirs)) return getMissingResource();
+		if (!ResourceUtils.resourceExists(originalResource)) {
+			BetterFoliage.log.info(String.format("Could not find resource: %s", originalResource.toString()));
+			return getMissingResource();
+		}
 		
 		BufferedImage result;
 		try {
-			result = generateLeaf(originalWithDirs);
+			result = generateLeaf(originalResource);
 		} catch (TextureGenerationException e) {
+			BetterFoliage.log.info(String.format("Error generating leaf for resource: %s", originalResource.toString()));
 			return getMissingResource();
 		}
 		generatedCounter++;
-		return new BufferedImageResource(result, originalWithDirs);
+		return new BufferedImageResource(result, originalResource);
 	}
 	
 	protected abstract BufferedImage generateLeaf(ResourceLocation originalWithDirs) throws IOException, TextureGenerationException;

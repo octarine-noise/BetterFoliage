@@ -27,18 +27,17 @@ public class ReedGenerator extends BlockTextureGenerator {
 	@Override
 	public IResource getResource(ResourceLocation resourceLocation) throws IOException {
 		IResourceManager resourceManager = Minecraft.getMinecraft().getResourceManager();
-		ResourceLocation originalNoDirs = unwrapResource(resourceLocation);
-		ResourceLocation originalWithDirs = new ResourceLocation(originalNoDirs.getResourceDomain(), "textures/blocks/" + originalNoDirs.getResourcePath());
+		ResourceLocation originalResource = unwrapResource(resourceLocation);
 		
 		// load full texture
-		BufferedImage origImage = ImageIO.read(resourceManager.getResource(originalWithDirs).getInputStream());
+		BufferedImage origImage = ImageIO.read(resourceManager.getResource(originalResource).getInputStream());
 
 		// draw half texture
 		BufferedImage result = new BufferedImage(origImage.getWidth(), origImage.getHeight() / 2, BufferedImage.TYPE_4BYTE_ABGR);
 		Graphics2D graphics = result.createGraphics();
 		graphics.drawImage(origImage, 0, isBottom ? -origImage.getHeight() / 2 : 0, null);
 		
-		return new BufferedImageResource(result, originalWithDirs);
+		return new BufferedImageResource(result, originalResource);
 	}
 
 }

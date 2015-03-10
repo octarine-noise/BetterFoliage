@@ -78,7 +78,12 @@ public abstract class BlockTextureGenerator implements IResourceManager {
 	}
 	
 	public ResourceLocation unwrapResource(ResourceLocation wrapped) {
-		return new ResourceLocation(wrapped.getResourcePath().substring(16));
+		if (wrapped.getResourcePath().startsWith("textures/blocks/")) {
+			ResourceLocation unwrapped = new ResourceLocation(wrapped.getResourcePath().substring(16));
+			return new ResourceLocation(unwrapped.getResourceDomain(), "textures/blocks/" + unwrapped.getResourcePath());
+		} else {
+			return new ResourceLocation(wrapped.getResourcePath());
+		}
 	}
 	
 	protected static int blendRGB(int rgbOrig, int rgbBlend, int weightOrig, int weightBlend) {

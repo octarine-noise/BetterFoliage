@@ -23,13 +23,13 @@ public class LeafGenerator extends LeafGeneratorBase {
 	public static String defaultMask = "default";
 	
 	public LeafGenerator() {
-		super("bf_leaves", "betterfoliage", "textures/blocks/%s/%s", "betterfoliage:textures/blocks/leafmask_%d_%s.png", BetterFoliageClient.missingTexture);
+		super("bf_leaves", "betterfoliage", "%s/%s", "betterfoliage:textures/blocks/leafmask_%d_%s.png", BetterFoliageClient.missingTexture);
 	}
 
 	@Override
-	protected BufferedImage generateLeaf(ResourceLocation originalWithDirs) throws IOException, TextureGenerationException {
+	protected BufferedImage generateLeaf(ResourceLocation originalResource) throws IOException, TextureGenerationException {
 		// load normal leaf texture
-		BufferedImage origFullIcon = ImageIO.read(Minecraft.getMinecraft().getResourceManager().getResource(originalWithDirs).getInputStream());
+		BufferedImage origFullIcon = ImageIO.read(Minecraft.getMinecraft().getResourceManager().getResource(originalResource).getInputStream());
 		int size = origFullIcon.getWidth();
 		int frames = origFullIcon.getHeight() / origFullIcon.getWidth();
 		if (origFullIcon.getHeight() % origFullIcon.getWidth() != 0) throw new TextureGenerationException();
@@ -50,7 +50,7 @@ public class LeafGenerator extends LeafGeneratorBase {
     		genGraphics.drawImage(origIcon, size, size, null);
     		
     		// overlay mask alpha on texture
-    		if (!ShadersModIntegration.isSpecialTexture(originalWithDirs)) {
+    		if (!ShadersModIntegration.isSpecialTexture(originalResource)) {
     			// load alpha mask of appropriate size
     			BufferedImage maskImage = loadLeafMaskImage(defaultMask, size * 2);
     			int scale = size * 2 / maskImage.getWidth();

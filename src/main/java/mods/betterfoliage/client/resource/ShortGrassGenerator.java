@@ -32,11 +32,10 @@ public class ShortGrassGenerator extends BlockTextureGenerator {
 	@Override
 	public IResource getResource(ResourceLocation resourceLocation) throws IOException {
 		IResourceManager resourceManager = Minecraft.getMinecraft().getResourceManager();
-		ResourceLocation originalNoDirs = unwrapResource(resourceLocation);
-		ResourceLocation originalWithDirs = new ResourceLocation(originalNoDirs.getResourceDomain(), "textures/blocks/" + originalNoDirs.getResourcePath());
+		ResourceLocation originalResource = unwrapResource(resourceLocation);
 		
 		// load full texture
-		BufferedImage origImage = ImageIO.read(resourceManager.getResource(originalWithDirs).getInputStream());
+		BufferedImage origImage = ImageIO.read(resourceManager.getResource(originalResource).getInputStream());
 
 		// draw bottom half of texture
 		BufferedImage result = new BufferedImage(origImage.getWidth(), origImage.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
@@ -44,13 +43,13 @@ public class ShortGrassGenerator extends BlockTextureGenerator {
 		graphics.drawImage(origImage, 0, 3 * origImage.getHeight() / 8, null);
 
 		// blend with white if snowed
-		if (isSnowed && !ShadersModIntegration.isSpecialTexture(originalWithDirs)) {
+		if (isSnowed && !ShadersModIntegration.isSpecialTexture(originalResource)) {
 			for (int x = 0; x < result.getWidth(); x++) for (int y = 0; y < result.getHeight(); y++) {
 				result.setRGB(x, y, blendRGB(result.getRGB(x, y), 0xFFFFFF, 2, 3));
 			}
 		}
 		
-		return new BufferedImageResource(result, originalWithDirs);
+		return new BufferedImageResource(result, originalResource);
 	}
 
 }
