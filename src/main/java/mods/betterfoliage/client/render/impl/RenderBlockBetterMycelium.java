@@ -25,7 +25,7 @@ public class RenderBlockBetterMycelium extends RenderBlockAOBase implements IRen
 	public IconSet myceliumIcons = new IconSet("bettergrassandleaves", "better_mycel_%d");
 	
 	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
-		if (!Config.grassEnabled) return false;
+		if (!Config.myceliumEnabled) return false;
 		if (block != Blocks.mycelium) return false;
 		if (!blockAccess.isAirBlock(x, y + 1, z) && blockAccess.getBlock(x, y + 1, z) != Blocks.snow_layer) return false;
 		return true;

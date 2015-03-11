@@ -49,10 +49,14 @@ betterfoliage.leavesMode.tooltip=Translate draws the leaves off-center at a 45de
 betterfoliage.leavesMode.true=Skew
 betterfoliage.leavesMode.false=Translate
 
-betterfoliage.shortGrass=Short Grass
-betterfoliage.shortGrass.tooltip=Tufts of grass on top of grass blocks
-betterfoliage.shortGrass.useGenerated=Use generated texture
+betterfoliage.shortGrass=Short Grass & Mycelium
+betterfoliage.shortGrass.tooltip=Tufts of grass/mycelium on top of appropriate blocks
+betterfoliage.shortGrass.useGenerated=Use generated texture for grass
 betterfoliage.shortGrass.useGenerated.tooltip=Generated texture is made by slicing the tallgrass texture from the active resource pack in half
+betterfoliage.shortGrass.myceliumEnabled=Enable Mycelium
+betterfoliage.shortGrass.myceliumEnabled.tooltip=Is this feature enabled for mycelium blocks?
+betterfoliage.shortGrass.grassEnabled=Enable Grass
+betterfoliage.shortGrass.grassEnabled.tooltip=Is this feature enabled for grass blocks?
 
 betterfoliage.cactus=Better Cactus
 betterfoliage.cactus.tooltip=Enhance cactus with extra bits and smooth shading
