@@ -81,16 +81,16 @@ public class RenderBlockLogs extends FakeRenderBlockAOBase implements IRenderBlo
         // draw log
 		drawQuarterLog(blockPos,logHorzDir1, logHorzDir2, logVertDir,
 		               connectNN || connectNP || connectPN ? null : (connectPP ? Config.logsLargeRadius : Config.logsSmallRadius),
-		               iconN2, iconN1, iconTop, iconBottom, 0);
+		               iconN2, iconN1, iconTop, iconBottom, 3);
 		drawQuarterLog(blockPos.add(new Double3(logHorzDir1)), logHorzDir2, logHorzDir1.getOpposite(), logVertDir,
 		               connectPN || connectNN || connectPP ? null : (connectNP ? Config.logsLargeRadius : Config.logsSmallRadius),
-		               iconP1, iconN2, iconTop, iconBottom, 3);
+		               iconP1, iconN2, iconTop, iconBottom, 2);
 		drawQuarterLog(blockPos.add(new Double3(logHorzDir1)).add(new Double3(logHorzDir2)), logHorzDir1.getOpposite(), logHorzDir2.getOpposite(), logVertDir,
 		               connectPP || connectNP || connectPN ? null : (connectNN ? Config.logsLargeRadius : Config.logsSmallRadius),
-		               iconP2, iconP1, iconTop, iconBottom, 2);
+		               iconP2, iconP1, iconTop, iconBottom, 1);
 		drawQuarterLog(blockPos.add(new Double3(logHorzDir2)), logHorzDir2.getOpposite(), logHorzDir1, logVertDir,
 		               connectNP || connectNN || connectPP ? null : (connectPN ? Config.logsLargeRadius : Config.logsSmallRadius),
-		               iconN1, iconP2, iconTop, iconBottom, 1);
+		               iconN1, iconP2, iconTop, iconBottom, 0);
 		return true;
 	}
 
