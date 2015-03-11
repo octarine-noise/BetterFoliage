@@ -57,15 +57,15 @@ public class RenderBlockBetterLogs extends FakeRenderBlockAOBase implements IRen
 		}
 		
 	    // check neighborhood
-        boolean connectP1 = isConnected(world, x, y, z, logVertDir, logHorzDir1);
-        boolean connectP2 = isConnected(world, x, y, z, logVertDir, logHorzDir2);
-        boolean connectN1 = isConnected(world, x, y, z, logVertDir, logHorzDir1.getOpposite());
-        boolean connectN2 = isConnected(world, x, y, z, logVertDir, logHorzDir2.getOpposite());
+        boolean connectP1 = Config.logsConnect && isConnected(world, x, y, z, logVertDir, true, logHorzDir1);
+        boolean connectP2 = Config.logsConnect && isConnected(world, x, y, z, logVertDir, true, logHorzDir2);
+        boolean connectN1 = Config.logsConnect && isConnected(world, x, y, z, logVertDir, true, logHorzDir1.getOpposite());
+        boolean connectN2 = Config.logsConnect && isConnected(world, x, y, z, logVertDir, true, logHorzDir2.getOpposite());
         
-        boolean connectPP = connectP1 && connectP2 && isConnected(world, x, y, z, logVertDir, logHorzDir1, logHorzDir2);
-        boolean connectPN = connectP1 && connectN2 && isConnected(world, x, y, z, logVertDir, logHorzDir1, logHorzDir2.getOpposite());
-        boolean connectNP = connectN1 && connectP2 && isConnected(world, x, y, z, logVertDir, logHorzDir1.getOpposite(), logHorzDir2);
-        boolean connectNN = connectN1 && connectN2 && isConnected(world, x, y, z, logVertDir, logHorzDir1.getOpposite(), logHorzDir2.getOpposite());
+        boolean connectPP = connectP1 && connectP2 && isConnected(world, x, y, z, logVertDir, true, logHorzDir1, logHorzDir2);
+        boolean connectPN = connectP1 && connectN2 && isConnected(world, x, y, z, logVertDir, true, logHorzDir1, logHorzDir2.getOpposite());
+        boolean connectNP = connectN1 && connectP2 && isConnected(world, x, y, z, logVertDir, true, logHorzDir1.getOpposite(), logHorzDir2);
+        boolean connectNN = connectN1 && connectN2 && isConnected(world, x, y, z, logVertDir, true, logHorzDir1.getOpposite(), logHorzDir2.getOpposite());
         
         boolean topBlocked = isBlocked(world, x, y, z, logVertDir);
         boolean bottomBlocked = isBlocked(world, x, y, z, logVertDir.getOpposite());
@@ -81,16 +81,16 @@ public class RenderBlockBetterLogs extends FakeRenderBlockAOBase implements IRen
         // draw log
 		drawQuarterLog(blockPos,logHorzDir1, logHorzDir2, logVertDir,
 		               connectNN || connectNP || connectPN ? null : (connectPP ? Config.logsLargeRadius : Config.logsSmallRadius),
-		               iconN2, iconN1, iconTop, iconBottom, 1);
+		               iconN2, iconN1, iconTop, iconBottom, 0);
 		drawQuarterLog(blockPos.add(new Double3(logHorzDir1)), logHorzDir2, logHorzDir1.getOpposite(), logVertDir,
 		               connectPN || connectNN || connectPP ? null : (connectNP ? Config.logsLargeRadius : Config.logsSmallRadius),
-		               iconP1, iconN2, iconTop, iconBottom, 2);
+		               iconP1, iconN2, iconTop, iconBottom, 3);
 		drawQuarterLog(blockPos.add(new Double3(logHorzDir1)).add(new Double3(logHorzDir2)), logHorzDir1.getOpposite(), logHorzDir2.getOpposite(), logVertDir,
 		               connectPP || connectNP || connectPN ? null : (connectNN ? Config.logsLargeRadius : Config.logsSmallRadius),
-		               iconP2, iconP1, iconTop, iconBottom, 3);
+		               iconP2, iconP1, iconTop, iconBottom, 2);
 		drawQuarterLog(blockPos.add(new Double3(logHorzDir2)), logHorzDir2.getOpposite(), logHorzDir1, logVertDir,
 		               connectNP || connectNN || connectPP ? null : (connectPN ? Config.logsLargeRadius : Config.logsSmallRadius),
-		               iconN1, iconP2, iconTop, iconBottom, 0);
+		               iconN1, iconP2, iconTop, iconBottom, 1);
 		return true;
 	}
 
@@ -270,7 +270,7 @@ public class RenderBlockBetterLogs extends FakeRenderBlockAOBase implements IRen
 	 * @param offsets offset given coordinate by 1 along these directions
 	 * @return true if the log connects to this block
 	 */
-	protected boolean isConnected(IBlockAccess blockAccess, int x, int y, int z, ForgeDirection referenceDir, ForgeDirection... offsets) {
+	protected boolean isConnected(IBlockAccess blockAccess, int x, int y, int z, ForgeDirection referenceDir, boolean matchOrientation, ForgeDirection... offsets) {
 	    int xOff = x;
 	    int yOff = y;
 	    int zOff = z;
@@ -279,22 +279,9 @@ public class RenderBlockBetterLogs extends FakeRenderBlockAOBase implements IRen
 	        yOff += dir.offsetY;
 	        zOff += dir.offsetZ;
 	    }
-	    return isConnected(blockAccess, xOff, yOff, zOff, referenceDir);
+	    return Config.logs.matchesID(blockAccess.getBlock(xOff, yOff, zOff)) && (getLogVerticalDir(blockAccess, xOff, yOff, zOff) != referenceDir ^ matchOrientation); 
     }
 
-	
-	/** Determine if a log block is connected to another block
-	 * @param blockAccess world object
-	 * @param x
-	 * @param y
-	 * @param z
-	 * @param referenceDir orientation of log block being rendered
-	 * @return true if the log connects to this block
-	 */
-	protected boolean isConnected(IBlockAccess blockAccess, int x, int y, int z, ForgeDirection referenceDir) {
-	    return Config.logsConnect && Config.logs.matchesID(blockAccess.getBlock(x, y, z)) && getLogVerticalDir(blockAccess, x, y, z) == referenceDir; 
-	}
-	   
     /** Determines if the block is fully obscured from a given side
      * @param blockAccess
      * @param x
