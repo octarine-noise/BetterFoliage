@@ -304,6 +304,8 @@ public class RenderBlockBetterLogs extends FakeRenderBlockAOBase implements IRen
     }
 	
     public RenderBlockBetterLogs() {
+    	vValues = new double[] {16.0, 16.0, 0.0, 0.0};
+    	
         putLookup(ForgeDirection.DOWN, ForgeDirection.SOUTH, ForgeDirection.EAST, aoYNXZPP);
         putLookup(ForgeDirection.DOWN, ForgeDirection.SOUTH, ForgeDirection.WEST, aoYNXZNP);
         putLookup(ForgeDirection.DOWN, ForgeDirection.NORTH, ForgeDirection.EAST, aoYNXZPN);
