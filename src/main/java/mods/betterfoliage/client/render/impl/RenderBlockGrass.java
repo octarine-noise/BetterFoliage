@@ -8,6 +8,7 @@ import mods.betterfoliage.client.render.IconSet;
 import mods.betterfoliage.client.render.RenderBlockAOBase;
 import mods.betterfoliage.common.config.Config;
 import mods.betterfoliage.common.util.Double3;
+import mods.betterfoliage.common.util.RenderUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.RenderBlocks;
@@ -51,7 +52,7 @@ public class RenderBlockGrass extends RenderBlockAOBase implements IRenderBlockD
 		Material topMaterial = blockAccess.getBlock(x, y + 1, z).getMaterial();
 		isSnowTop = (topMaterial == Material.snow || topMaterial == Material.craftedSnow); 
 		checkConnectedGrass(x, y, z);
-		grassTopIcon = block.getIcon(blockAccess, x, y, z, ForgeDirection.UP.ordinal());
+		grassTopIcon = RenderUtils.getIcon(blockAccess, block, x, y, z, ForgeDirection.UP);
 		biomeColor = block.colorMultiplier(blockAccess, x, y, z);
 		
 		renderWorldBlockBase(2, world, x, y, z, block, modelId, renderer);
