@@ -25,7 +25,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class RenderBlockBetterReed extends RenderBlockAOBase implements IRenderBlockDecorator {
+public class RenderBlockReed extends RenderBlockAOBase implements IRenderBlockDecorator {
 
 	public IconSet reedBottomIcons = new IconSet("bf_reed_bottom", "bettergrassandleaves:better_reed_%d");
 	public IconSet reedTopIcons = new IconSet("bf_reed_top", "bettergrassandleaves:better_reed_%d");

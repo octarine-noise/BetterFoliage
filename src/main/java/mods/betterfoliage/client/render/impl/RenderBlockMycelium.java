@@ -20,7 +20,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class RenderBlockBetterMycelium extends RenderBlockAOBase implements IRenderBlockDecorator {
+public class RenderBlockMycelium extends RenderBlockAOBase implements IRenderBlockDecorator {
 
 	public IconSet myceliumIcons = new IconSet("bettergrassandleaves", "better_mycel_%d");
 	

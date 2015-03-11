@@ -23,7 +23,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.event.world.WorldEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
-public class RenderBlockBetterCoral extends RenderBlockAOBase implements IRenderBlockDecorator {
+public class RenderBlockSandWithCoral extends RenderBlockAOBase implements IRenderBlockDecorator {
 
 	public IconSet coralCrustIcons = new IconSet("bettergrassandleaves", "better_crust_%d");
 	public IconSet coralCrossIcons = new IconSet("bettergrassandleaves", "better_coral_%d");

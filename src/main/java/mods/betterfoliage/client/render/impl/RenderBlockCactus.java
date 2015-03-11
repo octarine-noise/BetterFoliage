@@ -20,7 +20,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class RenderBlockBetterCactus extends FakeRenderBlockAOBase implements IRenderBlockDecorator {
+public class RenderBlockCactus extends FakeRenderBlockAOBase implements IRenderBlockDecorator {
 
 	public IIcon cactusRoundIcon;
 	public IconSet cactusSideIcons = new IconSet("bettergrassandleaves", "better_cactus_arm_%d");

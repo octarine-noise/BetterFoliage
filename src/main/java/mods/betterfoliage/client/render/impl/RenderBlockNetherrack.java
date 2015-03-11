@@ -20,7 +20,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class RenderBlockBetterNetherrack extends RenderBlockAOBase implements IRenderBlockDecorator {
+public class RenderBlockNetherrack extends RenderBlockAOBase implements IRenderBlockDecorator {
 
 	public IconSet netherrackVineIcons = new IconSet("bettergrassandleaves", "better_netherrack_%d");
 	

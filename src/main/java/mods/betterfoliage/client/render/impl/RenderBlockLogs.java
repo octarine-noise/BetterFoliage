@@ -15,7 +15,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class RenderBlockBetterLogs extends FakeRenderBlockAOBase implements IRenderBlockDecorator {
+public class RenderBlockLogs extends FakeRenderBlockAOBase implements IRenderBlockDecorator {
 	
     /** Quick lookup array to get AO values of a given block corner */
     protected ShadingValues[][][] shadingLookup = new ShadingValues[6][6][6];
@@ -303,7 +303,7 @@ public class RenderBlockBetterLogs extends FakeRenderBlockAOBase implements IRen
         return block.isOpaqueCube() && !Config.logs.matchesID(block);
     }
 	
-    public RenderBlockBetterLogs() {
+    public RenderBlockLogs() {
     	vValues = new double[] {16.0, 16.0, 0.0, 0.0};
     	
         putLookup(ForgeDirection.DOWN, ForgeDirection.SOUTH, ForgeDirection.EAST, aoYNXZPP);

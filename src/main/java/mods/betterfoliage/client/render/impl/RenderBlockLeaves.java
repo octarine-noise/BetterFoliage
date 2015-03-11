@@ -24,7 +24,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class RenderBlockBetterLeaves extends RenderBlockAOBase implements IRenderBlockDecorator {
+public class RenderBlockLeaves extends RenderBlockAOBase implements IRenderBlockDecorator {
 	
     public IconSet snowedLeavesIcons = new IconSet("bettergrassandleaves", "better_leaves_snowed_%d");
     

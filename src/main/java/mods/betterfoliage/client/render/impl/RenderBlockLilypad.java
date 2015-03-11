@@ -18,7 +18,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class RenderBlockBetterLilypad extends FakeRenderBlockAOBase implements IRenderBlockDecorator {
+public class RenderBlockLilypad extends FakeRenderBlockAOBase implements IRenderBlockDecorator {
 
 	public IconSet lilypadFlowers = new IconSet("bettergrassandleaves", "better_lilypad_flower_%d");
 	public IconSet lilypadRoots = new IconSet("bettergrassandleaves", "better_lilypad_roots_%d");

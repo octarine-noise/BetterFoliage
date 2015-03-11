@@ -24,7 +24,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class RenderBlockBetterAlgae extends RenderBlockAOBase implements IRenderBlockDecorator {
+public class RenderBlockDirtWithAlgae extends RenderBlockAOBase implements IRenderBlockDecorator {
 
 	public IconSet algaeIcons = new IconSet("bettergrassandleaves", "better_algae_%d");
 	public NoiseGeneratorSimplex noise;

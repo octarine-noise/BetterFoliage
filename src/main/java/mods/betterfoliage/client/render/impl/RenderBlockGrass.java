@@ -21,7 +21,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class RenderBlockBetterGrass extends RenderBlockAOBase implements IRenderBlockDecorator {
+public class RenderBlockGrass extends RenderBlockAOBase implements IRenderBlockDecorator {
 
     public enum RenderMode { DEFAULT, TFC };
     
