@@ -1,5 +1,7 @@
 package mods.betterfoliage.client.render.impl.primitives;
 
+import java.awt.Color;
+
 import net.minecraft.util.MathHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -47,6 +49,9 @@ public class Color4 {
         return result;
     }
     
+    public float getSaturation() {
+    	return Color.RGBtoHSB(R, G, B, null)[1];
+    }
     /**
      * @return color with alpha component of 255
      */
@@ -65,4 +70,8 @@ public class Color4 {
         return fromARGB(A, R * scaleI / 255, G * scaleI / 255, B * scaleI / 255);
     }
     
+    public Color4 withHSVBrightness(float value) {
+    	float[] hsvValues = Color.RGBtoHSB(R, G, B, null);
+    	return fromARGB(A | Color.HSBtoRGB(hsvValues[0], hsvValues[1], value));
+    }
 }

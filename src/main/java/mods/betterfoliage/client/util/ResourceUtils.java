@@ -14,6 +14,7 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 
 import mods.betterfoliage.BetterFoliage;
+import mods.betterfoliage.client.render.impl.primitives.Color4;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelBlock;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -114,7 +115,7 @@ public class ResourceUtils {
 	   /** Calculate average color value (in HSB color space) for a texture.
      * @param icon texture
      */
-    public static Integer calculateTextureColor(TextureAtlasSprite icon) {
+    public static Color4 calculateTextureColor(TextureAtlasSprite icon) {
         ResourceLocation locationNoDirs = new ResourceLocation(icon.getIconName());
         ResourceLocation locationWithDirs = new ResourceLocation(locationNoDirs.getResourceDomain(), String.format("textures/%s.png", locationNoDirs.getResourcePath()));
         try {
@@ -140,7 +141,7 @@ public class ResourceUtils {
             
             // average hue as usual for circular values - transform average unit vector back to polar angle
             float avgHue = (float) (Math.atan2(sumHueY, sumHueX) / (2.0 * Math.PI) + 0.5);
-            return Color.HSBtoRGB(avgHue, sumSaturation / numOpaque, sumBrightness / numOpaque);
+            return Color4.fromARGB(Color.HSBtoRGB(avgHue, sumSaturation / numOpaque, sumBrightness / numOpaque));
         } catch (IOException e) {
             return null;
         }

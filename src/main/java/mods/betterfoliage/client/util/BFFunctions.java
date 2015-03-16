@@ -7,13 +7,13 @@ import javax.annotation.Nullable;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.renderer.block.statemap.DefaultStateMapper;
 import net.minecraft.client.renderer.block.statemap.IStateMapper;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import com.google.common.base.Function;
-import com.google.common.collect.Maps;
 
 @SideOnly(Side.CLIENT)
 public class BFFunctions {
@@ -27,7 +27,8 @@ public class BFFunctions {
             @Nullable
             public Map<IBlockState, ModelResourceLocation> apply(@Nullable Block input) {
                 IStateMapper blockStateMapper = stateMappers.get(input);
-                return blockStateMapper == null ? Maps.newHashMap() : blockStateMapper.putStateModelLocations(input);
+                if (blockStateMapper != null) return blockStateMapper.putStateModelLocations(input);
+                return new DefaultStateMapper().putStateModelLocations(input);
             }
         };
     }

@@ -7,7 +7,7 @@ import mods.betterfoliage.client.misc.Double3;
 import mods.betterfoliage.client.render.TextureSet;
 import mods.betterfoliage.client.render.impl.primitives.BlockCrossedQuads;
 import mods.betterfoliage.client.render.impl.primitives.Color4;
-import mods.betterfoliage.client.texture.LeafTextureRegistry.LeafInfo;
+import mods.betterfoliage.client.texture.LeafTextures.LeafInfo;
 import mods.betterfoliage.common.config.Config;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;

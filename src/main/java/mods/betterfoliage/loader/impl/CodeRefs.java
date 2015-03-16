@@ -62,7 +62,15 @@ public class CodeRefs {
     public static MethodRef mPushEntity_I = new MethodRef(cSVertexBuilder, "pushEntity", ClassRef.VOID, ClassRef.LONG);
     public static MethodRef mPopEntity = new MethodRef(cSVertexBuilder, "popEntity", ClassRef.VOID);
     
+    // Optifine
+    public static ClassRef cConnectedTextures, cConnectedProperties;
+    public static MethodRef mGetConnectedTexture, mGetIndexInMap;
+    public static FieldRef fCTBlockProperties, fCTTileProperties,fCPTileIcons;
+    
     // Feature sets
+//    public static Collection<IResolvable<?>> optifineCTF = ImmutableList.<IResolvable<?>>of(
+//    	cConnectedTextures, cConnectedProperties, mGetConnectedTexture, mGetIndexInMap, fCTBlockProperties, fCTTileProperties, fCPTileIcons
+//    );
     public static Collection<IResolvable<?>> shaders = ImmutableList.<IResolvable<?>>of(
     	cSVertexBuilder, fSVertexBuilder, mPushEntity_S, mPushEntity_I, mPopEntity
     );

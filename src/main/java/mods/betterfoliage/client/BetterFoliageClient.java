@@ -17,7 +17,8 @@ import mods.betterfoliage.client.render.impl.RenderBlockLilypad;
 import mods.betterfoliage.client.render.impl.RenderBlockMycelium;
 import mods.betterfoliage.client.render.impl.RenderBlockNetherrack;
 import mods.betterfoliage.client.render.impl.RenderBlockReed;
-import mods.betterfoliage.client.texture.LeafTextureRegistry;
+import mods.betterfoliage.client.texture.GrassTextures;
+import mods.betterfoliage.client.texture.LeafTextures;
 import mods.betterfoliage.client.texture.SoulParticleTextures;
 import mods.betterfoliage.client.texture.generator.LeafGenerator;
 import mods.betterfoliage.client.texture.generator.ReedGenerator;
@@ -49,9 +50,10 @@ public class BetterFoliageClient {
 	
 	public static List<BFAbstractRenderer> renderers = Lists.newLinkedList();
 	
-	public static LeafTextureRegistry leafRegistry = new LeafTextureRegistry();
+	public static LeafTextures leafRegistry = new LeafTextures();
 	public static LeafGenerator leafGenerator = new LeafGenerator();
 	public static SoulParticleTextures soulParticles = new SoulParticleTextures();
+	public static GrassTextures grassRegistry = new GrassTextures();
 	public static WindTracker wind = new WindTracker();
 	
 	public static void postInit() {
@@ -84,6 +86,9 @@ public class BetterFoliageClient {
 		MinecraftForge.EVENT_BUS.register(leafGenerator);
 		MinecraftForge.EVENT_BUS.register(leafRegistry);
 		leafRegistry.leafMappings.add(new VanillaMapping("minecraft:models/block/leaves", "all"));
+		MinecraftForge.EVENT_BUS.register(grassRegistry);
+		grassRegistry.grassMappings.add(new VanillaMapping("minecraft:models/block/grass", "top"));
+		grassRegistry.grassMappings.add(new VanillaMapping("minecraft:models/block/cube_bottom_top", "top"));
 		
 		MinecraftForge.EVENT_BUS.register(new ReedGenerator("bf_reed_bottom", missingTexture, true));
 		MinecraftForge.EVENT_BUS.register(new ReedGenerator("bf_reed_top", missingTexture, false));
