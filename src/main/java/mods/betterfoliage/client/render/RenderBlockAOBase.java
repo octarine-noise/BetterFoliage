@@ -44,6 +44,11 @@ public class RenderBlockAOBase extends RenderBlocks {
 		public void setGray(float value) {
 			red = value; green = value; blue = value;
 		}
+		public void setColor(int value) {
+			red = ((value >> 16) & 0xFF) / 256.0f;
+			green = ((value >> 8) & 0xFF) / 256.0f;
+			blue = (value & 0xFF) / 256.0f;
+		}
 	}
 	
 	protected int drawPass = 0;

@@ -1,14 +1,22 @@
 package mods.betterfoliage.common.util;
 
+import java.awt.Color;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.imageio.ImageIO;
+
 import mods.betterfoliage.common.integration.OptifineIntegration;
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IIcon;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.util.ForgeDirection;
 import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
@@ -51,4 +59,39 @@ public class RenderUtils {
     	IIcon base = block.getIcon(blockAccess, x, y, z, side.ordinal());
     	return OptifineIntegration.isPresent ? OptifineIntegration.getConnectedTexture(blockAccess, block, x, y, z, side.ordinal(), base) : base; 
     }
+    
+	/** Calculate average color value (in HSB color space) for a texture.
+     * @param icon texture
+     */
+	public static Integer calculateTextureColor(TextureAtlasSprite icon) {
+		ResourceLocation locationNoDirs = new ResourceLocation(icon.getIconName());
+		ResourceLocation locationWithDirs = new ResourceLocation(locationNoDirs.getResourceDomain(), String.format("textures/blocks/%s.png", locationNoDirs.getResourcePath()));
+		try {
+			BufferedImage image = ImageIO.read(Minecraft.getMinecraft().getResourceManager().getResource(locationWithDirs).getInputStream());
+			
+			int numOpaque = 0;
+			float sumHueX = 0.0f;
+			float sumHueY = 0.0f;
+			float sumSaturation = 0.0f;
+			float sumBrightness = 0.0f;
+			for (int x = 0; x < image.getWidth(); x++) for (int y = 0; y < image.getHeight(); y++) {
+				int pixel = image.getRGB(x, y);
+				int alpha = (pixel >> 24) & 0xFF;
+				float[] hsbVals = Color.RGBtoHSB((pixel >> 16) & 0xFF, (pixel >> 8) & 0xFF, pixel & 0xFF, null);
+				if (alpha == 255) {
+					numOpaque++;
+					sumHueX += Math.cos((hsbVals[0] - 0.5) * 2.0 * Math.PI);
+					sumHueY += Math.sin((hsbVals[0] - 0.5) * 2.0 * Math.PI);
+					sumSaturation += hsbVals[1];
+					sumBrightness += hsbVals[2];
+				}
+			}
+			
+			// average hue as usual for circular values - transform average unit vector back to polar angle
+			float avgHue = (float) (Math.atan2(sumHueY, sumHueX) / (2.0 * Math.PI) + 0.5);
+			return Color.HSBtoRGB(avgHue, sumSaturation / numOpaque, sumBrightness / numOpaque);
+		} catch (IOException e) {
+		    return null;
+		}
+	}
 }

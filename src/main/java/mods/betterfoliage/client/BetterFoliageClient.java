@@ -18,6 +18,7 @@ import mods.betterfoliage.client.render.impl.RenderBlockNetherrack;
 import mods.betterfoliage.client.render.impl.RenderBlockReed;
 import mods.betterfoliage.client.render.impl.RenderBlockDirtWithGrassSide;
 import mods.betterfoliage.client.render.impl.RenderBlockDirtWithGrassTop;
+import mods.betterfoliage.client.resource.GrassTextures;
 import mods.betterfoliage.client.resource.LeafGenerator;
 import mods.betterfoliage.client.resource.LeafParticleTextures;
 import mods.betterfoliage.client.resource.LeafTextureEnumerator;
@@ -50,6 +51,7 @@ public class BetterFoliageClient {
 	public static LeafGenerator leafGenerator = new LeafGenerator();
 	public static LeafParticleTextures leafParticles = new LeafParticleTextures(0);
 	public static SoulParticleTextures soulParticles = new SoulParticleTextures();
+	public static GrassTextures grassTextures = new GrassTextures();
 	public static WindTracker wind = new WindTracker();
 	
 	public static void postInit() {
@@ -83,6 +85,7 @@ public class BetterFoliageClient {
 		MinecraftForge.EVENT_BUS.register(soulParticles);
 		MinecraftForge.EVENT_BUS.register(leafGenerator);
 		MinecraftForge.EVENT_BUS.register(leafParticles);
+		MinecraftForge.EVENT_BUS.register(grassTextures);
 		MinecraftForge.EVENT_BUS.register(new LeafTextureEnumerator());
 		
 		MinecraftForge.EVENT_BUS.register(new ReedGenerator("bf_reed_bottom", missingTexture, true));

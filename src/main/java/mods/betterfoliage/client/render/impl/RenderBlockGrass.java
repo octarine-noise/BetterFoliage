@@ -1,6 +1,7 @@
 package mods.betterfoliage.client.render.impl;
 
 import mods.betterfoliage.BetterFoliage;
+import mods.betterfoliage.client.BetterFoliageClient;
 import mods.betterfoliage.client.render.IRenderBlockDecorator;
 import mods.betterfoliage.client.render.IconSet;
 import mods.betterfoliage.client.render.RenderBlockAOBase;
@@ -34,8 +35,9 @@ public class RenderBlockGrass extends RenderBlockAOBase implements IRenderBlockD
 	protected RenderMode currentMode;
 	protected IIcon grassTopIcon;
 	protected boolean isSnowTop;
-	protected int biomeColor;
+	protected int blockColor;
 	protected boolean connectXP, connectXN, connectZP, connectZN;
+	
 	
 	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
 		return Config.grass.matchesID(block);
@@ -52,8 +54,12 @@ public class RenderBlockGrass extends RenderBlockAOBase implements IRenderBlockD
 		Material topMaterial = blockAccess.getBlock(x, y + 1, z).getMaterial();
 		isSnowTop = (topMaterial == Material.snow || topMaterial == Material.craftedSnow); 
 		checkConnectedGrass(x, y, z);
+		
+		// set colors and textures
 		grassTopIcon = RenderUtils.getIcon(blockAccess, block, x, y, z, ForgeDirection.UP);
-		biomeColor = block.colorMultiplier(blockAccess, x, y, z);
+		blockColor = block.colorMultiplier(blockAccess, x, y, z);
+		Integer avgColor = BetterFoliageClient.grassTextures.avgColors.get(grassTopIcon);
+		boolean useTextureColor = (avgColor != null);
 		
 		renderWorldBlockBase(2, world, x, y, z, block, modelId, renderer);
 		if (!Config.grassEnabled) return true;
@@ -74,7 +80,10 @@ public class RenderBlockGrass extends RenderBlockAOBase implements IRenderBlockD
 				Tessellator.instance.setColorOpaque(230, 230, 230);
 				shortGrassIcon = Config.grassUseGenerated ? snowGrassGenIcon : snowGrassIcons.get(iconVariation);
 			} else {
-				Tessellator.instance.setColorOpaque_I(block.colorMultiplier(blockAccess, x, y, z));
+				Tessellator.instance.setColorOpaque_I(useTextureColor ? avgColor : blockColor);
+				if (useTextureColor) {
+					aoYPXZNN.setColor(avgColor); aoYPXZNP.setColor(avgColor); aoYPXZPN.setColor(avgColor); aoYPXZPP.setColor(avgColor);
+				}
 				shortGrassIcon = Config.grassUseGenerated ? grassGenIcon : grassIcons.get(iconVariation);
 			}
 			if (shortGrassIcon == null) return true;
@@ -153,8 +162,8 @@ public class RenderBlockGrass extends RenderBlockAOBase implements IRenderBlockD
 	
 	protected void setBiomeColors() {
 	    if (fancyGrass) return;
-	    Tessellator.instance.setColorOpaque_I(biomeColor);
-        if (enableAO) setAOColors(biomeColor);
+	    Tessellator.instance.setColorOpaque_I(blockColor);
+        if (enableAO) setAOColors(blockColor);
 	}
 	
 	protected IIcon getDrawTexture(Block block, IIcon original, IIcon grassTop, boolean connected, int pass) {
