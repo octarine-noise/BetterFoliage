@@ -51,8 +51,8 @@ public abstract class BFAbstractRenderer extends BlockModelRenderer {
         boolean top = false;
         boolean left = false;
         
-        if (axis1 == neighborInfo.field_178276_g[0] || axis1 == neighborInfo.field_178276_g[0]) top = true;
-        if (axis1 == neighborInfo.field_178276_g[2] || axis1 == neighborInfo.field_178276_g[2]) left = true;
+        if (axis1 == neighborInfo.field_178276_g[0] || axis2 == neighborInfo.field_178276_g[0]) top = true;
+        if (axis1 == neighborInfo.field_178276_g[2] || axis2 == neighborInfo.field_178276_g[2]) left = true;
         
         if (top && !left) return vertexTrans.field_178191_g;
         if (top && left) return vertexTrans.field_178200_h;
