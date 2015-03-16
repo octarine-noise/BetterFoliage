@@ -1,12 +1,12 @@
 package mods.betterfoliage.client.render.impl;
 
 import mods.betterfoliage.BetterFoliage;
-import mods.betterfoliage.client.ShadersModIntegration;
-import mods.betterfoliage.client.TerraFirmaCraftIntegration;
 import mods.betterfoliage.client.render.IRenderBlockDecorator;
 import mods.betterfoliage.client.render.IconSet;
 import mods.betterfoliage.client.render.RenderBlockAOBase;
 import mods.betterfoliage.common.config.Config;
+import mods.betterfoliage.common.integration.ShadersModIntegration;
+import mods.betterfoliage.common.integration.TerraFirmaCraftIntegration;
 import mods.betterfoliage.common.util.Double3;
 import mods.betterfoliage.common.util.RenderUtils;
 import net.minecraft.block.Block;

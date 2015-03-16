@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import mods.betterfoliage.client.OptifineIntegration;
+import mods.betterfoliage.common.integration.OptifineIntegration;
 import net.minecraft.block.Block;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IIcon;

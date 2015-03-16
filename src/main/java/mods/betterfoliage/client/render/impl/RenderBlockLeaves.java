@@ -2,11 +2,11 @@ package mods.betterfoliage.client.render.impl;
 
 import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.BetterFoliageClient;
-import mods.betterfoliage.client.OptifineIntegration;
 import mods.betterfoliage.client.render.IRenderBlockDecorator;
 import mods.betterfoliage.client.render.IconSet;
 import mods.betterfoliage.client.render.RenderBlockAOBase;
 import mods.betterfoliage.common.config.Config;
+import mods.betterfoliage.common.integration.OptifineIntegration;
 import mods.betterfoliage.common.util.Double3;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;

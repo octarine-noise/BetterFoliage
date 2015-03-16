@@ -7,8 +7,8 @@ import java.util.Set;
 
 import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.BetterFoliageClient;
-import mods.betterfoliage.client.OptifineIntegration;
 import mods.betterfoliage.common.config.Config;
+import mods.betterfoliage.common.integration.OptifineIntegration;
 import mods.betterfoliage.loader.impl.CodeRefs;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.texture.IIconRegister;

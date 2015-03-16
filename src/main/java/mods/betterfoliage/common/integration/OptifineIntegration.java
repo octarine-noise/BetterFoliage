@@ -1,4 +1,4 @@
-package mods.betterfoliage.client;
+package mods.betterfoliage.common.integration;
 
 import java.util.Collection;
 

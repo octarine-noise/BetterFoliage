@@ -8,7 +8,7 @@ import javax.imageio.ImageIO;
 
 import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.BetterFoliageClient;
-import mods.betterfoliage.client.ShadersModIntegration;
+import mods.betterfoliage.common.integration.ShadersModIntegration;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.TextureStitchEvent;

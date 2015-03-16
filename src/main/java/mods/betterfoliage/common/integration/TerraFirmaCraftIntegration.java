@@ -1,6 +1,7 @@
-package mods.betterfoliage.client;
+package mods.betterfoliage.common.integration;
 
 import mods.betterfoliage.BetterFoliage;
+import mods.betterfoliage.client.BlockMatcher;
 import mods.betterfoliage.common.config.Config;
 import net.minecraft.block.Block;
 import net.minecraftforge.common.MinecraftForge;
