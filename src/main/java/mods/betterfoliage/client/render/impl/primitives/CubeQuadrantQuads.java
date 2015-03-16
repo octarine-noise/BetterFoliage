@@ -9,7 +9,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class OctaPrismQuadrantQuads implements IQuadCollection {
+public class CubeQuadrantQuads implements IQuadCollection {
 
 	public static boolean useMax = false;
 	
@@ -21,33 +21,21 @@ public class OctaPrismQuadrantQuads implements IQuadCollection {
 	
 	public EnumFacing vertDir;
 	
-	public double chamferSize;
-	
 	public int uvRot;
 	
-	public DynamicQuad dir1Mid;
+	public DynamicQuad dir1Face;
 	
-	public DynamicQuad dir1Cham;
+	public DynamicQuad dir2Face;
 	
-	public DynamicQuad dir2Cham;
+	public DynamicQuad topLid;
 	
-	public DynamicQuad dir2Mid;
+	public DynamicQuad bottomLid;
 	
-	public DynamicQuad topLid1;
+	private CubeQuadrantQuads() {}
 	
-	public DynamicQuad topLid2;
-	
-	public DynamicQuad bottomLid1;
-	
-	public DynamicQuad bottomLid2;
-
-	
-	private OctaPrismQuadrantQuads() {}
-	
-	public static OctaPrismQuadrantQuads create(Double3 originCorner, EnumFacing horz1Dir, EnumFacing horz2Dir, EnumFacing vertDir, double chamferSize, int uvRot, boolean hasTop, boolean hasBottom) {
-		OctaPrismQuadrantQuads result = new OctaPrismQuadrantQuads();
+	public static CubeQuadrantQuads create(Double3 originCorner, EnumFacing horz1Dir, EnumFacing horz2Dir, EnumFacing vertDir, int uvRot, boolean hasTop, boolean hasBottom) {
+		CubeQuadrantQuads result = new CubeQuadrantQuads();
 		
-		result.chamferSize = chamferSize;
 		result.uvRot = uvRot;
 		result.horz1Dir = horz1Dir;
 		result.horz2Dir = horz2Dir;
@@ -57,27 +45,16 @@ public class OctaPrismQuadrantQuads implements IQuadCollection {
 	    Double3 horz2 = new Double3(horz2Dir);
 	    Double3 vert = new Double3(vertDir);
         Double3 mid1 = originCorner.add(horz1.scale(0.5));
-        Double3 cham1 = originCorner.add(horz1.scale(chamferSize));
         Double3 mid2 = originCorner.add(horz2.scale(0.5));
-        Double3 cham2 = originCorner.add(horz2.scale(chamferSize));
-        Double3 chamCenter = cham1.add(cham2).scale(0.5);
         Double3 blockCenter = originCorner.add(horz1.scale(0.5)).add(horz2.scale(0.5));
 		
-        result.dir1Mid = DynamicQuad.createParallelogramExtruded(mid1, cham1, vert);
-        result.dir1Cham = DynamicQuad.createParallelogramExtruded(cham1, chamCenter, vert);
-        result.dir2Cham = DynamicQuad.createParallelogramExtruded(chamCenter, cham2, vert);
-        result.dir2Mid = DynamicQuad.createParallelogramExtruded(cham2, mid2, vert);
+        result.dir1Face = DynamicQuad.createParallelogramExtruded(mid1, originCorner, vert);
+        result.dir2Face = DynamicQuad.createParallelogramExtruded(originCorner, mid2, vert);
 		
-        if (hasTop) {
-        	result.topLid1 = DynamicQuad.createFromVertices(blockCenter.add(vert), mid1.add(vert), cham1.add(vert), chamCenter.add(vert));
-        	result.topLid2 = DynamicQuad.createFromVertices(cham2.add(vert), mid2.add(vert), blockCenter.add(vert), chamCenter.add(vert));
-        }
-        if (hasBottom) {
-        	result.bottomLid1 = DynamicQuad.createFromVertices(blockCenter, chamCenter, cham1, mid1);
-        	result.bottomLid2 = DynamicQuad.createFromVertices(cham2, chamCenter, blockCenter, mid2);
-        }
+        if (hasTop) result.topLid = DynamicQuad.createFromVertices(originCorner.add(vert), mid2.add(vert), blockCenter.add(vert), mid1.add(vert));
+        if (hasBottom) result.bottomLid = DynamicQuad.createFromVertices(mid1, blockCenter, mid2, originCorner);
 		
-		return result;
+        return result;
 	}
 	
 	@Override
@@ -100,9 +77,6 @@ public class OctaPrismQuadrantQuads implements IQuadCollection {
 		int br2MidTop = averageBrightness(br2FarTop, br2NearTop);
 		int br2MidBottom = averageBrightness(br2FarBottom, br2NearBottom);
 		
-		int brAvgSideTop = averageBrightness(br1NearTop, br2NearTop);
-		int brAvgSideBottom = averageBrightness(br1NearBottom, br2NearBottom);
-		
 		int brTopOrigin = shadingData.getBrightness(vertDir, horz1DirOpp, horz2DirOpp, useMax);
 		int brTopDir1 = shadingData.getBrightness(vertDir, horz1Dir, horz2DirOpp, useMax);
 		int brTopDir2 = shadingData.getBrightness(vertDir, horz1DirOpp, horz2Dir, useMax);
@@ -120,19 +94,11 @@ public class OctaPrismQuadrantQuads implements IQuadCollection {
 		int brTopCenter = averageBrightness(brTopOrigin, brTopDir1, brTopDir2, brTopOpposite);
 		int brBottomCenter = averageBrightness(brBottomOrigin, brBottomDir1, brBottomDir2, brBottomOpposite);
 		
-		dir1Mid.setBrightness(br1MidBottom, br1NearBottom, br1NearTop, br1MidTop);
-		dir1Cham.setBrightness(br1NearBottom, brAvgSideBottom, brAvgSideTop, br1NearTop);
-		dir2Cham.setBrightness(brAvgSideBottom, br2NearBottom, br2NearTop, brAvgSideTop);
-		dir2Mid.setBrightness(br2NearBottom, br2MidBottom, br2MidTop, br2NearTop);
+		dir1Face.setBrightness(br1MidBottom, br1NearBottom, br1NearTop, br1MidTop);
+		dir2Face.setBrightness(br2NearBottom, br2MidBottom, br2MidTop, br2NearTop);
 		
-		if (topLid1 != null) {
-			topLid1.setBrightness(brTopCenter, brTopMid1, brTopOrigin, brTopOrigin);
-			topLid2.setBrightness(brTopOrigin, brTopMid2, brTopCenter, brTopOrigin);
-		}
-		if (bottomLid1 != null) {
-			bottomLid1.setBrightness(brBottomCenter, brBottomOrigin, brBottomOrigin, brBottomMid1);
-			bottomLid2.setBrightness(brBottomOrigin, brBottomOrigin, brBottomCenter, brBottomMid2);
-		}
+		if (topLid != null) topLid.setBrightness(brTopOrigin, brTopMid2, brTopCenter, brTopMid1);
+		if (bottomLid != null) bottomLid.setBrightness(brBottomMid1, brBottomCenter, brBottomMid2, brBottomOrigin);
 		
 		return this;
 	}
@@ -158,9 +124,6 @@ public class OctaPrismQuadrantQuads implements IQuadCollection {
 			Color4 col2MidTop = Color4.average(col2FarTop, col2NearTop);
 			Color4 col2MidBottom = Color4.average(col2FarBottom, col2NearBottom);
 			
-			Color4 colAvgSideTop = Color4.average(col1NearTop, col2NearTop);
-			Color4 colAvgSideBottom = Color4.average(col1NearBottom, col2NearBottom);
-			
 			Color4 colTopOrigin = color.multiply(shadingData.getColorMultiplier(vertDir, horz1DirOpp, horz2DirOpp, useMax));
 			Color4 colTopDir1 = color.multiply(shadingData.getColorMultiplier(vertDir, horz1Dir, horz2DirOpp, useMax));
 			Color4 colTopDir2 = color.multiply(shadingData.getColorMultiplier(vertDir, horz1DirOpp, horz2Dir, useMax));
@@ -178,38 +141,22 @@ public class OctaPrismQuadrantQuads implements IQuadCollection {
 			Color4 colTopCenter = Color4.average(colTopOrigin, colTopDir1, colTopDir2, colTopOpposite);
 			Color4 colBottomCenter = Color4.average(colBottomOrigin, colBottomDir1, colBottomDir2, colBottomOpposite);
 			
-			dir1Mid.setColor(col1MidBottom, col1NearBottom, col1NearTop, col1MidTop);
-			dir1Cham.setColor(col1NearBottom, colAvgSideBottom, colAvgSideTop, col1NearTop);
-			dir2Cham.setColor(colAvgSideBottom, col2NearBottom, col2NearTop, colAvgSideTop);
-			dir2Mid.setColor(col2NearBottom, col2MidBottom, col2MidTop, col2NearTop);
+			dir1Face.setColor(col1MidBottom, col1NearBottom, col1NearTop, col1MidTop);
+			dir2Face.setColor(col2NearBottom, col2MidBottom, col2MidTop, col2NearTop);
 			
-			if (topLid1 != null) {
-				topLid1.setColor(colTopCenter, colTopMid1, colTopOrigin, colTopOrigin);
-				topLid2.setColor(colTopOrigin, colTopMid2, colTopCenter, colTopOrigin);
-			}
-			if (bottomLid1 != null && bottomLid2 != null) {
-				bottomLid1.setColor(colBottomCenter, colBottomOrigin, colBottomOrigin, colBottomMid1);
-				bottomLid2.setColor(colBottomOrigin, colBottomOrigin, colBottomCenter, colBottomMid2);
-			}
+			if (topLid != null) topLid.setColor(colTopOrigin, colTopMid2, colTopCenter, colTopMid1);
+			if (bottomLid != null) bottomLid.setColor(colBottomMid1, colBottomCenter, colBottomMid2, colBottomOrigin);
 		} else {
-			dir1Mid.setColor(color);
-			dir1Cham.setColor(color);
-			dir2Cham.setColor(color);
-			dir2Mid.setColor(color);
+			dir1Face.setColor(color);
+			dir2Face.setColor(color);
 			
-			if (topLid1 != null && topLid2 != null) {
-				topLid1.setColor(color);
-				topLid2.setColor(color);
-			}
-			if (bottomLid1 != null) {
-				bottomLid1.setColor(color);
-				bottomLid2.setColor(color);
-			}
+			if (topLid != null) topLid.setColor(color);
+			if (bottomLid != null) bottomLid.setColor(color);
 		}
 		return this;
 	}
 
-	/** Not applicable. Use {@link OctaPrismQuadrantQuads#setTexture(TextureAtlasSprite, TextureAtlasSprite, TextureAtlasSprite, TextureAtlasSprite, double, int)} instead.}
+	/** Not applicable. Use {@link CubeQuadrantQuads#setTexture(TextureAtlasSprite, TextureAtlasSprite, TextureAtlasSprite, TextureAtlasSprite, double, int)} instead.}
 	 * @see mods.betterfoliage.client.render.impl.primitives.IQuadCollection#setTexture(net.minecraft.client.renderer.texture.TextureAtlasSprite, int)
 	 */
 	@Override
@@ -226,47 +173,28 @@ public class OctaPrismQuadrantQuads implements IQuadCollection {
 	    double[] uTop = new double[] {uValues[uvRot & 3], uValues[(uvRot + 1) & 3], uValues[(uvRot + 2) & 3], uValues[(uvRot + 3) & 3]};
 	    double[] vTop = new double[] {vValues[uvRot & 3], vValues[(uvRot + 1) & 3], vValues[(uvRot + 2) & 3], vValues[(uvRot + 3) & 3]};
 		
-		double uLeft = chamferSize * 16.0;
-        double uRight = 16.0 - uLeft;
-        
-		dir1Mid.setTexture(sideTexture, new double[]{8.0, uRight, uRight, 8.0}, vSides);
-		dir1Cham.setTexture(sideTexture, new double[]{uRight, 16.0, 16.0, uRight}, vSides);
-		dir2Cham.setTexture(sideTexture, new double[]{0.0, uLeft, uLeft, 0.0}, vSides);
-		dir2Mid.setTexture(sideTexture, new double[]{uLeft, 8.0, 8.0, uLeft}, vSides);
+		dir1Face.setTexture(sideTexture, new double[]{8.0, 16.0, 16.0, 8.0}, vSides);
+		dir2Face.setTexture(sideTexture, new double[]{0.0, 8.0, 8.0, 0.0}, vSides);
 		
-		if (topLid1 != null) {
-			topLid1.setTexture(endTexture,
-					new double[]{8.0, (uTop[0] + uTop[3]) * 0.5, uTop[0] * (1 - chamferSize) + uTop[3] * chamferSize, uTop[0]},
-					new double[]{8.0, (vTop[0] + vTop[3]) * 0.5, vTop[0] * (1 - chamferSize) + vTop[3] * chamferSize, vTop[0]});
-			topLid2.setTexture(endTexture,
-					new double[]{uTop[0] * (1 - chamferSize) + uTop[1] * chamferSize, (uTop[0] + uTop[1]) * 0.5, 8.0, uTop[0]},
-					new double[]{vTop[0] * (1 - chamferSize) + vTop[1] * chamferSize, (vTop[0] + vTop[1]) * 0.5, 8.0, vTop[0]});
+		if (topLid != null) {
+			topLid.setTexture(endTexture,
+					new double[]{uTop[0], (uTop[0] + uTop[1]) * 0.5, 8.0, (uTop[0] + uTop[3]) * 0.5},
+					new double[]{vTop[0], (vTop[0] + vTop[1]) * 0.5, 8.0, (vTop[0] + vTop[3]) * 0.5});
 		}
-		if (bottomLid1 != null) {
-			bottomLid1.setTexture(endTexture,
-					new double[]{8.0, uTop[0], uTop[0] * (1 - chamferSize) + uTop[3] * chamferSize, (uTop[0] + uTop[3]) * 0.5},
-					new double[]{8.0, vTop[0], vTop[0] * (1 - chamferSize) + vTop[3] * chamferSize, (vTop[0] + vTop[3]) * 0.5});
-			bottomLid2.setTexture(endTexture,
-					new double[]{uTop[0] * (1 - chamferSize) + uTop[1] * chamferSize, uTop[0], 8.0, (uTop[0] + uTop[1]) * 0.5},
-					new double[]{vTop[0] * (1 - chamferSize) + vTop[1] * chamferSize, vTop[0], 8.0, (vTop[0] + vTop[1]) * 0.5});
+		if (bottomLid != null) {
+			bottomLid.setTexture(endTexture,
+					new double[]{(uTop[0] + uTop[3]) * 0.5, 8.0, (uTop[0] + uTop[1]) * 0.5, uTop[0]},
+					new double[]{(vTop[0] + vTop[3]) * 0.5, 8.0, (vTop[0] + vTop[1]) * 0.5, vTop[0]});
 		}
 		return this;
 	}
 	
 	@Override
 	public void render(WorldRenderer renderer) {
-		dir1Mid.render(renderer);
-		dir1Cham.render(renderer);
-		dir2Cham.render(renderer);
-		dir2Mid.render(renderer);
-		if (topLid1 != null) {
-			topLid1.render(renderer);
-			topLid2.render(renderer);
-		}
-		if (bottomLid1 != null) {
-			bottomLid1.render(renderer);
-			bottomLid2.render(renderer);
-		}
+		dir1Face.render(renderer);
+		dir2Face.render(renderer);
+		if (topLid != null) topLid.render(renderer);
+		if (bottomLid != null) bottomLid.render(renderer);
 	}
 
 	protected int averageBrightness(int br1, int br2) {

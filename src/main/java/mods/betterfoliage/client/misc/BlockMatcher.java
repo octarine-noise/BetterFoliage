@@ -6,7 +6,6 @@ import java.util.Set;
 
 import mods.betterfoliage.client.util.ResourceUtils;
 import net.minecraft.block.Block;
-import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
