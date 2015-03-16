@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import mods.betterfoliage.client.util.RenderUtils;
+import mods.betterfoliage.client.util.MiscUtils;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.EnumChatFormatting;
@@ -29,7 +29,7 @@ public abstract class SelectListConfigEntry<T> extends CategoryEntry {
     @SuppressWarnings("unchecked")
     public SelectListConfigEntry(GuiConfig owningScreen, GuiConfigEntries owningEntryList, IConfigElement configElement) {
         super(owningScreen, owningEntryList, configElement);
-        RenderUtils.stripTooltipDefaultText(toolTip);
+        MiscUtils.stripTooltipDefaultText(toolTip);
     }
 
     @Override

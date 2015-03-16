@@ -22,14 +22,17 @@ import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+@SideOnly(Side.CLIENT)
 public class GrassTextures {
 
-    /** Rendering information for a leaf block 
+    /** Rendering information for a grass block 
      * @author octarine-noise
      */
     public static class GrassInfo {
