@@ -85,7 +85,6 @@ public class LogTextures {
             
             if (sideName != null && endName != null) {
             	// store texture locations for this blockstate
-            	BetterFoliage.log.info(String.format("block=%s, side=%s, end=%s", stateMapping.getKey().toString(), sideName, endName));
             	LogInfo info = new LogInfo(sideName, endName);
             	logInfoMap.put(stateMapping.getKey(), info);
             	
@@ -94,6 +93,8 @@ public class LogTextures {
             	if (axisValue.toString().toUpperCase().equals("X")) info.verticalDir = EnumFacing.EAST;
             	else if (axisValue.toString().toUpperCase().equals("Z")) info.verticalDir = EnumFacing.SOUTH;
             	else info.verticalDir = EnumFacing.UP;
+            	
+            	BetterFoliage.log.info(String.format("block=%s, side=%s, end=%s, dir=%s", stateMapping.getKey().toString(), sideName, endName, info.verticalDir.toString()));
             }
         }
     }

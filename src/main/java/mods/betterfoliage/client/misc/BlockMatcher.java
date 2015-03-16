@@ -74,6 +74,6 @@ public class BlockMatcher {
 	 */
 	@SubscribeEvent
 	public void handleWorldLoad(WorldEvent.Load event) {
-		if (event.world instanceof WorldClient) updateBlockIDs();
+		updateBlockIDs();
 	}
 }

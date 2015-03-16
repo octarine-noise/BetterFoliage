@@ -64,8 +64,6 @@ public class BetterFoliageClient {
 		FMLCommonHandler.instance().bus().register(new KeyHandler());
 		FMLCommonHandler.instance().bus().register(new Config());
 		
-		ShadersModIntegration.init();
-		
 		BetterFoliage.log.info("Registering renderers");
 		registerRenderer(new RenderBlockLeaves());
 		registerRenderer(new RenderBlockGrass());
@@ -85,6 +83,7 @@ public class BetterFoliageClient {
 		MinecraftForge.EVENT_BUS.register(Config.crops);
 		MinecraftForge.EVENT_BUS.register(Config.dirt);
 		MinecraftForge.EVENT_BUS.register(Config.grass);
+		MinecraftForge.EVENT_BUS.register(Config.logs);
 		
 		BetterFoliage.log.info("Registering texture generators");
 		MinecraftForge.EVENT_BUS.register(soulParticles);
@@ -105,7 +104,7 @@ public class BetterFoliageClient {
 		MinecraftForge.EVENT_BUS.register(new ShortGrassGenerator("bf_shortgrass", missingTexture, false));
 		MinecraftForge.EVENT_BUS.register(new ShortGrassGenerator("bf_shortgrass_snow", missingTexture, true));
 		
-		
+		ShadersModIntegration.init();
 	}
 
 	/** Called from transformed {@link WorldClient#doVoidFogParticles(int, int, int)} method right before the end of the <b>for</b> loop.
@@ -144,7 +143,7 @@ public class BetterFoliageClient {
     
 	public static boolean canRenderBlockInLayer(Block block, EnumWorldBlockLayer layer) {
 		// enable CUTOUT_MIPPED layer ONLY for blocks where needed
-		if (Config.logs.matchesID(block) && Config.logsEnabled) return layer == EnumWorldBlockLayer.CUTOUT_MIPPED;
+		if (Config.logsEnabled && Config.logs.matchesID(block)) return layer == EnumWorldBlockLayer.CUTOUT_MIPPED;
 		
 	    if (block.canRenderInLayer(layer)) return true;
 	    

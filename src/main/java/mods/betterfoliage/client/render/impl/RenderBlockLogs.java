@@ -32,10 +32,10 @@ public class RenderBlockLogs extends BFAbstractRenderer {
     	
     	LogInfo logInfo = BetterFoliageClient.logRegistry.logInfoMap.get(blockState);
     	if (logInfo == null || logInfo.sideTexture == null || logInfo.endTexture == null) return false;
-    	EnumFacing logVertDir = logInfo.verticalDir;
     	
     	// set axes
     	Double3 blockPos = new Double3(pos);
+    	EnumFacing logVertDir = logInfo.verticalDir;
     	EnumFacing logHorzDir1, logHorzDir2;
 		if (logVertDir == EnumFacing.UP || logVertDir == EnumFacing.DOWN) {
 		    logVertDir = EnumFacing.UP;
