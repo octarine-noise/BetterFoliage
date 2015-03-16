@@ -1,4 +1,4 @@
-package mods.betterfoliage.common.util;
+package mods.betterfoliage.client.util;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;

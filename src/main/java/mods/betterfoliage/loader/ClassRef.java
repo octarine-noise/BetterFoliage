@@ -4,7 +4,7 @@ package mods.betterfoliage.loader;
 /** Reference to a class. Contains information to locate the class regardless of environment.
  * @author octarine-noise
  */
-public class ClassRef {
+public class ClassRef implements IResolvable<Class<?>> {
     
     /** Reference to primitive <b>int</b> type */
     public static final ClassRef INT = primitive("I", int.class);

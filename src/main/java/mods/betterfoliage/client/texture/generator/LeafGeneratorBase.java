@@ -1,11 +1,11 @@
-package mods.betterfoliage.client.resource;
+package mods.betterfoliage.client.texture.generator;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import mods.betterfoliage.common.util.ResourceUtils;
+import mods.betterfoliage.client.util.ResourceUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;

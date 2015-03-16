@@ -2,8 +2,8 @@ package mods.betterfoliage.client.gui;
 
 import java.util.List;
 
+import mods.betterfoliage.client.util.BiomeUtils;
 import mods.betterfoliage.common.config.Config;
-import mods.betterfoliage.common.util.BiomeUtils;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.fml.client.config.GuiConfig;
 import net.minecraftforge.fml.client.config.GuiConfigEntries;

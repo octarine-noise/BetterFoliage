@@ -1,8 +1,8 @@
 package net.minecraft.client.renderer;
 
-import mods.betterfoliage.client.PerturbationSource;
+import mods.betterfoliage.client.misc.Double3;
+import mods.betterfoliage.client.misc.PerturbationSource;
 import mods.betterfoliage.client.render.BlockShadingData;
-import mods.betterfoliage.common.util.Double3;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;

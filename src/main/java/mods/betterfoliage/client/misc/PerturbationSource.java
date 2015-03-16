@@ -1,4 +1,4 @@
-package mods.betterfoliage.client;
+package mods.betterfoliage.client.misc;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -7,8 +7,6 @@ import java.util.List;
 
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-
-import mods.betterfoliage.common.util.Double3;
 
 /** Source for random perturbation vectors. Uses a pre-filled array[64] of values for performance and consistency reasons. 
  * @author octarine-noise

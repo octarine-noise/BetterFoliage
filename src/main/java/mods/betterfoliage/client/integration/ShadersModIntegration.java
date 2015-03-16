@@ -1,4 +1,4 @@
-package mods.betterfoliage.client;
+package mods.betterfoliage.client.integration;
 
 import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.common.config.Config;
@@ -15,9 +15,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
  * @author octarine-noise
  */
 @SideOnly(Side.CLIENT)
-public class ShadersModIntegration {
+public class ShadersModIntegration extends AbstractModIntegration {
 
-	private static boolean hasShadersMod = false;
+	private static boolean isAvailable = false;
 	private static int tallGrassEntityData;
 	private static int leavesEntityData;
 	
@@ -28,34 +28,28 @@ public class ShadersModIntegration {
         tallGrassEntityData = Block.blockRegistry.getIDForObject(Blocks.tallgrass) & 0xFFFF | Blocks.tallgrass.getRenderType() << 16;
         leavesEntityData = Block.blockRegistry.getIDForObject(Blocks.leaves) & 0xFFFF | Blocks.leaves.getRenderType() << 16;
         
-        if (CodeRefs.cSVertexBuilder.resolve() == null ||
-            CodeRefs.fSVertexBuilder.resolve() == null ||
-            CodeRefs.mPushEntity_S.resolve() == null ||
-            CodeRefs.mPushEntity_I.resolve() == null ||
-            CodeRefs.mPopEntity.resolve() == null) {
-            BetterFoliage.log.info("ShadersMod not found, integration disabled");
-        } else {
-            hasShadersMod = true;
-            BetterFoliage.log.info("ShadersMod found, integration enabled");
-        }
+        if (isAllAvailable(CodeRefs.shaders)) {
+        	isAvailable = true;
+        	BetterFoliage.log.info("ShadersMod found, integration enabled");
+		}
 	}
 	
 	/** Signal start of grass-type quads
 	 */
 	public static void startGrassQuads(WorldRenderer renderer) {
-		if (!hasShadersMod) return;
+		if (!isAvailable) return;
 		pushEntity(renderer, tallGrassEntityData);
 	}
 
 	/** Signal start of leaf-type quads
 	 */
 	public static void startLeavesQuads(WorldRenderer renderer) {
-		if (!hasShadersMod) return;
+		if (!isAvailable) return;
 		pushEntity(renderer, leavesEntityData);
 	}
 	
 	public static void finish(WorldRenderer renderer) {
-	    if (!hasShadersMod) return;
+	    if (!isAvailable) return;
 	    popEntity(renderer);
 	}
 	

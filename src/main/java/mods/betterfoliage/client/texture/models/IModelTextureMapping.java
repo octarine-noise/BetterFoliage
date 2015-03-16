@@ -1,4 +1,4 @@
-package mods.betterfoliage.client;
+package mods.betterfoliage.client.texture.models;
 
 import com.google.common.base.Function;
 

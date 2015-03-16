@@ -4,8 +4,8 @@ import java.util.Deque;
 import java.util.Iterator;
 
 import mods.betterfoliage.client.BetterFoliageClient;
+import mods.betterfoliage.client.misc.Double3;
 import mods.betterfoliage.common.config.Config;
-import mods.betterfoliage.common.util.Double3;
 import net.minecraft.client.particle.EntityFX;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;

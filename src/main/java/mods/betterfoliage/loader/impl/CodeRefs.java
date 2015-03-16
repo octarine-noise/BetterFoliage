@@ -1,7 +1,12 @@
 package mods.betterfoliage.loader.impl;
 
+import java.util.Collection;
+
+import com.google.common.collect.ImmutableList;
+
 import mods.betterfoliage.loader.ClassRef;
 import mods.betterfoliage.loader.FieldRef;
+import mods.betterfoliage.loader.IResolvable;
 import mods.betterfoliage.loader.MethodRef;
 
 /** Static helper class holding constants referencing Minecraft code.<br/>
@@ -11,8 +16,10 @@ import mods.betterfoliage.loader.MethodRef;
  */
 public class CodeRefs {
     
+	// Java
     public static ClassRef cMap = new ClassRef("java.util.Map");
     
+ // Minecraft
     public static ClassRef cBlock = new ClassRef("net.minecraft.block.Block", "atr");
     public static ClassRef cIBlockAccess = new ClassRef("net.minecraft.world.IBlockAccess", "ard");
     public static ClassRef cIBlockState = new ClassRef("net.minecraft.block.state.IBlockState", "bec");
@@ -40,6 +47,7 @@ public class CodeRefs {
     public static ClassRef cSimpleReloadableResourceManager = new ClassRef("net.minecraft.client.resources.SimpleReloadableResourceManager", "cvt");
     public static FieldRef fDomainResourceManagers = new FieldRef(cSimpleReloadableResourceManager, "domainResourceManagers", "field_110548_a", "c", cMap);
     
+    // BetterFoliage
     public static ClassRef cBetterFoliageClient = new ClassRef("mods.betterfoliage.client.BetterFoliageClient");
     public static MethodRef mOnRandomDisplayTick = new MethodRef(cBetterFoliageClient, "onRandomDisplayTick", ClassRef.VOID, cWorld, cIBlockState, cBlockPos);
     public static MethodRef mOnAfterLoadModelDefinitions = new MethodRef(cBetterFoliageClient, "onAfterLoadModelDefinitions", ClassRef.VOID, cModelLoader);
@@ -47,10 +55,15 @@ public class CodeRefs {
     public static MethodRef mCanRenderBlockInLayer = new MethodRef(cBetterFoliageClient, "canRenderBlockInLayer", ClassRef.BOOLEAN, cBlock, cEnumWorldBlockLayer);
     public static MethodRef mGetBlockIdOverride = new MethodRef(new ClassRef("mods.betterfoliage.client.ShadersModIntegration"), "getBlockIdOverride", ClassRef.INT, ClassRef.INT, cIBlockState);
     
+    // ShadersMod
     public static ClassRef cSVertexBuilder = new ClassRef("shadersmod.client.SVertexBuilder");
     public static FieldRef fSVertexBuilder = new FieldRef(cWorldRenderer, "sVertexBuilder", cSVertexBuilder);
     public static MethodRef mPushEntity_S = new MethodRef(cSVertexBuilder, "pushEntity", ClassRef.VOID, cIBlockState, cBlockPos, cIBlockAccess, cWorldRenderer);
     public static MethodRef mPushEntity_I = new MethodRef(cSVertexBuilder, "pushEntity", ClassRef.VOID, ClassRef.LONG);
     public static MethodRef mPopEntity = new MethodRef(cSVertexBuilder, "popEntity", ClassRef.VOID);
     
+    // Feature sets
+    public static Collection<IResolvable<?>> shaders = ImmutableList.<IResolvable<?>>of(
+    	cSVertexBuilder, fSVertexBuilder, mPushEntity_S, mPushEntity_I, mPopEntity
+    );
 }

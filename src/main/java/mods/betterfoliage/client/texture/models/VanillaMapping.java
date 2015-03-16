@@ -1,4 +1,4 @@
-package mods.betterfoliage.client;
+package mods.betterfoliage.client.texture.models;
 
 import java.lang.reflect.Field;
 import java.util.Collection;

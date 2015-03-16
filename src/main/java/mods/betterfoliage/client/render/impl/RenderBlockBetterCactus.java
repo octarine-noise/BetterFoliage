@@ -1,12 +1,12 @@
 package mods.betterfoliage.client.render.impl;
 
 import mods.betterfoliage.BetterFoliage;
+import mods.betterfoliage.client.misc.Double3;
 import mods.betterfoliage.client.render.TextureSet;
 import mods.betterfoliage.client.render.impl.primitives.BlockCrossedQuads;
 import mods.betterfoliage.client.render.impl.primitives.Color4;
 import mods.betterfoliage.client.render.impl.primitives.FaceCrossedQuads;
 import mods.betterfoliage.common.config.Config;
-import mods.betterfoliage.common.util.Double3;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.BFAbstractRenderer;
 import net.minecraft.client.renderer.WorldRenderer;

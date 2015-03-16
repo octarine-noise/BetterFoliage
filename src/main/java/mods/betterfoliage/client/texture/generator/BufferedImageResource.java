@@ -1,4 +1,4 @@
-package mods.betterfoliage.client.resource;
+package mods.betterfoliage.client.texture.generator;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;

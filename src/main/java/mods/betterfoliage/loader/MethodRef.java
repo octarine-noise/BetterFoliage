@@ -8,7 +8,7 @@ import com.google.common.collect.Lists;
 /** Reference to a method. Contains information to locate the method regardless of environment.
  * @author octarine-noise
  */
-public class MethodRef {
+public class MethodRef implements IResolvable<Method> {
     
     public ClassRef parent;
     public String mcpName;
@@ -47,23 +47,29 @@ public class MethodRef {
     }
     
     public Method resolve() {
-        if (methodObj == null) {
-            Class<?> parentClass = parent.resolve();
+    	if (methodObj == null) {
+    		Class<?> parentClass = parent.resolve();
             if (parentClass == null) return null;
-            List<Class<?>> argList = Lists.newLinkedList();
-            for (ClassRef arg : argTypes) {
-                if (arg.resolve() == null) return null;
-                argList.add(arg.resolve());
+            
+            List<Class<?>> argClasses = Lists.newLinkedList();
+            for (ClassRef argType : argTypes) {
+            	if (argType.resolve() == null) return null;
+            	argClasses.add(argType.resolve());
             }
-            Class<?>[] argArray = argList.toArray(new Class<?>[]{});
+            Class<?>[] args = argClasses.toArray(new Class<?>[0]);
+            
             try {
-                methodObj = parentClass.getDeclaredMethod(srgName, argArray);
+            	methodObj = parentClass.getDeclaredMethod(srgName, args);
+            	methodObj.setAccessible(true);
             } catch (Exception e) {}
+            
             if (methodObj == null) try {
-                methodObj = parentClass.getDeclaredMethod(mcpName, argArray);
+            	methodObj = parentClass.getDeclaredMethod(mcpName, args);
+            	methodObj.setAccessible(true);
             } catch (Exception e) {}
-        }
-        return methodObj;
+            
+    	}
+    	return methodObj;
     }
     
     @SuppressWarnings("unchecked")

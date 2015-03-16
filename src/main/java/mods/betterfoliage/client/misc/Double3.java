@@ -1,4 +1,4 @@
-package mods.betterfoliage.common.util;
+package mods.betterfoliage.client.misc;
 
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;

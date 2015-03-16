@@ -1,17 +1,18 @@
-package mods.betterfoliage.client.resource;
+package mods.betterfoliage.client.texture;
 
 import java.util.Collection;
 import java.util.Map;
 
 import mods.betterfoliage.BetterFoliage;
-import mods.betterfoliage.client.IModelTextureMapping;
 import mods.betterfoliage.client.event.PostLoadModelDefinitionsEvent;
+import mods.betterfoliage.client.misc.TextureMatcher;
 import mods.betterfoliage.client.render.TextureSet;
 import mods.betterfoliage.client.render.impl.primitives.Color4;
+import mods.betterfoliage.client.texture.generator.LeafGenerator;
+import mods.betterfoliage.client.texture.models.IModelTextureMapping;
+import mods.betterfoliage.client.util.BFFunctions;
+import mods.betterfoliage.client.util.ResourceUtils;
 import mods.betterfoliage.common.config.Config;
-import mods.betterfoliage.common.util.BFFunctions;
-import mods.betterfoliage.common.util.ResourceUtils;
-import mods.betterfoliage.common.util.TextureMatcher;
 import mods.betterfoliage.loader.impl.CodeRefs;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;

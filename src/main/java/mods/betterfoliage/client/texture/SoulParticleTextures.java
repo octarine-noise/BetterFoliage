@@ -1,4 +1,4 @@
-package mods.betterfoliage.client.resource;
+package mods.betterfoliage.client.texture;
 
 import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.render.TextureSet;

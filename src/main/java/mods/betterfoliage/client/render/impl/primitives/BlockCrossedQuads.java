@@ -1,7 +1,7 @@
 package mods.betterfoliage.client.render.impl.primitives;
 
+import mods.betterfoliage.client.misc.Double3;
 import mods.betterfoliage.client.render.BlockShadingData;
-import mods.betterfoliage.common.util.Double3;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.EnumFacing;

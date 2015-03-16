@@ -1,4 +1,4 @@
-package mods.betterfoliage.common.util;
+package mods.betterfoliage.client.util;
 
 import java.util.Map;
 import java.util.Map.Entry;

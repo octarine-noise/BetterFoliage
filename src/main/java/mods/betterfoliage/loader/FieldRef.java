@@ -5,7 +5,7 @@ import java.lang.reflect.Field;
 /** Reference to a field. Contains information to locate the field regardless of environment.
  * @author octarine-noise
  */
-public class FieldRef {
+public class FieldRef implements IResolvable<Field> {
     
     /** Containing class */
     public ClassRef parent;
