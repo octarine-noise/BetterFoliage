@@ -53,11 +53,12 @@ public class CodeRefs {
     
     // BetterFoliage
     public static ClassRef cBetterFoliageClient = new ClassRef("mods.betterfoliage.client.BetterFoliageClient");
+    public static ClassRef cShadersModIntegration = new ClassRef("mods.betterfoliage.client.integration.ShadersModIntegration");
     public static MethodRef mOnRandomDisplayTick = new MethodRef(cBetterFoliageClient, "onRandomDisplayTick", ClassRef.VOID, cWorld, cIBlockState, cBlockPos);
     public static MethodRef mOnAfterLoadModelDefinitions = new MethodRef(cBetterFoliageClient, "onAfterLoadModelDefinitions", ClassRef.VOID, cModelLoader);
     public static MethodRef mRenderWorldBlock = new MethodRef(cBetterFoliageClient, "renderWorldBlock", ClassRef.BOOLEAN, cBlockRendererDispatcher, cIBlockState, cBlockPos, cIBlockAccess, cWorldRenderer, cEnumWorldBlockLayer);
     public static MethodRef mCanRenderBlockInLayer = new MethodRef(cBetterFoliageClient, "canRenderBlockInLayer", ClassRef.BOOLEAN, cBlock, cEnumWorldBlockLayer);
-    public static MethodRef mGetBlockIdOverride = new MethodRef(new ClassRef("mods.betterfoliage.client.ShadersModIntegration"), "getBlockIdOverride", ClassRef.INT, ClassRef.INT, cIBlockState);
+    public static MethodRef mGetBlockIdOverride = new MethodRef(cShadersModIntegration, "getBlockIdOverride", ClassRef.INT, ClassRef.INT, cIBlockState);
     public static MethodRef mGetAmbientOcclusionLightValueOverride = new MethodRef(cBetterFoliageClient, "getAmbientOcclusionLightValueOverride", ClassRef.FLOAT, ClassRef.FLOAT, cBlock);
     public static MethodRef mGetUseNeighborBrightnessOverride = new MethodRef(cBetterFoliageClient, "getUseNeighborBrightnessOverride", ClassRef.BOOLEAN, ClassRef.BOOLEAN, cBlock);
     public static MethodRef mShouldRenderBlockSideOverride = new MethodRef(cBetterFoliageClient, "shouldRenderBlockSideOverride", ClassRef.BOOLEAN, ClassRef.BOOLEAN, cIBlockAccess, cBlockPos, cEnumFacing);
