@@ -38,12 +38,36 @@ public class DynamicQuad {
      * @param vec2 vector from midpoint of quad to midpoint of "top" edge
      * @return quad data
      */
-    public static DynamicQuad createParallelogram(Double3 center, Double3 vec1, Double3 vec2) {
+    public static DynamicQuad createParallelogramCentered(Double3 center, Double3 vec1, Double3 vec2) {
         DynamicQuad result = new DynamicQuad();
         result.putRawXYZ(center.add(vec1).add(vec2), 0);
         result.putRawXYZ(center.sub(vec1).add(vec2), 1);
         result.putRawXYZ(center.sub(vec1).sub(vec2), 2);
         result.putRawXYZ(center.add(vec1).sub(vec2), 3);
+        return result;
+    }
+    
+    /** Create quad forming a parallelogram.
+     * @param center coordinates of midpoint of quad
+     * @param vec1 vector from midpoint of quad to midpoint of "right" edge
+     * @param vec2 vector from midpoint of quad to midpoint of "top" edge
+     * @return quad data
+     */
+    public static DynamicQuad createParallelogramExtruded(Double3 vert1, Double3 vert2, Double3 extrude) {
+        DynamicQuad result = new DynamicQuad();
+        result.putRawXYZ(vert1, 0);
+        result.putRawXYZ(vert2, 1);
+        result.putRawXYZ(vert2.add(extrude), 2);
+        result.putRawXYZ(vert1.add(extrude), 3);
+        return result;
+    }
+    
+    public static DynamicQuad createFromVertices(Double3 vert1, Double3 vert2, Double3 vert3, Double3 vert4) {
+    	DynamicQuad result = new DynamicQuad();
+        result.putRawXYZ(vert1, 0);
+        result.putRawXYZ(vert2, 1);
+        result.putRawXYZ(vert3, 2);
+        result.putRawXYZ(vert4, 3);
         return result;
     }
     
@@ -69,6 +93,14 @@ public class DynamicQuad {
             v[idx] = texture.getInterpolatedV(vValues[(uvRot + idx) & 3]);
         }
         return this;
+    }
+    
+    public DynamicQuad setTexture(TextureAtlasSprite texture, double[] uCoords, double[] vCoords) {
+    	for (int idx = 0; idx < 4; idx++) {
+    		u[idx] = texture.getInterpolatedU(uCoords[idx]);
+    		v[idx] = texture.getInterpolatedV(vCoords[idx]);
+    	}
+    	return this;
     }
     
     /** Set vertex colors

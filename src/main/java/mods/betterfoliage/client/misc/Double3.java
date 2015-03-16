@@ -42,6 +42,10 @@ public class Double3 {
 		return new Double3(this.x + x, this.y + y, this.z + z);
 	}
 	
+	public Double3 add(EnumFacing dir) {
+		return new Double3(x + dir.getFrontOffsetX(), y + dir.getFrontOffsetY(), z + dir.getFrontOffsetZ());
+	}
+	
 	public Double3 scaleAxes(double sx, double sy, double sz) {
 		return new Double3(x * sx, y * sy, z * sz);
 	}

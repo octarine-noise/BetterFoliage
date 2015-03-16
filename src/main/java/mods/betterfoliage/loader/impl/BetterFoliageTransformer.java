@@ -84,6 +84,51 @@ public class BetterFoliageTransformer extends AbstractClassTransformer {
                              createInvokeStatic(CodeRefs.mGetBlockIdOverride));
             }
         });
+        
+        // where: Block.getAmbientOcclusionLightValue()
+        // what: invoke code to overrule AO transparency value
+        // why: allows us to have light behave properly on non-solid log blocks without
+        //      messing with isOpaqueBlock(), which could have gameplay effects
+        methodTransformers.put(CodeRefs.mGetAmbientOcclusionLightValue, new AbstractMethodTransformer() {
+            @Override
+            public void transform() {
+                log.info("Applying Block.getAmbientOcclusionLightValue() override");
+                insertBefore(matchOpcode(Opcodes.FRETURN),
+                             new VarInsnNode(Opcodes.ALOAD, 0),
+                             createInvokeStatic(CodeRefs.mGetAmbientOcclusionLightValueOverride));
+            }
+            
+        });
+        
+        // where: Block.getUseNeighborBrightness()
+        // what: invoke code to overrule <b>useNeighborBrightness</b>
+        // why: allows us to have light behave properly on non-solid log blocks
+        methodTransformers.put(CodeRefs.mGetUseNeighborBrightness, new AbstractMethodTransformer() {
+            @Override
+            public void transform() {
+                log.info("Applying Block.getUseNeighborBrightness() override");
+                insertBefore(matchOpcode(Opcodes.IRETURN),
+                             new VarInsnNode(Opcodes.ALOAD, 0),
+                             createInvokeStatic(CodeRefs.mGetUseNeighborBrightnessOverride));
+            }
+            
+        });
+        
+        // where: Block.shouldSideBeRendered()
+        // what: invoke code to overrule condition
+        // why: allows us to make log blocks non-solid without
+        //      messing with isOpaqueBlock(), which could have gameplay effects
+        methodTransformers.put(CodeRefs.mShouldSideBeRendered, new AbstractMethodTransformer() {
+            @Override
+            public void transform() {
+                log.info("Applying Block.shouldSideBeRendered() override");
+                insertBefore(matchOpcode(Opcodes.IRETURN),
+                             new VarInsnNode(Opcodes.ALOAD, 1),
+                             new VarInsnNode(Opcodes.ALOAD, 2),
+                             new VarInsnNode(Opcodes.ALOAD, 3),
+                             createInvokeStatic(CodeRefs.mShouldRenderBlockSideOverride));
+            }
+        });
     }
     
     protected boolean isOptifinePresent() {

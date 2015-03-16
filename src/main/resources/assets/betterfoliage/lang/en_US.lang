@@ -28,6 +28,8 @@ betterfoliage.blockTypes.leavesWhitelist=Leaves Whitelist
 betterfoliage.blockTypes.leavesBlacklist=Leaves Blacklist
 betterfoliage.blockTypes.cropWhitelist=Crop Whitelist
 betterfoliage.blockTypes.cropBlacklist=Crop Blacklist
+betterfoliage.blockTypes.logWhitelist=Wood Log Whitelist
+betterfoliage.blockTypes.logBlacklist=Wood Log Blacklist
 
 betterfoliage.blockTypes.dirtWhitelist.tooltip=Blocks recognized as Dirt. Has an impact on Reeds, Algae, Connected Grass
 betterfoliage.blockTypes.dirtBlacklist.tooltip=Blocks never accepted as Dirt. Has an impact on Reeds, Algae, Connected Grass
@@ -37,6 +39,8 @@ betterfoliage.blockTypes.leavesWhitelist.tooltip=Blocks recognized as Leaves. Ha
 betterfoliage.blockTypes.leavesBlacklist.tooltip=Blocks never accepted as Leaves. Has an impact on Extra Leaves, Falling Leaves. Leaves will render with leaves block ID in shader programs
 betterfoliage.blockTypes.cropWhitelist.tooltip=Blocks recognized as crops. Crops will render with tallgrass block ID in shader programs
 betterfoliage.blockTypes.cropBlacklist.tooltip=Blocks never accepted as crops. Crops will render with tallgrass block ID in shader programs
+betterfoliage.blockTypes.logWhitelist.tooltip=Blocks recognized as wooden logs. Has an impact on Rounded Logs
+betterfoliage.blockTypes.logBlacklist.tooltip=Blocks never accepted as wooden logs. Has an impact on Rounded Logs
 
 betterfoliage.extraLeaves=Extra Leaves
 betterfoliage.extraLeaves.tooltip=Extra round leaves on leaf blocks
@@ -133,3 +137,14 @@ betterfoliage.connectedGrass.classic=Classic connected grass
 betterfoliage.connectedGrass.classic.tooltip=Draw grass top texture on grass block face if there is a grass block diagonally under it
 betterfoliage.connectedGrass.aggressive=Aggressive connected grass
 betterfoliage.connectedGrass.aggressive.tooltip=If there is a grass block on top of a dirt block: draw grass top texture on all grass block sides, render dirt block as standard grass block
+
+betterfoliage.roundLogs=Rounded Logs
+betterfoliage.roundLogs.tooltip=Make wooden log blocks octagonal in cross-section
+betterfoliage.roundLogs.connect=Connect Logs
+betterfoliage.roundLogs.connect.tooltip=Connect large areas of parallel logs along inner edges
+betterfoliage.roundLogs.connectGrass=Connect Grass
+betterfoliage.roundLogs.connectGrass.tooltip=Render grass block under trees instead of dirt if there is grass nearby
+betterfoliage.roundLogs.smallRadius=Chamfer radius
+betterfoliage.roundLogs.smallRadius.tooltip=How much to chop off from the log corner
+betterfoliage.roundLogs.largeRadius=Connected chamfer radius
+betterfoliage.roundLogs.largeRadius.tooltip=How much to chop off from the outer corner of connected logs

@@ -43,10 +43,10 @@ public class BlockCrossedQuads implements IQuadCollection {
         Double3 horz2 = new Double3(halfSize, 0.0, -halfSize).add(perturb2);
         Double3 vert = new Double3(0.0, halfSize * 1.41, 0.0);
         
-        result.SW = DynamicQuad.createParallelogram(blockCenter, horz1, vert);
-        result.NE = DynamicQuad.createParallelogram(blockCenter, horz1.inverse(), vert);
-        result.SE = DynamicQuad.createParallelogram(blockCenter, horz2, vert);
-        result.NW = DynamicQuad.createParallelogram(blockCenter, horz2.inverse(), vert);
+        result.SW = DynamicQuad.createParallelogramCentered(blockCenter, horz1, vert);
+        result.NE = DynamicQuad.createParallelogramCentered(blockCenter, horz1.inverse(), vert);
+        result.SE = DynamicQuad.createParallelogramCentered(blockCenter, horz2, vert);
+        result.NW = DynamicQuad.createParallelogramCentered(blockCenter, horz2.inverse(), vert);
         
         return result;
     }
@@ -64,10 +64,10 @@ public class BlockCrossedQuads implements IQuadCollection {
         Double3 horz2 = new Double3(halfSize, 0.0, -halfSize);
         Double3 vert = new Double3(0.0, halfSize * 1.41, 0.0);
         
-        result.SW = DynamicQuad.createParallelogram(drawCenter, horz1, vert);
-        result.NE = DynamicQuad.createParallelogram(drawCenter, horz1.inverse(), vert);
-        result.SE = DynamicQuad.createParallelogram(drawCenter, horz2, vert);
-        result.NW = DynamicQuad.createParallelogram(drawCenter, horz2.inverse(), vert);
+        result.SW = DynamicQuad.createParallelogramCentered(drawCenter, horz1, vert);
+        result.NE = DynamicQuad.createParallelogramCentered(drawCenter, horz1.inverse(), vert);
+        result.SE = DynamicQuad.createParallelogramCentered(drawCenter, horz2, vert);
+        result.NW = DynamicQuad.createParallelogramCentered(drawCenter, horz2.inverse(), vert);
         
         return result;
     }

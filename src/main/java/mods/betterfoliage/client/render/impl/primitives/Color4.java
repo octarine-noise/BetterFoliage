@@ -49,6 +49,24 @@ public class Color4 {
         return result;
     }
     
+    public static Color4 average(Color4 col1, Color4 col2) {
+    	Color4 result = new Color4();
+    	result.A = (col1.A + col2.A) / 2;
+    	result.R = (col1.R + col2.R) / 2;
+    	result.G = (col1.G + col2.G) / 2;
+    	result.B = (col1.B + col2.B) / 2;
+    	return result;
+    }
+    
+    public static Color4 average(Color4 col1, Color4 col2, Color4 col3, Color4 col4) {
+    	Color4 result = new Color4();
+    	result.A = (col1.A + col2.A + col3.A + col4.A) / 4;
+    	result.R = (col1.R + col2.R + col3.R + col4.R) / 4;
+    	result.G = (col1.G + col2.G + col3.G + col4.G) / 4;
+    	result.B = (col1.B + col2.B + col3.B + col4.B) / 4;
+    	return result;
+    }
+    
     public float getSaturation() {
     	return Color.RGBtoHSB(R, G, B, null)[1];
     }

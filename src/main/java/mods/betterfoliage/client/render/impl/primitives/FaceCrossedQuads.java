@@ -45,10 +45,10 @@ public class FaceCrossedQuads implements IQuadCollection {
         Double3 faceTL = new Double3(DynamicQuad.faceRight[facing.ordinal()]).inverse().add(new Double3(DynamicQuad.faceTop[facing.ordinal()])).scale(halfWidth);
         Double3 drawCenter = base.add(faceN).add(new Double3(DynamicQuad.faceRight[facing.ordinal()]).scale(perturb.x)).add(new Double3(DynamicQuad.faceTop[facing.ordinal()]).scale(perturb.z));
         
-        result.BR = DynamicQuad.createParallelogram(drawCenter, faceTR, faceN);
-        result.TL = DynamicQuad.createParallelogram(drawCenter, faceTR.inverse(), faceN);
-        result.TR = DynamicQuad.createParallelogram(drawCenter, faceTL, faceN);
-        result.BL = DynamicQuad.createParallelogram(drawCenter, faceTL.inverse(), faceN);
+        result.BR = DynamicQuad.createParallelogramCentered(drawCenter, faceTR, faceN);
+        result.TL = DynamicQuad.createParallelogramCentered(drawCenter, faceTR.inverse(), faceN);
+        result.TR = DynamicQuad.createParallelogramCentered(drawCenter, faceTL, faceN);
+        result.BL = DynamicQuad.createParallelogramCentered(drawCenter, faceTL.inverse(), faceN);
         result.facing = facing;
         return result;
     }

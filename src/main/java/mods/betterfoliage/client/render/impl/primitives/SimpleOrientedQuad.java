@@ -21,7 +21,7 @@ public class SimpleOrientedQuad implements IQuadCollection {
         SimpleOrientedQuad result = new SimpleOrientedQuad();
         Double3 horz1 = new Double3(DynamicQuad.faceRight[facing.ordinal()]).scale(halfSize);
         Double3 horz2 = new Double3(DynamicQuad.faceTop[facing.ordinal()]).scale(halfSize);
-        result.quad = DynamicQuad.createParallelogram(center, horz1, horz2);
+        result.quad = DynamicQuad.createParallelogramCentered(center, horz1, horz2);
         result.facing = facing;
         return result;
     }

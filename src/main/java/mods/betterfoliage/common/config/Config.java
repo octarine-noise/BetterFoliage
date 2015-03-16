@@ -26,7 +26,7 @@ import com.google.common.collect.Lists;
 public class Config {
 
 	public enum Category {
-	    blockTypes, extraLeaves, shortGrass, cactus, lilypad, reed, algae, coral, netherrack, fallingLeaves, risingSoul, connectedGrass;
+	    blockTypes, extraLeaves, shortGrass, cactus, lilypad, reed, algae, coral, netherrack, fallingLeaves, risingSoul, connectedGrass, roundLogs;
 	}
 	
 	/** {@link Configuration} object bound to the config file */
@@ -37,6 +37,7 @@ public class Config {
     public static BlockMatcher crops = new BlockMatcher();
     public static BlockMatcher dirt = new BlockMatcher();
     public static BlockMatcher grass = new BlockMatcher();
+    public static BlockMatcher logs = new BlockMatcher();
     
 	// extracted config values
 	public static boolean leavesEnabled;
@@ -112,6 +113,12 @@ public class Config {
 	    
 	public static boolean ctxGrassClassicEnabled;
 	public static boolean ctxGrassAggressiveEnabled;
+	
+	public static boolean logsEnabled;
+	public static double logsSmallRadius;
+	public static double logsLargeRadius;
+	public static boolean logsConnect;
+	public static boolean logsConnectGrass;
 	
 	public static List<Integer> reedBiomeList = Lists.newArrayList();
 	public static List<Integer> algaeBiomeList = Lists.newArrayList();
@@ -213,10 +220,17 @@ public class Config {
         ctxGrassClassicEnabled = getBoolean(Category.connectedGrass, "classic", true, "betterfoliage.connectedGrass.classic");
         ctxGrassAggressiveEnabled= getBoolean(Category.connectedGrass, "aggressive", true, "betterfoliage.connectedGrass.aggressive");
 		
+        logsEnabled = getBoolean(Category.roundLogs, "enabled", true, "betterfoliage.enabled");
+        logsSmallRadius = getDouble(Category.roundLogs, "smallRadius", 0.25, 0.0, 0.5, "betterfoliage.roundLogs.smallRadius");
+        logsLargeRadius = getDouble(Category.roundLogs, "largeRadius", 0.45, 0.0, 0.5, "betterfoliage.roundLogs.largeRadius");
+        logsConnect = getBoolean(Category.roundLogs, "connect", true, "betterfoliage.roundLogs.connect");
+        logsConnectGrass = getBoolean(Category.roundLogs, "connectGrass", true, "betterfoliage.roundLogs.connectGrass");
+        
         updateBlockMatcher(dirt, Category.blockTypes, "dirtWhitelist", "betterfoliage.blockTypes.dirtWhitelist", "dirtBlacklist", "betterfoliage.blockTypes.dirtBlacklist", new ResourceLocation("betterfoliage:classesDirtDefault.cfg"));
         updateBlockMatcher(grass, Category.blockTypes, "grassWhitelist", "betterfoliage.blockTypes.grassWhitelist", "grassBlacklist", "betterfoliage.blockTypes.grassBlacklist", new ResourceLocation("betterfoliage:classesGrassDefault.cfg"));
         updateBlockMatcher(leaves, Category.blockTypes, "leavesWhitelist", "betterfoliage.blockTypes.leavesWhitelist", "leavesBlacklist", "betterfoliage.blockTypes.leavesBlacklist", new ResourceLocation("betterfoliage:classesLeavesDefault.cfg"));
         updateBlockMatcher(crops, Category.blockTypes, "cropWhitelist", "betterfoliage.blockTypes.cropWhitelist", "cropBlacklist", "betterfoliage.blockTypes.cropBlacklist", new ResourceLocation("betterfoliage:classesCropDefault.cfg"));
+        updateBlockMatcher(logs, Category.blockTypes, "logWhitelist", "betterfoliage.blockTypes.logWhitelist", "logBlacklist", "betterfoliage.blockTypes.logBlacklist", new ResourceLocation("betterfoliage:classesLogDefault.cfg"));
         
         rawConfig.getCategory(Category.extraLeaves.toString()).get("skewMode").setConfigEntryClass(AlternateTextBooleanEntry.class);
         rawConfig.getCategory(Category.reed.toString()).get("reedBiomeList").setConfigEntryClass(BiomeListConfigEntry.class);
@@ -235,6 +249,7 @@ public class Config {
 		setOrder(Category.fallingLeaves, "enabled", "chance", "size", "lifetime", "speed", "windStrength", "stormStrength", "perturb");
 		setOrder(Category.risingSoul, "enabled", "chance", "speed", "perturb", "headSize", "trailSize", "sizeDecay", "opacity", "opacityDecay", "lifetime", "trailLength", "trailDensity");
 		setOrder(Category.connectedGrass, "classic", "aggressive");
+		setOrder(Category.roundLogs, "enabled", "connect", "connectGrass", "smallRadius", "largeRadius");
 	}
 	
 	public static void setupDefaultBiomes() {

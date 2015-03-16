@@ -10,6 +10,7 @@ import mods.betterfoliage.client.render.impl.EntityFXFallingLeaves;
 import mods.betterfoliage.client.render.impl.EntityFXRisingSoul;
 import mods.betterfoliage.client.render.impl.RenderBlockDirtWithAlgae;
 import mods.betterfoliage.client.render.impl.RenderBlockCactus;
+import mods.betterfoliage.client.render.impl.RenderBlockLogs;
 import mods.betterfoliage.client.render.impl.RenderBlockSandWithCoral;
 import mods.betterfoliage.client.render.impl.RenderBlockGrass;
 import mods.betterfoliage.client.render.impl.RenderBlockLeaves;
@@ -19,6 +20,7 @@ import mods.betterfoliage.client.render.impl.RenderBlockNetherrack;
 import mods.betterfoliage.client.render.impl.RenderBlockReed;
 import mods.betterfoliage.client.texture.GrassTextures;
 import mods.betterfoliage.client.texture.LeafTextures;
+import mods.betterfoliage.client.texture.LogTextures;
 import mods.betterfoliage.client.texture.SoulParticleTextures;
 import mods.betterfoliage.client.texture.generator.LeafGenerator;
 import mods.betterfoliage.client.texture.generator.ReedGenerator;
@@ -34,6 +36,7 @@ import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumWorldBlockLayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IBlockAccess;
@@ -54,6 +57,7 @@ public class BetterFoliageClient {
 	public static LeafGenerator leafGenerator = new LeafGenerator();
 	public static SoulParticleTextures soulParticles = new SoulParticleTextures();
 	public static GrassTextures grassRegistry = new GrassTextures();
+	public static LogTextures logRegistry = new LogTextures();
 	public static WindTracker wind = new WindTracker();
 	
 	public static void postInit() {
@@ -72,6 +76,7 @@ public class BetterFoliageClient {
 		registerRenderer(new RenderBlockSandWithCoral());
 		registerRenderer(new RenderBlockReed());
 		registerRenderer(new RenderBlockNetherrack());
+		registerRenderer(new RenderBlockLogs());
 		
 		MinecraftForge.EVENT_BUS.register(wind);
 		FMLCommonHandler.instance().bus().register(wind);
@@ -89,6 +94,11 @@ public class BetterFoliageClient {
 		MinecraftForge.EVENT_BUS.register(grassRegistry);
 		grassRegistry.grassMappings.add(new VanillaMapping("minecraft:models/block/grass", "top"));
 		grassRegistry.grassMappings.add(new VanillaMapping("minecraft:models/block/cube_bottom_top", "top"));
+		MinecraftForge.EVENT_BUS.register(logRegistry);
+		logRegistry.logSideMappings.add(new VanillaMapping("minecraft:models/block/cube_column", "side"));
+		logRegistry.logSideMappings.add(new VanillaMapping("minecraft:models/block/column_side", "side"));
+		logRegistry.logEndMappings.add(new VanillaMapping("minecraft:models/block/cube_column", "end"));
+		logRegistry.logEndMappings.add(new VanillaMapping("minecraft:models/block/column_side", "end"));
 		
 		MinecraftForge.EVENT_BUS.register(new ReedGenerator("bf_reed_bottom", missingTexture, true));
 		MinecraftForge.EVENT_BUS.register(new ReedGenerator("bf_reed_top", missingTexture, false));
@@ -119,16 +129,33 @@ public class BetterFoliageClient {
 	    }
 	}
 	
+	public static boolean shouldRenderBlockSideOverride(boolean original, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
+	    return original || (Config.logsEnabled && Config.logs.matchesID(blockAccess.getBlockState(pos).getBlock()));
+	}
+	
+	public static float getAmbientOcclusionLightValueOverride(float original, Block block) {
+	    if (Config.logsEnabled && Config.logs.matchesID(block)) return 1.0f;
+	    return original;
+	}
+	
+    public static boolean getUseNeighborBrightnessOverride(boolean original, Block block) {
+        return original || (Config.logsEnabled && Config.logs.matchesID(block));
+    }
+    
 	public static boolean canRenderBlockInLayer(Block block, EnumWorldBlockLayer layer) {
+		// enable CUTOUT_MIPPED layer ONLY for blocks where needed
+		if (Config.logs.matchesID(block) && Config.logsEnabled) return layer == EnumWorldBlockLayer.CUTOUT_MIPPED;
+		
 	    if (block.canRenderInLayer(layer)) return true;
 	    
-	    // enable CUTOUT_MIPPED layer for blocks where needed
+	    // enable CUTOUT_MIPPED layer IN ADDITION for blocks where needed
 	    if (block == Blocks.sand && Config.coralEnabled) return layer == EnumWorldBlockLayer.CUTOUT_MIPPED;
 	    if (block == Blocks.mycelium && Config.grassEnabled) return layer == EnumWorldBlockLayer.CUTOUT_MIPPED;
 	    if (block == Blocks.cactus && Config.cactusEnabled) return layer == EnumWorldBlockLayer.CUTOUT_MIPPED;
 	    if (block == Blocks.waterlily && Config.lilypadEnabled) return layer == EnumWorldBlockLayer.CUTOUT_MIPPED;
 	    if (block == Blocks.netherrack && Config.netherrackEnabled) return layer == EnumWorldBlockLayer.CUTOUT_MIPPED;
 	    if (Config.dirt.matchesID(block) && (Config.algaeEnabled || Config.reedEnabled)) return layer == EnumWorldBlockLayer.CUTOUT_MIPPED;
+	    
 	    return false;
 	}
 	

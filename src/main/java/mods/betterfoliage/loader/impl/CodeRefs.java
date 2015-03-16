@@ -25,7 +25,11 @@ public class CodeRefs {
     public static ClassRef cIBlockState = new ClassRef("net.minecraft.block.state.IBlockState", "bec");
     public static ClassRef cBlockPos = new ClassRef("net.minecraft.util.BlockPos", "dt");
     public static ClassRef cEnumWorldBlockLayer = new ClassRef("net.minecraft.util.EnumWorldBlockLayer", "aql");
+    public static ClassRef cEnumFacing = new ClassRef("net.minecraft.util.EnumFacing", "ej");
     public static MethodRef mCanRenderInLayer = new MethodRef(cBlock, "canRenderInLayer", ClassRef.BOOLEAN, cEnumWorldBlockLayer);
+    public static MethodRef mGetAmbientOcclusionLightValue = new MethodRef(cBlock, "getAmbientOcclusionLightValue", "func_149685_I", "f", ClassRef.FLOAT);
+    public static MethodRef mGetUseNeighborBrightness = new MethodRef(cBlock, "getUseNeighborBrightness", "func_149710_n", "q", ClassRef.BOOLEAN);
+    public static MethodRef mShouldSideBeRendered = new MethodRef(cBlock, "shouldSideBeRendered", "func_149646_a", "a", ClassRef.BOOLEAN, cIBlockAccess, cBlockPos, cEnumFacing);
     
     public static ClassRef cWorld = new ClassRef("net.minecraft.world.World", "aqu");
     public static ClassRef cWorldClient = new ClassRef("net.minecraft.client.multiplayer.WorldClient", "cen");
@@ -54,6 +58,9 @@ public class CodeRefs {
     public static MethodRef mRenderWorldBlock = new MethodRef(cBetterFoliageClient, "renderWorldBlock", ClassRef.BOOLEAN, cBlockRendererDispatcher, cIBlockState, cBlockPos, cIBlockAccess, cWorldRenderer, cEnumWorldBlockLayer);
     public static MethodRef mCanRenderBlockInLayer = new MethodRef(cBetterFoliageClient, "canRenderBlockInLayer", ClassRef.BOOLEAN, cBlock, cEnumWorldBlockLayer);
     public static MethodRef mGetBlockIdOverride = new MethodRef(new ClassRef("mods.betterfoliage.client.ShadersModIntegration"), "getBlockIdOverride", ClassRef.INT, ClassRef.INT, cIBlockState);
+    public static MethodRef mGetAmbientOcclusionLightValueOverride = new MethodRef(cBetterFoliageClient, "getAmbientOcclusionLightValueOverride", ClassRef.FLOAT, ClassRef.FLOAT, cBlock);
+    public static MethodRef mGetUseNeighborBrightnessOverride = new MethodRef(cBetterFoliageClient, "getUseNeighborBrightnessOverride", ClassRef.BOOLEAN, ClassRef.BOOLEAN, cBlock);
+    public static MethodRef mShouldRenderBlockSideOverride = new MethodRef(cBetterFoliageClient, "shouldRenderBlockSideOverride", ClassRef.BOOLEAN, ClassRef.BOOLEAN, cIBlockAccess, cBlockPos, cEnumFacing);
     
     // ShadersMod
     public static ClassRef cSVertexBuilder = new ClassRef("shadersmod.client.SVertexBuilder");
