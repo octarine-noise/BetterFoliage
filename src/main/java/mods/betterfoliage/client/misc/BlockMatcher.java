@@ -1,10 +1,10 @@
-package mods.betterfoliage.client;
+package mods.betterfoliage.client.misc;
 
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
 
-import mods.betterfoliage.common.util.ResourceUtils;
+import mods.betterfoliage.client.util.ResourceUtils;
 import net.minecraft.block.Block;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.util.ResourceLocation;

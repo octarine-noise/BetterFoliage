@@ -1,9 +1,8 @@
-package mods.betterfoliage.common.integration;
+package mods.betterfoliage.client.integration;
 
 import java.util.Collection;
 
 import mods.betterfoliage.BetterFoliage;
-import mods.betterfoliage.loader.IResolvable;
 import mods.betterfoliage.loader.impl.CodeRefs;
 import net.minecraft.block.Block;
 import net.minecraft.util.IIcon;
@@ -11,23 +10,21 @@ import net.minecraft.world.IBlockAccess;
 
 import com.google.common.collect.Sets;
 
-public class OptifineIntegration {
+/** Helper methods for dealing with Optifine.
+ * @author octarine-noise
+ */
+public class OptifineIntegration extends AbstractModIntegration {
 
 	public static boolean isPresent = false;
 	
+    /** Hide constructor */
+    private OptifineIntegration() {}
+    
 	public static void init() {
-		boolean some = false, all = true;
-		for (IResolvable<?> element : CodeRefs.optifineCTF) {
-			if (element.resolve() == null) {
-				all = false;
-			} else {
-				some = true;
-			}
-		}
-		if (all) {
+		if (isAllAvailable(CodeRefs.optifineCTF)) {
 			BetterFoliage.log.info("Found Optifine, using CTM support");
 			isPresent = true;
-		} else if (some) {
+		} else if (isSomeAvailable(CodeRefs.optifineCTF)) {
 			BetterFoliage.log.info("Found Optifine, but not all needed elements (wrong version?)");
 		}
 	}

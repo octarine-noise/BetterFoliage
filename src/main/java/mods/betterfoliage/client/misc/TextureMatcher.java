@@ -1,9 +1,9 @@
-package mods.betterfoliage.client;
+package mods.betterfoliage.client.misc;
 
 import java.util.List;
 import java.util.Map;
 
-import mods.betterfoliage.common.util.ResourceUtils;
+import mods.betterfoliage.client.util.ResourceUtils;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;

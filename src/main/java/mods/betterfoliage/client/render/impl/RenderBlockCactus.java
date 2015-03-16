@@ -1,11 +1,11 @@
 package mods.betterfoliage.client.render.impl;
 
 import mods.betterfoliage.BetterFoliage;
+import mods.betterfoliage.client.misc.Double3;
 import mods.betterfoliage.client.render.FakeRenderBlockAOBase;
 import mods.betterfoliage.client.render.IRenderBlockDecorator;
 import mods.betterfoliage.client.render.IconSet;
 import mods.betterfoliage.common.config.Config;
-import mods.betterfoliage.common.util.Double3;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderBlocks;

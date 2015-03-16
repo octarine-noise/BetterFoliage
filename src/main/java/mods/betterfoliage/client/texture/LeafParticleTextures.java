@@ -1,12 +1,12 @@
-package mods.betterfoliage.client.resource;
+package mods.betterfoliage.client.texture;
 
 import java.util.Map;
 
 import mods.betterfoliage.BetterFoliage;
-import mods.betterfoliage.client.TextureMatcher;
+import mods.betterfoliage.client.misc.TextureMatcher;
 import mods.betterfoliage.client.render.IconSet;
-import mods.betterfoliage.client.resource.LeafTextureEnumerator.LeafTextureFoundEvent;
-import mods.betterfoliage.common.util.RenderUtils;
+import mods.betterfoliage.client.texture.LeafTextureEnumerator.LeafTextureFoundEvent;
+import mods.betterfoliage.client.util.RenderUtils;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.TextureStitchEvent;

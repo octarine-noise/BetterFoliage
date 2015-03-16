@@ -1,4 +1,4 @@
-package mods.betterfoliage.client.resource;
+package mods.betterfoliage.client.texture.generator;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -8,7 +8,7 @@ import javax.imageio.ImageIO;
 
 import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.BetterFoliageClient;
-import mods.betterfoliage.common.integration.ShadersModIntegration;
+import mods.betterfoliage.client.integration.ShadersModIntegration;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.TextureStitchEvent;

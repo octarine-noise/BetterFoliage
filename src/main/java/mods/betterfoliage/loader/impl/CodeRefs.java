@@ -1,5 +1,9 @@
 package mods.betterfoliage.loader.impl;
 
+import java.util.Collection;
+
+import com.google.common.collect.ImmutableList;
+
 import cpw.mods.fml.relauncher.FMLInjectionData;
 import mods.betterfoliage.loader.ClassRef;
 import mods.betterfoliage.loader.FieldRef;
@@ -26,7 +30,9 @@ public class CodeRefs {
     public static MethodRef mGetRenderTypeOverride, mOnRandomDisplayTick, mGetAmbientOcclusionLightValueOverride, mGetBlockIdOverride, mGetUseNeighborBrightnessOverride, mShouldRenderBlockSideOverride;
 
     // ShadersMod
+    public static ClassRef cShaders;
     public static MethodRef mPushEntity;
+    public static FieldRef fShadersEntityData, fShadersEntityDataIndex;
     
     // Optifine
     public static ClassRef cConnectedTextures, cConnectedProperties;
@@ -34,7 +40,8 @@ public class CodeRefs {
     public static FieldRef fCTBlockProperties, fCTTileProperties,fCPTileIcons;
     
     // Feature sets
-    public static IResolvable<?>[] optifineCTF;
+    public static Collection<IResolvable<?>> optifineCTF;
+    public static Collection<IResolvable<?>> shaders;
     
     static {
         String mcVersion = FMLInjectionData.data()[4].toString();
@@ -82,7 +89,10 @@ public class CodeRefs {
         mShouldRenderBlockSideOverride = new MethodRef(cBetterFoliageClient, "shouldRenderBlockSideOverride", ClassRef.BOOLEAN, ClassRef.BOOLEAN, cIBlockAccess, ClassRef.INT, ClassRef.INT, ClassRef.INT, ClassRef.INT);
         
         mGetBlockIdOverride = new MethodRef(new ClassRef("mods.betterfoliage.client.ShadersModIntegration"), "getBlockIdOverride", ClassRef.INT, ClassRef.INT, cBlock);
-        mPushEntity = new MethodRef(new ClassRef("shadersmodcore.client.Shaders"), "pushEntity", ClassRef.VOID, cRenderBlocks, cBlock, ClassRef.INT, ClassRef.INT, ClassRef.INT);
+        cShaders = new ClassRef("shadersmodcore.client.Shaders");
+        mPushEntity = new MethodRef(cShaders, "pushEntity", ClassRef.VOID, cRenderBlocks, cBlock, ClassRef.INT, ClassRef.INT, ClassRef.INT);
+        fShadersEntityData = new FieldRef(cShaders, "entityData", ClassRef.INT);
+        fShadersEntityDataIndex = new FieldRef(cShaders, "entityDataIndex", ClassRef.INT);
         
         cConnectedTextures = new ClassRef("ConnectedTextures");
         cConnectedProperties = new ClassRef("ConnectedProperties");
@@ -96,8 +106,9 @@ public class CodeRefs {
         
         fCPTileIcons = new FieldRef(cConnectedProperties, "tileIcons", null);
         
-        optifineCTF = new IResolvable<?>[] {
+        optifineCTF = ImmutableList.<IResolvable<?>>of(
         	cConnectedTextures, cConnectedProperties, mGetConnectedTexture, mGetIndexInMap, fCTBlockProperties, fCTTileProperties, fCPTileIcons
-        };
+        );
+        shaders = ImmutableList.<IResolvable<?>>of(cShaders, fShadersEntityData, fShadersEntityDataIndex);
     }
 }

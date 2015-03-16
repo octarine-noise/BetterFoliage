@@ -5,8 +5,8 @@ import java.awt.Color;
 import org.lwjgl.opengl.GL11;
 
 import mods.betterfoliage.client.BetterFoliageClient;
+import mods.betterfoliage.client.misc.Double3;
 import mods.betterfoliage.common.config.Config;
-import mods.betterfoliage.common.util.Double3;
 import net.minecraft.block.Block;
 import net.minecraft.client.particle.EntityFX;
 import net.minecraft.client.renderer.Tessellator;

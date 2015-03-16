@@ -1,6 +1,6 @@
 package mods.betterfoliage.client.render;
 
-import mods.betterfoliage.common.util.ResourceUtils;
+import mods.betterfoliage.client.util.ResourceUtils;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;

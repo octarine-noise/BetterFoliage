@@ -2,7 +2,7 @@ package mods.betterfoliage.client.gui;
 
 import java.util.List;
 
-import mods.betterfoliage.common.util.BiomeUtils;
+import mods.betterfoliage.client.util.BiomeUtils;
 import net.minecraft.world.biome.BiomeGenBase;
 
 import com.google.common.collect.Collections2;

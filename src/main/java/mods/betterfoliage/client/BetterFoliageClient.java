@@ -3,6 +3,10 @@ package mods.betterfoliage.client;
 import java.util.Map;
 
 import mods.betterfoliage.BetterFoliage;
+import mods.betterfoliage.client.integration.OptifineIntegration;
+import mods.betterfoliage.client.integration.ShadersModIntegration;
+import mods.betterfoliage.client.integration.TerraFirmaCraftIntegration;
+import mods.betterfoliage.client.misc.WindTracker;
 import mods.betterfoliage.client.render.IRenderBlockDecorator;
 import mods.betterfoliage.client.render.impl.EntityFXFallingLeaves;
 import mods.betterfoliage.client.render.impl.EntityFXRisingSoul;
@@ -18,17 +22,14 @@ import mods.betterfoliage.client.render.impl.RenderBlockNetherrack;
 import mods.betterfoliage.client.render.impl.RenderBlockReed;
 import mods.betterfoliage.client.render.impl.RenderBlockDirtWithGrassSide;
 import mods.betterfoliage.client.render.impl.RenderBlockDirtWithGrassTop;
-import mods.betterfoliage.client.resource.GrassTextures;
-import mods.betterfoliage.client.resource.LeafGenerator;
-import mods.betterfoliage.client.resource.LeafParticleTextures;
-import mods.betterfoliage.client.resource.LeafTextureEnumerator;
-import mods.betterfoliage.client.resource.ReedGenerator;
-import mods.betterfoliage.client.resource.ShortGrassGenerator;
-import mods.betterfoliage.client.resource.SoulParticleTextures;
+import mods.betterfoliage.client.texture.GrassTextures;
+import mods.betterfoliage.client.texture.LeafParticleTextures;
+import mods.betterfoliage.client.texture.LeafTextureEnumerator;
+import mods.betterfoliage.client.texture.SoulParticleTextures;
+import mods.betterfoliage.client.texture.generator.LeafGenerator;
+import mods.betterfoliage.client.texture.generator.ReedGenerator;
+import mods.betterfoliage.client.texture.generator.ShortGrassGenerator;
 import mods.betterfoliage.common.config.Config;
-import mods.betterfoliage.common.integration.OptifineIntegration;
-import mods.betterfoliage.common.integration.ShadersModIntegration;
-import mods.betterfoliage.common.integration.TerraFirmaCraftIntegration;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -43,6 +44,9 @@ import com.google.common.collect.Maps;
 import cpw.mods.fml.client.registry.RenderingRegistry;
 import cpw.mods.fml.common.FMLCommonHandler;
 
+/** Client proxy class. Contains initialization and ASM-ed call hooks.
+ * @author octarine-noise
+ */
 public class BetterFoliageClient {
 
 	public static ResourceLocation missingTexture = new ResourceLocation("betterfoliage", "textures/blocks/missing_leaf.png");

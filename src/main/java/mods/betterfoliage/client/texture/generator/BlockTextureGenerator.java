@@ -1,4 +1,4 @@
-package mods.betterfoliage.client.resource;
+package mods.betterfoliage.client.texture.generator;
 
 import java.io.IOException;
 import java.util.List;

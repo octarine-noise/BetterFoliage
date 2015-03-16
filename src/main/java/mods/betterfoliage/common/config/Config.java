@@ -4,11 +4,11 @@ import java.io.File;
 import java.util.List;
 
 import mods.betterfoliage.BetterFoliage;
-import mods.betterfoliage.client.BlockMatcher;
 import mods.betterfoliage.client.gui.AlternateTextBooleanEntry;
 import mods.betterfoliage.client.gui.BiomeListConfigEntry;
 import mods.betterfoliage.client.gui.NonVerboseArrayEntry;
-import mods.betterfoliage.common.util.BiomeUtils;
+import mods.betterfoliage.client.misc.BlockMatcher;
+import mods.betterfoliage.client.util.BiomeUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.BiomeGenBase;

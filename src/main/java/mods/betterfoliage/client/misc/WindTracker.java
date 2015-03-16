@@ -1,4 +1,4 @@
-package mods.betterfoliage.client;
+package mods.betterfoliage.client.misc;
 
 import java.util.Random;
 

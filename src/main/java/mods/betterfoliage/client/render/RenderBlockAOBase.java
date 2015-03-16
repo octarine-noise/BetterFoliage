@@ -6,8 +6,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import mods.betterfoliage.BetterFoliage;
-import mods.betterfoliage.common.util.Double3;
-import mods.betterfoliage.common.util.RenderUtils;
+import mods.betterfoliage.client.misc.Double3;
+import mods.betterfoliage.client.util.RenderUtils;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderBlocks;

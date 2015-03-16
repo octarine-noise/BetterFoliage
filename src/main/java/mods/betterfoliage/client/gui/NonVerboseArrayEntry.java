@@ -1,6 +1,6 @@
 package mods.betterfoliage.client.gui;
 
-import mods.betterfoliage.common.util.RenderUtils;
+import mods.betterfoliage.client.util.RenderUtils;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.EnumChatFormatting;
 import cpw.mods.fml.client.config.GuiConfig;

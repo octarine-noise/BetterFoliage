@@ -1,4 +1,4 @@
-package mods.betterfoliage.client.resource;
+package mods.betterfoliage.client.texture.generator;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -8,24 +8,20 @@ import javax.imageio.ImageIO;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import mods.betterfoliage.common.integration.ShadersModIntegration;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 
 @SideOnly(Side.CLIENT)
-public class ShortGrassGenerator extends BlockTextureGenerator {
+public class ReedGenerator extends BlockTextureGenerator {
 
-	protected boolean isSnowed = false;
+	public boolean isBottom;
 	
-	protected int snowOriginalWeight = 2;
-	
-	protected int snowWhiteWeight = 3;
-	
-	public ShortGrassGenerator(String domainName, ResourceLocation missingResource, boolean isSnowed) {
+	public ReedGenerator(String domainName, ResourceLocation missingResource, boolean isBottom) {
 		super(domainName, missingResource);
-		this.isSnowed = isSnowed;
+		this.isBottom = isBottom;
 	}
 
 	@Override
@@ -36,17 +32,10 @@ public class ShortGrassGenerator extends BlockTextureGenerator {
 		// load full texture
 		BufferedImage origImage = ImageIO.read(resourceManager.getResource(originalResource).getInputStream());
 
-		// draw bottom half of texture
-		BufferedImage result = new BufferedImage(origImage.getWidth(), origImage.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+		// draw half texture
+		BufferedImage result = new BufferedImage(origImage.getWidth(), origImage.getHeight() / 2, BufferedImage.TYPE_4BYTE_ABGR);
 		Graphics2D graphics = result.createGraphics();
-		graphics.drawImage(origImage, 0, 3 * origImage.getHeight() / 8, null);
-
-		// blend with white if snowed
-		if (isSnowed && !ShadersModIntegration.isSpecialTexture(originalResource)) {
-			for (int x = 0; x < result.getWidth(); x++) for (int y = 0; y < result.getHeight(); y++) {
-				result.setRGB(x, y, blendRGB(result.getRGB(x, y), 0xFFFFFF, 2, 3));
-			}
-		}
+		graphics.drawImage(origImage, 0, isBottom ? -origImage.getHeight() / 2 : 0, null);
 		
 		return new BufferedImageResource(result, originalResource);
 	}

@@ -1,4 +1,4 @@
-package mods.betterfoliage.client.resource;
+package mods.betterfoliage.client.texture;
 
 import java.awt.Color;
 import java.util.Iterator;
@@ -7,8 +7,8 @@ import java.util.Map;
 import com.google.common.collect.Maps;
 
 import mods.betterfoliage.BetterFoliage;
+import mods.betterfoliage.client.util.RenderUtils;
 import mods.betterfoliage.common.config.Config;
-import mods.betterfoliage.common.util.RenderUtils;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -18,19 +18,28 @@ import net.minecraftforge.client.event.TextureStitchEvent;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
+/** Stores average texture color values for non-grey grass textures
+ * @author octarine-noise
+ */
 public class GrassTextures implements IIconRegister {
 
 	/** Texture atlas for block textures used in the current run */
 	public TextureMap blockTextures;
 	
-	public Map<IIcon, Integer> avgColors = Maps.newHashMap();
+	/** Map of average color values */
+	public Map<IIcon, Integer> iconColors = Maps.newHashMap();
 	
-	/** Leaf blocks register their textures here.
+	public int getColor(IIcon icon, int defaultColor) {
+		Integer result = iconColors.get(icon);
+		return result == null ? defaultColor : result;
+	}
+	
+	/** Grass blocks register their textures here.
 	 *  @return the originally registered {@link IIcon} already in the atlas
 	 */
 	public IIcon registerIcon(String resourceLocation) {
 		TextureAtlasSprite original = blockTextures.getTextureExtry(resourceLocation);
-		BetterFoliage.log.debug(String.format("Found grass texture: %s", resourceLocation));
+		BetterFoliage.log.info(String.format("Found grass texture: %s", resourceLocation));
 		
 		// get texture color
 		int avgColor = RenderUtils.calculateTextureColor(original);
@@ -38,7 +47,8 @@ public class GrassTextures implements IIconRegister {
 		if (hsbVals[1] > 0.1) {
 			// non-grey texture
 			hsbVals[2] = 1.0f;
-			avgColors.put(original, Color.HSBtoRGB(hsbVals[0], hsbVals[1], hsbVals[2]));
+			iconColors.put(original, Color.HSBtoRGB(hsbVals[0], hsbVals[1], hsbVals[2]));
+			BetterFoliage.log.info(String.format("Texture color: %d", Color.HSBtoRGB(hsbVals[0], hsbVals[1], hsbVals[2])));
 		}
 		return original;
 	}
@@ -52,7 +62,7 @@ public class GrassTextures implements IIconRegister {
 	public void handleTextureReload(TextureStitchEvent.Pre event) {
 		if (event.map.getTextureType() != 0) return;
 		blockTextures = event.map;
-		avgColors = Maps.newHashMap();
+		iconColors = Maps.newHashMap();
 		
 		// register simple block textures
 		Iterator<Block> iter = Block.blockRegistry.iterator();

@@ -1,4 +1,4 @@
-package mods.betterfoliage.common.util;
+package mods.betterfoliage.client.util;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -10,7 +10,7 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
-import mods.betterfoliage.common.integration.OptifineIntegration;
+import mods.betterfoliage.client.integration.OptifineIntegration;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -46,6 +46,9 @@ public class RenderUtils {
     	}
     }
 
+    /** Remove the lines from config GUI tooltips showing default values
+     * @param tooltip tooltip lines
+     */
     public static void stripTooltipDefaultText(List<String> tooltip) {
         boolean defaultRows = false;
         Iterator<String> iter = tooltip.iterator();
@@ -55,6 +58,15 @@ public class RenderUtils {
         }
     }
     
+    /** Retrieve actual texture used for rendering block face. Uses Optifine CTM if available.
+     * @param blockAccess world instance
+     * @param block
+     * @param x
+     * @param y
+     * @param z
+     * @param side
+     * @return texture
+     */
     public static IIcon getIcon(IBlockAccess blockAccess, Block block, int x, int y, int z, ForgeDirection side) {
     	IIcon base = block.getIcon(blockAccess, x, y, z, side.ordinal());
     	return OptifineIntegration.isPresent ? OptifineIntegration.getConnectedTexture(blockAccess, block, x, y, z, side.ordinal(), base) : base; 
@@ -62,7 +74,8 @@ public class RenderUtils {
     
 	/** Calculate average color value (in HSB color space) for a texture.
      * @param icon texture
-     */
+	 * @return average color (in RGB space)
+	 */
 	public static Integer calculateTextureColor(TextureAtlasSprite icon) {
 		ResourceLocation locationNoDirs = new ResourceLocation(icon.getIconName());
 		ResourceLocation locationWithDirs = new ResourceLocation(locationNoDirs.getResourceDomain(), String.format("textures/blocks/%s.png", locationNoDirs.getResourcePath()));

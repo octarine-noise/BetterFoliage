@@ -2,14 +2,14 @@ package mods.betterfoliage.client.render.impl;
 
 import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.BetterFoliageClient;
+import mods.betterfoliage.client.integration.ShadersModIntegration;
+import mods.betterfoliage.client.integration.TerraFirmaCraftIntegration;
+import mods.betterfoliage.client.misc.Double3;
 import mods.betterfoliage.client.render.IRenderBlockDecorator;
 import mods.betterfoliage.client.render.IconSet;
 import mods.betterfoliage.client.render.RenderBlockAOBase;
+import mods.betterfoliage.client.util.RenderUtils;
 import mods.betterfoliage.common.config.Config;
-import mods.betterfoliage.common.integration.ShadersModIntegration;
-import mods.betterfoliage.common.integration.TerraFirmaCraftIntegration;
-import mods.betterfoliage.common.util.Double3;
-import mods.betterfoliage.common.util.RenderUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.RenderBlocks;
@@ -58,7 +58,7 @@ public class RenderBlockGrass extends RenderBlockAOBase implements IRenderBlockD
 		// set colors and textures
 		grassTopIcon = RenderUtils.getIcon(blockAccess, block, x, y, z, ForgeDirection.UP);
 		blockColor = block.colorMultiplier(blockAccess, x, y, z);
-		Integer avgColor = BetterFoliageClient.grassTextures.avgColors.get(grassTopIcon);
+		Integer avgColor = BetterFoliageClient.grassTextures.iconColors.get(grassTopIcon);
 		boolean useTextureColor = (avgColor != null);
 		
 		renderWorldBlockBase(2, world, x, y, z, block, modelId, renderer);

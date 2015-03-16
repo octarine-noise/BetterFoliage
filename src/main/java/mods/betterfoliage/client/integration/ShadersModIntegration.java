@@ -1,26 +1,23 @@
-package mods.betterfoliage.common.integration;
+package mods.betterfoliage.client.integration;
 
-import java.lang.reflect.Field;
-
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-
+import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.common.config.Config;
+import mods.betterfoliage.loader.impl.CodeRefs;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.ResourceLocation;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 /** Call hooks and helper methods for dealing with Shaders Mod.
  * @author octarine-noise
  */
 @SideOnly(Side.CLIENT)
-public class ShadersModIntegration {
+public class ShadersModIntegration extends AbstractModIntegration {
 
-	private static boolean hasShadersMod = false;
+	private static boolean isAvailable = false;
 	private static int tallGrassEntityData;
 	private static int leavesEntityData;
-	private static Field shadersEntityData;
-	private static Field shadersEntityDataIndex;
 	
 	/** Hide constructor */
 	private ShadersModIntegration() {}
@@ -29,26 +26,23 @@ public class ShadersModIntegration {
 		tallGrassEntityData = Block.blockRegistry.getIDForObject(Blocks.tallgrass) & 0xFFFF | Blocks.tallgrass.getRenderType() << 16;
 		leavesEntityData = Block.blockRegistry.getIDForObject(Blocks.leaves) & 0xFFFF | Blocks.leaves.getRenderType() << 16;
 		
-		try {
-			Class<?> classShaders = Class.forName("shadersmodcore.client.Shaders");
-			shadersEntityData = classShaders.getDeclaredField("entityData");
-			shadersEntityDataIndex = classShaders.getDeclaredField("entityDataIndex");
-			hasShadersMod = true;
-		} catch(Exception e) {
+		if (isAllAvailable(CodeRefs.shaders)) {
+			isAvailable = true;
+			BetterFoliage.log.info("Found Shaders Mod");
 		}
 	}
 	
 	/** Signal start of grass-type quads
 	 */
 	public static void startGrassQuads() {
-		if (!hasShadersMod) return;
+		if (!isAvailable) return;
 		setShadersEntityData(tallGrassEntityData);
 	}
 
 	/** Signal start of leaf-type quads
 	 */
 	public static void startLeavesQuads() {
-		if (!hasShadersMod) return;
+		if (!isAvailable) return;
 		setShadersEntityData(leavesEntityData);
 	}
 	
@@ -58,8 +52,8 @@ public class ShadersModIntegration {
 	 */
 	private static void setShadersEntityData(int data) {
 		try {
-			int[] entityData = (int[]) shadersEntityData.get(null);
-			int entityDataIndex = shadersEntityDataIndex.getInt(null);
+			int[] entityData = CodeRefs.fShadersEntityData.getStaticField();
+			int entityDataIndex = CodeRefs.fShadersEntityDataIndex.getStaticField();
 			entityData[(entityDataIndex * 2)] = data;
 		} catch (Exception e) {
 		}

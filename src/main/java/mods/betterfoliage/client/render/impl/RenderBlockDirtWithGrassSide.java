@@ -2,9 +2,9 @@ package mods.betterfoliage.client.render.impl;
 
 import mods.betterfoliage.client.render.FakeRenderBlockAOBase;
 import mods.betterfoliage.client.render.IRenderBlockDecorator;
+import mods.betterfoliage.client.render.OffsetBlockAccess;
+import mods.betterfoliage.client.util.RenderUtils;
 import mods.betterfoliage.common.config.Config;
-import mods.betterfoliage.common.util.OffsetBlockAccess;
-import mods.betterfoliage.common.util.RenderUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.RenderBlocks;

@@ -1,7 +1,7 @@
-package mods.betterfoliage.common.integration;
+package mods.betterfoliage.client.integration;
 
 import mods.betterfoliage.BetterFoliage;
-import mods.betterfoliage.client.BlockMatcher;
+import mods.betterfoliage.client.misc.BlockMatcher;
 import mods.betterfoliage.common.config.Config;
 import net.minecraft.block.Block;
 import net.minecraftforge.common.MinecraftForge;
@@ -13,7 +13,7 @@ import cpw.mods.fml.relauncher.SideOnly;
  * @author octarine-noise
  */
 @SideOnly(Side.CLIENT)
-public class TerraFirmaCraftIntegration {
+public class TerraFirmaCraftIntegration extends AbstractModIntegration {
 
     public static boolean isTFCLoaded = false;
     
