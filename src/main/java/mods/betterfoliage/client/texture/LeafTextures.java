@@ -36,14 +36,13 @@ import com.google.common.collect.Maps;
  * @author octarine-noise
  */
 @SideOnly(Side.CLIENT)
-public class LeafTextureRegistry {
+public class LeafTextures {
 
     /** Rendering information for a leaf block 
      * @author octarine-noise
      */
     public static class LeafInfo {
         public LeafInfo(String baseTextureName) {
-            super();
             this.baseTextureName = baseTextureName;
         }
         public String baseTextureName;
@@ -128,7 +127,7 @@ public class LeafTextureRegistry {
             }
             
             entry.getValue().roundLeafTexture = roundLeafTexture;
-            entry.getValue().averageColor = Color4.fromARGB(ResourceUtils.calculateTextureColor(baseLeafTexture));
+            entry.getValue().averageColor = ResourceUtils.calculateTextureColor(baseLeafTexture);
             entry.getValue().particleType = particleTypes.get(baseLeafTexture);
         }
     }
