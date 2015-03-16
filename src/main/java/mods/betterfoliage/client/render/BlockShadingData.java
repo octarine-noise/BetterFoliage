@@ -20,6 +20,8 @@ public class BlockShadingData {
     /** AO data for all faces */
     public BFAmbientOcclusionFace[] aoFaces = new BFAmbientOcclusionFace[6];
     
+    public BitSet shadingBitSet = new BitSet(3);
+    
     /** Translucence for all faces */
     public boolean[] isTranslucent = new boolean[6];
     
@@ -39,6 +41,7 @@ public class BlockShadingData {
     }
     
     public BlockShadingData(BFAbstractRenderer renderer) {
+    	shadingBitSet.set(0);
         for (int j = 0; j < EnumFacing.values().length; ++j) aoFaces[j] = renderer.new BFAmbientOcclusionFace();
     }
     
@@ -52,10 +55,8 @@ public class BlockShadingData {
         this.useAO = useAO;
         if (useAO) {
             // update ambient occlusion data
-            BitSet bitset = new BitSet(3);
-            bitset.set(0);
             for (EnumFacing facing : EnumFacing.values()) {
-                aoFaces[facing.ordinal()].updateVertexBrightness(blockAccessIn, blockIn, blockPosIn, facing, null, bitset);
+                aoFaces[facing.ordinal()].updateVertexBrightness(blockAccessIn, blockIn, blockPosIn, facing, null, shadingBitSet);
                 isTranslucent[facing.ordinal()] = blockAccessIn.getBlockState(blockPosIn).getBlock().isTranslucent();
             }
         } else {

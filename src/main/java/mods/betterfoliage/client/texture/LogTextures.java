@@ -7,6 +7,7 @@ import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.event.PostLoadModelDefinitionsEvent;
 import mods.betterfoliage.client.texture.models.IModelTextureMapping;
 import mods.betterfoliage.client.util.BFFunctions;
+import mods.betterfoliage.client.util.MiscUtils;
 import mods.betterfoliage.common.config.Config;
 import mods.betterfoliage.loader.impl.CodeRefs;
 import net.minecraft.block.Block;
@@ -14,6 +15,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.client.model.IModel;
@@ -39,7 +41,8 @@ public class LogTextures {
             this.endTextureName = endTextureName;
         }
         public String sideTextureName, endTextureName;
-        public TextureAtlasSprite sideTexture, endTexture; 
+        public TextureAtlasSprite sideTexture, endTexture;
+        public EnumFacing verticalDir;
     }
     
     /** {@link TextureMap} used in {@link ModelLoader} in the current run */
@@ -83,7 +86,14 @@ public class LogTextures {
             if (sideName != null && endName != null) {
             	// store texture locations for this blockstate
             	BetterFoliage.log.info(String.format("block=%s, side=%s, end=%s", stateMapping.getKey().toString(), sideName, endName));
-            	logInfoMap.put(stateMapping.getKey(), new LogInfo(sideName, endName));
+            	LogInfo info = new LogInfo(sideName, endName);
+            	logInfoMap.put(stateMapping.getKey(), info);
+            	
+            	// determine axis
+            	Object axisValue = MiscUtils.getState(stateMapping.getKey(), "axis");
+            	if (axisValue.toString().toUpperCase().equals("X")) info.verticalDir = EnumFacing.EAST;
+            	else if (axisValue.toString().toUpperCase().equals("Z")) info.verticalDir = EnumFacing.SOUTH;
+            	else info.verticalDir = EnumFacing.UP;
             }
         }
     }

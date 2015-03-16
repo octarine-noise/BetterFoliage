@@ -344,8 +344,13 @@ public class Config {
 	public void handleConfigChange(ConfigChangedEvent.OnConfigChangedEvent event) {
 	    if (event.modID.equals(BetterFoliage.MOD_ID)) {
 	        updateValues();
+	        boolean blocksUpdated = rawConfig.getCategory(Category.blockTypes.toString()).hasChanged();
 	        if (rawConfig.hasChanged()) rawConfig.save();
-	        Minecraft.getMinecraft().renderGlobal.loadRenderers();
+	        
+	        if (blocksUpdated)
+	        	Minecraft.getMinecraft().refreshResources();
+	        else
+	        	Minecraft.getMinecraft().renderGlobal.loadRenderers();
 	    }
 	}
 }

@@ -80,8 +80,8 @@ public class OctaPrismQuadrantQuads implements IQuadCollection {
 	@Override
 	public IQuadCollection setBrightness(BlockShadingData shadingData) {
 		EnumFacing horz1DirOpp = horz1Dir.getOpposite();
-		EnumFacing horz2DirOpp = horz1Dir.getOpposite();
-		EnumFacing vertDirOpp = horz1Dir.getOpposite();
+		EnumFacing horz2DirOpp = horz2Dir.getOpposite();
+		EnumFacing vertDirOpp = vertDir.getOpposite();
 		
 		int br1FarBottom = shadingData.getBrightness(horz2DirOpp, horz1Dir, vertDirOpp, useMax);
 		int br1NearBottom = shadingData.getBrightness(horz2DirOpp, horz1DirOpp, vertDirOpp, useMax);
@@ -138,8 +138,8 @@ public class OctaPrismQuadrantQuads implements IQuadCollection {
 	public IQuadCollection setColor(BlockShadingData shadingData, Color4 color) {
 		if (shadingData.useAO) {
 			EnumFacing horz1DirOpp = horz1Dir.getOpposite();
-			EnumFacing horz2DirOpp = horz1Dir.getOpposite();
-			EnumFacing vertDirOpp = horz1Dir.getOpposite();
+			EnumFacing horz2DirOpp = horz2Dir.getOpposite();
+			EnumFacing vertDirOpp = vertDir.getOpposite();
 			
 			Color4 col1FarBottom = color.multiply(shadingData.getColorMultiplier(horz2DirOpp, horz1Dir, vertDirOpp, useMax));
 			Color4 col1NearBottom = color.multiply(shadingData.getColorMultiplier(horz2DirOpp, horz1DirOpp, vertDirOpp, useMax));

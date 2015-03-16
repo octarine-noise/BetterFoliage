@@ -21,6 +21,10 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class RenderBlockLogs extends BFAbstractRenderer {
 
+	public RenderBlockLogs() {
+		shadingData.shadingBitSet.clear(0);
+	}
+	
     @Override
     public boolean renderFeatureForBlock(IBlockAccess blockAccess, IBlockState blockState, BlockPos pos, WorldRenderer worldRenderer, boolean useAO) {
     	if (!Config.logsEnabled) return false;
@@ -28,7 +32,7 @@ public class RenderBlockLogs extends BFAbstractRenderer {
     	
     	LogInfo logInfo = BetterFoliageClient.logRegistry.logInfoMap.get(blockState);
     	if (logInfo == null || logInfo.sideTexture == null || logInfo.endTexture == null) return false;
-    	EnumFacing logVertDir = getLogVerticalDir(blockAccess, pos);
+    	EnumFacing logVertDir = logInfo.verticalDir;
     	
     	// set axes
     	Double3 blockPos = new Double3(pos);
