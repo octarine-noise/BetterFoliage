@@ -22,7 +22,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class RenderBlockBetterCactus extends BFAbstractRenderer {
+public class RenderBlockCactus extends BFAbstractRenderer {
 
     /** Valid directions of cactus arm */
     public static EnumFacing[] cactusDirections = new EnumFacing[]{ EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.WEST, EnumFacing.EAST };

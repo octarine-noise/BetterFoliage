@@ -19,7 +19,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class RenderBlockBetterNetherrack extends BFAbstractRenderer {
+public class RenderBlockNetherrack extends BFAbstractRenderer {
 
     public TextureSet netherrackVineIcons = new TextureSet("bettergrassandleaves", "blocks/better_netherrack_%d");
     

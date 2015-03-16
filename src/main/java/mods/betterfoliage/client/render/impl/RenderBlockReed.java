@@ -25,7 +25,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class RenderBlockBetterReed extends BFAbstractRenderer {
+public class RenderBlockReed extends BFAbstractRenderer {
 
     public static int seedOffset = 0;
     

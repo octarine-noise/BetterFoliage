@@ -20,7 +20,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class RenderBlockBetterLilypad extends BFAbstractRenderer {
+public class RenderBlockLilypad extends BFAbstractRenderer {
 
     public TextureSet lilypadFlowers = new TextureSet("bettergrassandleaves", "blocks/better_lilypad_flower_%d");
     public TextureSet lilypadRoots = new TextureSet("bettergrassandleaves", "blocks/better_lilypad_roots_%d");

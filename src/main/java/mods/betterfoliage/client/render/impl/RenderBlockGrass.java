@@ -22,7 +22,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class RenderBlockBetterGrass extends BFAbstractRenderer {
+public class RenderBlockGrass extends BFAbstractRenderer {
 
     public TextureSet grassIcons = new TextureSet("bettergrassandleaves", "blocks/better_grass_long_%d");
     public TextureSet snowGrassIcons = new TextureSet("bettergrassandleaves", "blocks/better_grass_snowed_%d");

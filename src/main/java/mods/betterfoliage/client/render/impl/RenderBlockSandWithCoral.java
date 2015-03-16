@@ -23,7 +23,7 @@ import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-public class RenderBlockBetterCoral extends BFAbstractRenderer {
+public class RenderBlockSandWithCoral extends BFAbstractRenderer {
 
     public static int seedOffset = 2;
     

@@ -21,7 +21,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class RenderBlockBetterMycelium extends BFAbstractRenderer {
+public class RenderBlockMycelium extends BFAbstractRenderer {
 
     public TextureSet myceliumIcons = new TextureSet("bettergrassandleaves", "blocks/better_mycel_%d");
     
