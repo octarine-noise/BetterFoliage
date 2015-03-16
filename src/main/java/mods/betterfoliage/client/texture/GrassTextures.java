@@ -39,7 +39,7 @@ public class GrassTextures implements IIconRegister {
 	 */
 	public IIcon registerIcon(String resourceLocation) {
 		TextureAtlasSprite original = blockTextures.getTextureExtry(resourceLocation);
-		BetterFoliage.log.info(String.format("Found grass texture: %s", resourceLocation));
+		BetterFoliage.log.debug(String.format("Found grass texture: %s", resourceLocation));
 		
 		// get texture color
 		int avgColor = RenderUtils.calculateTextureColor(original);
@@ -48,7 +48,6 @@ public class GrassTextures implements IIconRegister {
 			// non-grey texture
 			hsbVals[2] = 1.0f;
 			iconColors.put(original, Color.HSBtoRGB(hsbVals[0], hsbVals[1], hsbVals[2]));
-			BetterFoliage.log.info(String.format("Texture color: %d", Color.HSBtoRGB(hsbVals[0], hsbVals[1], hsbVals[2])));
 		}
 		return original;
 	}

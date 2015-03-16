@@ -3,8 +3,6 @@ package mods.betterfoliage.loader;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import mods.betterfoliage.BetterFoliage;
-
 import com.google.common.collect.Lists;
 
 /** Reference to a method. Contains information to locate the method regardless of environment.
@@ -52,17 +50,14 @@ public class MethodRef implements IResolvable<Method> {
     	if (methodObj == null) {
     		Class<?> parentClass = parent.resolve();
             if (parentClass == null) return null;
-            BetterFoliage.log.info(String.format("MethodRef.resolve() parent class: %s -> %s", parent.mcpName, parentClass.toString()));
             
             List<Class<?>> argClasses = Lists.newLinkedList();
             for (ClassRef argType : argTypes) {
             	if (argType.resolve() == null) return null;
             	argClasses.add(argType.resolve());
-            	BetterFoliage.log.info(String.format("MethodRef.resolve() arg class: %s -> %s", argType.mcpName, argType.resolve().toString()));
             }
             Class<?>[] args = argClasses.toArray(new Class<?>[0]);
             
-            BetterFoliage.log.info("All args resolved");
             try {
             	methodObj = parentClass.getDeclaredMethod(srgName, args);
             	methodObj.setAccessible(true);
@@ -73,7 +68,6 @@ public class MethodRef implements IResolvable<Method> {
             	methodObj.setAccessible(true);
             } catch (Exception e) {}
             
-            BetterFoliage.log.info(String.format("MethodRef.resolve() result: %s", methodObj));
     	}
     	return methodObj;
     }
