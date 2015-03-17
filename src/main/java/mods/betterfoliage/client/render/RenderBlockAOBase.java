@@ -66,6 +66,9 @@ public class RenderBlockAOBase extends RenderBlocks {
 	/** Pool of random double values. Filled at init time. */
 	public double[] pRand = new double[64];
 	
+	/** Indicates AO should be disabled. */
+	public boolean noShading = false;
+	
 	public ShadingValues aoXPYZPP = new ShadingValues();
 	public ShadingValues aoXPYZPN = new ShadingValues();
 	public ShadingValues aoXPYZNP = new ShadingValues();
@@ -144,6 +147,7 @@ public class RenderBlockAOBase extends RenderBlocks {
 		}
 		
 		// render block
+		noShading = block.getLightValue() != 0;
 		drawPass = 0;
 		setAOPassCounters(pass);
 		setRenderBoundsFromBlock(block);
@@ -255,7 +259,7 @@ public class RenderBlockAOBase extends RenderBlocks {
 			}
 		}
 		
-		if (Minecraft.isAmbientOcclusionEnabled() && !noShading) {
+		if (Minecraft.isAmbientOcclusionEnabled() && !noShading && !this.noShading) {
 			setShadingForFace(dir);
 			renderQuadWithShading(renderIcon, drawCenter, facePP, faceNormal, uvRot,			faceAOPP, faceAONN, faceAONN, faceAOPP);
 			renderQuadWithShading(renderIcon, drawCenter, facePP.inverse(), faceNormal, uvRot,	faceAONN, faceAOPP, faceAOPP, faceAONN);
@@ -288,7 +292,7 @@ public class RenderBlockAOBase extends RenderBlocks {
 	}
 	
 	private void renderCrossedBlockQuadsInternal(Double3 drawCenter, Double3 horz1, Double3 horz2, Double3 vert1, IIcon crossLeafIcon, int uvRot, boolean isAirTop, boolean isAirBottom) {
-		if (Minecraft.isAmbientOcclusionEnabled()) {
+		if (Minecraft.isAmbientOcclusionEnabled() && !noShading) {
 			renderQuadWithShading(crossLeafIcon, drawCenter, horz1, vert1, uvRot,
 					isAirTop ? aoYPXZPP : aoZPXYPP, isAirTop ? aoYPXZNN : aoXNYZPN, isAirBottom ? aoYNXZNN : aoXNYZNN, isAirBottom ? aoYNXZPP : aoZPXYPN);
 			renderQuadWithShading(crossLeafIcon, drawCenter, horz1.inverse(), vert1, uvRot,
