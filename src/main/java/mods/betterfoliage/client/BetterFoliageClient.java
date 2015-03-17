@@ -3,6 +3,7 @@ package mods.betterfoliage.client;
 import java.util.Map;
 
 import mods.betterfoliage.BetterFoliage;
+import mods.betterfoliage.client.integration.CLCIntegration;
 import mods.betterfoliage.client.integration.OptifineIntegration;
 import mods.betterfoliage.client.integration.ShadersModIntegration;
 import mods.betterfoliage.client.integration.TerraFirmaCraftIntegration;
@@ -100,6 +101,7 @@ public class BetterFoliageClient {
 		ShadersModIntegration.init();
 		TerraFirmaCraftIntegration.init();
 		OptifineIntegration.init();
+		CLCIntegration.init();
 	}
 
 	public static boolean isLeafTexture(TextureAtlasSprite icon) {

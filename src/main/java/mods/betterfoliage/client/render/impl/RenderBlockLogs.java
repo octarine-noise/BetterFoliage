@@ -1,5 +1,6 @@
 package mods.betterfoliage.client.render.impl;
 
+import mods.betterfoliage.client.integration.CLCIntegration;
 import mods.betterfoliage.client.misc.Double3;
 import mods.betterfoliage.client.render.FakeRenderBlockAOBase;
 import mods.betterfoliage.client.render.IRenderBlockDecorator;
@@ -168,28 +169,28 @@ public class RenderBlockLogs extends FakeRenderBlockAOBase implements IRenderBlo
     	    
             // face 1 middle
             renderQuad(textureSide1, mid1, cham1, cham1.add(vert), mid1.add(vert), new double[]{8.0, uRight, uRight, 8.0}, vSide,
-                                  avgShading(aoFace1FarBottom, aoFace1NearBottom), aoFace1NearBottom, aoFace1NearTop, avgShading(aoFace1FarTop, aoFace1NearTop));
+                                  CLCIntegration.avgShading(aoFace1FarBottom, aoFace1NearBottom), aoFace1NearBottom, aoFace1NearTop, CLCIntegration.avgShading(aoFace1FarTop, aoFace1NearTop));
             // face 1 chamfer
             renderQuad(textureSide1, cham1, chamCenter, chamCenter.add(vert), cham1.add(vert), new double[]{uRight, 16.0, 16.0, uRight}, vSide,
-                                  aoFace1NearBottom, avgShading(aoFace1NearBottom, aoFace2NearBottom), avgShading(aoFace1NearTop, aoFace2NearTop), aoFace1NearTop);
+                                  aoFace1NearBottom, CLCIntegration.avgShading(aoFace1NearBottom, aoFace2NearBottom), CLCIntegration.avgShading(aoFace1NearTop, aoFace2NearTop), aoFace1NearTop);
             // face 2 chamfer
             renderQuad(textureSide2, chamCenter, cham2, cham2.add(vert), chamCenter.add(vert), new double[]{0.0, uLeft, uLeft, 0.0}, vSide,
-                                  avgShading(aoFace1NearBottom, aoFace2NearBottom), aoFace2NearBottom, aoFace2NearTop, avgShading(aoFace1NearTop, aoFace2NearTop));
+            		CLCIntegration.avgShading(aoFace1NearBottom, aoFace2NearBottom), aoFace2NearBottom, aoFace2NearTop, CLCIntegration.avgShading(aoFace1NearTop, aoFace2NearTop));
             // face 2 middle
             renderQuad(textureSide2, cham2, mid2, mid2.add(vert), cham2.add(vert), new double[]{uLeft, 8.0, 8.0, uLeft}, vSide,
-                                  aoFace2NearBottom, avgShading(aoFace2FarBottom, aoFace2NearBottom), avgShading(aoFace2FarTop, aoFace2NearTop), aoFace2NearTop);
+                                  aoFace2NearBottom, CLCIntegration.avgShading(aoFace2FarBottom, aoFace2NearBottom), CLCIntegration.avgShading(aoFace2FarTop, aoFace2NearTop), aoFace2NearTop);
             
             if (textureTop != null) {
                 // top lid 1
                 renderQuad(textureTop, blockCenter.add(vert), mid1.add(vert), cham1.add(vert), chamCenter.add(vert),
                                       new double[]{8.0, (uTop[0] + uTop[3]) * 0.5, uTop[0] * (1 - chamferSize) + uTop[3] * chamferSize, uTop[0]},
                                       new double[]{8.0, (vTop[0] + vTop[3]) * 0.5, vTop[0] * (1 - chamferSize) + vTop[3] * chamferSize, vTop[0]},
-                                      aoTopCenter, avgShading(aoTop1, aoTopOrigin), aoTopOrigin, aoTopOrigin);
+                                      aoTopCenter, CLCIntegration.avgShading(aoTop1, aoTopOrigin), aoTopOrigin, aoTopOrigin);
                 // top lid 2
                 renderQuad(textureTop, cham2.add(vert), mid2.add(vert), blockCenter.add(vert), chamCenter.add(vert),
                                       new double[]{uTop[0] * (1 - chamferSize) + uTop[1] * chamferSize, (uTop[0] + uTop[1]) * 0.5, 8.0, uTop[0]},
                                       new double[]{vTop[0] * (1 - chamferSize) + vTop[1] * chamferSize, (vTop[0] + vTop[1]) * 0.5, 8.0, vTop[0]},
-                                      aoTopOrigin, avgShading(aoTop2, aoTopOrigin), aoTopCenter, aoTopOrigin);
+                                      aoTopOrigin, CLCIntegration.avgShading(aoTop2, aoTopOrigin), aoTopCenter, aoTopOrigin);
             }
             
             if (textureBottom != null) {
@@ -197,12 +198,12 @@ public class RenderBlockLogs extends FakeRenderBlockAOBase implements IRenderBlo
                 renderQuad(textureBottom, blockCenter, chamCenter, cham1, mid1,
                                       new double[]{8.0, uTop[0], uTop[0] * (1 - chamferSize) + uTop[3] * chamferSize, (uTop[0] + uTop[3]) * 0.5},
                                       new double[]{8.0, vTop[0], vTop[0] * (1 - chamferSize) + vTop[3] * chamferSize, (vTop[0] + vTop[3]) * 0.5},
-                                      aoBottomCenter, aoBottomOrigin, aoBottomOrigin, avgShading(aoBottom1, aoBottomOrigin));
+                                      aoBottomCenter, aoBottomOrigin, aoBottomOrigin, CLCIntegration.avgShading(aoBottom1, aoBottomOrigin));
                 // bottom lid 2
                 renderQuad(textureBottom, cham2, chamCenter, blockCenter, mid2,
                                       new double[]{uTop[0] * (1 - chamferSize) + uTop[1] * chamferSize, uTop[0], 8.0, (uTop[0] + uTop[1]) * 0.5},
                                       new double[]{vTop[0] * (1 - chamferSize) + vTop[1] * chamferSize, vTop[0], 8.0, (vTop[0] + vTop[1]) * 0.5},
-                                      aoBottomOrigin, aoBottomOrigin, aoBottomCenter, avgShading(aoBottom2, aoBottomOrigin));
+                                      aoBottomOrigin, aoBottomOrigin, aoBottomCenter, CLCIntegration.avgShading(aoBottom2, aoBottomOrigin));
             }
 	    } else {
 	        // normal
@@ -212,39 +213,24 @@ public class RenderBlockLogs extends FakeRenderBlockAOBase implements IRenderBlo
 	        
 	        // face 1
 	        renderQuad(textureSide1, mid1, origin, origin.add(vert), mid1.add(vert), new double[]{8.0, 16.0, 16.0, 8.0}, vSide,
-	                   avgShading(aoFace1FarBottom, aoFace1NearBottom), aoFace1NearBottom, aoFace1NearTop, avgShading(aoFace1FarTop, aoFace1NearTop));
+	        		CLCIntegration.avgShading(aoFace1FarBottom, aoFace1NearBottom), aoFace1NearBottom, aoFace1NearTop, CLCIntegration.avgShading(aoFace1FarTop, aoFace1NearTop));
 	        
 	        // face 2
             renderQuad(textureSide2, origin, mid2, mid2.add(vert), origin.add(vert), new double[]{0.0, 8.0, 8.0, 0.0}, vSide,
-                       aoFace2NearBottom, avgShading(aoFace2FarBottom, aoFace2NearBottom), avgShading(aoFace2FarTop, aoFace2NearTop), aoFace2NearTop);
+                       aoFace2NearBottom, CLCIntegration.avgShading(aoFace2FarBottom, aoFace2NearBottom), CLCIntegration.avgShading(aoFace2FarTop, aoFace2NearTop), aoFace2NearTop);
             
             // top lid
             if (textureTop != null) renderQuad(textureTop, origin.add(vert), mid2.add(vert), blockCenter.add(vert), mid1.add(vert),
                                                new double[]{uTop[0], (uTop[0] + uTop[1]) * 0.5, 8.0, (uTop[0] + uTop[3]) * 0.5},
                                                new double[]{vTop[0], (vTop[0] + vTop[1]) * 0.5, 8.0, (vTop[0] + vTop[3]) * 0.5},
-                                               aoTopOrigin, avgShading(aoTop2, aoTopOrigin), aoTopCenter, avgShading(aoTop1, aoTopOrigin));
+                                               aoTopOrigin, CLCIntegration.avgShading(aoTop2, aoTopOrigin), aoTopCenter, CLCIntegration.avgShading(aoTop1, aoTopOrigin));
             
             // bottom lid
             if (textureBottom != null) renderQuad(textureBottom, mid1, blockCenter , mid2, origin,
                                                   new double[]{(uTop[0] + uTop[3]) * 0.5, 8.0, (uTop[0] + uTop[1]) * 0.5, uTop[0]},
                                                   new double[]{(vTop[0] + vTop[3]) * 0.5, 8.0, (vTop[0] + vTop[1]) * 0.5, vTop[0]},
-                                                  avgShading(aoBottom1, aoBottomOrigin), aoBottomCenter, avgShading(aoBottom2, aoBottomOrigin), aoBottomOrigin);
+                                                  CLCIntegration.avgShading(aoBottom1, aoBottomOrigin), aoBottomCenter, CLCIntegration.avgShading(aoBottom2, aoBottomOrigin), aoBottomOrigin);
 	    }
-	}
-	
-	/** Get the average shading values of 2 AO data points
-	 * @param shading1 data 1
-	 * @param shading2 data 2
-	 * @return average
-	 */
-	protected ShadingValues avgShading(ShadingValues shading1, ShadingValues shading2) {
-	    if (shading1 == null || shading2 == null) return null;
-	    ShadingValues result = new ShadingValues();
-	    result.brightness = (shading1.brightness + shading2.brightness) / 2;
-	    result.red = (shading1.red + shading2.red) * 0.5f;
-	    result.green = (shading1.green + shading2.green) * 0.5f;
-	    result.blue = (shading1.blue + shading2.blue) * 0.5f;
-	    return result;
 	}
 	
 	/** Get the average shading values of the 4 AO data points of a face
@@ -253,12 +239,7 @@ public class RenderBlockLogs extends FakeRenderBlockAOBase implements IRenderBlo
 	 */
 	protected ShadingValues avgShadingForFace(ForgeDirection dir) {
 	    setShadingForFace(dir);
-	    ShadingValues result = new ShadingValues();
-	    result.brightness = (faceAONN.brightness + faceAONP.brightness + faceAOPN.brightness + faceAOPP.brightness) / 4;
-	    result.red = (faceAONN.red + faceAONP.red + faceAOPN.red + faceAOPP.red) * 0.25f;
-	    result.green = (faceAONN.green + faceAONP.green + faceAOPN.green + faceAOPP.green) * 0.25f;
-	    result.blue = (faceAONN.blue + faceAONP.blue + faceAOPN.blue + faceAOPP.blue) * 0.25f;
-	    return result;
+	    return CLCIntegration.avgShading(CLCIntegration.avgShading(faceAONN, faceAONP), CLCIntegration.avgShading(faceAOPN, faceAOPP));
 	}
 	
 	/** Determine if a log block is connected to another block

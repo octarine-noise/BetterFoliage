@@ -25,7 +25,7 @@ public class CodeRefs {
     public static FieldRef fBlockAccess, fMapRegisteredSprites, fDomainResourceManagers;
     public static MethodRef mRenderBlockByRenderType, mDoVoidFogParticles, mGetAmbientOcclusionLightValue, mGetUseNeighborBrightness, mShouldSideBeRendered;
     
-    // BetterFoliage classes
+    // BetterFoliage
     public static ClassRef cBetterFoliageClient;
     public static MethodRef mGetRenderTypeOverride, mOnRandomDisplayTick, mGetAmbientOcclusionLightValueOverride, mGetBlockIdOverride, mGetUseNeighborBrightnessOverride, mShouldRenderBlockSideOverride;
 
@@ -38,6 +38,9 @@ public class CodeRefs {
     public static ClassRef cConnectedTextures, cConnectedProperties;
     public static MethodRef mGetConnectedTexture, mGetIndexInMap;
     public static FieldRef fCTBlockProperties, fCTTileProperties,fCPTileIcons;
+    
+    // CLC
+    public static ClassRef cCLCLoader = new ClassRef("coloredlightscore.src.asm.ColoredLightsCoreLoadingPlugin");
     
     // Feature sets
     public static Collection<IResolvable<?>> optifineCTF;
