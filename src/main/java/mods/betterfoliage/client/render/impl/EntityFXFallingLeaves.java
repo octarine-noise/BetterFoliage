@@ -6,6 +6,7 @@ import org.lwjgl.opengl.GL11;
 
 import mods.betterfoliage.client.BetterFoliageClient;
 import mods.betterfoliage.client.misc.Double3;
+import mods.betterfoliage.client.texture.LeafTextures.LeafInfo;
 import mods.betterfoliage.common.config.Config;
 import net.minecraft.block.Block;
 import net.minecraft.client.particle.EntityFX;
@@ -47,8 +48,11 @@ public class EntityFXFallingLeaves extends EntityFX {
 		
 		Block block = world.getBlock(x, y, z);
 		IIcon blockIcon = block.getIcon(world, x, y, z, ForgeDirection.DOWN.ordinal());
-		particleIcon = BetterFoliageClient.leafParticles.getIconSet(blockIcon).get(rand.nextInt(1024));
-		calculateParticleColor(BetterFoliageClient.leafParticles.getColor(blockIcon), block.colorMultiplier(world, x, y, z));
+		LeafInfo leafInfo = BetterFoliageClient.leafTextures.leafInfoMap.get(blockIcon);
+		if (leafInfo != null) {
+			particleIcon = leafInfo.particleIcons.get(rand.nextInt(1024));
+			calculateParticleColor(leafInfo.averageColor, block.colorMultiplier(world, x, y, z));
+		}
 	}
 
 	@Override

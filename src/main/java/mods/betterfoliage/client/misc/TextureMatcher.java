@@ -13,6 +13,8 @@ import com.google.common.collect.Maps;
 
 public class TextureMatcher {
     
+	public static String DEFAULT_TYPE = "default";
+	
     public static class TextureMapping {
         public String matchDomain;
         public String matchName;
@@ -35,13 +37,17 @@ public class TextureMatcher {
     
     public Map<IIcon, String> types = Maps.newHashMap();
 
+    public void clear() {
+    	types.clear();
+    }
+    
     public String put(TextureAtlasSprite icon) {
         if (types.keySet().contains(icon)) return types.get(icon);
         for (TextureMapping mapping : mappings) if (mapping.matches(icon)) {
             types.put(icon, mapping.textureType);
             return mapping.textureType;
         }
-        return null;
+        return DEFAULT_TYPE;
     }
     
     public String get(IIcon icon) {

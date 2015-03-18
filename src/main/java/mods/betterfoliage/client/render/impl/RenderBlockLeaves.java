@@ -7,10 +7,10 @@ import mods.betterfoliage.client.misc.Double3;
 import mods.betterfoliage.client.render.IRenderBlockDecorator;
 import mods.betterfoliage.client.render.IconSet;
 import mods.betterfoliage.client.render.RenderBlockAOBase;
+import mods.betterfoliage.client.texture.LeafTextures.LeafInfo;
 import mods.betterfoliage.common.config.Config;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -54,13 +54,11 @@ public class RenderBlockLeaves extends RenderBlockAOBase implements IRenderBlock
 			BetterFoliage.log.debug(String.format("null leaf texture, x:%d, y:%d, z:%d, meta:%d, block:%s", x, y, z, blockAccess.getBlockMetadata(x, y, z), block.getClass().getName()));
 			return true;
 		}
-		IIcon crossLeafIcon = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(BetterFoliageClient.leafGenerator.domainName + ":" + blockLeafIcon.getIconName());
-		if (crossLeafIcon == null) {
-			return true;
-		}
+		LeafInfo leafInfo = BetterFoliageClient.leafTextures.leafInfoMap.get(blockLeafIcon);
+		if (leafInfo.roundLeafTexture == null) return true;
 		
 		int offsetVariation = getSemiRandomFromPos(x, y, z, 0);
-		int uvVariation = getSemiRandomFromPos(x, y, z, 1);
+		int uvVariation = leafInfo.rotation ? getSemiRandomFromPos(x, y, z, 1) : 0;
 		double halfSize = 0.5 * Config.leavesSize;
 		boolean isAirTop = blockAccess.isAirBlock(x, y + 1, z);
 		boolean isAirBottom = blockAccess.isAirBlock(x, y - 1, z);
@@ -75,7 +73,7 @@ public class RenderBlockLeaves extends RenderBlockAOBase implements IRenderBlock
 		Double3 offset2 = pRot[(offsetVariation + 1) & 63].scaleAxes(Config.leavesHOffset, Config.leavesVOffset, Config.leavesHOffset);
 		
 		if (Config.leavesSkew) {
-			renderCrossedBlockQuadsSkew(blockCenter, halfSize, offset1, offset2, crossLeafIcon, uvVariation, isAirTop, isAirBottom);
+			renderCrossedBlockQuadsSkew(blockCenter, halfSize, offset1, offset2, leafInfo.roundLeafTexture, uvVariation, isAirTop, isAirBottom);
 			if (isSnowTop) {
 			    // clear biome colors
                 aoYPXZNN.setGray(0.9f); aoYPXZNP.setGray(0.9f); aoYPXZPN.setGray(0.9f); aoYPXZPP.setGray(0.9f);
@@ -83,7 +81,7 @@ public class RenderBlockLeaves extends RenderBlockAOBase implements IRenderBlock
 			    renderCrossedBlockQuadsSkew(blockCenter, halfSize, offset1, offset2, snowedLeavesIcons.get(uvVariation), 0, true, isAirBottom);
 			}
 		} else {
-			renderCrossedBlockQuadsTranslate(blockCenter, halfSize, offset1, crossLeafIcon, uvVariation, isAirTop, isAirBottom);
+			renderCrossedBlockQuadsTranslate(blockCenter, halfSize, offset1, leafInfo.roundLeafTexture, uvVariation, isAirTop, isAirBottom);
 			if (isSnowTop) {
 			    // clear biome colors
                 aoYPXZNN.setGray(0.9f); aoYPXZNP.setGray(0.9f); aoYPXZPN.setGray(0.9f); aoYPXZPP.setGray(0.9f);

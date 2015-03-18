@@ -8,7 +8,6 @@ import java.util.Set;
 import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.loader.impl.CodeRefs;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
@@ -34,9 +33,6 @@ public abstract class BlockTextureGenerator implements IResourceManager {
 	/** Resource location for fallback texture (if the generation process fails) */
 	public ResourceLocation missingResource;
 	
-	/** Texture atlas for block textures used in the current run */
-	public TextureMap blockTextures;
-	
 	public BlockTextureGenerator(String domainName, ResourceLocation missingResource) {
 		this.domainName = domainName;
 		this.missingResource = missingResource;
@@ -45,7 +41,6 @@ public abstract class BlockTextureGenerator implements IResourceManager {
 	@SubscribeEvent
 	public void handleTextureReload(TextureStitchEvent.Pre event) {
 		if (event.map.getTextureType() != 0) return;
-		blockTextures = event.map;
 
 		Map<String, IResourceManager> domainManagers = CodeRefs.fDomainResourceManagers.getInstanceField(Minecraft.getMinecraft().getResourceManager());
 		if (domainManagers == null) {
@@ -57,7 +52,6 @@ public abstract class BlockTextureGenerator implements IResourceManager {
 	
 	@SubscribeEvent
 	public void endTextureReload(TextureStitchEvent.Post event) {
-		blockTextures = null;
 		if (event.map.getTextureType() != 0) return;
 		
 		// don't leave a mess
@@ -75,15 +69,6 @@ public abstract class BlockTextureGenerator implements IResourceManager {
 	
 	public IResource getMissingResource() throws IOException {
 		return Minecraft.getMinecraft().getResourceManager().getResource(missingResource);
-	}
-	
-	public ResourceLocation unwrapResource(ResourceLocation wrapped) {
-		if (wrapped.getResourcePath().startsWith("textures/blocks/")) {
-			ResourceLocation unwrapped = new ResourceLocation(wrapped.getResourcePath().substring(16));
-			return new ResourceLocation(unwrapped.getResourceDomain(), "textures/blocks/" + unwrapped.getResourcePath());
-		} else {
-			return new ResourceLocation(wrapped.getResourcePath());
-		}
 	}
 	
 	protected static int blendRGB(int rgbOrig, int rgbBlend, int weightOrig, int weightBlend) {

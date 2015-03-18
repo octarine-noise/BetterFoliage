@@ -9,6 +9,7 @@ import javax.imageio.ImageIO;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import mods.betterfoliage.client.integration.ShadersModIntegration;
+import mods.betterfoliage.client.util.ResourceUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;
@@ -31,7 +32,7 @@ public class ShortGrassGenerator extends BlockTextureGenerator {
 	@Override
 	public IResource getResource(ResourceLocation resourceLocation) throws IOException {
 		IResourceManager resourceManager = Minecraft.getMinecraft().getResourceManager();
-		ResourceLocation originalResource = unwrapResource(resourceLocation);
+		ResourceLocation originalResource = ResourceUtils.unwrapResource(resourceLocation);
 		
 		// load full texture
 		BufferedImage origImage = ImageIO.read(resourceManager.getResource(originalResource).getInputStream());

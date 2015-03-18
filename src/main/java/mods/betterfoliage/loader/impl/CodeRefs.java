@@ -21,8 +21,8 @@ public class CodeRefs {
 	public static ClassRef cMap;
 	
 	// Minecraft
-    public static ClassRef cBlock, cRenderBlocks, cIBlockAccess, cWorldClient, cWorld, cTextureMap, cSimpleReloadableResourceManager, cIIcon, cTextureAtlasSprite;
-    public static FieldRef fBlockAccess, fMapRegisteredSprites, fDomainResourceManagers;
+    public static ClassRef cBlock, cRenderBlocks, cIBlockAccess, cWorldClient, cWorld, cTextureMap, cSimpleReloadableResourceManager, cIIcon, cTextureAtlasSprite, cIMetadataSerializer;
+    public static FieldRef fBlockAccess, fMapRegisteredSprites, fDomainResourceManagers, fMetadataSerializer;
     public static MethodRef mRenderBlockByRenderType, mDoVoidFogParticles, mGetAmbientOcclusionLightValue, mGetUseNeighborBrightness, mShouldSideBeRendered;
     
     // BetterFoliage
@@ -58,6 +58,7 @@ public class CodeRefs {
             cSimpleReloadableResourceManager = new ClassRef("net.minecraft.client.resources.SimpleReloadableResourceManager", "bqx");
             cIIcon =  new ClassRef("net.minecraft.util.IIcon", "ps");
             cTextureAtlasSprite = new ClassRef("net.minecraft.client.renderer.texture.TextureAtlasSprite", "bpv");
+            cIMetadataSerializer = new ClassRef("net.minecraft.client.resources.data.IMetadataSerializer", "brh");
         } else if ("1.7.10".equals(mcVersion)) {
             cRenderBlocks = new ClassRef("net.minecraft.client.renderer.RenderBlocks", "blm");
             cIBlockAccess = new ClassRef("net.minecraft.world.IBlockAccess", "ahl");
@@ -68,6 +69,7 @@ public class CodeRefs {
             cSimpleReloadableResourceManager = new ClassRef("net.minecraft.client.resources.SimpleReloadableResourceManager", "brg");
             cIIcon =  new ClassRef("net.minecraft.util.IIcon", "rf");
             cTextureAtlasSprite = new ClassRef("net.minecraft.client.renderer.texture.TextureAtlasSprite", "bqd");
+            cIMetadataSerializer = new ClassRef("net.minecraft.client.resources.data.IMetadataSerializer", "brw");
         }
         
         cMap = new ClassRef("java.util.Map");
@@ -76,6 +78,7 @@ public class CodeRefs {
         fBlockAccess = new FieldRef(cRenderBlocks, "blockAccess", null, "a", cIBlockAccess);
         fMapRegisteredSprites = new FieldRef(cTextureMap, "mapRegisteredSprites", "field_110574_e", "bpr", cMap);
         fDomainResourceManagers = new FieldRef(cSimpleReloadableResourceManager, "domainResourceManagers", "field_110548_a", null, cMap);
+        fMetadataSerializer = new FieldRef(cSimpleReloadableResourceManager, "rmMetadataSerializer", "field_110547_c", "f", cIMetadataSerializer);
         
         mRenderBlockByRenderType = new MethodRef(cRenderBlocks, "renderBlockByRenderType", null, "b", ClassRef.BOOLEAN, cBlock, ClassRef.INT, ClassRef.INT, ClassRef.INT);
         mDoVoidFogParticles = new MethodRef(cWorldClient, "doVoidFogParticles", null, "C", ClassRef.VOID, ClassRef.INT, ClassRef.INT, ClassRef.INT);

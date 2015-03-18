@@ -7,13 +7,15 @@ import mods.betterfoliage.client.integration.CLCIntegration;
 import mods.betterfoliage.client.integration.OptifineIntegration;
 import mods.betterfoliage.client.integration.ShadersModIntegration;
 import mods.betterfoliage.client.integration.TerraFirmaCraftIntegration;
+import mods.betterfoliage.client.misc.BetterFoliageMetadataSection;
 import mods.betterfoliage.client.misc.WindTracker;
 import mods.betterfoliage.client.render.IRenderBlockDecorator;
 import mods.betterfoliage.client.render.impl.EntityFXFallingLeaves;
 import mods.betterfoliage.client.render.impl.EntityFXRisingSoul;
-import mods.betterfoliage.client.render.impl.RenderBlockDirtWithAlgae;
 import mods.betterfoliage.client.render.impl.RenderBlockCactus;
-import mods.betterfoliage.client.render.impl.RenderBlockSandWithCoral;
+import mods.betterfoliage.client.render.impl.RenderBlockDirtWithAlgae;
+import mods.betterfoliage.client.render.impl.RenderBlockDirtWithGrassSide;
+import mods.betterfoliage.client.render.impl.RenderBlockDirtWithGrassTop;
 import mods.betterfoliage.client.render.impl.RenderBlockGrass;
 import mods.betterfoliage.client.render.impl.RenderBlockLeaves;
 import mods.betterfoliage.client.render.impl.RenderBlockLilypad;
@@ -21,19 +23,20 @@ import mods.betterfoliage.client.render.impl.RenderBlockLogs;
 import mods.betterfoliage.client.render.impl.RenderBlockMycelium;
 import mods.betterfoliage.client.render.impl.RenderBlockNetherrack;
 import mods.betterfoliage.client.render.impl.RenderBlockReed;
-import mods.betterfoliage.client.render.impl.RenderBlockDirtWithGrassSide;
-import mods.betterfoliage.client.render.impl.RenderBlockDirtWithGrassTop;
+import mods.betterfoliage.client.render.impl.RenderBlockSandWithCoral;
 import mods.betterfoliage.client.texture.GrassTextures;
-import mods.betterfoliage.client.texture.LeafParticleTextures;
+import mods.betterfoliage.client.texture.LeafTextures;
 import mods.betterfoliage.client.texture.LeafTextureEnumerator;
 import mods.betterfoliage.client.texture.SoulParticleTextures;
 import mods.betterfoliage.client.texture.generator.LeafGenerator;
 import mods.betterfoliage.client.texture.generator.ReedGenerator;
 import mods.betterfoliage.client.texture.generator.ShortGrassGenerator;
 import mods.betterfoliage.common.config.Config;
+import mods.betterfoliage.loader.impl.CodeRefs;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.data.IMetadataSerializer;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IBlockAccess;
@@ -54,7 +57,7 @@ public class BetterFoliageClient {
 	
 	public static Map<Integer, IRenderBlockDecorator> decorators = Maps.newHashMap();
 	public static LeafGenerator leafGenerator = new LeafGenerator();
-	public static LeafParticleTextures leafParticles = new LeafParticleTextures(0);
+	public static LeafTextures leafTextures = new LeafTextures();
 	public static SoulParticleTextures soulParticles = new SoulParticleTextures();
 	public static GrassTextures grassTextures = new GrassTextures();
 	public static WindTracker wind = new WindTracker();
@@ -89,7 +92,7 @@ public class BetterFoliageClient {
 		BetterFoliage.log.info("Registering texture generators");
 		MinecraftForge.EVENT_BUS.register(soulParticles);
 		MinecraftForge.EVENT_BUS.register(leafGenerator);
-		MinecraftForge.EVENT_BUS.register(leafParticles);
+		MinecraftForge.EVENT_BUS.register(leafTextures);
 		MinecraftForge.EVENT_BUS.register(grassTextures);
 		MinecraftForge.EVENT_BUS.register(new LeafTextureEnumerator());
 		
@@ -97,6 +100,9 @@ public class BetterFoliageClient {
 		MinecraftForge.EVENT_BUS.register(new ReedGenerator("bf_reed_top", missingTexture, false));
 		MinecraftForge.EVENT_BUS.register(new ShortGrassGenerator("bf_shortgrass", missingTexture, false));
 		MinecraftForge.EVENT_BUS.register(new ShortGrassGenerator("bf_shortgrass_snow", missingTexture, true));
+		
+		IMetadataSerializer serializer = CodeRefs.fMetadataSerializer.<IMetadataSerializer>getInstanceField(Minecraft.getMinecraft().getResourceManager());
+		serializer.registerMetadataSectionType(new BetterFoliageMetadataSection.BetterFoliageMetadataSerializer(), BetterFoliageMetadataSection.class);
 		
 		ShadersModIntegration.init();
 		TerraFirmaCraftIntegration.init();

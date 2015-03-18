@@ -2,11 +2,11 @@ package mods.betterfoliage.client.texture.generator;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 
 import mods.betterfoliage.BetterFoliage;
-import mods.betterfoliage.client.texture.LeafTextureEnumerator;
 import mods.betterfoliage.client.texture.LeafTextureEnumerator.LeafTextureFoundEvent;
 import mods.betterfoliage.client.util.ResourceUtils;
 import net.minecraft.client.Minecraft;
@@ -14,6 +14,9 @@ import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.TextureStitchEvent.Pre;
+
+import com.google.common.collect.Maps;
+
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -31,7 +34,7 @@ public abstract class LeafGeneratorBase extends BlockTextureGenerator {
 	};
 	
 	/** Format string of pre-drawn texture location */
-	public String handDrawnLocationFormat;
+	public String customLocationFormat;
 	
 	/** Format string of alpha mask location */
 	public String maskImageLocationFormat;
@@ -45,26 +48,31 @@ public abstract class LeafGeneratorBase extends BlockTextureGenerator {
 	/** Number of pre-drawn textures found in the current run */
 	public int drawnCounter = 0;
 	
+	public Map<ResourceLocation, IResource> resourceCache = Maps.newHashMap(); 
+	
 	public LeafGeneratorBase(String domain, String nonGeneratedDomain, String handDrawnLocationFormat, String maskImageLocationFormat, ResourceLocation missingResource) {
 		super(domain, missingResource);
 		this.nonGeneratedDomain = nonGeneratedDomain;
-		this.handDrawnLocationFormat = handDrawnLocationFormat;
+		this.customLocationFormat = handDrawnLocationFormat;
 		this.maskImageLocationFormat = maskImageLocationFormat;
 	}
 
 	@Override
 	public IResource getResource(ResourceLocation resourceLocation) throws IOException {
+		IResource cached = resourceCache.get(resourceLocation);
+		if (cached != null) return cached;
+		
 		IResourceManager resourceManager = Minecraft.getMinecraft().getResourceManager();
-		ResourceLocation originalResource = unwrapResource(resourceLocation);
+		ResourceLocation originalResource = ResourceUtils.unwrapResource(resourceLocation);
 		
 		// use animation metadata as-is
 		if (resourceLocation.getResourcePath().toLowerCase().endsWith(".mcmeta")) return resourceManager.getResource(originalResource);
 		
 		// check for provided texture
-		ResourceLocation handDrawnLocation = new ResourceLocation(nonGeneratedDomain, String.format(handDrawnLocationFormat, originalResource.getResourceDomain(), originalResource.getResourcePath())); 
-		if (ResourceUtils.resourceExists(handDrawnLocation)) {
+		ResourceLocation customLocation = getCustomLocation(originalResource);
+		if (ResourceUtils.resourceExists(customLocation)) {
 			drawnCounter++;
-			return resourceManager.getResource(handDrawnLocation);
+			return resourceManager.getResource(customLocation);
 		}
 		
 		// generate our own
@@ -81,7 +89,10 @@ public abstract class LeafGeneratorBase extends BlockTextureGenerator {
 			return getMissingResource();
 		}
 		generatedCounter++;
-		return new BufferedImageResource(result, originalResource);
+		IResource generated = new BufferedImageResource(result, originalResource);
+		resourceCache.put(resourceLocation, generated);
+		return generated;
+		
 	}
 	
 	protected abstract BufferedImage generateLeaf(ResourceLocation originalWithDirs) throws IOException, TextureGenerationException;
@@ -117,11 +128,25 @@ public abstract class LeafGeneratorBase extends BlockTextureGenerator {
 		if (event.map.getTextureType() != 0) return;
 		generatedCounter = 0;
 		drawnCounter = 0;
+		resourceCache.clear();
 	}
 
 	@SubscribeEvent
 	public void handleRegisterTexture(LeafTextureFoundEvent event) {
-		event.blockTextures.registerIcon(new ResourceLocation(domainName, event.icon.getIconName()).toString());
+		event.blockTextures.registerIcon(getRoundLocationShort(event.icon.getIconName()).toString());
 	}
 
+	public ResourceLocation getCustomLocation(ResourceLocation baseLocation) {
+		return new ResourceLocation(nonGeneratedDomain, String.format(customLocationFormat, baseLocation.getResourceDomain(), baseLocation.getResourcePath())); 
+	}
+	
+	public ResourceLocation getRoundLocationShort(String iconName) {
+		return new ResourceLocation(domainName, iconName);
+	}
+	
+	
+	public ResourceLocation getRoundLocationFull(String iconName) {
+		return new ResourceLocation(domainName, String.format("textures/blocks/%s.png", new ResourceLocation(iconName).toString()));
+	}
+	
 }

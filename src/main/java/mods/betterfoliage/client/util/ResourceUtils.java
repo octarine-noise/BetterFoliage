@@ -10,6 +10,7 @@ import java.util.List;
 import mods.betterfoliage.BetterFoliage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IResource;
+import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
 
 import com.google.common.base.Charsets;
@@ -70,5 +71,28 @@ public class ResourceUtils {
             return Lists.newArrayList();
         }
         return result;
+	}
+	
+	public static IResource getResource(ResourceLocation location) {
+		try {
+			return Minecraft.getMinecraft().getResourceManager().getResource(location);
+		} catch (IOException e) {
+			return null;
+		}
+	}
+	
+	public static ResourceLocation unwrapResource(ResourceLocation wrapped) {
+		if (wrapped.getResourcePath().startsWith("textures/blocks/")) {
+			ResourceLocation unwrapped = new ResourceLocation(wrapped.getResourcePath().substring(16));
+			return new ResourceLocation(unwrapped.getResourceDomain(), "textures/blocks/" + unwrapped.getResourcePath());
+		} else {
+			return new ResourceLocation(wrapped.getResourcePath());
+		}
+	}
+	
+	public static ResourceLocation getIconLocation(IIcon icon) {
+		ResourceLocation shortLocation = new ResourceLocation(icon.getIconName());
+		ResourceLocation fullLocation = new ResourceLocation(shortLocation.getResourceDomain(), String.format("textures/blocks/%s.png", shortLocation.getResourcePath()));
+		return fullLocation;
 	}
 }
