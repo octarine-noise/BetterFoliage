@@ -5,7 +5,7 @@ import java.lang.reflect.Field;
 /** Reference to a field. Contains information to locate the field regardless of environment.
  * @author octarine-noise
  */
-public class FieldRef implements IResolvable<Field> {
+public class FieldRef extends AbstractResolvable<Field> {
     
     /** Containing class */
     public ClassRef parent;
@@ -21,9 +21,6 @@ public class FieldRef implements IResolvable<Field> {
     
     /** Field type */
     public ClassRef type;
-    
-    /** Cached {@link Field} object to use for reflection */
-    public Field fieldObj;
     
     public FieldRef(ClassRef parent, String mcpName, String srgName, String obfName, ClassRef returnType) {
         this.parent = parent;
@@ -55,20 +52,22 @@ public class FieldRef implements IResolvable<Field> {
         return type.getAsmDescriptor(ns);
     }
     
-    public Field resolve() {
-        if (fieldObj == null) {
-            Class<?> parentClass = parent.resolve();
-            if (parentClass == null) return null;
-            try {
-                fieldObj = parentClass.getDeclaredField(srgName);
-                fieldObj.setAccessible(true);
-            } catch (Exception e) {}
-            if (fieldObj == null) try {
-                fieldObj = parentClass.getDeclaredField(mcpName);
-                fieldObj.setAccessible(true);
-            } catch (Exception e) {}
-        }
-        return fieldObj;
+    public Field resolveInternal() {
+        Class<?> parentClass = parent.resolve();
+        if (parentClass == null) return null;
+        
+        Field fieldObj = null;
+        try {
+            fieldObj = parentClass.getDeclaredField(srgName);
+            fieldObj.setAccessible(true);
+            return fieldObj;
+        } catch (Exception e) {}
+        try {
+            fieldObj = parentClass.getDeclaredField(mcpName);
+            fieldObj.setAccessible(true);
+            return fieldObj;
+        } catch (Exception e) {}
+		return fieldObj;
     }
     
     /** Get field value for a given instance

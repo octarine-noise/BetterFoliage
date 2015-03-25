@@ -4,7 +4,7 @@ package mods.betterfoliage.loader;
 /** Reference to a class. Contains information to locate the class regardless of environment.
  * @author octarine-noise
  */
-public class ClassRef implements IResolvable<Class<?>> {
+public class ClassRef extends AbstractResolvable<Class<?>> {
     
     /** Reference to primitive <b>int</b> type */
     public static final ClassRef INT = primitive("I", int.class);
@@ -27,9 +27,6 @@ public class ClassRef implements IResolvable<Class<?>> {
     /** Class name in OBF namespace */
     public String obfName;
     
-    /** Cached {@link Class} object to use for reflection */
-    public Class<?> classObj;
-    
     public ClassRef(String mcpName, String obfName) {
         this.mcpName = mcpName;
         this.obfName = obfName;
@@ -47,7 +44,8 @@ public class ClassRef implements IResolvable<Class<?>> {
     protected static ClassRef primitive(String name, Class<?> classObj) {
         ClassRef result = new ClassRef(name);
         result.isPrimitive = true;
-        result.classObj = classObj;
+        result.resolvedObj = classObj;
+        result.isResolved = true;
         return result;
     }
     
@@ -67,15 +65,13 @@ public class ClassRef implements IResolvable<Class<?>> {
         return isPrimitive ? mcpName : "L" + getName(ns).replace(".", "/") + ";";
     }
     
-    public Class<?> resolve() {
-        if (classObj == null) {
-            try {
-                classObj = Class.forName(mcpName);
-            } catch (ClassNotFoundException e) {}
-            if (classObj == null) try {
-                classObj = Class.forName(obfName);
-            } catch (ClassNotFoundException e) {}
-        }
-        return classObj;
+    protected Class<?> resolveInternal() {
+        try {
+            return Class.forName(mcpName);
+        } catch (ClassNotFoundException e) {}
+        try {
+            return Class.forName(obfName);
+        } catch (ClassNotFoundException e) {}
+        return null;
     }
 }

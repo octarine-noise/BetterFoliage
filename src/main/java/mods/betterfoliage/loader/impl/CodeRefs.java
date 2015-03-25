@@ -2,13 +2,14 @@ package mods.betterfoliage.loader.impl;
 
 import java.util.Collection;
 
+import mods.betterfoliage.loader.AbstractResolvable;
+import mods.betterfoliage.loader.ClassRef;
+import mods.betterfoliage.loader.FieldRef;
+import mods.betterfoliage.loader.MethodRef;
+
 import com.google.common.collect.ImmutableList;
 
 import cpw.mods.fml.relauncher.FMLInjectionData;
-import mods.betterfoliage.loader.ClassRef;
-import mods.betterfoliage.loader.FieldRef;
-import mods.betterfoliage.loader.IResolvable;
-import mods.betterfoliage.loader.MethodRef;
 
 /** Static helper class holding constants referencing Minecraft code.<br/>
  * This should be the <b>only</b> place in the mod code with code element names!
@@ -43,8 +44,8 @@ public class CodeRefs {
     public static ClassRef cCLCLoader = new ClassRef("coloredlightscore.src.asm.ColoredLightsCoreLoadingPlugin");
     
     // Feature sets
-    public static Collection<IResolvable<?>> optifineCTF;
-    public static Collection<IResolvable<?>> shaders;
+    public static Collection<AbstractResolvable<?>> optifineCTF;
+    public static Collection<AbstractResolvable<?>> shaders;
     
     static {
         String mcVersion = FMLInjectionData.data()[4].toString();
@@ -112,9 +113,9 @@ public class CodeRefs {
         
         fCPTileIcons = new FieldRef(cConnectedProperties, "tileIcons", null);
         
-        optifineCTF = ImmutableList.<IResolvable<?>>of(
+        optifineCTF = ImmutableList.<AbstractResolvable<?>>of(
         	cConnectedTextures, cConnectedProperties, mGetConnectedTexture, mGetIndexInMap, fCTBlockProperties, fCTTileProperties, fCPTileIcons
         );
-        shaders = ImmutableList.<IResolvable<?>>of(cShaders, fShadersEntityData, fShadersEntityDataIndex);
+        shaders = ImmutableList.<AbstractResolvable<?>>of(cShaders, fShadersEntityData, fShadersEntityDataIndex);
     }
 }
