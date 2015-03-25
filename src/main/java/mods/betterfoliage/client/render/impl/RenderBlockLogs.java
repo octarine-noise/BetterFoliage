@@ -15,6 +15,7 @@ import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumWorldBlockLayer;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -22,10 +23,17 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class RenderBlockLogs extends BFAbstractRenderer {
 
+	public RenderBlockLogs() {
+		isStandardRenderBlocked = true;
+	}
+	
+    public boolean isBlockEligible(IBlockAccess blockAccess, IBlockState blockState, BlockPos pos) {
+    	return Config.logsEnabled && Config.logs.matchesID(blockState.getBlock());
+    }
+
     @Override
-    public boolean renderFeatureForBlock(IBlockAccess blockAccess, IBlockState blockState, BlockPos pos, WorldRenderer worldRenderer, boolean useAO) {
-    	if (!Config.logsEnabled) return false;
-    	if (!Config.logs.matchesID(blockState.getBlock())) return false;
+    public boolean renderBlock(IBlockAccess blockAccess, IBlockState blockState, BlockPos pos, WorldRenderer worldRenderer, boolean useAO, EnumWorldBlockLayer layer) {
+    	if (layer != EnumWorldBlockLayer.SOLID) return false;
     	
     	LogInfo logInfo = BetterFoliageClient.logRegistry.logInfoMap.get(blockState);
     	if (logInfo == null || logInfo.sideTexture == null || logInfo.endTexture == null) return false;

@@ -1,11 +1,16 @@
 package net.minecraft.client.renderer;
 
+import java.util.Collection;
+
+import com.google.common.collect.ImmutableList;
+
 import mods.betterfoliage.client.misc.Double3;
 import mods.betterfoliage.client.misc.PerturbationSource;
 import mods.betterfoliage.client.render.BlockShadingData;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumWorldBlockLayer;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -16,6 +21,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public abstract class BFAbstractRenderer extends BlockModelRenderer {
 
+	public boolean isStandardRenderBlocked = false;
+	
     /** Identical to {@link AmbientOcclusionFace} with <b>public</b> visibility.
      * @author octarine-noise
      */
@@ -34,9 +41,12 @@ public abstract class BFAbstractRenderer extends BlockModelRenderer {
      * @param pos position
      * @param worldRenderer renderer
      * @param useAO ambient occlusion should be used for the block
+     * @param layer render layer
      * @return true if drawing took place
      */
-    public abstract boolean renderFeatureForBlock(IBlockAccess blockAccess, IBlockState blockState, BlockPos pos, WorldRenderer worldRenderer, boolean useAO);
+    public abstract boolean renderBlock(IBlockAccess blockAccess, IBlockState blockState, BlockPos pos, WorldRenderer worldRenderer, boolean useAO, EnumWorldBlockLayer layer);
+    
+    public abstract boolean isBlockEligible(IBlockAccess blockAccess, IBlockState blockState, BlockPos pos);
     
     /** Get the {@link AmbientOcclusionFace} array index for a corner vertex
      * @param face block face

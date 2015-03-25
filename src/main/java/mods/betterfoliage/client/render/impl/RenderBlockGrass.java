@@ -15,6 +15,7 @@ import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumWorldBlockLayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.client.event.TextureStitchEvent;
@@ -30,14 +31,18 @@ public class RenderBlockGrass extends BFAbstractRenderer {
     public TextureAtlasSprite grassGenIcon, snowGrassGenIcon;
     public static Color4 snowColor = Color4.fromARGB(255, 200, 200, 200);
     
+    public boolean isBlockEligible(IBlockAccess blockAccess, IBlockState blockState, BlockPos pos) {
+    	return Config.grassEnabled && Config.grass.matchesID(blockState.getBlock()) && !blockAccess.getBlockState(pos.up()).getBlock().isOpaqueCube();
+    }
+    
     @Override
-    public boolean renderFeatureForBlock(IBlockAccess blockAccess, IBlockState blockState, BlockPos pos, WorldRenderer worldRenderer, boolean useAO) {
-        if (!Config.grassEnabled) return false;
-        if (!Config.grass.matchesID(blockState.getBlock())) return false;
-        if (blockAccess.getBlockState(pos.up()).getBlock().isOpaqueCube()) return false;
-        
+    public boolean renderBlock(IBlockAccess blockAccess, IBlockState blockState, BlockPos pos, WorldRenderer worldRenderer, boolean useAO, EnumWorldBlockLayer layer) {
+    	if (layer != EnumWorldBlockLayer.CUTOUT_MIPPED) return false;
+    	
+    	boolean isSnowTop = blockAccess.getBlockState(pos.offset(EnumFacing.UP)).getBlock().getMaterial() == Material.snow;
+    	if (isSnowTop && !Config.grassSnowEnabled) return false;
+    	
         // render round leaves
-        boolean isSnowTop = blockAccess.getBlockState(pos.offset(EnumFacing.UP)).getBlock().getMaterial() == Material.snow;
         int offsetVariation = getSemiRandomFromPos(pos, 0);
         int textureVariation = getSemiRandomFromPos(pos, 1);
         double halfSize = 0.5 * Config.grassSize;

@@ -15,6 +15,7 @@ import net.minecraft.client.renderer.BFAbstractRenderer;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumWorldBlockLayer;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -26,11 +27,14 @@ public class RenderBlockLeaves extends BFAbstractRenderer {
 
     public TextureSet snowedLeavesIcons = new TextureSet("bettergrassandleaves", "blocks/better_leaves_snowed_%d");
     
+    public boolean isBlockEligible(IBlockAccess blockAccess, IBlockState blockState, BlockPos pos) {
+    	return Config.leavesEnabled && Config.leaves.matchesID(blockState.getBlock());
+    }
+
     @Override
-    public boolean renderFeatureForBlock(IBlockAccess blockAccess, IBlockState blockState, BlockPos pos, WorldRenderer worldRenderer, boolean useAO) {
-        if (!Config.leavesEnabled) return false;
-        if (!Config.leaves.matchesID(blockState.getBlock())) return false;
-        
+    public boolean renderBlock(IBlockAccess blockAccess, IBlockState blockState, BlockPos pos, WorldRenderer worldRenderer, boolean useAO, EnumWorldBlockLayer layer) {
+    	if (layer != EnumWorldBlockLayer.CUTOUT_MIPPED) return false;
+    	
         // check if we have leaf textures for this block
         LeafInfo leafInfo = BetterFoliageClient.leafRegistry.leafInfoMap.get(blockState);
         if (leafInfo == null || leafInfo.roundLeafTexture == null) {

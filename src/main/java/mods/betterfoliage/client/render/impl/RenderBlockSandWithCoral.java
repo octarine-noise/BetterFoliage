@@ -16,6 +16,7 @@ import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumWorldBlockLayer;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.gen.NoiseGeneratorSimplex;
@@ -31,14 +32,22 @@ public class RenderBlockSandWithCoral extends BFAbstractRenderer {
 	public TextureSet coralCrossIcons = new TextureSet("bettergrassandleaves", "blocks/better_coral_%d");
 	public NoiseGeneratorSimplex noise;
 	
-	@Override
-    public boolean renderFeatureForBlock(IBlockAccess blockAccess, IBlockState blockState, BlockPos pos, WorldRenderer worldRenderer, boolean useAO) {
-	    if (!Config.coralEnabled) return false;
+    public boolean isBlockEligible(IBlockAccess blockAccess, IBlockState blockState, BlockPos pos) {
+    	if (!Config.coralEnabled) return false;
 	    if (noise == null) return false;
+	    
 	    if (blockState.getBlock() != Blocks.sand) return false;
 	    if (!Config.coralBiomeList.contains(blockAccess.getBiomeGenForCoords(pos).biomeID)) return false;
+	    
 	    int terrainVariation = MathHelper.floor_double((noise.func_151605_a(pos.getX() * 0.1, pos.getZ() * 0.1) + 1.0) * 32.0);
 	    if (terrainVariation >= Config.coralPopulation) return false;
+	    
+	    return true;
+    }
+
+	@Override
+    public boolean renderBlock(IBlockAccess blockAccess, IBlockState blockState, BlockPos pos, WorldRenderer worldRenderer, boolean useAO, EnumWorldBlockLayer layer) {
+		if (layer != EnumWorldBlockLayer.CUTOUT_MIPPED) return false;
 	        
 		Double3 blockCenter = new Double3(pos).add(0.5, 0.5, 0.5);
 		double offset = random.getRange(0.0, Config.coralVOffset, getSemiRandomFromPos(pos, 1));

@@ -14,6 +14,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumWorldBlockLayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.client.event.TextureStitchEvent;
@@ -36,11 +37,14 @@ public class RenderBlockCactus extends BFAbstractRenderer {
     /** Texture set of cactus arms */
     public TextureSet cactusSideIcons = new TextureSet("bettergrassandleaves", "blocks/better_cactus_arm_%d");
     
+    public boolean isBlockEligible(IBlockAccess blockAccess, IBlockState blockState, BlockPos pos) {
+    	return Config.cactusEnabled && blockState.getBlock() == Blocks.cactus;
+    }
+    
     @Override
-    public boolean renderFeatureForBlock(IBlockAccess blockAccess, IBlockState blockState, BlockPos pos, WorldRenderer worldRenderer, boolean useAO) {
-        if (!Config.cactusEnabled) return false;
-        if (blockState.getBlock() != Blocks.cactus) return false;
-        
+    public boolean renderBlock(IBlockAccess blockAccess, IBlockState blockState, BlockPos pos, WorldRenderer worldRenderer, boolean useAO, EnumWorldBlockLayer layer) {
+    	if (layer != EnumWorldBlockLayer.CUTOUT_MIPPED) return false;
+    	
         int offsetVariation = getSemiRandomFromPos(pos, 0);
         int uvVariation = getSemiRandomFromPos(pos, 1);
         int iconVariation = getSemiRandomFromPos(pos, 2);

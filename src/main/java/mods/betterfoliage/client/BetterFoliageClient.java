@@ -142,29 +142,19 @@ public class BetterFoliageClient {
     }
     
 	public static boolean canRenderBlockInLayer(Block block, EnumWorldBlockLayer layer) {
-		// enable CUTOUT_MIPPED layer ONLY for blocks where needed
-		if (Config.logsEnabled && Config.logs.matchesID(block)) return layer == EnumWorldBlockLayer.CUTOUT_MIPPED;
-		
-	    if (block.canRenderInLayer(layer)) return true;
-	    
-	    // enable CUTOUT_MIPPED layer IN ADDITION for blocks where needed
-	    if (block == Blocks.sand && Config.coralEnabled) return layer == EnumWorldBlockLayer.CUTOUT_MIPPED;
-	    if (block == Blocks.mycelium && Config.grassEnabled) return layer == EnumWorldBlockLayer.CUTOUT_MIPPED;
-	    if (block == Blocks.cactus && Config.cactusEnabled) return layer == EnumWorldBlockLayer.CUTOUT_MIPPED;
-	    if (block == Blocks.waterlily && Config.lilypadEnabled) return layer == EnumWorldBlockLayer.CUTOUT_MIPPED;
-	    if (block == Blocks.netherrack && Config.netherrackEnabled) return layer == EnumWorldBlockLayer.CUTOUT_MIPPED;
-	    if (Config.dirt.matchesID(block) && (Config.algaeEnabled || Config.reedEnabled)) return layer == EnumWorldBlockLayer.CUTOUT_MIPPED;
-	    
-	    return false;
+	    return block.canRenderInLayer(layer) || layer == EnumWorldBlockLayer.CUTOUT_MIPPED;
 	}
 	
 	public static boolean renderWorldBlock(BlockRendererDispatcher dispatcher, IBlockState state, BlockPos pos, IBlockAccess blockAccess, WorldRenderer worldRenderer, EnumWorldBlockLayer layer) {
-	    boolean result = state.getBlock().canRenderInLayer(layer) ? dispatcher.renderBlock(state, pos, blockAccess, worldRenderer) : false;
-	    if (layer == EnumWorldBlockLayer.CUTOUT_MIPPED) {
-	        boolean useAO = Minecraft.isAmbientOcclusionEnabled() && state.getBlock().getLightValue() == 0;
-	        for(BFAbstractRenderer renderer : renderers) result |= renderer.renderFeatureForBlock(blockAccess, state, pos, worldRenderer, useAO);
-	    }
-	    return result;
+		boolean canBlockRender = state.getBlock().canRenderInLayer(layer);
+		boolean hasRendered = false;
+		boolean useAO = Minecraft.isAmbientOcclusionEnabled() && state.getBlock().getLightValue() == 0;
+		for(BFAbstractRenderer renderer : renderers) if (renderer.isBlockEligible(blockAccess, state, pos)) {
+			if (!renderer.isStandardRenderBlocked && canBlockRender) hasRendered = dispatcher.renderBlock(state, pos, blockAccess, worldRenderer);
+			if (renderer.renderBlock(blockAccess, state, pos, worldRenderer, useAO, layer)) hasRendered = true;
+			return hasRendered;
+		}
+	    return canBlockRender ? dispatcher.renderBlock(state, pos, blockAccess, worldRenderer) : false;
 	}
 	
     public static void onAfterLoadModelDefinitions(ModelLoader loader) {

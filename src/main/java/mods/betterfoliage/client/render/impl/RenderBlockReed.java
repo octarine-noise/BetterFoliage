@@ -15,6 +15,7 @@ import net.minecraft.client.renderer.BFAbstractRenderer;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumWorldBlockLayer;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.gen.NoiseGeneratorSimplex;
@@ -33,16 +34,25 @@ public class RenderBlockReed extends BFAbstractRenderer {
     public TextureSet reedTopIcons = new TextureSet("bf_reed_top", "bettergrassandleaves:blocks/better_reed_%d");
     public NoiseGeneratorSimplex noise;
     
-    @Override
-    public boolean renderFeatureForBlock(IBlockAccess blockAccess, IBlockState blockState, BlockPos pos, WorldRenderer worldRenderer, boolean useAO) {
+    public boolean isBlockEligible(IBlockAccess blockAccess, IBlockState blockState, BlockPos pos) {
         if (!Config.reedEnabled) return false;
         if (noise == null) return false;
+        
         if (!Config.dirt.matchesID(blockState.getBlock())) return false;
         if (!Config.reedBiomeList.contains(blockAccess.getBiomeGenForCoords(pos).biomeID)) return false;
+        
         if (blockAccess.getBlockState(pos.up()).getBlock().getMaterial() != Material.water) return false;
         if (!blockAccess.isAirBlock(pos.up(2))) return false;
+        
         int terrainVariation = MathHelper.floor_double((noise.func_151605_a(pos.getX(), pos.getZ()) + 1.0) * 32.0);
         if (terrainVariation >= Config.reedPopulation) return false;
+        
+        return true;
+    }
+
+    @Override
+    public boolean renderBlock(IBlockAccess blockAccess, IBlockState blockState, BlockPos pos, WorldRenderer worldRenderer, boolean useAO, EnumWorldBlockLayer layer) {
+    	if (layer != EnumWorldBlockLayer.CUTOUT_MIPPED) return false;
         
         int offsetVariation = getSemiRandomFromPos(pos, 0);
         int textureVariation = getSemiRandomFromPos(pos, 1);
