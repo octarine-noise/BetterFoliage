@@ -158,7 +158,9 @@ public class RenderBlockAOBase extends RenderBlocks {
     protected ShadingValues getAoLookupMax(ForgeDirection primary, ForgeDirection secondary, ForgeDirection tertiary) {
     	ShadingValues pri = shadingLookup[primary.ordinal()][secondary.ordinal()][tertiary.ordinal()];
     	ShadingValues sec = shadingLookup[secondary.ordinal()][primary.ordinal()][tertiary.ordinal()];
-    	return pri.brightness > sec.brightness ? pri : sec;
+//    	ShadingValues ter = shadingLookup[tertiary.ordinal()][primary.ordinal()][secondary.ordinal()];
+    	return pri.green > sec.green ? pri :sec;
+//    	return pri.green > sec.green && pri.green > ter.green ? pri : (sec.green > ter.green ? sec : ter);
     }
 
     
@@ -352,29 +354,31 @@ public class RenderBlockAOBase extends RenderBlocks {
 	
 	private void renderCrossedBlockQuadsInternal(ForgeDirection axisMain, Double3 drawCenter, Double3 horz1, Double3 horz2, Double3 vert1, IIcon crossLeafIcon, int uvRot) {
 		if (Minecraft.isAmbientOcclusionEnabled() && !noShading) {
-			ForgeDirection axis1 = faceDir1[axisMain.ordinal()];
-			ForgeDirection axis2 = faceDir2[axisMain.ordinal()];
+			ForgeDirection axis1P = faceDir1[axisMain.ordinal()];
+			ForgeDirection axis2P = faceDir2[axisMain.ordinal()];
+			ForgeDirection axis1N = axis1P.getOpposite();
+			ForgeDirection axis2N = axis2P.getOpposite();
 			
 			renderQuadWithShading(crossLeafIcon, drawCenter, horz1, vert1, uvRot,
-					getAoLookupMax(axisMain, axis2, axis1.getOpposite()),
-					getAoLookupMax(axisMain, axis1, axis2.getOpposite()),
-					getAoLookupMax(axisMain.getOpposite(), axis1, axis2.getOpposite()),
-					getAoLookupMax(axisMain.getOpposite(), axis2, axis1.getOpposite()));
+					getAoLookupMax(axisMain, axis2P, axis1P),
+					getAoLookupMax(axisMain, axis1N, axis2N),
+					getAoLookupMax(axisMain.getOpposite(), axis1N, axis2N),
+					getAoLookupMax(axisMain.getOpposite(), axis2P, axis1P));
 			renderQuadWithShading(crossLeafIcon, drawCenter, horz1.inverse(), vert1, uvRot,
-					getAoLookupMax(axisMain, axis2.getOpposite(), axis1),
-					getAoLookupMax(axisMain, axis1.getOpposite(), axis2),
-					getAoLookupMax(axisMain.getOpposite(), axis1.getOpposite(), axis2),
-					getAoLookupMax(axisMain.getOpposite(), axis2.getOpposite(), axis1));
+					getAoLookupMax(axisMain, axis2N, axis1N),
+					getAoLookupMax(axisMain, axis1P, axis2P),
+					getAoLookupMax(axisMain.getOpposite(), axis1P, axis2P),
+					getAoLookupMax(axisMain.getOpposite(), axis2N, axis1N));
 			renderQuadWithShading(crossLeafIcon, drawCenter, horz2, vert1, uvRot,
-					getAoLookupMax(axisMain, axis1.getOpposite(), axis2.getOpposite()),
-					getAoLookupMax(axisMain, axis2, axis1),
-					getAoLookupMax(axisMain.getOpposite(), axis2, axis1),
-					getAoLookupMax(axisMain.getOpposite(), axis1.getOpposite(), axis2.getOpposite()));
+					getAoLookupMax(axisMain, axis1P, axis2N),
+					getAoLookupMax(axisMain, axis2P, axis1N),
+					getAoLookupMax(axisMain.getOpposite(), axis2P, axis1N),
+					getAoLookupMax(axisMain.getOpposite(), axis1P, axis2N));
 			renderQuadWithShading(crossLeafIcon, drawCenter, horz2.inverse(), vert1, uvRot,
-					getAoLookupMax(axisMain, axis1, axis2),
-					getAoLookupMax(axisMain, axis2.getOpposite(), axis1.getOpposite()),
-					getAoLookupMax(axisMain.getOpposite(), axis2.getOpposite(), axis1.getOpposite()),
-					getAoLookupMax(axisMain.getOpposite(), axis1, axis2));
+					getAoLookupMax(axisMain, axis1N, axis2P),
+					getAoLookupMax(axisMain, axis2N, axis1P),
+					getAoLookupMax(axisMain.getOpposite(), axis2N, axis1P),
+					getAoLookupMax(axisMain.getOpposite(), axis1N, axis2P));
 		} else {
 			renderQuad(crossLeafIcon, drawCenter, horz1, vert1, uvRot);
 			renderQuad(crossLeafIcon, drawCenter, horz1.inverse(), vert1, uvRot);

@@ -2,12 +2,12 @@ package mods.betterfoliage.client.render.impl;
 
 import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.BetterFoliageClient;
-import mods.betterfoliage.client.integration.OptifineIntegration;
 import mods.betterfoliage.client.misc.Double3;
 import mods.betterfoliage.client.render.IRenderBlockDecorator;
 import mods.betterfoliage.client.render.IconSet;
 import mods.betterfoliage.client.render.RenderBlockAOBase;
 import mods.betterfoliage.client.texture.LeafTextures.LeafInfo;
+import mods.betterfoliage.client.util.RenderUtils;
 import mods.betterfoliage.common.config.Config;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -15,7 +15,6 @@ import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -36,20 +35,14 @@ public class RenderBlockLeaves extends RenderBlockAOBase implements IRenderBlock
 	
 	public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer) {
 		blockAccess = world;
-		skipFaces = Config.leavesDense;
 		renderWorldBlockBase(1, world, x, y, z, block, modelId, renderer);
 		
 		// find generated texture to render with, assume the
 		// "true" texture of the block is the one on the north size
 		TextureAtlasSprite blockLeafIcon = null;
 		try {
-			blockLeafIcon = (TextureAtlasSprite) block.getIcon(world, x, y, z, ForgeDirection.NORTH.ordinal());
-			IIcon ctmIcon = OptifineIntegration.getConnectedTexture(blockAccess, block, x, y, z, ForgeDirection.NORTH.ordinal(), blockLeafIcon);
-			if (ctmIcon != null && ctmIcon != blockLeafIcon && ctmIcon instanceof TextureAtlasSprite) {
-				blockLeafIcon = (TextureAtlasSprite) ctmIcon;
-			}
-		} catch (ClassCastException e) {
-		}
+			blockLeafIcon = (TextureAtlasSprite) RenderUtils.getIcon(world, block, x, y, z, ForgeDirection.NORTH);
+		} catch (ClassCastException e) {}
 		
 		if (blockLeafIcon == null) {
 			BetterFoliage.log.debug(String.format("null leaf texture, x:%d, y:%d, z:%d, meta:%d, block:%s", x, y, z, blockAccess.getBlockMetadata(x, y, z), block.getClass().getName()));
@@ -57,8 +50,6 @@ public class RenderBlockLeaves extends RenderBlockAOBase implements IRenderBlock
 		}
 		LeafInfo leafInfo = BetterFoliageClient.leafTextures.leafInfoMap.get(blockLeafIcon);
 		if (leafInfo.roundLeafTexture == null) return true;
-		
-		
 		
 		int offsetVariation = getSemiRandomFromPos(x, y, z, 0);
 		int uvVariation = leafInfo.rotation ? getSemiRandomFromPos(x, y, z, 1) : 0;
