@@ -1,8 +1,8 @@
 package mods.betterfoliage.client.render.impl;
 
-import mods.betterfoliage.client.render.FakeRenderBlockAOBase;
 import mods.betterfoliage.client.render.IRenderBlockDecorator;
 import mods.betterfoliage.client.render.OffsetBlockAccess;
+import mods.betterfoliage.client.render.RenderBlockAOBase;
 import mods.betterfoliage.client.util.RenderUtils;
 import mods.betterfoliage.common.config.Config;
 import net.minecraft.block.Block;
@@ -18,8 +18,12 @@ import cpw.mods.fml.relauncher.SideOnly;
  * @author octarine-noise
  */
 @SideOnly(Side.CLIENT)
-public class RenderBlockDirtWithGrassSide extends FakeRenderBlockAOBase implements IRenderBlockDecorator {
+public class RenderBlockDirtWithGrassSide extends RenderBlockAOBase implements IRenderBlockDecorator {
 
+	public RenderBlockDirtWithGrassSide() {
+		skipFaces = true;
+	}
+	
 	@Override
 	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
 	    Material top2Material = blockAccess.getBlock(x, y + 2, z).getMaterial();

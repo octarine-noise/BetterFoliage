@@ -2,9 +2,9 @@ package mods.betterfoliage.client.render.impl;
 
 import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.misc.Double3;
-import mods.betterfoliage.client.render.FakeRenderBlockAOBase;
 import mods.betterfoliage.client.render.IRenderBlockDecorator;
 import mods.betterfoliage.client.render.IconSet;
+import mods.betterfoliage.client.render.RenderBlockAOBase;
 import mods.betterfoliage.common.config.Config;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
@@ -20,7 +20,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class RenderBlockCactus extends FakeRenderBlockAOBase implements IRenderBlockDecorator {
+public class RenderBlockCactus extends RenderBlockAOBase implements IRenderBlockDecorator {
 
 	public IIcon cactusRoundIcon;
 	public IconSet cactusSideIcons = new IconSet("bettergrassandleaves", "better_cactus_arm_%d");
@@ -30,6 +30,10 @@ public class RenderBlockCactus extends FakeRenderBlockAOBase implements IRenderB
 	
 	/** Inner radius of cactus stem */
 	public static double cactusRadius = 0.4375;
+	
+	public RenderBlockCactus() {
+		skipFaces = true;
+	}
 	
 	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
 		return Config.cactusEnabled && block == Blocks.cactus;
@@ -62,10 +66,10 @@ public class RenderBlockCactus extends FakeRenderBlockAOBase implements IRenderB
 		
 		Tessellator.instance.setBrightness(getBrightness(block, x, y, z));
 		if (cactusSideIcons.hasIcons()) renderCrossedSideQuads(drawBase, drawDirection, 0.5, 0.5, pRot[iconVariation], 0.2, cactusSideIcons.get(iconVariation), 0, false);
-		renderCrossedBlockQuadsSkew(blockCenter, 0.65,
+		renderCrossedBlockQuadsSkew(ForgeDirection.UP, blockCenter,
+									0.65,
 									pRot[iconVariation].scaleAxes(0.1, 0.0, 0.1),
-									pRot[(iconVariation + 1) & 63].scaleAxes(0.1, 0.0, 0.1),
-									cactusRoundIcon, iconVariation, false, false);
+									pRot[(iconVariation + 1) & 63].scaleAxes(0.1, 0.0, 0.1), cactusRoundIcon, iconVariation, false, false);
 		return true;
 	}
 

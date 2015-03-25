@@ -42,6 +42,7 @@ public class Config {
 	// extracted config values
 	public static boolean leavesEnabled;
 	public static boolean leavesSkew;
+	public static boolean leavesDense;
 	public static double leavesHOffset;
 	public static double leavesVOffset;
 	public static double leavesSize;
@@ -143,6 +144,7 @@ public class Config {
         leavesHOffset = getDouble(Category.extraLeaves, "hOffset", 0.2, 0.0, 0.4, "betterfoliage.hOffset");
         leavesVOffset = getDouble(Category.extraLeaves, "vOffset", 0.1, 0.0, 0.4, "betterfoliage.vOffset");
         leavesSize = getDouble(Category.extraLeaves, "size", 1.4, 0.75, 2.5, "betterfoliage.size");
+        leavesDense = getBoolean(Category.extraLeaves, "dense", false, "betterfoliage.leaves.dense");
 
         grassEnabled = getBoolean(Category.shortGrass, "enabled", true, "betterfoliage.shortGrass.grassEnabled");
         grassHOffset = getDouble(Category.shortGrass, "hOffset", 0.2, 0.0, 0.4, "betterfoliage.hOffset");
@@ -235,13 +237,14 @@ public class Config {
         updateBlockMatcher(logs, Category.blockTypes, "logWhitelist", "betterfoliage.blockTypes.logWhitelist", "logBlacklist", "betterfoliage.blockTypes.logBlacklist", new ResourceLocation("betterfoliage:classesLogDefault.cfg"));
         
         rawConfig.getCategory(Category.extraLeaves.toString()).get("skewMode").setConfigEntryClass(AlternateTextBooleanEntry.class);
+        rawConfig.getCategory(Category.extraLeaves.toString()).get("dense").setConfigEntryClass(AlternateTextBooleanEntry.class);
         rawConfig.getCategory(Category.reed.toString()).get("reedBiomeList").setConfigEntryClass(BiomeListConfigEntry.class);
         rawConfig.getCategory(Category.algae.toString()).get("algaeBiomeList").setConfigEntryClass(BiomeListConfigEntry.class);
         rawConfig.getCategory(Category.coral.toString()).get("coralBiomeList").setConfigEntryClass(BiomeListConfigEntry.class);
         
 		for (Category category : Category.values()) rawConfig.setCategoryLanguageKey(category.toString(), String.format("betterfoliage.%s", category.toString()));
 		
-		setOrder(Category.extraLeaves, "enabled", "skewMode", "hOffset", "vOffset", "size");
+		setOrder(Category.extraLeaves, "enabled", "dense", "skewMode", "hOffset", "vOffset", "size");
 		setOrder(Category.shortGrass, "enabled", "myceliumEnabled", "snowEnabled", "useGenerated", "hOffset", "heightMin", "heightMax", "size", "shaderWind");
 		setOrder(Category.lilypad, "enabled", "hOffset", "flowerChance");
 		setOrder(Category.reed, "enabled", "hOffset", "heightMin", "heightMax", "population", "biomeList", "shaderWind");

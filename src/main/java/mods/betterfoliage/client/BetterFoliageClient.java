@@ -133,6 +133,7 @@ public class BetterFoliageClient {
 	
 	public static float getAmbientOcclusionLightValueOverride(float original, Block block) {
 	    if (Config.logsEnabled && Config.logs.matchesID(block)) return 1.0f;
+	    if (Config.leaves.matchesID(block)) return 0.5f;
 	    return original;
 	}
 	

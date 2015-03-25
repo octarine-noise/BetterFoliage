@@ -2,8 +2,8 @@ package mods.betterfoliage.client.render.impl;
 
 import mods.betterfoliage.client.integration.CLCIntegration;
 import mods.betterfoliage.client.misc.Double3;
-import mods.betterfoliage.client.render.FakeRenderBlockAOBase;
 import mods.betterfoliage.client.render.IRenderBlockDecorator;
+import mods.betterfoliage.client.render.RenderBlockAOBase;
 import mods.betterfoliage.client.util.RenderUtils;
 import mods.betterfoliage.common.config.Config;
 import net.minecraft.block.Block;
@@ -16,11 +16,13 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class RenderBlockLogs extends FakeRenderBlockAOBase implements IRenderBlockDecorator {
+public class RenderBlockLogs extends RenderBlockAOBase implements IRenderBlockDecorator {
 	
-    /** Quick lookup array to get AO values of a given block corner */
-    protected ShadingValues[][][] shadingLookup = new ShadingValues[6][6][6];
-        
+    public RenderBlockLogs() {
+    	skipFaces = true;
+    	vValues = new double[] {16.0, 16.0, 0.0, 0.0};
+    }
+    
 	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
 		return Config.logsEnabled && Config.logs.matchesID(block);
 	}
@@ -233,15 +235,6 @@ public class RenderBlockLogs extends FakeRenderBlockAOBase implements IRenderBlo
 	    }
 	}
 	
-	/** Get the average shading values of the 4 AO data points of a face
-	 * @param dir face direction
-	 * @return average
-	 */
-	protected ShadingValues avgShadingForFace(ForgeDirection dir) {
-	    setShadingForFace(dir);
-	    return CLCIntegration.avgShading(CLCIntegration.avgShading(faceAONN, faceAONP), CLCIntegration.avgShading(faceAOPN, faceAOPP));
-	}
-	
 	/** Determine if a log block is connected to another block
 	 * @param blockAccess world object
 	 * @param x
@@ -283,47 +276,5 @@ public class RenderBlockLogs extends FakeRenderBlockAOBase implements IRenderBlo
         Block block = blockAccess.getBlock(xOff, yOff, zOff);
         return block.isOpaqueCube() && !Config.logs.matchesID(block);
     }
-	
-    public RenderBlockLogs() {
-    	vValues = new double[] {16.0, 16.0, 0.0, 0.0};
-    	
-        putLookup(ForgeDirection.DOWN, ForgeDirection.SOUTH, ForgeDirection.EAST, aoYNXZPP);
-        putLookup(ForgeDirection.DOWN, ForgeDirection.SOUTH, ForgeDirection.WEST, aoYNXZNP);
-        putLookup(ForgeDirection.DOWN, ForgeDirection.NORTH, ForgeDirection.EAST, aoYNXZPN);
-        putLookup(ForgeDirection.DOWN, ForgeDirection.NORTH, ForgeDirection.WEST, aoYNXZNN);
-        
-        putLookup(ForgeDirection.UP, ForgeDirection.SOUTH, ForgeDirection.EAST, aoYPXZPP);
-        putLookup(ForgeDirection.UP, ForgeDirection.SOUTH, ForgeDirection.WEST, aoYPXZNP);
-        putLookup(ForgeDirection.UP, ForgeDirection.NORTH, ForgeDirection.EAST, aoYPXZPN);
-        putLookup(ForgeDirection.UP, ForgeDirection.NORTH, ForgeDirection.WEST, aoYPXZNN);
-        
-        putLookup(ForgeDirection.WEST, ForgeDirection.UP, ForgeDirection.NORTH, aoXNYZPN);
-        putLookup(ForgeDirection.WEST, ForgeDirection.UP, ForgeDirection.SOUTH, aoXNYZPP);
-        putLookup(ForgeDirection.WEST, ForgeDirection.DOWN, ForgeDirection.NORTH, aoXNYZNN);
-        putLookup(ForgeDirection.WEST, ForgeDirection.DOWN, ForgeDirection.SOUTH, aoXNYZNP);
-        
-        putLookup(ForgeDirection.EAST, ForgeDirection.UP, ForgeDirection.NORTH, aoXPYZPN);
-        putLookup(ForgeDirection.EAST, ForgeDirection.UP, ForgeDirection.SOUTH, aoXPYZPP);
-        putLookup(ForgeDirection.EAST, ForgeDirection.DOWN, ForgeDirection.NORTH, aoXPYZNN);
-        putLookup(ForgeDirection.EAST, ForgeDirection.DOWN, ForgeDirection.SOUTH, aoXPYZNP);
-        
-        putLookup(ForgeDirection.NORTH, ForgeDirection.UP, ForgeDirection.EAST, aoZNXYPP);
-        putLookup(ForgeDirection.NORTH, ForgeDirection.UP, ForgeDirection.WEST, aoZNXYNP);
-        putLookup(ForgeDirection.NORTH, ForgeDirection.DOWN, ForgeDirection.EAST, aoZNXYPN);
-        putLookup(ForgeDirection.NORTH, ForgeDirection.DOWN, ForgeDirection.WEST, aoZNXYNN);
-        
-        putLookup(ForgeDirection.SOUTH, ForgeDirection.UP, ForgeDirection.EAST, aoZPXYPP);
-        putLookup(ForgeDirection.SOUTH, ForgeDirection.UP, ForgeDirection.WEST, aoZPXYNP);
-        putLookup(ForgeDirection.SOUTH, ForgeDirection.DOWN, ForgeDirection.EAST, aoZPXYPN);
-        putLookup(ForgeDirection.SOUTH, ForgeDirection.DOWN, ForgeDirection.WEST, aoZPXYNN);
-    }
-    
-    protected void putLookup(ForgeDirection face, ForgeDirection dir1, ForgeDirection dir2, ShadingValues shading) {
-        shadingLookup[face.ordinal()][dir1.ordinal()][dir2.ordinal()] = shading;
-        shadingLookup[face.ordinal()][dir2.ordinal()][dir1.ordinal()] = shading;
-    }
-    
-    protected ShadingValues getAoLookup(ForgeDirection face, ForgeDirection dir1, ForgeDirection dir2) {
-        return shadingLookup[face.ordinal()][dir1.ordinal()][dir2.ordinal()];
-    }
+
 }

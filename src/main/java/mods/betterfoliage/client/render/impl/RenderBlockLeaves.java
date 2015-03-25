@@ -36,8 +36,9 @@ public class RenderBlockLeaves extends RenderBlockAOBase implements IRenderBlock
 	
 	public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer) {
 		blockAccess = world;
+		skipFaces = Config.leavesDense;
 		renderWorldBlockBase(1, world, x, y, z, block, modelId, renderer);
-
+		
 		// find generated texture to render with, assume the
 		// "true" texture of the block is the one on the north size
 		TextureAtlasSprite blockLeafIcon = null;
@@ -57,6 +58,8 @@ public class RenderBlockLeaves extends RenderBlockAOBase implements IRenderBlock
 		LeafInfo leafInfo = BetterFoliageClient.leafTextures.leafInfoMap.get(blockLeafIcon);
 		if (leafInfo.roundLeafTexture == null) return true;
 		
+		
+		
 		int offsetVariation = getSemiRandomFromPos(x, y, z, 0);
 		int uvVariation = leafInfo.rotation ? getSemiRandomFromPos(x, y, z, 1) : 0;
 		double halfSize = 0.5 * Config.leavesSize;
@@ -73,20 +76,28 @@ public class RenderBlockLeaves extends RenderBlockAOBase implements IRenderBlock
 		Double3 offset2 = pRot[(offsetVariation + 1) & 63].scaleAxes(Config.leavesHOffset, Config.leavesVOffset, Config.leavesHOffset);
 		
 		if (Config.leavesSkew) {
-			renderCrossedBlockQuadsSkew(blockCenter, halfSize, offset1, offset2, leafInfo.roundLeafTexture, uvVariation, isAirTop, isAirBottom);
+			renderCrossedBlockQuadsSkew(ForgeDirection.UP, blockCenter, halfSize, offset1, offset2, leafInfo.roundLeafTexture, uvVariation, isAirTop, isAirBottom);
+			if (Config.leavesDense) {
+				renderCrossedBlockQuadsSkew(ForgeDirection.EAST, blockCenter, halfSize, offset1, offset2, leafInfo.roundLeafTexture, uvVariation, isAirTop, isAirBottom);
+				renderCrossedBlockQuadsSkew(ForgeDirection.SOUTH, blockCenter, halfSize, offset1, offset2, leafInfo.roundLeafTexture, uvVariation, isAirTop, isAirBottom);
+			}
 			if (isSnowTop) {
 			    // clear biome colors
-                aoYPXZNN.setGray(0.9f); aoYPXZNP.setGray(0.9f); aoYPXZPN.setGray(0.9f); aoYPXZPP.setGray(0.9f);
+				setShadingsGray(0.9f, aoYPXZNN, aoYPXZNP, aoYPXZPN, aoYPXZPP);
                 Tessellator.instance.setColorOpaque(230, 230, 230);
-			    renderCrossedBlockQuadsSkew(blockCenter, halfSize, offset1, offset2, snowedLeavesIcons.get(uvVariation), 0, true, isAirBottom);
+			    renderCrossedBlockQuadsSkew(ForgeDirection.UP, blockCenter, halfSize, offset1, offset2, snowedLeavesIcons.get(uvVariation), 0, true, isAirBottom);
 			}
 		} else {
-			renderCrossedBlockQuadsTranslate(blockCenter, halfSize, offset1, leafInfo.roundLeafTexture, uvVariation, isAirTop, isAirBottom);
+			renderCrossedBlockQuadsTranslate(ForgeDirection.UP, blockCenter, halfSize, offset1, leafInfo.roundLeafTexture, uvVariation, isAirTop, isAirBottom);
+			if (Config.leavesDense) {
+				renderCrossedBlockQuadsTranslate(ForgeDirection.EAST, blockCenter, halfSize, offset1, leafInfo.roundLeafTexture, uvVariation, isAirTop, isAirBottom);
+				renderCrossedBlockQuadsTranslate(ForgeDirection.SOUTH, blockCenter, halfSize, offset1, leafInfo.roundLeafTexture, uvVariation, isAirTop, isAirBottom);
+			}
 			if (isSnowTop) {
 			    // clear biome colors
-                aoYPXZNN.setGray(0.9f); aoYPXZNP.setGray(0.9f); aoYPXZPN.setGray(0.9f); aoYPXZPP.setGray(0.9f);
+				setShadingsGray(0.9f, aoYPXZNN, aoYPXZNP, aoYPXZPN, aoYPXZPP);
                 Tessellator.instance.setColorOpaque(230, 230, 230);
-			    renderCrossedBlockQuadsTranslate(blockCenter, halfSize, offset1, snowedLeavesIcons.get(uvVariation), 0, true, isAirBottom);
+			    renderCrossedBlockQuadsTranslate(ForgeDirection.UP, blockCenter, halfSize, offset1, snowedLeavesIcons.get(uvVariation), 0, true, isAirBottom);
 			}
 		}
 
@@ -107,6 +118,10 @@ public class RenderBlockLeaves extends RenderBlockAOBase implements IRenderBlock
 		return block.getMaterial() == Material.air || block == Blocks.snow_layer;
 	}
 	
+	protected void setShadingsGray(float value, ShadingValues... shadings) {
+		for (ShadingValues shading : shadings) shading.setGray(value);
+	}
+	
 	@SubscribeEvent
     public void handleTextureReload(TextureStitchEvent.Pre event) {
 	    if (event.map.getTextureType() != 0) return;
@@ -114,4 +129,5 @@ public class RenderBlockLeaves extends RenderBlockAOBase implements IRenderBlock
 	    snowedLeavesIcons.registerIcons(event.map);
         BetterFoliage.log.info(String.format("Found %d snowed leaves textures", snowedLeavesIcons.numLoaded));
     }
+	
 }

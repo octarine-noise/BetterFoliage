@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import mods.betterfoliage.BetterFoliage;
+import mods.betterfoliage.client.integration.CLCIntegration;
 import mods.betterfoliage.client.misc.Double3;
 import mods.betterfoliage.client.util.RenderUtils;
 import net.minecraft.block.Block;
@@ -53,6 +54,8 @@ public class RenderBlockAOBase extends RenderBlocks {
 	
 	protected int drawPass = 0;
 	
+	protected boolean skipFaces = false;
+	
 	protected double[] uValues = new double[] {0.0, 16.0, 16.0, 0.0};
 	protected double[] vValues = new double[] {0.0, 0.0, 16.0, 16.0};
 	
@@ -97,7 +100,10 @@ public class RenderBlockAOBase extends RenderBlocks {
 	// temporary shading values for a single face
 	public ShadingValues faceAOPP, faceAOPN, faceAONN, faceAONP;
 	
-	/** Initialize random values */
+    /** Quick lookup array to get AO values of a given block corner */
+    protected ShadingValues[][][] shadingLookup = new ShadingValues[6][6][6];
+    
+	/** Initialize random values and lookup array */
 	public void init() {
 		List<Double3> perturbs = new ArrayList<Double3>(64);
 		for (int idx = 0; idx < 64; idx++) {
@@ -108,8 +114,54 @@ public class RenderBlockAOBase extends RenderBlocks {
 		Collections.shuffle(perturbs);
 		Iterator<Double3> iter = perturbs.iterator();
 		for (int idx = 0; idx < 64; idx++) pRot[idx] = iter.next();
+		
+        putLookup(ForgeDirection.DOWN, ForgeDirection.SOUTH, ForgeDirection.EAST, aoYNXZPP);
+        putLookup(ForgeDirection.DOWN, ForgeDirection.SOUTH, ForgeDirection.WEST, aoYNXZNP);
+        putLookup(ForgeDirection.DOWN, ForgeDirection.NORTH, ForgeDirection.EAST, aoYNXZPN);
+        putLookup(ForgeDirection.DOWN, ForgeDirection.NORTH, ForgeDirection.WEST, aoYNXZNN);
+        
+        putLookup(ForgeDirection.UP, ForgeDirection.SOUTH, ForgeDirection.EAST, aoYPXZPP);
+        putLookup(ForgeDirection.UP, ForgeDirection.SOUTH, ForgeDirection.WEST, aoYPXZNP);
+        putLookup(ForgeDirection.UP, ForgeDirection.NORTH, ForgeDirection.EAST, aoYPXZPN);
+        putLookup(ForgeDirection.UP, ForgeDirection.NORTH, ForgeDirection.WEST, aoYPXZNN);
+        
+        putLookup(ForgeDirection.WEST, ForgeDirection.UP, ForgeDirection.NORTH, aoXNYZPN);
+        putLookup(ForgeDirection.WEST, ForgeDirection.UP, ForgeDirection.SOUTH, aoXNYZPP);
+        putLookup(ForgeDirection.WEST, ForgeDirection.DOWN, ForgeDirection.NORTH, aoXNYZNN);
+        putLookup(ForgeDirection.WEST, ForgeDirection.DOWN, ForgeDirection.SOUTH, aoXNYZNP);
+        
+        putLookup(ForgeDirection.EAST, ForgeDirection.UP, ForgeDirection.NORTH, aoXPYZPN);
+        putLookup(ForgeDirection.EAST, ForgeDirection.UP, ForgeDirection.SOUTH, aoXPYZPP);
+        putLookup(ForgeDirection.EAST, ForgeDirection.DOWN, ForgeDirection.NORTH, aoXPYZNN);
+        putLookup(ForgeDirection.EAST, ForgeDirection.DOWN, ForgeDirection.SOUTH, aoXPYZNP);
+        
+        putLookup(ForgeDirection.NORTH, ForgeDirection.UP, ForgeDirection.EAST, aoZNXYPP);
+        putLookup(ForgeDirection.NORTH, ForgeDirection.UP, ForgeDirection.WEST, aoZNXYNP);
+        putLookup(ForgeDirection.NORTH, ForgeDirection.DOWN, ForgeDirection.EAST, aoZNXYPN);
+        putLookup(ForgeDirection.NORTH, ForgeDirection.DOWN, ForgeDirection.WEST, aoZNXYNN);
+        
+        putLookup(ForgeDirection.SOUTH, ForgeDirection.UP, ForgeDirection.EAST, aoZPXYPP);
+        putLookup(ForgeDirection.SOUTH, ForgeDirection.UP, ForgeDirection.WEST, aoZPXYNP);
+        putLookup(ForgeDirection.SOUTH, ForgeDirection.DOWN, ForgeDirection.EAST, aoZPXYPN);
+        putLookup(ForgeDirection.SOUTH, ForgeDirection.DOWN, ForgeDirection.WEST, aoZPXYNN);
 	}
 			
+    protected void putLookup(ForgeDirection face, ForgeDirection dir1, ForgeDirection dir2, ShadingValues shading) {
+        shadingLookup[face.ordinal()][dir1.ordinal()][dir2.ordinal()] = shading;
+        shadingLookup[face.ordinal()][dir2.ordinal()][dir1.ordinal()] = shading;
+    }
+    
+    protected ShadingValues getAoLookup(ForgeDirection face, ForgeDirection dir1, ForgeDirection dir2) {
+        return shadingLookup[face.ordinal()][dir1.ordinal()][dir2.ordinal()];
+    }
+
+    protected ShadingValues getAoLookupMax(ForgeDirection primary, ForgeDirection secondary, ForgeDirection tertiary) {
+    	ShadingValues pri = shadingLookup[primary.ordinal()][secondary.ordinal()][tertiary.ordinal()];
+    	ShadingValues sec = shadingLookup[secondary.ordinal()][primary.ordinal()][tertiary.ordinal()];
+    	return pri.brightness > sec.brightness ? pri : sec;
+    }
+
+    
 	/** Get a semi-random value depending on block position.
 	 * @param x block X coord
 	 * @param y block Y coord
@@ -273,34 +325,73 @@ public class RenderBlockAOBase extends RenderBlocks {
 		}
 	}
 	
-	protected void renderCrossedBlockQuadsTranslate(Double3 blockCenter, double halfSize, Double3 offsetVec, IIcon crossLeafIcon, int uvRot, boolean isAirTop, boolean isAirBottom) {
+	protected void renderCrossedBlockQuadsTranslate(ForgeDirection axisMain, Double3 blockCenter, double halfSize, Double3 offsetVec, IIcon crossLeafIcon, int uvRot, boolean isAirTop, boolean isAirBottom) {
 		Double3 drawCenter = blockCenter;
 		if (offsetVec != null) drawCenter = drawCenter.add(offsetVec);
-		Double3 horz1 = new Double3(halfSize, 0.0, halfSize);
-		Double3 horz2 = new Double3(halfSize, 0.0, -halfSize);
-		Double3 vert1 = new Double3(0.0, halfSize * 1.41, 0.0);
 		
-		renderCrossedBlockQuadsInternal(drawCenter, horz1, horz2, vert1, crossLeafIcon, uvRot, isAirTop, isAirBottom);
+		Double3 axis1 = new Double3(faceDir1[axisMain.ordinal()]);
+		Double3 axis2 = new Double3(faceDir2[axisMain.ordinal()]);
+		
+		Double3 horz1 = axis1.add(axis2).scale(halfSize);
+		Double3 horz2 = axis1.sub(axis2).scale(halfSize);
+		Double3 vert1 = new Double3(axisMain).scale(halfSize * 1.41);
+		
+		renderCrossedBlockQuadsInternal(axisMain, drawCenter, horz1, horz2, vert1, crossLeafIcon, uvRot, isAirTop, isAirBottom);
 	}
 	
-	protected void renderCrossedBlockQuadsSkew(Double3 blockCenter, double halfSize, Double3 offsetVec1, Double3 offsetVec2, IIcon crossLeafIcon, int uvRot, boolean isAirTop, boolean isAirBottom) {
-		Double3 horz1 = new Double3(halfSize, 0.0, halfSize).add(offsetVec1);
-		Double3 horz2 = new Double3(halfSize, 0.0, -halfSize).add(offsetVec2);
-		Double3 vert1 = new Double3(0.0, halfSize * 1.41, 0.0);
+	protected void renderCrossedBlockQuadsSkew(ForgeDirection axisMain, Double3 blockCenter, double halfSize, Double3 offsetVec1, Double3 offsetVec2, IIcon crossLeafIcon, int uvRot, boolean isAirTop, boolean isAirBottom) {
+		Double3 axis1 = new Double3(faceDir1[axisMain.ordinal()]);
+		Double3 axis2 = new Double3(faceDir2[axisMain.ordinal()]);
 		
-		renderCrossedBlockQuadsInternal(blockCenter, horz1, horz2, vert1, crossLeafIcon, uvRot, isAirTop, isAirBottom);
+		Double3 horz1 = axis1.add(axis2).scale(halfSize).add(axis1.scale(offsetVec1.x)).add(axis2.scale(offsetVec1.z)).add(new Double3(axisMain).scale(offsetVec1.y));
+		Double3 horz2 = axis1.sub(axis2).scale(halfSize).add(axis1.scale(offsetVec2.x)).add(axis2.scale(offsetVec2.z)).add(new Double3(axisMain).scale(offsetVec2.y));
+		Double3 vert1 = new Double3(axisMain).scale(halfSize * 1.41);
+		
+		renderCrossedBlockQuadsInternal(axisMain, blockCenter, horz1, horz2, vert1, crossLeafIcon, uvRot, isAirTop, isAirBottom);
 	}
 	
-	private void renderCrossedBlockQuadsInternal(Double3 drawCenter, Double3 horz1, Double3 horz2, Double3 vert1, IIcon crossLeafIcon, int uvRot, boolean isAirTop, boolean isAirBottom) {
+	private void renderCrossedBlockQuadsInternal(ForgeDirection axisMain, Double3 drawCenter, Double3 horz1, Double3 horz2, Double3 vert1, IIcon crossLeafIcon, int uvRot, boolean isAirTop, boolean isAirBottom) {
+		// XYZ NPP
 		if (Minecraft.isAmbientOcclusionEnabled() && !noShading) {
+			ForgeDirection axis1 = faceDir1[axisMain.ordinal()];
+			ForgeDirection axis2 = faceDir2[axisMain.ordinal()];
+			
 			renderQuadWithShading(crossLeafIcon, drawCenter, horz1, vert1, uvRot,
-					isAirTop ? aoYPXZPP : aoZPXYPP, isAirTop ? aoYPXZNN : aoXNYZPN, isAirBottom ? aoYNXZNN : aoXNYZNN, isAirBottom ? aoYNXZPP : aoZPXYPN);
+					getAoLookupMax(axisMain, axis2, axis1.getOpposite()),
+					getAoLookupMax(axisMain, axis1, axis2.getOpposite()),
+					getAoLookupMax(axisMain.getOpposite(), axis1, axis2.getOpposite()),
+					getAoLookupMax(axisMain.getOpposite(), axis2, axis1.getOpposite()));
+//					isAirTop ? getAoLookup(axisMain, axis1.getOpposite(), axis2) : getAoLookup(axis2, axis1.getOpposite(), axisMain),
+//					isAirTop ? getAoLookup(axisMain, axis1, axis2.getOpposite()) : getAoLookup(axis1, axis2.getOpposite(), axisMain),
+//					isAirBottom ? getAoLookup(axisMain.getOpposite(), axis1, axis2.getOpposite()) : getAoLookup(axis1, axisMain.getOpposite(), axis2.getOpposite()),
+//					isAirBottom ? getAoLookup(axisMain.getOpposite(), axis1.getOpposite(), axis2) : getAoLookup(axis2, axis1.getOpposite(), axisMain.getOpposite()));
 			renderQuadWithShading(crossLeafIcon, drawCenter, horz1.inverse(), vert1, uvRot,
-					isAirTop ? aoYPXZNN : aoZNXYNP, isAirTop ? aoYPXZPP : aoXPYZPP, isAirBottom ? aoYNXZPP : aoXPYZNP, isAirBottom ? aoYNXZNN : aoZNXYNN);
+					getAoLookupMax(axisMain, axis2.getOpposite(), axis1),
+					getAoLookupMax(axisMain, axis1.getOpposite(), axis2),
+					getAoLookupMax(axisMain.getOpposite(), axis1.getOpposite(), axis2),
+					getAoLookupMax(axisMain.getOpposite(), axis2.getOpposite(), axis1));
+//					isAirTop ? getAoLookup(axisMain, axis1, axis2.getOpposite()) : getAoLookup(axis2.getOpposite(), axis1, axisMain),
+//					isAirTop ? getAoLookup(axisMain, axis1.getOpposite(), axis2) : getAoLookup(axis1.getOpposite(), axis2, axisMain),
+//					isAirBottom ? getAoLookup(axisMain.getOpposite(), axis1.getOpposite(), axis2) : getAoLookup(axis1.getOpposite(), axisMain.getOpposite(), axis2),
+//					isAirBottom ? getAoLookup(axisMain.getOpposite(), axis1, axis2.getOpposite()) : getAoLookup(axis2.getOpposite(), axis1, axisMain.getOpposite()));
 			renderQuadWithShading(crossLeafIcon, drawCenter, horz2, vert1, uvRot,
-					isAirTop ? aoYPXZPN : aoXPYZPN, isAirTop ? aoYPXZNP : aoZPXYNP, isAirBottom ? aoYNXZNP : aoZPXYNN, isAirBottom ? aoYNXZPN : aoXPYZNN);
+					getAoLookupMax(axisMain, axis1.getOpposite(), axis2.getOpposite()),
+					getAoLookupMax(axisMain, axis2, axis1),
+					getAoLookupMax(axisMain.getOpposite(), axis2, axis1),
+					getAoLookupMax(axisMain.getOpposite(), axis1.getOpposite(), axis2.getOpposite()));
+//					isAirTop ? getAoLookup(axisMain, axis1.getOpposite(), axis2.getOpposite()) : getAoLookup(axis1.getOpposite(), axisMain, axis2.getOpposite()), 
+//					isAirTop ? getAoLookup(axisMain, axis1, axis2) : getAoLookup(axis2, axis1, axisMain),
+//					isAirBottom ? getAoLookup(axisMain.getOpposite(), axis1, axis2) : getAoLookup(axis2, axis1, axisMain.getOpposite()),
+//					isAirBottom ? getAoLookup(axisMain.getOpposite(), axis1.getOpposite(), axis2.getOpposite()) : getAoLookup(axis1.getOpposite(), axis2.getOpposite(), axisMain.getOpposite()));
 			renderQuadWithShading(crossLeafIcon, drawCenter, horz2.inverse(), vert1, uvRot,
-					isAirTop ? aoYPXZNP : aoXNYZPP, isAirTop ? aoYPXZPN : aoZNXYPP, isAirBottom ? aoYNXZPN : aoZNXYPN, isAirBottom ? aoYNXZNP : aoXNYZNP);
+					getAoLookupMax(axisMain, axis1, axis2),
+					getAoLookupMax(axisMain, axis2.getOpposite(), axis1.getOpposite()),
+					getAoLookupMax(axisMain.getOpposite(), axis2.getOpposite(), axis1.getOpposite()),
+					getAoLookupMax(axisMain.getOpposite(), axis1, axis2));
+//					isAirTop ? getAoLookup(axisMain, axis1, axis2) : getAoLookup(axis1, axis2, axisMain),
+//					isAirTop ? getAoLookup(axisMain, axis1.getOpposite(), axis2.getOpposite()) : getAoLookup(axis2.getOpposite(), axis1.getOpposite(), axisMain),
+//					isAirBottom ? getAoLookup(axisMain.getOpposite(), axis1.getOpposite(), axis2.getOpposite()) : getAoLookup(axis2.getOpposite(), axis1.getOpposite(), axisMain.getOpposite()),
+//					isAirBottom ? getAoLookup(axisMain.getOpposite(), axis1, axis2) : getAoLookup(axis1, axis2, axisMain.getOpposite()));
 		} else {
 			renderQuad(crossLeafIcon, drawCenter, horz1, vert1, uvRot);
 			renderQuad(crossLeafIcon, drawCenter, horz1.inverse(), vert1, uvRot);
@@ -311,7 +402,7 @@ public class RenderBlockAOBase extends RenderBlocks {
 	
 	@Override
 	public void renderFaceZNeg(Block block, double x, double y, double z, IIcon icon) {
-		super.renderFaceZNeg(block, x, y, z, icon);
+		if (!skipFaces) super.renderFaceZNeg(block, x, y, z, icon);
 		saveShadingTopLeft(aoZNXYPP);
 		saveShadingTopRight(aoZNXYNP);
 		saveShadingBottomLeft(aoZNXYPN);
@@ -320,7 +411,7 @@ public class RenderBlockAOBase extends RenderBlocks {
 
 	@Override
 	public void renderFaceZPos(Block block, double x, double y, double z, IIcon icon) {
-		super.renderFaceZPos(block, x, y, z, icon);
+		if (!skipFaces) super.renderFaceZPos(block, x, y, z, icon);
 		saveShadingTopLeft(aoZPXYNP);
 		saveShadingTopRight(aoZPXYPP);
 		saveShadingBottomLeft(aoZPXYNN);
@@ -329,7 +420,7 @@ public class RenderBlockAOBase extends RenderBlocks {
 
 	@Override
 	public void renderFaceXNeg(Block block, double x, double y, double z, IIcon icon) {
-		super.renderFaceXNeg(block, x, y, z, icon);
+		if (!skipFaces) super.renderFaceXNeg(block, x, y, z, icon);
 		saveShadingTopLeft(aoXNYZPN);
 		saveShadingTopRight(aoXNYZPP);
 		saveShadingBottomLeft(aoXNYZNN);
@@ -338,7 +429,7 @@ public class RenderBlockAOBase extends RenderBlocks {
 
 	@Override
 	public void renderFaceXPos(Block block, double x, double y, double z, IIcon icon) {
-		super.renderFaceXPos(block, x, y, z, icon);
+		if (!skipFaces) super.renderFaceXPos(block, x, y, z, icon);
 		saveShadingTopLeft(aoXPYZPP);
 		saveShadingTopRight(aoXPYZPN);
 		saveShadingBottomLeft(aoXPYZNP);
@@ -347,7 +438,7 @@ public class RenderBlockAOBase extends RenderBlocks {
 
 	@Override
 	public void renderFaceYNeg(Block block, double x, double y, double z, IIcon icon) {
-		super.renderFaceYNeg(block, x, y, z, icon);
+		if (!skipFaces) super.renderFaceYNeg(block, x, y, z, icon);
 		saveShadingTopLeft(aoYNXZNP);
 		saveShadingTopRight(aoYNXZPP);
 		saveShadingBottomLeft(aoYNXZNN);
@@ -356,7 +447,7 @@ public class RenderBlockAOBase extends RenderBlocks {
 
 	@Override
 	public void renderFaceYPos(Block block, double x, double y, double z, IIcon icon) {
-		super.renderFaceYPos(block, x, y, z, icon);
+		if (!skipFaces) super.renderFaceYPos(block, x, y, z, icon);
 		saveShadingTopLeft(aoYPXZPP);
 		saveShadingTopRight(aoYPXZNP);
 		saveShadingBottomLeft(aoYPXZPN);
@@ -499,6 +590,15 @@ public class RenderBlockAOBase extends RenderBlocks {
 	
 	protected int getBrightness(Block block, int x, int y, int z) {
 		return block.getMixedBrightnessForBlock(blockAccess, x, y, z);
+	}
+	
+	/** Get the average shading values of the 4 AO data points of a face
+	 * @param dir face direction
+	 * @return average
+	 */
+	protected ShadingValues avgShadingForFace(ForgeDirection dir) {
+	    setShadingForFace(dir);
+	    return CLCIntegration.avgShading(CLCIntegration.avgShading(faceAONN, faceAONP), CLCIntegration.avgShading(faceAOPN, faceAOPP));
 	}
 	
 	protected void setAOColors(int color) {

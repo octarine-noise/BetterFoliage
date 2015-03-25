@@ -2,9 +2,9 @@ package mods.betterfoliage.client.render.impl;
 
 import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.misc.Double3;
-import mods.betterfoliage.client.render.FakeRenderBlockAOBase;
 import mods.betterfoliage.client.render.IRenderBlockDecorator;
 import mods.betterfoliage.client.render.IconSet;
+import mods.betterfoliage.client.render.RenderBlockAOBase;
 import mods.betterfoliage.common.config.Config;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
@@ -18,10 +18,14 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class RenderBlockLilypad extends FakeRenderBlockAOBase implements IRenderBlockDecorator {
+public class RenderBlockLilypad extends RenderBlockAOBase implements IRenderBlockDecorator {
 
 	public IconSet lilypadFlowers = new IconSet("bettergrassandleaves", "better_lilypad_flower_%d");
 	public IconSet lilypadRoots = new IconSet("bettergrassandleaves", "better_lilypad_roots_%d");
+	
+	public RenderBlockLilypad() {
+		skipFaces = true;
+	}
 	
 	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
 		return Config.lilypadEnabled && block == Blocks.waterlily;
