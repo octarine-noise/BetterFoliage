@@ -4,6 +4,8 @@ import java.util.Map;
 
 import net.minecraft.launchwrapper.IClassTransformer;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.tree.ClassNode;
@@ -14,6 +16,8 @@ import com.google.common.collect.Maps;
 
 public abstract class AbstractClassTransformer implements IClassTransformer {
 
+	protected final Logger log = LogManager.getLogger(getClass().getSimpleName());
+	
     /** The kind of environment we are in. Assume MCP until proven otherwise */
     protected Namespace environment = Namespace.MCP;
     
@@ -37,8 +41,15 @@ public abstract class AbstractClassTransformer implements IClassTransformer {
         
         for (Map.Entry<MethodRef, AbstractMethodTransformer> entry : methodTransformers.entrySet()) {
             if (transformedName.equals(entry.getKey().parent.getName(Namespace.MCP))) {
+            	log.debug(String.format("Found class: %s -> %s", name, transformedName));
+            	log.debug(String.format("Searching for method: %s %s -> %s %s", 
+            			entry.getKey().getName(Namespace.OBF), entry.getKey().getAsmDescriptor(Namespace.OBF),
+            			entry.getKey().getName(Namespace.MCP), entry.getKey().getAsmDescriptor(Namespace.MCP)));
                 for (MethodNode methodNode : classNode.methods) {
-                    if (entry.getKey().getName(environment).equals(methodNode.name) && entry.getKey().getAsmDescriptor(environment).equals(methodNode.desc)) {
+                	log.debug(String.format("    %s, %s", methodNode.name, methodNode.desc));
+                	// try to match against both namespaces - mods sometimes have deobfed class names in signatures
+                    if (entry.getKey().getName(Namespace.MCP).equals(methodNode.name) && entry.getKey().getAsmDescriptor(Namespace.MCP).equals(methodNode.desc) ||
+                    	entry.getKey().getName(Namespace.OBF).equals(methodNode.name) && entry.getKey().getAsmDescriptor(Namespace.OBF).equals(methodNode.desc)) {
                         AbstractMethodTransformer transformer = entry.getValue();
                         hasTransformed = true;
                         

@@ -95,7 +95,7 @@ public class CodeRefs {
         mShouldSideBeRendered = new MethodRef(cBlock, "shouldSideBeRendered", "func_149646_a", "a", ClassRef.BOOLEAN, cIBlockAccess, ClassRef.INT, ClassRef.INT, ClassRef.INT, ClassRef.INT);
         mShouldRenderBlockSideOverride = new MethodRef(cBetterFoliageClient, "shouldRenderBlockSideOverride", ClassRef.BOOLEAN, ClassRef.BOOLEAN, cIBlockAccess, ClassRef.INT, ClassRef.INT, ClassRef.INT, ClassRef.INT);
         
-        mGetBlockIdOverride = new MethodRef(new ClassRef("mods.betterfoliage.client.ShadersModIntegration"), "getBlockIdOverride", ClassRef.INT, ClassRef.INT, cBlock);
+        mGetBlockIdOverride = new MethodRef(new ClassRef("mods.betterfoliage.client.integration.ShadersModIntegration"), "getBlockIdOverride", ClassRef.INT, ClassRef.INT, cBlock);
         cShaders = new ClassRef("shadersmodcore.client.Shaders");
         mPushEntity = new MethodRef(cShaders, "pushEntity", ClassRef.VOID, cRenderBlocks, cBlock, ClassRef.INT, ClassRef.INT, ClassRef.INT);
         fShadersEntityData = new FieldRef(cShaders, "entityData", ClassRef.INT);

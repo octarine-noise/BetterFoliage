@@ -1,19 +1,15 @@
 package mods.betterfoliage.loader.impl;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.tree.VarInsnNode;
-
 import mods.betterfoliage.loader.AbstractClassTransformer;
 import mods.betterfoliage.loader.AbstractMethodTransformer;
+
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.tree.VarInsnNode;
 
 
 public class BetterFoliageTransformer extends AbstractClassTransformer {
 
     public BetterFoliageTransformer() {
-        final Logger log = LogManager.getLogger(BetterFoliageTransformer.class.getSimpleName());
-        
         // where: RenderBlocks.renderBlockByRenderType()
         // what: invoke code to overrule the return value of Block.getRenderType()
         // why: allows us to use custom block renderers for any block, without touching block code
