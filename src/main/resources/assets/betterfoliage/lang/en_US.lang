@@ -49,7 +49,7 @@ betterfoliage.leavesMode.tooltip=Translate draws the leaves off-center at a 45de
 betterfoliage.leavesMode.true=Skew
 betterfoliage.leavesMode.false=Translate
 betterfoliage.leaves.dense=Leaves mode
-betterfoliage.leaves.dense.tooltip=Dense mode does not draw regular blocks faces, but has more round leaves
+betterfoliage.leaves.dense.tooltip=Dense mode has more round leaves
 betterfoliage.leaves.dense.true=Dense leaves
 betterfoliage.leaves.dense.false=Normal leaves
 
