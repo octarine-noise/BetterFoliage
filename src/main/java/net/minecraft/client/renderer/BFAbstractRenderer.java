@@ -1,9 +1,5 @@
 package net.minecraft.client.renderer;
 
-import java.util.Collection;
-
-import com.google.common.collect.ImmutableList;
-
 import mods.betterfoliage.client.misc.Double3;
 import mods.betterfoliage.client.misc.PerturbationSource;
 import mods.betterfoliage.client.render.BlockShadingData;
@@ -96,4 +92,11 @@ public abstract class BFAbstractRenderer extends BlockModelRenderer {
         return new Double3(cX * 16, cY * 16, cZ * 16);
     }
     
+    protected boolean isBlockObscured(IBlockAccess blockAccess, BlockPos pos) {
+    	for (EnumFacing dir : EnumFacing.values()) {
+    		BlockPos neighbor = pos.add(dir.getFrontOffsetX(), dir.getFrontOffsetY(), dir.getFrontOffsetZ());
+    		if (!blockAccess.getBlockState(neighbor).getBlock().isOpaqueCube()) return false;
+    	}
+    	return true;
+    }
 }

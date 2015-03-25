@@ -3,9 +3,10 @@ package mods.betterfoliage.client.render.impl;
 import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.misc.Double3;
 import mods.betterfoliage.client.render.TextureSet;
-import mods.betterfoliage.client.render.impl.primitives.BlockCrossedQuads;
 import mods.betterfoliage.client.render.impl.primitives.Color4;
 import mods.betterfoliage.client.render.impl.primitives.FaceCrossedQuads;
+import mods.betterfoliage.client.render.impl.primitives.IQuadCollection;
+import mods.betterfoliage.client.render.impl.primitives.BlockCrossedQuads;
 import mods.betterfoliage.common.config.Config;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.BFAbstractRenderer;
@@ -53,7 +54,7 @@ public class RenderBlockCactus extends BFAbstractRenderer {
         
         // render cactus center
         shadingData.update(blockAccess, blockState.getBlock(), pos, useAO);
-        BlockCrossedQuads cactusCenter = BlockCrossedQuads.createSkewed(blockCenter, random.getCircleXZ(0.1, offsetVariation), random.getCircleXZ(0.1, offsetVariation + 1), halfSize);
+        IQuadCollection cactusCenter = BlockCrossedQuads.createSkewed(EnumFacing.UP, blockCenter, random.getCircleXZ(0.1, offsetVariation), random.getCircleXZ(0.1, offsetVariation + 1), halfSize);
         cactusCenter.setTexture(cactusRoundIcon, uvVariation).setBrightness(shadingData).setColor(shadingData, Color4.opaqueWhite).render(worldRenderer);
         
         // render cactus arm

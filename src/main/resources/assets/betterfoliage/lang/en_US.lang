@@ -44,10 +44,14 @@ betterfoliage.blockTypes.logBlacklist.tooltip=Blocks never accepted as wooden lo
 
 betterfoliage.extraLeaves=Extra Leaves
 betterfoliage.extraLeaves.tooltip=Extra round leaves on leaf blocks
-betterfoliage.leavesMode=Leaves offset mode
+betterfoliage.leavesMode=Leaves perturbation
 betterfoliage.leavesMode.tooltip=Translate draws the leaves off-center at a 45deg angle, Skew draws them dentered but with a slightly changed angle
 betterfoliage.leavesMode.true=Skew
 betterfoliage.leavesMode.false=Translate
+betterfoliage.leaves.dense=Leaves mode
+betterfoliage.leaves.dense.tooltip=Dense mode has more round leaves
+betterfoliage.leaves.dense.true=Dense leaves
+betterfoliage.leaves.dense.false=Normal leaves
 
 betterfoliage.shortGrass=Short Grass
 betterfoliage.shortGrass.tooltip=Tufts of grass on top of grass blocks
