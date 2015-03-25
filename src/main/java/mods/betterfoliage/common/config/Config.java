@@ -54,6 +54,7 @@ public class Config {
 	public static double grassSize;
 	public static boolean grassShaderWind;
 	public static boolean myceliumEnabled;
+	public static boolean grassSnowEnabled;
 	
 	public static boolean cactusEnabled;
 	
@@ -152,6 +153,7 @@ public class Config {
         grassHeightMin = clampDoubleToMax(Category.shortGrass, "heightMin", "heightMax");
         grassShaderWind = getBoolean(Category.shortGrass, "shaderWind", true, "betterfoliage.shaderWind");
         myceliumEnabled = getBoolean(Category.shortGrass, "myceliumEnabled", true, "betterfoliage.shortGrass.myceliumEnabled");
+        grassSnowEnabled = getBoolean(Category.shortGrass, "snowEnabled", true, "betterfoliage.shortGrass.grassSnowEnabled");
         
         cactusEnabled = getBoolean(Category.cactus, "enabled", true, "betterfoliage.enabled");
 
@@ -240,7 +242,7 @@ public class Config {
 		for (Category category : Category.values()) rawConfig.setCategoryLanguageKey(category.toString(), String.format("betterfoliage.%s", category.toString()));
 		
 		setOrder(Category.extraLeaves, "enabled", "skewMode", "hOffset", "vOffset", "size");
-		setOrder(Category.shortGrass, "enabled", "myceliumEnabled", "useGenerated", "hOffset", "heightMin", "heightMax", "size", "shaderWind");
+		setOrder(Category.shortGrass, "enabled", "myceliumEnabled", "snowEnabled", "useGenerated", "hOffset", "heightMin", "heightMax", "size", "shaderWind");
 		setOrder(Category.lilypad, "enabled", "hOffset", "flowerChance");
 		setOrder(Category.reed, "enabled", "hOffset", "heightMin", "heightMax", "population", "biomeList", "shaderWind");
 		setOrder(Category.algae, "enabled", "hOffset", "heightMin", "heightMax", "size", "population", "biomeList");

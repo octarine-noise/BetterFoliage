@@ -27,7 +27,7 @@ public class RenderBlockMycelium extends RenderBlockAOBase implements IRenderBlo
 	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
 		if (!Config.myceliumEnabled) return false;
 		if (block != Blocks.mycelium) return false;
-		if (!blockAccess.isAirBlock(x, y + 1, z) && blockAccess.getBlock(x, y + 1, z) != Blocks.snow_layer) return false;
+		if (!blockAccess.isAirBlock(x, y + 1, z)) return false;
 		return true;
 	}
 	
@@ -35,26 +35,20 @@ public class RenderBlockMycelium extends RenderBlockAOBase implements IRenderBlo
 		blockAccess = world;
 		renderWorldBlockBase(1, world, x, y, z, block, modelId, renderer);
 		
-		boolean isSnowed = blockAccess.getBlock(x, y + 1, z) == Blocks.snow_layer;
 		int iconVariation = getSemiRandomFromPos(x, y, z, 0);
 		IIcon renderIcon = myceliumIcons.get(iconVariation);
 		
-		if (isSnowed || renderIcon == null) return true;
+		if (renderIcon == null) return true;
 		
 		int heightVariation = getSemiRandomFromPos(x, y, z, 1);
 		double scale = Config.grassSize * 0.5;
 		double halfHeight = 0.5 * (Config.grassHeightMin + pRand[heightVariation] * (Config.grassHeightMax - Config.grassHeightMin));
 		
-		if (isSnowed) {
-			aoYPXZNN.setGray(0.9f); aoYPXZNP.setGray(0.9f); aoYPXZPN.setGray(0.9f); aoYPXZPP.setGray(0.9f);
-			Tessellator.instance.setColorOpaque(230, 230, 230);
-		}
-		
 		// render mycelium
 		ShadersModIntegration.startGrassQuads();
 		Tessellator.instance.setBrightness(getBrightness(block, x, y + 1, z));
 		Tessellator.instance.setColorOpaque_I(block.colorMultiplier(blockAccess, x, y, z));
-		renderCrossedSideQuads(new Double3(x + 0.5, y + 1.0 + (isSnowed ? 0.0625 : 0.0), z + 0.5), ForgeDirection.UP, scale, halfHeight, pRot[iconVariation], Config.grassHOffset, renderIcon, 0, false);
+		renderCrossedSideQuads(new Double3(x + 0.5, y + 1.0, z + 0.5), ForgeDirection.UP, scale, halfHeight, pRot[iconVariation], Config.grassHOffset, renderIcon, 0, false);
 		
 		return true;
 	}

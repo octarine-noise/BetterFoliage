@@ -57,6 +57,8 @@ betterfoliage.shortGrass.myceliumEnabled=Enable Mycelium
 betterfoliage.shortGrass.myceliumEnabled.tooltip=Is this feature enabled for mycelium blocks?
 betterfoliage.shortGrass.grassEnabled=Enable Grass
 betterfoliage.shortGrass.grassEnabled.tooltip=Is this feature enabled for grass blocks?
+betterfoliage.shortGrass.grassSnowEnabled=Enable under snow
+betterfoliage.shortGrass.grassSnowEnabled.tooltip=Enable on snowed grass blocks?
 
 betterfoliage.cactus=Better Cactus
 betterfoliage.cactus.tooltip=Enhance cactus with extra bits and smooth shading

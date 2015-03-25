@@ -63,6 +63,8 @@ public class RenderBlockGrass extends RenderBlockAOBase implements IRenderBlockD
 		
 		renderWorldBlockBase(2, world, x, y, z, block, modelId, renderer);
 		if (!Config.grassEnabled) return true;
+		if (isSnowTop && !Config.grassSnowEnabled) return true;
+		
 		boolean isAirTop = blockAccess.isAirBlock(x, y + 1, z);
 		
 		if (isSnowTop || isAirTop) {
