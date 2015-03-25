@@ -69,7 +69,7 @@ public class RenderBlockCactus extends RenderBlockAOBase implements IRenderBlock
 		renderCrossedBlockQuadsSkew(ForgeDirection.UP, blockCenter,
 									0.65,
 									pRot[iconVariation].scaleAxes(0.1, 0.0, 0.1),
-									pRot[(iconVariation + 1) & 63].scaleAxes(0.1, 0.0, 0.1), cactusRoundIcon, iconVariation, false, false);
+									pRot[(iconVariation + 1) & 63].scaleAxes(0.1, 0.0, 0.1), cactusRoundIcon, iconVariation);
 		return true;
 	}
 

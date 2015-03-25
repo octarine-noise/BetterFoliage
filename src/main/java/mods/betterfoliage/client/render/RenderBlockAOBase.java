@@ -325,7 +325,7 @@ public class RenderBlockAOBase extends RenderBlocks {
 		}
 	}
 	
-	protected void renderCrossedBlockQuadsTranslate(ForgeDirection axisMain, Double3 blockCenter, double halfSize, Double3 offsetVec, IIcon crossLeafIcon, int uvRot, boolean isAirTop, boolean isAirBottom) {
+	protected void renderCrossedBlockQuadsTranslate(ForgeDirection axisMain, Double3 blockCenter, double halfSize, Double3 offsetVec, IIcon crossLeafIcon, int uvRot) {
 		Double3 drawCenter = blockCenter;
 		if (offsetVec != null) drawCenter = drawCenter.add(offsetVec);
 		
@@ -336,10 +336,10 @@ public class RenderBlockAOBase extends RenderBlocks {
 		Double3 horz2 = axis1.sub(axis2).scale(halfSize);
 		Double3 vert1 = new Double3(axisMain).scale(halfSize * 1.41);
 		
-		renderCrossedBlockQuadsInternal(axisMain, drawCenter, horz1, horz2, vert1, crossLeafIcon, uvRot, isAirTop, isAirBottom);
+		renderCrossedBlockQuadsInternal(axisMain, drawCenter, horz1, horz2, vert1, crossLeafIcon, uvRot);
 	}
 	
-	protected void renderCrossedBlockQuadsSkew(ForgeDirection axisMain, Double3 blockCenter, double halfSize, Double3 offsetVec1, Double3 offsetVec2, IIcon crossLeafIcon, int uvRot, boolean isAirTop, boolean isAirBottom) {
+	protected void renderCrossedBlockQuadsSkew(ForgeDirection axisMain, Double3 blockCenter, double halfSize, Double3 offsetVec1, Double3 offsetVec2, IIcon crossLeafIcon, int uvRot) {
 		Double3 axis1 = new Double3(faceDir1[axisMain.ordinal()]);
 		Double3 axis2 = new Double3(faceDir2[axisMain.ordinal()]);
 		
@@ -347,11 +347,10 @@ public class RenderBlockAOBase extends RenderBlocks {
 		Double3 horz2 = axis1.sub(axis2).scale(halfSize).add(axis1.scale(offsetVec2.x)).add(axis2.scale(offsetVec2.z)).add(new Double3(axisMain).scale(offsetVec2.y));
 		Double3 vert1 = new Double3(axisMain).scale(halfSize * 1.41);
 		
-		renderCrossedBlockQuadsInternal(axisMain, blockCenter, horz1, horz2, vert1, crossLeafIcon, uvRot, isAirTop, isAirBottom);
+		renderCrossedBlockQuadsInternal(axisMain, blockCenter, horz1, horz2, vert1, crossLeafIcon, uvRot);
 	}
 	
-	private void renderCrossedBlockQuadsInternal(ForgeDirection axisMain, Double3 drawCenter, Double3 horz1, Double3 horz2, Double3 vert1, IIcon crossLeafIcon, int uvRot, boolean isAirTop, boolean isAirBottom) {
-		// XYZ NPP
+	private void renderCrossedBlockQuadsInternal(ForgeDirection axisMain, Double3 drawCenter, Double3 horz1, Double3 horz2, Double3 vert1, IIcon crossLeafIcon, int uvRot) {
 		if (Minecraft.isAmbientOcclusionEnabled() && !noShading) {
 			ForgeDirection axis1 = faceDir1[axisMain.ordinal()];
 			ForgeDirection axis2 = faceDir2[axisMain.ordinal()];
@@ -361,37 +360,21 @@ public class RenderBlockAOBase extends RenderBlocks {
 					getAoLookupMax(axisMain, axis1, axis2.getOpposite()),
 					getAoLookupMax(axisMain.getOpposite(), axis1, axis2.getOpposite()),
 					getAoLookupMax(axisMain.getOpposite(), axis2, axis1.getOpposite()));
-//					isAirTop ? getAoLookup(axisMain, axis1.getOpposite(), axis2) : getAoLookup(axis2, axis1.getOpposite(), axisMain),
-//					isAirTop ? getAoLookup(axisMain, axis1, axis2.getOpposite()) : getAoLookup(axis1, axis2.getOpposite(), axisMain),
-//					isAirBottom ? getAoLookup(axisMain.getOpposite(), axis1, axis2.getOpposite()) : getAoLookup(axis1, axisMain.getOpposite(), axis2.getOpposite()),
-//					isAirBottom ? getAoLookup(axisMain.getOpposite(), axis1.getOpposite(), axis2) : getAoLookup(axis2, axis1.getOpposite(), axisMain.getOpposite()));
 			renderQuadWithShading(crossLeafIcon, drawCenter, horz1.inverse(), vert1, uvRot,
 					getAoLookupMax(axisMain, axis2.getOpposite(), axis1),
 					getAoLookupMax(axisMain, axis1.getOpposite(), axis2),
 					getAoLookupMax(axisMain.getOpposite(), axis1.getOpposite(), axis2),
 					getAoLookupMax(axisMain.getOpposite(), axis2.getOpposite(), axis1));
-//					isAirTop ? getAoLookup(axisMain, axis1, axis2.getOpposite()) : getAoLookup(axis2.getOpposite(), axis1, axisMain),
-//					isAirTop ? getAoLookup(axisMain, axis1.getOpposite(), axis2) : getAoLookup(axis1.getOpposite(), axis2, axisMain),
-//					isAirBottom ? getAoLookup(axisMain.getOpposite(), axis1.getOpposite(), axis2) : getAoLookup(axis1.getOpposite(), axisMain.getOpposite(), axis2),
-//					isAirBottom ? getAoLookup(axisMain.getOpposite(), axis1, axis2.getOpposite()) : getAoLookup(axis2.getOpposite(), axis1, axisMain.getOpposite()));
 			renderQuadWithShading(crossLeafIcon, drawCenter, horz2, vert1, uvRot,
 					getAoLookupMax(axisMain, axis1.getOpposite(), axis2.getOpposite()),
 					getAoLookupMax(axisMain, axis2, axis1),
 					getAoLookupMax(axisMain.getOpposite(), axis2, axis1),
 					getAoLookupMax(axisMain.getOpposite(), axis1.getOpposite(), axis2.getOpposite()));
-//					isAirTop ? getAoLookup(axisMain, axis1.getOpposite(), axis2.getOpposite()) : getAoLookup(axis1.getOpposite(), axisMain, axis2.getOpposite()), 
-//					isAirTop ? getAoLookup(axisMain, axis1, axis2) : getAoLookup(axis2, axis1, axisMain),
-//					isAirBottom ? getAoLookup(axisMain.getOpposite(), axis1, axis2) : getAoLookup(axis2, axis1, axisMain.getOpposite()),
-//					isAirBottom ? getAoLookup(axisMain.getOpposite(), axis1.getOpposite(), axis2.getOpposite()) : getAoLookup(axis1.getOpposite(), axis2.getOpposite(), axisMain.getOpposite()));
 			renderQuadWithShading(crossLeafIcon, drawCenter, horz2.inverse(), vert1, uvRot,
 					getAoLookupMax(axisMain, axis1, axis2),
 					getAoLookupMax(axisMain, axis2.getOpposite(), axis1.getOpposite()),
 					getAoLookupMax(axisMain.getOpposite(), axis2.getOpposite(), axis1.getOpposite()),
 					getAoLookupMax(axisMain.getOpposite(), axis1, axis2));
-//					isAirTop ? getAoLookup(axisMain, axis1, axis2) : getAoLookup(axis1, axis2, axisMain),
-//					isAirTop ? getAoLookup(axisMain, axis1.getOpposite(), axis2.getOpposite()) : getAoLookup(axis2.getOpposite(), axis1.getOpposite(), axisMain),
-//					isAirBottom ? getAoLookup(axisMain.getOpposite(), axis1.getOpposite(), axis2.getOpposite()) : getAoLookup(axis2.getOpposite(), axis1.getOpposite(), axisMain.getOpposite()),
-//					isAirBottom ? getAoLookup(axisMain.getOpposite(), axis1, axis2) : getAoLookup(axis1, axis2, axisMain.getOpposite()));
 		} else {
 			renderQuad(crossLeafIcon, drawCenter, horz1, vert1, uvRot);
 			renderQuad(crossLeafIcon, drawCenter, horz1.inverse(), vert1, uvRot);

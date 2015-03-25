@@ -76,28 +76,28 @@ public class RenderBlockLeaves extends RenderBlockAOBase implements IRenderBlock
 		Double3 offset2 = pRot[(offsetVariation + 1) & 63].scaleAxes(Config.leavesHOffset, Config.leavesVOffset, Config.leavesHOffset);
 		
 		if (Config.leavesSkew) {
-			renderCrossedBlockQuadsSkew(ForgeDirection.UP, blockCenter, halfSize, offset1, offset2, leafInfo.roundLeafTexture, uvVariation, isAirTop, isAirBottom);
+			renderCrossedBlockQuadsSkew(ForgeDirection.UP, blockCenter, halfSize, offset1, offset2, leafInfo.roundLeafTexture, uvVariation);
 			if (Config.leavesDense) {
-				renderCrossedBlockQuadsSkew(ForgeDirection.EAST, blockCenter, halfSize, offset1, offset2, leafInfo.roundLeafTexture, uvVariation, isAirTop, isAirBottom);
-				renderCrossedBlockQuadsSkew(ForgeDirection.SOUTH, blockCenter, halfSize, offset1, offset2, leafInfo.roundLeafTexture, uvVariation, isAirTop, isAirBottom);
+				renderCrossedBlockQuadsSkew(ForgeDirection.EAST, blockCenter, halfSize, offset1, offset2, leafInfo.roundLeafTexture, uvVariation);
+				renderCrossedBlockQuadsSkew(ForgeDirection.SOUTH, blockCenter, halfSize, offset1, offset2, leafInfo.roundLeafTexture, uvVariation);
 			}
 			if (isSnowTop) {
 			    // clear biome colors
 				setShadingsGray(0.9f, aoYPXZNN, aoYPXZNP, aoYPXZPN, aoYPXZPP);
                 Tessellator.instance.setColorOpaque(230, 230, 230);
-			    renderCrossedBlockQuadsSkew(ForgeDirection.UP, blockCenter, halfSize, offset1, offset2, snowedLeavesIcons.get(uvVariation), 0, true, isAirBottom);
+			    renderCrossedBlockQuadsSkew(ForgeDirection.UP, blockCenter, halfSize, offset1, offset2, snowedLeavesIcons.get(uvVariation), 0);
 			}
 		} else {
-			renderCrossedBlockQuadsTranslate(ForgeDirection.UP, blockCenter, halfSize, offset1, leafInfo.roundLeafTexture, uvVariation, isAirTop, isAirBottom);
+			renderCrossedBlockQuadsTranslate(ForgeDirection.UP, blockCenter, halfSize, offset1, leafInfo.roundLeafTexture, uvVariation);
 			if (Config.leavesDense) {
-				renderCrossedBlockQuadsTranslate(ForgeDirection.EAST, blockCenter, halfSize, offset1, leafInfo.roundLeafTexture, uvVariation, isAirTop, isAirBottom);
-				renderCrossedBlockQuadsTranslate(ForgeDirection.SOUTH, blockCenter, halfSize, offset1, leafInfo.roundLeafTexture, uvVariation, isAirTop, isAirBottom);
+				renderCrossedBlockQuadsTranslate(ForgeDirection.EAST, blockCenter, halfSize, offset1, leafInfo.roundLeafTexture, uvVariation);
+				renderCrossedBlockQuadsTranslate(ForgeDirection.SOUTH, blockCenter, halfSize, offset1, leafInfo.roundLeafTexture, uvVariation);
 			}
 			if (isSnowTop) {
 			    // clear biome colors
 				setShadingsGray(0.9f, aoYPXZNN, aoYPXZNP, aoYPXZPN, aoYPXZPP);
                 Tessellator.instance.setColorOpaque(230, 230, 230);
-			    renderCrossedBlockQuadsTranslate(ForgeDirection.UP, blockCenter, halfSize, offset1, snowedLeavesIcons.get(uvVariation), 0, true, isAirBottom);
+			    renderCrossedBlockQuadsTranslate(ForgeDirection.UP, blockCenter, halfSize, offset1, snowedLeavesIcons.get(uvVariation), 0);
 			}
 		}
 
