@@ -16,6 +16,8 @@ public class BetterFoliageTransformer extends AbstractClassTransformer {
         final Logger log = LogManager.getLogger(BetterFoliageTransformer.class.getSimpleName());
         final boolean optifinePresent = isOptifinePresent();
 
+        if (isServerSide()) return;
+        
         // where: WorldClient.doVoidFogParticles(), right before the end of the loop
         // what: invoke code for every random display tick
         // why: allows us to catch random display ticks, without touching block code
@@ -140,4 +142,5 @@ public class BetterFoliageTransformer extends AbstractClassTransformer {
             return false;
         }
     }
+    
 }

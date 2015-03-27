@@ -6,6 +6,7 @@ import java.util.Map;
 
 import mods.betterfoliage.BetterFoliage;
 import net.minecraft.launchwrapper.IClassTransformer;
+import net.minecraftforge.fml.relauncher.FMLLaunchHandler;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -66,11 +67,16 @@ public abstract class AbstractClassTransformer implements IClassTransformer {
         if (hasTransformed) {
             ClassWriter writer = new ClassWriter(0);
             classNode.accept(writer);
-            dumpClass(writer.toByteArray(), transformedName, BetterFoliage.configDir);
+//            dumpClass(writer.toByteArray(), transformedName, BetterFoliage.configDir);
             return writer.toByteArray();
         } else {
             return basicClass;
         }
+    }
+    
+    protected boolean isServerSide() {
+    	String side = FMLLaunchHandler.side().name();
+    	return "SERVER".equals(side);
     }
     
     protected void dumpClass(byte[] classData, String className, File dir) {
