@@ -13,6 +13,8 @@ import org.objectweb.asm.tree.MethodNode;
 
 import com.google.common.collect.Maps;
 
+import cpw.mods.fml.relauncher.FMLLaunchHandler;
+
 
 public abstract class AbstractClassTransformer implements IClassTransformer {
 
@@ -76,4 +78,8 @@ public abstract class AbstractClassTransformer implements IClassTransformer {
         return !hasTransformed ? basicClass : writer.toByteArray();
     }
     
+    protected boolean isServerSide() {
+    	String side = FMLLaunchHandler.side().name();
+    	return "SERVER".equals(side);
+    }
 }

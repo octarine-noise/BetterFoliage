@@ -10,6 +10,8 @@ import org.objectweb.asm.tree.VarInsnNode;
 public class BetterFoliageTransformer extends AbstractClassTransformer {
 
     public BetterFoliageTransformer() {
+    	if (isServerSide()) return;
+    	
         // where: RenderBlocks.renderBlockByRenderType()
         // what: invoke code to overrule the return value of Block.getRenderType()
         // why: allows us to use custom block renderers for any block, without touching block code
