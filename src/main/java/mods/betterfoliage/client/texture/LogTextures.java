@@ -90,11 +90,12 @@ public class LogTextures {
             	
             	// determine axis
             	Object axisValue = MiscUtils.getState(stateMapping.getKey(), "axis");
-            	if (axisValue.toString().toUpperCase().equals("X")) info.verticalDir = EnumFacing.EAST;
+            	if (axisValue == null) info.verticalDir = EnumFacing.UP;
+            	else if (axisValue.toString().toUpperCase().equals("X")) info.verticalDir = EnumFacing.EAST;
             	else if (axisValue.toString().toUpperCase().equals("Z")) info.verticalDir = EnumFacing.SOUTH;
             	else info.verticalDir = EnumFacing.UP;
             	
-            	BetterFoliage.log.info(String.format("block=%s, side=%s, end=%s, dir=%s", stateMapping.getKey().toString(), sideName, endName, info.verticalDir.toString()));
+            	BetterFoliage.log.debug(String.format("block=%s, side=%s, end=%s, dir=%s", stateMapping.getKey().toString(), sideName, endName, info.verticalDir.toString()));
             }
         }
     }

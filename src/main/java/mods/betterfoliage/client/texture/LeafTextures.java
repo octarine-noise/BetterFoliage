@@ -7,6 +7,7 @@ import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.event.PostLoadModelDefinitionsEvent;
 import mods.betterfoliage.client.misc.TextureMatcher;
 import mods.betterfoliage.client.render.TextureSet;
+import mods.betterfoliage.client.render.impl.EntityFXFallingLeaves;
 import mods.betterfoliage.client.render.impl.primitives.Color4;
 import mods.betterfoliage.client.texture.generator.LeafGenerator;
 import mods.betterfoliage.client.texture.models.IModelTextureMapping;
@@ -73,6 +74,7 @@ public class LeafTextures {
         blockTextures = event.loader.textureMap;
         leafInfoMap.clear();
         particleTextures.clear();
+        EntityFXFallingLeaves.erroredStates.clear();
         loadedParticles = 0;
         particleTypes.loadMappings(new ResourceLocation(BetterFoliage.DOMAIN, "leafParticleMappings.cfg"));
         
@@ -98,7 +100,7 @@ public class LeafTextures {
                 String resolvedName = leafMapping.apply(model);
                 if (resolvedName != null) {
                     // store (preliminary) render information for this blockstate
-                    BetterFoliage.log.info(String.format("block=%s, texture=%s", stateMapping.getKey().toString(), resolvedName));
+                    BetterFoliage.log.debug(String.format("block=%s, texture=%s", stateMapping.getKey().toString(), resolvedName));
                     leafInfoMap.put(stateMapping.getKey(), new LeafInfo(resolvedName));
                     break;
                 }

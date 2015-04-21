@@ -1,13 +1,18 @@
 package mods.betterfoliage.client.render.impl;
 
 import java.awt.Color;
+import java.util.Collection;
 
+import com.google.common.collect.Sets;
+
+import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.BetterFoliageClient;
 import mods.betterfoliage.client.misc.Double3;
 import mods.betterfoliage.client.render.impl.primitives.Color4;
 import mods.betterfoliage.client.texture.LeafTextures.LeafInfo;
 import mods.betterfoliage.common.config.Config;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.particle.EffectRenderer;
 import net.minecraft.client.particle.EntityFX;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.entity.Entity;
@@ -20,6 +25,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class EntityFXFallingLeaves extends EntityFX {
 
+	/** {@link IBlockState}s which have had problems. List is kept to avoid massive log spam. */
+	public static Collection<IBlockState> erroredStates = Sets.newHashSet();
+	
     /** Quick <b>cos</b> lookup for <b>particleRotation</b> */
 	protected static double[] cos = new double[64];
 	
@@ -60,12 +68,24 @@ public class EntityFXFallingLeaves extends EntityFX {
 		particleScale = (float) Config.leafFXSize;
 		
 		LeafInfo leafInfo = BetterFoliageClient.leafRegistry.leafInfoMap.get(blockState);
-		if (leafInfo == null || leafInfo.particleType == null) return;
-		particleIcon = BetterFoliageClient.leafRegistry.particleTextures.get(leafInfo.particleType).get(rand.nextInt(1024));
-		Color4 blockColor = Color4.fromARGB(blockState.getBlock().colorMultiplier(world, pos, 0)).opaque();
-		calculateParticleColor(leafInfo.averageColor, blockColor);
+		if (leafInfo != null && leafInfo.particleType != null) {
+			particleIcon = BetterFoliageClient.leafRegistry.particleTextures.get(leafInfo.particleType).get(rand.nextInt(1024));
+			Color4 blockColor = Color4.fromARGB(blockState.getBlock().colorMultiplier(world, pos, 0)).opaque();
+			calculateParticleColor(leafInfo.averageColor, blockColor);
+		} else if (!erroredStates.contains(blockState)) {
+			erroredStates.add(blockState);
+			BetterFoliage.log.warn(String.format("Error creating leaf particle - unknown texture for state: %s", blockState.toString()));
+		}
 	}
 
+	/** Add the particle to the supplied {@link EffectRenderer}.
+	 * Operation deferred to the particle itself for easier error handling.
+	 * @param renderer
+	 */
+	public void addToRenderer(EffectRenderer renderer) {
+		if (particleIcon != null) renderer.addEffect(this);
+	}
+	
 	@Override
 	public void onUpdate() {
 		super.onUpdate();

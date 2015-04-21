@@ -85,7 +85,7 @@ public class GrassTextures {
                 String resolvedName = grassMapping.apply(model);
                 if (resolvedName != null) {
                     // store texture location for this blockstate
-                    BetterFoliage.log.info(String.format("block=%s, texture=%s", stateMapping.getKey().toString(), resolvedName));
+                    BetterFoliage.log.debug(String.format("block=%s, texture=%s", stateMapping.getKey().toString(), resolvedName));
                     grassInfoMap.put(stateMapping.getKey(), new GrassInfo(resolvedName));
                     break;
                 }
