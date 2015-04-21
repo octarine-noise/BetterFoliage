@@ -1,7 +1,8 @@
 package mods.betterfoliage.client.render.impl.primitives;
 
 import mods.betterfoliage.client.misc.Double3;
-import mods.betterfoliage.client.render.BlockShadingData;
+import mods.betterfoliage.client.render.IShadingData;
+import mods.betterfoliage.client.render.Rotation;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.EnumFacing;
@@ -58,7 +59,7 @@ public class CubeQuadrantQuads implements IQuadCollection {
 	}
 	
 	@Override
-	public IQuadCollection setBrightness(BlockShadingData shadingData) {
+	public IQuadCollection setBrightness(IShadingData shadingData) {
 		EnumFacing horz1DirOpp = horz1Dir.getOpposite();
 		EnumFacing horz2DirOpp = horz2Dir.getOpposite();
 		EnumFacing vertDirOpp = vertDir.getOpposite();
@@ -104,8 +105,8 @@ public class CubeQuadrantQuads implements IQuadCollection {
 	}
 
 	@Override
-	public IQuadCollection setColor(BlockShadingData shadingData, Color4 color) {
-		if (shadingData.useAO) {
+	public IQuadCollection setColor(IShadingData shadingData, Color4 color) {
+		if (shadingData.shouldUseAO()) {
 			EnumFacing horz1DirOpp = horz1Dir.getOpposite();
 			EnumFacing horz2DirOpp = horz2Dir.getOpposite();
 			EnumFacing vertDirOpp = vertDir.getOpposite();
@@ -197,6 +198,14 @@ public class CubeQuadrantQuads implements IQuadCollection {
 		if (bottomLid != null) bottomLid.render(renderer);
 	}
 
+	@Override
+	public void render(WorldRenderer renderer, Double3 translate) {
+		dir1Face.render(renderer, translate);
+		dir2Face.render(renderer, translate);
+		if (topLid != null) topLid.render(renderer, translate);
+		if (bottomLid != null) bottomLid.render(renderer, translate);
+	}
+	
 	protected int averageBrightness(int br1, int br2) {
 		return (br1 + br2) / 2;
 	}
@@ -211,5 +220,14 @@ public class CubeQuadrantQuads implements IQuadCollection {
 	
 	protected float averageColorMultiplier(float cm1, float cm2, float cm3, float cm4) {
 		return (cm1 + cm2 + cm3 + cm4) * 0.25f;
+	}
+
+	@Override
+	public IQuadCollection transform(Rotation rotation) {
+		dir1Face.transform(rotation);
+		dir2Face.transform(rotation);
+		topLid.transform(rotation);
+		bottomLid.transform(rotation);
+		return this;
 	}
 }

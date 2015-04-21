@@ -43,7 +43,10 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import com.google.common.collect.Lists;
 
@@ -63,6 +66,7 @@ public class BetterFoliageClient {
 	public static void postInit() {
 		FMLCommonHandler.instance().bus().register(new KeyHandler());
 		FMLCommonHandler.instance().bus().register(new Config());
+		FMLCommonHandler.instance().bus().register(new BetterFoliageClient());
 		
 		BetterFoliage.log.info("Registering renderers");
 		registerRenderer(new RenderBlockLeaves());
@@ -90,6 +94,7 @@ public class BetterFoliageClient {
 		MinecraftForge.EVENT_BUS.register(leafGenerator);
 		MinecraftForge.EVENT_BUS.register(leafRegistry);
 		leafRegistry.leafMappings.add(new VanillaMapping("minecraft:models/block/leaves", "all"));
+		leafRegistry.leafMappings.add(new VanillaMapping("minecraft:models/block/cube", "all"));
 		MinecraftForge.EVENT_BUS.register(grassRegistry);
 		grassRegistry.grassMappings.add(new VanillaMapping("minecraft:models/block/grass", "top"));
 		grassRegistry.grassMappings.add(new VanillaMapping("minecraft:models/block/cube_bottom_top", "top"));
@@ -122,7 +127,7 @@ public class BetterFoliageClient {
 	    }
 	    if (Config.leafFXEnabled) {
 	        if (Config.leaves.matchesID(block) && world.isAirBlock(pos.add(0, -1, 0)) && Math.random() < Config.leafFXChance) {
-	            Minecraft.getMinecraft().effectRenderer.addEffect(new EntityFXFallingLeaves(world, blockState, pos));
+	        	new EntityFXFallingLeaves(world, blockState, pos).addToRenderer(Minecraft.getMinecraft().effectRenderer);
 	            return;
 	        }
 	    }
@@ -164,5 +169,11 @@ public class BetterFoliageClient {
     public static void registerRenderer(BFAbstractRenderer renderer) {
         MinecraftForge.EVENT_BUS.register(renderer);
         renderers.add(renderer);
+        renderer.onConfigReload();
+    }
+    
+    @SubscribeEvent(priority = EventPriority.LOW)
+    public void handleConfigReload(ConfigChangedEvent.OnConfigChangedEvent event) {
+        for (BFAbstractRenderer renderer : renderers) renderer.onConfigReload();
     }
 }

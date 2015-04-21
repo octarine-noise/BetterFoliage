@@ -1,7 +1,8 @@
 package mods.betterfoliage.client.render.impl.primitives;
 
 import mods.betterfoliage.client.misc.Double3;
-import mods.betterfoliage.client.render.BlockShadingData;
+import mods.betterfoliage.client.render.IShadingData;
+import mods.betterfoliage.client.render.Rotation;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.EnumFacing;
@@ -33,7 +34,7 @@ public class SimpleOrientedQuad implements IQuadCollection {
     }
 
     @Override
-    public IQuadCollection setBrightness(BlockShadingData shadingData) {
+    public IQuadCollection setBrightness(IShadingData shadingData) {
         int brTR = shadingData.getBrightness(facing, DynamicQuad.faceRight[facing.ordinal()], DynamicQuad.faceTop[facing.ordinal()], false);
         int brTL = shadingData.getBrightness(facing, DynamicQuad.faceRight[facing.ordinal()].getOpposite(), DynamicQuad.faceTop[facing.ordinal()], false);
         int brBL = shadingData.getBrightness(facing, DynamicQuad.faceRight[facing.ordinal()].getOpposite(), DynamicQuad.faceTop[facing.ordinal()].getOpposite(), false);
@@ -43,8 +44,8 @@ public class SimpleOrientedQuad implements IQuadCollection {
     }
 
     @Override
-    public IQuadCollection setColor(BlockShadingData shadingData, Color4 color) {
-        if (shadingData.useAO) {
+    public IQuadCollection setColor(IShadingData shadingData, Color4 color) {
+        if (shadingData.shouldUseAO()) {
             Color4 colTR = color.multiply(shadingData.getColorMultiplier(facing, DynamicQuad.faceRight[facing.ordinal()], DynamicQuad.faceTop[facing.ordinal()], false));
             Color4 colTL = color.multiply(shadingData.getColorMultiplier(facing, DynamicQuad.faceRight[facing.ordinal()].getOpposite(), DynamicQuad.faceTop[facing.ordinal()], false));
             Color4 colBL = color.multiply(shadingData.getColorMultiplier(facing, DynamicQuad.faceRight[facing.ordinal()].getOpposite(), DynamicQuad.faceTop[facing.ordinal()].getOpposite(), false));
@@ -62,5 +63,15 @@ public class SimpleOrientedQuad implements IQuadCollection {
         quad.render(renderer);
     }
 
+    @Override
+    public void render(WorldRenderer renderer, Double3 translate) {
+        quad.render(renderer, translate);
+    }
+    
+	@Override
+	public IQuadCollection transform(Rotation rotation) {
+		quad.transform(rotation);
+		return this;
+	}
     
 }

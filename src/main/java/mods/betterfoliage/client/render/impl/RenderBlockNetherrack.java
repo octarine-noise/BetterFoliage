@@ -2,6 +2,7 @@ package mods.betterfoliage.client.render.impl;
 
 import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.misc.Double3;
+import mods.betterfoliage.client.render.BlockShadingData;
 import mods.betterfoliage.client.render.TextureSet;
 import mods.betterfoliage.client.render.impl.primitives.Color4;
 import mods.betterfoliage.client.render.impl.primitives.FaceCrossedQuads;
@@ -39,9 +40,10 @@ public class RenderBlockNetherrack extends BFAbstractRenderer {
         Double3 offset = random.getCircleXZ(Config.netherrackHOffset, offsetVariation);
         Double3 faceCenter = new Double3(pos).add(0.5, 0.0, 0.5);
         
-        shadingData.update(blockAccess, blockState.getBlock(), pos, useAO);
+        BlockShadingData shading = shadingData.get();
+        shading.update(blockAccess, blockState.getBlock(), pos, useAO);
         FaceCrossedQuads vines = FaceCrossedQuads.createTranslated(faceCenter, EnumFacing.DOWN, offset, halfSize, halfHeight);
-        vines.setTexture(netherrackVineIcons.get(textureVariation), 2).setBrightness(shadingData).setColor(shadingData, Color4.opaqueWhite).render(worldRenderer);
+        vines.setTexture(netherrackVineIcons.get(textureVariation), 2).setBrightness(shading).setColor(shading, Color4.opaqueWhite).render(worldRenderer);
         
         return true;
     }

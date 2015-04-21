@@ -5,6 +5,7 @@ import java.util.Random;
 import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.integration.ShadersModIntegration;
 import mods.betterfoliage.client.misc.Double3;
+import mods.betterfoliage.client.render.BlockShadingData;
 import mods.betterfoliage.client.render.TextureSet;
 import mods.betterfoliage.client.render.impl.primitives.Color4;
 import mods.betterfoliage.client.render.impl.primitives.FaceCrossedQuads;
@@ -62,11 +63,12 @@ public class RenderBlockReed extends BFAbstractRenderer {
         Double3 faceCenter = new Double3(pos).add(0.5, 1.0, 0.5);
         
         ShadersModIntegration.startGrassQuads(worldRenderer);
-        shadingData.update(blockAccess, blockState.getBlock(), pos.up(), useAO);
+        BlockShadingData shading = shadingData.get();
+        shading.update(blockAccess, blockState.getBlock(), pos.up(), useAO);
         FaceCrossedQuads reedBottom = FaceCrossedQuads.createTranslated(faceCenter, EnumFacing.UP, offset, halfSize, quarterHeight);
         FaceCrossedQuads reedTop = FaceCrossedQuads.createTranslated(faceCenter.add(0, 2 * quarterHeight, 0), EnumFacing.UP, offset, halfSize, quarterHeight);
-        reedBottom.setTexture(reedBottomIcons.get(textureVariation), 0).setBrightness(shadingData).setColor(shadingData, Color4.opaqueWhite).render(worldRenderer);
-        reedTop.setTexture(reedTopIcons.get(textureVariation), 0).setBrightness(shadingData).setColor(shadingData, Color4.opaqueWhite).render(worldRenderer);
+        reedBottom.setTexture(reedBottomIcons.get(textureVariation), 0).setBrightness(shading).setColor(shading, Color4.opaqueWhite).render(worldRenderer);
+        reedTop.setTexture(reedTopIcons.get(textureVariation), 0).setBrightness(shading).setColor(shading, Color4.opaqueWhite).render(worldRenderer);
         ShadersModIntegration.finish(worldRenderer);
         
         return true;

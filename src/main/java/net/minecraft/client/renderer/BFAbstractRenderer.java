@@ -17,6 +17,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public abstract class BFAbstractRenderer extends BlockModelRenderer {
 
+	/** If true, this renderer should be used <i>instead of</i> the normal block rendering,
+	 *  not <i>in addition to</i>.*/
 	public boolean isStandardRenderBlocked = false;
 	
     /** Identical to {@link AmbientOcclusionFace} with <b>public</b> visibility.
@@ -25,13 +27,16 @@ public abstract class BFAbstractRenderer extends BlockModelRenderer {
     public class BFAmbientOcclusionFace extends AmbientOcclusionFace {}
     
     /** Shading data for the currently rendered block */
-    public BlockShadingData shadingData = new BlockShadingData(this);
+    public ThreadLocal<BlockShadingData> shadingData = new ThreadLocal<BlockShadingData>() {
+		protected BlockShadingData initialValue() {
+			return new BlockShadingData(BFAbstractRenderer.this);
+		}
+    };
     
     /** Perturbation source */
     public PerturbationSource random = new PerturbationSource();
     
-    /** Render feature for a block.
-     * This method gets called for <i>every block</i>, so it needs to fail-fast if the block is not eligible for this feature. 
+    /** Render feature for a block. It's still OK
      * @param blockAccess world instance
      * @param blockState block state
      * @param pos position
@@ -42,8 +47,18 @@ public abstract class BFAbstractRenderer extends BlockModelRenderer {
      */
     public abstract boolean renderBlock(IBlockAccess blockAccess, IBlockState blockState, BlockPos pos, WorldRenderer worldRenderer, boolean useAO, EnumWorldBlockLayer layer);
     
+    /** Determing if a block is eligible for this feature.
+     * This method gets called for <i>every block</i>, so it needs to fail-fast if the answer is false.
+     * @param blockAccess world instance
+     * @param blockState block state
+     * @param pos position
+     * @return true if this renderer should be used
+     */
     public abstract boolean isBlockEligible(IBlockAccess blockAccess, IBlockState blockState, BlockPos pos);
     
+	/** Called if the mod configuration changes, to allow recalculating cached resources */
+	public void onConfigReload() { }
+	
     /** Get the {@link AmbientOcclusionFace} array index for a corner vertex
      * @param face block face
      * @param axis1 1st cardinal direction of corner
@@ -99,4 +114,6 @@ public abstract class BFAbstractRenderer extends BlockModelRenderer {
     	}
     	return true;
     }
+
+
 }

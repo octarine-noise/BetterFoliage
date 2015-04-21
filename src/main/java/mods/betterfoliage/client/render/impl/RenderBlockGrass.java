@@ -4,6 +4,7 @@ import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.BetterFoliageClient;
 import mods.betterfoliage.client.integration.ShadersModIntegration;
 import mods.betterfoliage.client.misc.Double3;
+import mods.betterfoliage.client.render.BlockShadingData;
 import mods.betterfoliage.client.render.TextureSet;
 import mods.betterfoliage.client.render.impl.primitives.Color4;
 import mods.betterfoliage.client.render.impl.primitives.FaceCrossedQuads;
@@ -48,14 +49,15 @@ public class RenderBlockGrass extends BFAbstractRenderer {
         double halfSize = 0.5 * Config.grassSize;
         double halfHeight = 0.5 * random.getRange(Config.grassHeightMin, Config.grassHeightMax, offsetVariation);
         Double3 offset = random.getCircleXZ(Config.grassHOffset, offsetVariation);
-        Double3 faceCenter = new Double3(pos).add(0.5, 1.0, 0.5);
+        Double3 blockCenter = new Double3(pos).add(0.5, 0.5, 0.5);
         Color4 renderColor = isSnowTop ? snowColor : BetterFoliageClient.grassRegistry.getRenderColor(blockState, Color4.fromARGB(blockState.getBlock().colorMultiplier(blockAccess, pos, 0)).opaque());
         
         ShadersModIntegration.startGrassQuads(worldRenderer);
-        shadingData.update(blockAccess, blockState.getBlock(), pos, useAO);
-        FaceCrossedQuads grass = FaceCrossedQuads.createTranslated(faceCenter.add(0, isSnowTop ? 0.1 : 0, 0), EnumFacing.UP, offset, halfSize, halfHeight);
+        BlockShadingData shading = shadingData.get();
+        shading.update(blockAccess, blockState.getBlock(), pos, useAO);
+        FaceCrossedQuads grass = FaceCrossedQuads.create(offset, halfSize, halfHeight);
         grass.setTexture(Config.grassUseGenerated ? (isSnowTop ? snowGrassGenIcon : grassGenIcon) : ( (isSnowTop ? snowGrassIcons : grassIcons).get(textureVariation) ), 0);
-        grass.setBrightness(shadingData).setColor(shadingData, renderColor).render(worldRenderer);
+        grass.setBrightness(shading).setColor(shading, renderColor).render(worldRenderer, blockCenter);
         ShadersModIntegration.finish(worldRenderer);
         
         return true;

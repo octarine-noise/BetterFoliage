@@ -1,6 +1,7 @@
 package mods.betterfoliage.client.render.impl.primitives;
 
 import mods.betterfoliage.client.misc.Double3;
+import mods.betterfoliage.client.render.Rotation;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.EnumFacing;
@@ -151,6 +152,13 @@ public class DynamicQuad {
         return this;
     }
     
+    public void transform(Rotation rotation) {
+    	for (int idx = 0; idx < 4; idx++) {
+        	Double3 orig = new Double3(x[idx], y[idx], z[idx]);
+        	putRawXYZ(rotation.transform(orig), idx);
+    	}
+    }
+
     /** Render vertex data with renderer
      * @param renderer
      */
@@ -163,4 +171,19 @@ public class DynamicQuad {
             renderer.addVertex(x[idx], y[idx], z[idx]);
         }
     }
+    
+    /** Render vertex data with renderer and offset
+     * @param renderer
+     * @param offset
+     */
+    public void render(WorldRenderer renderer, Double3 offset) {
+        for (int idx = 0; idx < 4; idx++) {
+            Color4 col = color[idx];
+            renderer.setColorRGBA(col.R, col.G, col.B, col.A);
+            renderer.setBrightness(brightness[idx]);
+            renderer.setTextureUV(u[idx], v[idx]);
+            renderer.addVertex(x[idx] + offset.x, y[idx] + offset.y, z[idx] + offset.z);
+        }
+    }
+    
 }

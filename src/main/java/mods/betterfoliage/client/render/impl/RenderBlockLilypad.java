@@ -3,6 +3,7 @@ package mods.betterfoliage.client.render.impl;
 import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.integration.ShadersModIntegration;
 import mods.betterfoliage.client.misc.Double3;
+import mods.betterfoliage.client.render.BlockShadingData;
 import mods.betterfoliage.client.render.TextureSet;
 import mods.betterfoliage.client.render.impl.primitives.Color4;
 import mods.betterfoliage.client.render.impl.primitives.FaceCrossedQuads;
@@ -44,14 +45,15 @@ public class RenderBlockLilypad extends BFAbstractRenderer {
         Double3 faceCenter = new Double3(pos).add(0.5, 0.0, 0.5);
         
         ShadersModIntegration.startGrassQuads(worldRenderer);
-        shadingData.update(blockAccess, blockState.getBlock(), pos, useAO);
+        BlockShadingData shading = shadingData.get();
+        shading.update(blockAccess, blockState.getBlock(), pos, useAO);
         FaceCrossedQuads roots = FaceCrossedQuads.createTranslated(faceCenter.add(0, 0.015, 0), EnumFacing.DOWN, offset, halfSize, halfHeight);
-        roots.setTexture(lilypadRoots.get(iconVariation), 2).setBrightness(shadingData).setColor(shadingData, Color4.opaqueWhite).render(worldRenderer);
+        roots.setTexture(lilypadRoots.get(iconVariation), 2).setBrightness(shading).setColor(shading, Color4.opaqueWhite).render(worldRenderer);
         ShadersModIntegration.finish(worldRenderer);
         
         if (chanceVariation < Config.lilypadChance) {
             FaceCrossedQuads flower = FaceCrossedQuads.createTranslated(faceCenter.add(0, 0.02, 0), EnumFacing.UP, offset, halfSize, halfHeight);
-            flower.setTexture(lilypadFlowers.get(iconVariation), 0).setBrightness(shadingData).setColor(shadingData, Color4.opaqueWhite).render(worldRenderer);
+            flower.setTexture(lilypadFlowers.get(iconVariation), 0).setBrightness(shading).setColor(shading, Color4.opaqueWhite).render(worldRenderer);
         }
         
         return true;

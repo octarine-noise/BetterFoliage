@@ -2,11 +2,12 @@ package mods.betterfoliage.client.render.impl;
 
 import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.misc.Double3;
+import mods.betterfoliage.client.render.BlockShadingData;
 import mods.betterfoliage.client.render.TextureSet;
+import mods.betterfoliage.client.render.impl.primitives.BlockCrossedQuads;
 import mods.betterfoliage.client.render.impl.primitives.Color4;
 import mods.betterfoliage.client.render.impl.primitives.FaceCrossedQuads;
 import mods.betterfoliage.client.render.impl.primitives.IQuadCollection;
-import mods.betterfoliage.client.render.impl.primitives.BlockCrossedQuads;
 import mods.betterfoliage.common.config.Config;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.BFAbstractRenderer;
@@ -53,15 +54,16 @@ public class RenderBlockCactus extends BFAbstractRenderer {
         Double3 blockCenter = new Double3(pos).add(0.5, 0.5, 0.5);
         
         // render cactus center
-        shadingData.update(blockAccess, blockState.getBlock(), pos, useAO);
-        IQuadCollection cactusCenter = BlockCrossedQuads.createSkewed(EnumFacing.UP, blockCenter, random.getCircleXZ(0.1, offsetVariation), random.getCircleXZ(0.1, offsetVariation + 1), halfSize);
-        cactusCenter.setTexture(cactusRoundIcon, uvVariation).setBrightness(shadingData).setColor(shadingData, Color4.opaqueWhite).render(worldRenderer);
+        BlockShadingData shading = shadingData.get();
+        shading.update(blockAccess, blockState.getBlock(), pos, useAO);
+        IQuadCollection cactusCenter = BlockCrossedQuads.create(random.getCircleXZ(0.1, offsetVariation), random.getCircleXZ(0.1, offsetVariation + 1), halfSize);
+        cactusCenter.setTexture(cactusRoundIcon, uvVariation).setBrightness(shading).setColor(shading, Color4.opaqueWhite).render(worldRenderer, blockCenter);
         
         // render cactus arm
         EnumFacing sideFacing = cactusDirections[offsetVariation % 4];
         halfSize = 0.5;
         FaceCrossedQuads cactusArm = FaceCrossedQuads.createTranslated(blockCenter.add(new Double3(sideFacing).scale(cactusRadius)), sideFacing, random.getCircleXZ(0.2, offsetVariation), halfSize, halfSize);
-        cactusArm.setTexture(cactusSideIcons.get(iconVariation), 0).setBrightness(shadingData).setColor(shadingData, Color4.opaqueWhite).render(worldRenderer);
+        cactusArm.setTexture(cactusSideIcons.get(iconVariation), 0).setBrightness(shading).setColor(shading, Color4.opaqueWhite).render(worldRenderer);
         
         return true;
     }

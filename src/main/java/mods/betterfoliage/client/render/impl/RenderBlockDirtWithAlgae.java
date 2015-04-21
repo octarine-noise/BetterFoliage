@@ -5,6 +5,7 @@ import java.util.Random;
 import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.integration.ShadersModIntegration;
 import mods.betterfoliage.client.misc.Double3;
+import mods.betterfoliage.client.render.BlockShadingData;
 import mods.betterfoliage.client.render.TextureSet;
 import mods.betterfoliage.client.render.impl.primitives.Color4;
 import mods.betterfoliage.client.render.impl.primitives.FaceCrossedQuads;
@@ -61,9 +62,10 @@ public class RenderBlockDirtWithAlgae extends BFAbstractRenderer {
         Double3 faceCenter = new Double3(pos).add(0.5, 1.0, 0.5);
         
         ShadersModIntegration.startGrassQuads(worldRenderer);
-        shadingData.update(blockAccess, blockState.getBlock(), pos, useAO);
+        BlockShadingData shading = shadingData.get();
+        shading.update(blockAccess, blockState.getBlock(), pos, useAO);
         FaceCrossedQuads algae = FaceCrossedQuads.createTranslated(faceCenter, EnumFacing.UP, offset, halfSize, halfHeight);
-        algae.setTexture(algaeIcons.get(textureVariation), 0).setBrightness(shadingData).setColor(shadingData, Color4.opaqueWhite).render(worldRenderer);
+        algae.setTexture(algaeIcons.get(textureVariation), 0).setBrightness(shading).setColor(shading, Color4.opaqueWhite).render(worldRenderer);
         ShadersModIntegration.finish(worldRenderer);
         
         return true;

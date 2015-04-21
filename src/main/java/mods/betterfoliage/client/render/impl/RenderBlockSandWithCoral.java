@@ -4,6 +4,7 @@ import java.util.Random;
 
 import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.misc.Double3;
+import mods.betterfoliage.client.render.BlockShadingData;
 import mods.betterfoliage.client.render.TextureSet;
 import mods.betterfoliage.client.render.impl.primitives.Color4;
 import mods.betterfoliage.client.render.impl.primitives.FaceCrossedQuads;
@@ -55,7 +56,8 @@ public class RenderBlockSandWithCoral extends BFAbstractRenderer {
 		double halfSize = Config.coralSize * 0.5;
 		double halfCrustSize = Config.coralCrustSize * 0.5;
 		
-		shadingData.update(blockAccess, blockState.getBlock(), pos, useAO);
+		BlockShadingData shading = shadingData.get();
+		shading.update(blockAccess, blockState.getBlock(), pos, useAO);
 		for (EnumFacing face : EnumFacing.values()) {
 			if (blockAccess.getBlockState(pos.offset(face)).getBlock().getMaterial() != Material.water) continue;
 			if (!Config.coralShallowWater && blockAccess.isAirBlock(pos.offset(face).up())) continue;
@@ -65,8 +67,8 @@ public class RenderBlockSandWithCoral extends BFAbstractRenderer {
 			    SimpleOrientedQuad coralCrust = SimpleOrientedQuad.create(blockCenter.add(new Double3(face).scale(0.5 + offset)), face, halfCrustSize);
 			    FaceCrossedQuads coral = FaceCrossedQuads.createTranslated(blockCenter.add(new Double3(face).scale(0.5)), face, random.getCircleXZ(Config.coralHOffset, textureVariation), halfSize, halfSize);
 			    
-			    coralCrust.setTexture(coralCrustIcons.get(textureVariation + face.ordinal()), textureVariation + face.ordinal()).setBrightness(shadingData).setColor(shadingData, Color4.opaqueWhite).render(worldRenderer);
-			    coral.setTexture(coralCrossIcons.get(textureVariation + face.ordinal()), 0).setBrightness(shadingData).setColor(shadingData, Color4.opaqueWhite).render(worldRenderer);
+			    coralCrust.setTexture(coralCrustIcons.get(textureVariation + face.ordinal()), textureVariation + face.ordinal()).setBrightness(shading).setColor(shading, Color4.opaqueWhite).render(worldRenderer);
+			    coral.setTexture(coralCrossIcons.get(textureVariation + face.ordinal()), 0).setBrightness(shading).setColor(shading, Color4.opaqueWhite).render(worldRenderer);
 			}
 		}
 		return true;

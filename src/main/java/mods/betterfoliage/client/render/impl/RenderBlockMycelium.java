@@ -3,6 +3,7 @@ package mods.betterfoliage.client.render.impl;
 import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.integration.ShadersModIntegration;
 import mods.betterfoliage.client.misc.Double3;
+import mods.betterfoliage.client.render.BlockShadingData;
 import mods.betterfoliage.client.render.TextureSet;
 import mods.betterfoliage.client.render.impl.primitives.Color4;
 import mods.betterfoliage.client.render.impl.primitives.FaceCrossedQuads;
@@ -45,9 +46,10 @@ public class RenderBlockMycelium extends BFAbstractRenderer {
         Double3 faceCenter = new Double3(pos).add(0.5, 1.0, 0.5);
         
         ShadersModIntegration.startGrassQuads(worldRenderer);
-        shadingData.update(blockAccess, blockState.getBlock(), pos, useAO);
+        BlockShadingData shading = shadingData.get();
+        shading.update(blockAccess, blockState.getBlock(), pos, useAO);
         FaceCrossedQuads mycelium = FaceCrossedQuads.createTranslated(faceCenter.add(0, isSnowTop ? 0.1 : 0, 0), EnumFacing.UP, offset, halfSize, halfHeight);
-        mycelium.setTexture(myceliumIcons.get(textureVariation), 0).setBrightness(shadingData).setColor(shadingData, Color4.opaqueWhite).render(worldRenderer);
+        mycelium.setTexture(myceliumIcons.get(textureVariation), 0).setBrightness(shading).setColor(shading, Color4.opaqueWhite).render(worldRenderer);
         ShadersModIntegration.finish(worldRenderer);
         
         return true;

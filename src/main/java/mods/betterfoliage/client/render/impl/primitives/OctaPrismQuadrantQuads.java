@@ -1,7 +1,8 @@
 package mods.betterfoliage.client.render.impl.primitives;
 
 import mods.betterfoliage.client.misc.Double3;
-import mods.betterfoliage.client.render.BlockShadingData;
+import mods.betterfoliage.client.render.IShadingData;
+import mods.betterfoliage.client.render.Rotation;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.EnumFacing;
@@ -81,7 +82,7 @@ public class OctaPrismQuadrantQuads implements IQuadCollection {
 	}
 	
 	@Override
-	public IQuadCollection setBrightness(BlockShadingData shadingData) {
+	public IQuadCollection setBrightness(IShadingData shadingData) {
 		EnumFacing horz1DirOpp = horz1Dir.getOpposite();
 		EnumFacing horz2DirOpp = horz2Dir.getOpposite();
 		EnumFacing vertDirOpp = vertDir.getOpposite();
@@ -138,8 +139,8 @@ public class OctaPrismQuadrantQuads implements IQuadCollection {
 	}
 
 	@Override
-	public IQuadCollection setColor(BlockShadingData shadingData, Color4 color) {
-		if (shadingData.useAO) {
+	public IQuadCollection setColor(IShadingData shadingData, Color4 color) {
+		if (shadingData.shouldUseAO()) {
 			EnumFacing horz1DirOpp = horz1Dir.getOpposite();
 			EnumFacing horz2DirOpp = horz2Dir.getOpposite();
 			EnumFacing vertDirOpp = vertDir.getOpposite();
@@ -269,6 +270,22 @@ public class OctaPrismQuadrantQuads implements IQuadCollection {
 		}
 	}
 
+	@Override
+	public void render(WorldRenderer renderer, Double3 translate) {
+		dir1Mid.render(renderer, translate);
+		dir1Cham.render(renderer, translate);
+		dir2Cham.render(renderer, translate);
+		dir2Mid.render(renderer, translate);
+		if (topLid1 != null) {
+			topLid1.render(renderer, translate);
+			topLid2.render(renderer, translate);
+		}
+		if (bottomLid1 != null) {
+			bottomLid1.render(renderer, translate);
+			bottomLid2.render(renderer, translate);
+		}
+	}
+	
 	protected int averageBrightness(int br1, int br2) {
 		return (br1 + br2) / 2;
 	}
@@ -283,5 +300,22 @@ public class OctaPrismQuadrantQuads implements IQuadCollection {
 	
 	protected float averageColorMultiplier(float cm1, float cm2, float cm3, float cm4) {
 		return (cm1 + cm2 + cm3 + cm4) * 0.25f;
+	}
+
+	@Override
+	public IQuadCollection transform(Rotation rotation) {
+		dir1Mid.transform(rotation);
+		dir1Cham.transform(rotation);
+		dir2Cham.transform(rotation);
+		dir2Mid.transform(rotation);
+		if (topLid1 != null) {
+			topLid1.transform(rotation);
+			topLid2.transform(rotation);
+		}
+		if (bottomLid1 != null) {
+			bottomLid1.transform(rotation);
+			bottomLid2.transform(rotation);
+		}
+		return this;
 	}
 }

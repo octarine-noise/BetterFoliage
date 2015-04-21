@@ -2,6 +2,7 @@ package mods.betterfoliage.client.render.impl;
 
 import mods.betterfoliage.client.BetterFoliageClient;
 import mods.betterfoliage.client.misc.Double3;
+import mods.betterfoliage.client.render.BlockShadingData;
 import mods.betterfoliage.client.render.impl.primitives.Color4;
 import mods.betterfoliage.client.render.impl.primitives.CubeQuadrantQuads;
 import mods.betterfoliage.client.render.impl.primitives.IQuadCollection;
@@ -70,7 +71,8 @@ public class RenderBlockLogs extends BFAbstractRenderer {
         boolean topBlocked = isBlocked(blockAccess, pos, logVertDir);
         boolean bottomBlocked = isBlocked(blockAccess, pos, logVertDir.getOpposite());
         
-    	shadingData.update(blockAccess, blockState.getBlock(), pos, useAO);
+        BlockShadingData shading = shadingData.get();
+        shading.update(blockAccess, blockState.getBlock(), pos, useAO);
     	IQuadCollection quadsNN = getQuadrant(blockPos, logHorzDir1, logHorzDir2, logVertDir, 3, !topBlocked, !bottomBlocked,
     			connectNN || connectNP || connectPN ? null : (connectPP ? Config.logsLargeRadius : Config.logsSmallRadius), logInfo.sideTexture, logInfo.endTexture);
     	IQuadCollection quadsPN = getQuadrant(blockPos.add(logHorzDir1), logHorzDir2, logHorzDir1.getOpposite(), logVertDir, 2, !topBlocked, !bottomBlocked,
@@ -80,10 +82,10 @@ public class RenderBlockLogs extends BFAbstractRenderer {
     	IQuadCollection quadsNP = getQuadrant(blockPos.add(logHorzDir2), logHorzDir2.getOpposite(), logHorzDir1, logVertDir, 0, !topBlocked, !bottomBlocked,
     			connectNP || connectNN || connectPP ? null : (connectPN ? Config.logsLargeRadius : Config.logsSmallRadius), logInfo.sideTexture, logInfo.endTexture);
     	
-    	quadsNN.setBrightness(shadingData).setColor(shadingData, Color4.opaqueWhite).render(worldRenderer);
-    	quadsPN.setBrightness(shadingData).setColor(shadingData, Color4.opaqueWhite).render(worldRenderer);
-    	quadsPP.setBrightness(shadingData).setColor(shadingData, Color4.opaqueWhite).render(worldRenderer);
-    	quadsNP.setBrightness(shadingData).setColor(shadingData, Color4.opaqueWhite).render(worldRenderer);
+    	quadsNN.setBrightness(shading).setColor(shading, Color4.opaqueWhite).render(worldRenderer);
+    	quadsPN.setBrightness(shading).setColor(shading, Color4.opaqueWhite).render(worldRenderer);
+    	quadsPP.setBrightness(shading).setColor(shading, Color4.opaqueWhite).render(worldRenderer);
+    	quadsNP.setBrightness(shading).setColor(shading, Color4.opaqueWhite).render(worldRenderer);
     	return true;
     }
     

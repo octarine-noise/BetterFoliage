@@ -1,7 +1,8 @@
 package mods.betterfoliage.client.render.impl.primitives;
 
 import mods.betterfoliage.client.misc.Double3;
-import mods.betterfoliage.client.render.BlockShadingData;
+import mods.betterfoliage.client.render.IShadingData;
+import mods.betterfoliage.client.render.Rotation;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.EnumFacing;
@@ -38,6 +39,29 @@ public class FaceCrossedQuads implements IQuadCollection {
      * @param halfHeight half the quad edge length in face-normal direction 
      * @return
      */
+    public static FaceCrossedQuads create(Double3 perturb, double halfWidth, double halfHeight) {
+        FaceCrossedQuads result = new FaceCrossedQuads();
+        Double3 vert = new Double3(0.0, halfHeight, 0.0);
+        Double3 faceTR = new Double3(-1.0, 0.0, 1.0).scale(halfWidth);
+        Double3 faceTL = new Double3(1.0, 0.0, 1.0).scale(halfWidth);
+        Double3 drawCenter = new Double3(0.0, 0.5 + halfHeight, 0.0).add(perturb.x, 0.0, perturb.z);
+        
+        result.BR = DynamicQuad.createParallelogramCentered(drawCenter, faceTR, vert);
+        result.TL = DynamicQuad.createParallelogramCentered(drawCenter, faceTR.inverse(), vert);
+        result.TR = DynamicQuad.createParallelogramCentered(drawCenter, faceTL, vert);
+        result.BL = DynamicQuad.createParallelogramCentered(drawCenter, faceTL.inverse(), vert);
+        result.facing = EnumFacing.UP;
+        return result;
+    }
+    
+    /** Create quads with their base point perturbed along the block face.
+     * @param base base point
+     * @param facing face direction
+     * @param perturb perturbation to apply (should be in plane XZ)
+     * @param halfWidth half the quad edge length in face-parallel direction
+     * @param halfHeight half the quad edge length in face-normal direction 
+     * @return
+     */
     public static FaceCrossedQuads createTranslated(Double3 base, EnumFacing facing, Double3 perturb, double halfWidth, double halfHeight) {
         FaceCrossedQuads result = new FaceCrossedQuads();
         Double3 faceN = new Double3(facing).scale(halfHeight);
@@ -61,7 +85,7 @@ public class FaceCrossedQuads implements IQuadCollection {
         return this;
     }
     
-    public FaceCrossedQuads setBrightness(BlockShadingData shadingData) {
+    public FaceCrossedQuads setBrightness(IShadingData shadingData) {
         int brTR = shadingData.getBrightness(facing, DynamicQuad.faceRight[facing.ordinal()], DynamicQuad.faceTop[facing.ordinal()], false);
         int brTL = shadingData.getBrightness(facing, DynamicQuad.faceRight[facing.ordinal()].getOpposite(), DynamicQuad.faceTop[facing.ordinal()], false);
         int brBL = shadingData.getBrightness(facing, DynamicQuad.faceRight[facing.ordinal()].getOpposite(), DynamicQuad.faceTop[facing.ordinal()].getOpposite(), false);
@@ -74,8 +98,8 @@ public class FaceCrossedQuads implements IQuadCollection {
         return this;
     }
     
-    public FaceCrossedQuads setColor(BlockShadingData shadingData, Color4 color) {
-        if (shadingData.useAO) {
+    public FaceCrossedQuads setColor(IShadingData shadingData, Color4 color) {
+        if (shadingData.shouldUseAO()) {
             Color4 colTR = color.multiply(shadingData.getColorMultiplier(facing, DynamicQuad.faceRight[facing.ordinal()], DynamicQuad.faceTop[facing.ordinal()], false));
             Color4 colTL = color.multiply(shadingData.getColorMultiplier(facing, DynamicQuad.faceRight[facing.ordinal()].getOpposite(), DynamicQuad.faceTop[facing.ordinal()], false));
             Color4 colBL = color.multiply(shadingData.getColorMultiplier(facing, DynamicQuad.faceRight[facing.ordinal()].getOpposite(), DynamicQuad.faceTop[facing.ordinal()].getOpposite(), false));
@@ -100,4 +124,20 @@ public class FaceCrossedQuads implements IQuadCollection {
         BL.render(renderer);
         BR.render(renderer);
     }
+
+    public void render(WorldRenderer renderer, Double3 translate) {
+        TR.render(renderer, translate);
+        TL.render(renderer, translate);
+        BL.render(renderer, translate);
+        BR.render(renderer, translate);
+    }
+    
+	@Override
+	public IQuadCollection transform(Rotation rotation) {
+		TR.transform(rotation);
+		TL.transform(rotation);
+		BL.transform(rotation);
+		BR.transform(rotation);
+		return this;
+	}
 }
