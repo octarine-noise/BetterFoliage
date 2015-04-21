@@ -1,6 +1,9 @@
 package mods.betterfoliage.client.render.impl.primitives;
 
+import mods.betterfoliage.client.misc.Double3;
 import mods.betterfoliage.client.render.BlockShadingData;
+import mods.betterfoliage.client.render.IShadingData;
+import mods.betterfoliage.client.render.Rotation;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraftforge.fml.relauncher.Side;
@@ -20,17 +23,29 @@ public interface IQuadCollection {
      * @param shadingData {@link BlockShadingData} of the block these quads are for
      * @return quad collection with brightness applied
      */
-    public IQuadCollection setBrightness(BlockShadingData shadingData);
+    public IQuadCollection setBrightness(IShadingData shadingData);
     
     /** Set the color of all vertices in this collection
      * @param shadingData {@link BlockShadingData} of the block these quads are for
      * @param color color of vertices
      * @return quad collection with color applied
      */
-    public IQuadCollection setColor(BlockShadingData shadingData, Color4 color);
+    public IQuadCollection setColor(IShadingData shadingData, Color4 color);
     
     /** Render these quads with the given renderer
      * @param renderer the renderer
      */
     public void render(WorldRenderer renderer);
+    
+    /** Render these quads with the given renderer and translation
+     * @param renderer the renderer
+     * @param translate translate vertices with this vector
+     */
+    public void render(WorldRenderer renderer, Double3 translate);
+    
+    /** Apply a {@link Rotation} to the quads in this collection
+     * @param rotation
+     * @return
+     */
+    public IQuadCollection transform(Rotation rotation);
 }

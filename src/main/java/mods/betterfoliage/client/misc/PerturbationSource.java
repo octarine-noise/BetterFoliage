@@ -10,28 +10,33 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 /** Source for random perturbation vectors. Uses a pre-filled array[64] of values for performance and consistency reasons. 
  * @author octarine-noise
- *
  */
 @SideOnly(Side.CLIENT)
 public class PerturbationSource {
 
+	/** Number of discrete variations (rotation steps) to calculate. Should be a power of 2. */
+	public static final int STEPS = 64;
+	
+	/** Mask to apply (bitwise AND) to integers to get an array index. */
+	public static final int MASK = 63;
+	
     /** Random vector pool. Unit rotation vectors in the XZ plane, Y coord goes between [-1.0, 1.0].
      * Filled at init time */
-    public Double3[] pRot = new Double3[64];
+    public Double3[] pRot = new Double3[STEPS];
     
     /** Pool of random double values. Filled at init time. */
-    public double[] pRand = new double[64];
+    public double[] pRand = new double[STEPS];
     
     public PerturbationSource() {
-        List<Double3> perturbs = new ArrayList<Double3>(64);
-        for (int idx = 0; idx < 64; idx++) {
-            double angle = (double) idx * Math.PI * 2.0 / 64.0;
+        List<Double3> perturbs = new ArrayList<Double3>(STEPS);
+        for (int idx = 0; idx < STEPS; idx++) {
+            double angle = (double) idx * Math.PI * 2.0 / ((double) STEPS);
             perturbs.add(new Double3(Math.cos(angle), Math.random() * 2.0 - 1.0, Math.sin(angle)));
             pRand[idx] = Math.random();
         }
         Collections.shuffle(perturbs);
         Iterator<Double3> iter = perturbs.iterator();
-        for (int idx = 0; idx < 64; idx++) pRot[idx] = iter.next();
+        for (int idx = 0; idx < STEPS; idx++) pRot[idx] = iter.next();
     }
     
     /** Returns a random vector.<br/>
@@ -43,7 +48,7 @@ public class PerturbationSource {
      * @return random vector
      */
     public Double3 getCylinderXZY(double radius, double halfHeight, int variation) {
-        return pRot[variation & 63].scaleAxes(radius, halfHeight, radius);
+        return pRot[variation & MASK].scaleAxes(radius, halfHeight, radius);
     }
     
     /** Same as {@link PerturbationSource#getCylinderXZY(double, double, int)} with Y amplitude of 0.
@@ -62,6 +67,6 @@ public class PerturbationSource {
      * @return random value
      */
     public double getRange(double min, double max, int variation) {
-        return min + (max - min) * pRand[variation & 63];
+        return min + (max - min) * pRand[variation & MASK];
     }
 }

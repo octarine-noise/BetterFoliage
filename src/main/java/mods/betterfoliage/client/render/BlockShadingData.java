@@ -15,7 +15,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
  * @author octarine-noise
  */
 @SideOnly(Side.CLIENT)
-public class BlockShadingData {
+public class BlockShadingData implements IShadingData {
 
     /** AO data for all faces */
     public BFAmbientOcclusionFace[] aoFaces = new BFAmbientOcclusionFace[6];
@@ -69,15 +69,11 @@ public class BlockShadingData {
         }
     }
     
-    /** Get the brightness value to use for a vertex in a given block corner. The corner is defined by its 3 worldspace directions (eg. TOP-SOUTH-WEST).
-     * Since there are 3 faces meeting in a corner, the primary direction determines which value to use.
-     * @param primary direction of face
-     * @param secondary direction of corner on face
-     * @param tertiary direction of corner on face
-     * @param useMax if true, check the other 2 permutations and return the maximum value
-     * @return brightness of block corner
-     */
-    public int getBrightness(EnumFacing primary, EnumFacing secondary, EnumFacing tertiary, boolean useMax) {
+    /* (non-Javadoc)
+	 * @see mods.betterfoliage.client.render.IShadingData#getBrightness(net.minecraft.util.EnumFacing, net.minecraft.util.EnumFacing, net.minecraft.util.EnumFacing, boolean)
+	 */
+    @Override
+	public int getBrightness(EnumFacing primary, EnumFacing secondary, EnumFacing tertiary, boolean useMax) {
         if (useAO) {
             int pri = aoFaces[primary.ordinal()].vertexBrightness[ vertexIndexToFaces[primary.ordinal()][secondary.ordinal()][tertiary.ordinal()] ];
             if (!useMax) return pri;
@@ -93,19 +89,20 @@ public class BlockShadingData {
         }
     }
     
-    /** Get the color multiplier to use for a vertex in a given block corner. The corner is defined by its 3 worldspace directions (eg. TOP-SOUTH-WEST).
-     * Since there are 3 faces meeting in a corner, the primary direction determines which value to use.
-     * @param primary direction of face
-     * @param secondary direction of corner on face
-     * @param tertiary direction of corner on face
-     * @param useMax if true, check the other 2 permutations and return the maximum value
-     * @return color multiplier of block corner
-     */
-    public float getColorMultiplier(EnumFacing primary, EnumFacing secondary, EnumFacing tertiary, boolean useMax) {
+    /* (non-Javadoc)
+	 * @see mods.betterfoliage.client.render.IShadingData#getColorMultiplier(net.minecraft.util.EnumFacing, net.minecraft.util.EnumFacing, net.minecraft.util.EnumFacing, boolean)
+	 */
+    @Override
+	public float getColorMultiplier(EnumFacing primary, EnumFacing secondary, EnumFacing tertiary, boolean useMax) {
         float pri = aoFaces[primary.ordinal()].vertexColorMultiplier[ vertexIndexToFaces[primary.ordinal()][secondary.ordinal()][tertiary.ordinal()] ];
         if (!useMax) return pri;
         float sec = aoFaces[secondary.ordinal()].vertexColorMultiplier[ vertexIndexToFaces[secondary.ordinal()][primary.ordinal()][tertiary.ordinal()] ];
         float ter = aoFaces[tertiary.ordinal()].vertexColorMultiplier[ vertexIndexToFaces[tertiary.ordinal()][primary.ordinal()][secondary.ordinal()] ];
         return pri > sec && pri > ter ? pri : (sec > ter ? sec : ter);
     }
+
+	@Override
+	public boolean shouldUseAO() {
+		return useAO;
+	}
 }
