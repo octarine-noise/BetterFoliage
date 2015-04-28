@@ -4,11 +4,13 @@ import java.awt.Color;
 
 import org.lwjgl.opengl.GL11;
 
+import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.BetterFoliageClient;
 import mods.betterfoliage.client.misc.Double3;
 import mods.betterfoliage.client.texture.LeafTextures.LeafInfo;
 import mods.betterfoliage.common.config.Config;
 import net.minecraft.block.Block;
+import net.minecraft.client.particle.EffectRenderer;
 import net.minecraft.client.particle.EntityFX;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.IIcon;
@@ -52,9 +54,16 @@ public class EntityFXFallingLeaves extends EntityFX {
 		if (leafInfo != null) {
 			particleIcon = leafInfo.particleIcons.get(rand.nextInt(1024));
 			calculateParticleColor(leafInfo.averageColor, block.colorMultiplier(world, x, y, z));
+		} else if (!BetterFoliageClient.leafTextures.erroredTextures.contains(blockIcon)){
+			BetterFoliageClient.leafTextures.erroredTextures.add(blockIcon);
+			BetterFoliage.log.warn(String.format("Error creating leaf particle: unknown texture %s", blockIcon.getIconName()));
 		}
 	}
 
+	public void addToRenderer(EffectRenderer renderer) {
+		if (particleIcon != null) renderer.addEffect(this);
+	}
+	
 	@Override
 	public void onUpdate() {
 		super.onUpdate();

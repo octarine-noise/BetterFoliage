@@ -1,5 +1,6 @@
 package mods.betterfoliage.client.texture;
 
+import java.util.Collection;
 import java.util.Map;
 
 import mods.betterfoliage.BetterFoliage;
@@ -17,6 +18,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.TextureStitchEvent;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -29,6 +31,8 @@ import cpw.mods.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class LeafTextures {
 
+	public Collection<IIcon> erroredTextures = Sets.newHashSet();
+	
     /** Rendering information for a leaf block 
      * @author octarine-noise
      */
@@ -62,6 +66,7 @@ public class LeafTextures {
 		leafInfoMap.clear();
 		leafTypes.clear();		
 		leafTypes.loadMappings(new ResourceLocation("betterfoliage", "leafTextureMappings.cfg"));
+		erroredTextures.clear();
 	}
 	
     @SubscribeEvent

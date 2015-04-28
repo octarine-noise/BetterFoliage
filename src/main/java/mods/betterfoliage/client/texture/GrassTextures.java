@@ -39,7 +39,12 @@ public class GrassTextures implements IIconRegister {
 	 */
 	public IIcon registerIcon(String resourceLocation) {
 		TextureAtlasSprite original = blockTextures.getTextureExtry(resourceLocation);
-		BetterFoliage.log.debug(String.format("Found grass texture: %s", resourceLocation));
+		if (original != null) {
+			BetterFoliage.log.debug(String.format("Found grass texture: %s", resourceLocation));
+		} else {
+			BetterFoliage.log.warn(String.format("Invalid grass texture: %s", resourceLocation));
+			return null;
+		}
 		
 		// get texture color
 		int avgColor = RenderUtils.calculateTextureColor(original);

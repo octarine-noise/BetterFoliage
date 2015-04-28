@@ -149,7 +149,7 @@ public class BetterFoliageClient {
 	    }
 	    if (Config.leafFXEnabled) {
 	        if (Config.leaves.matchesID(block) && world.isAirBlock(x, y - 1, z) && Math.random() < Config.leafFXChance) {
-	            Minecraft.getMinecraft().effectRenderer.addEffect(new EntityFXFallingLeaves(world, x, y, z));
+	            new EntityFXFallingLeaves(world, x, y, z).addToRenderer(Minecraft.getMinecraft().effectRenderer);
 	            return;
 	        }
 	    }
