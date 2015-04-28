@@ -27,6 +27,7 @@ public class RenderBlockNetherrack extends RenderBlockAOBase implements IRenderB
 	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
 		if (!Config.netherrackEnabled) return false;
 		if (block != Blocks.netherrack) return false;
+		if (getCameraDistance(x, y, z) > Config.netherrackDistance) return false;
 		if (!blockAccess.isAirBlock(x, y - 1, z)) return false;
 		return true;
 	}

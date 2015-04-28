@@ -32,6 +32,7 @@ public class RenderBlockSandWithCoral extends RenderBlockAOBase implements IRend
 	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
 		if (!Config.coralEnabled) return false;
 		if (block != Blocks.sand) return false;
+		if (getCameraDistance(x, y, z) > Config.coralDistance) return false;
 		if (!Config.coralBiomeList.contains(blockAccess.getBiomeGenForCoords(x, z).biomeID)) return false;
 		int terrainVariation = MathHelper.floor_double((noise.func_151605_a(x * 0.1, z * 0.1) + 1.0) * 32.0);
 		return terrainVariation < Config.coralPopulation;

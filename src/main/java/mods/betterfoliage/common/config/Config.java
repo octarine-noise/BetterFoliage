@@ -41,6 +41,7 @@ public class Config {
     
 	// extracted config values
 	public static boolean leavesEnabled;
+	public static int leavesDistance;
 	public static boolean leavesSkew;
 	public static boolean leavesDense;
 	public static double leavesHOffset;
@@ -48,6 +49,7 @@ public class Config {
 	public static double leavesSize;
 	
 	public static boolean grassEnabled;
+	public static int grassDistance;
 	public static boolean grassUseGenerated;
 	public static double grassHOffset;
 	public static double grassHeightMin;
@@ -58,12 +60,15 @@ public class Config {
 	public static boolean grassSnowEnabled;
 	
 	public static boolean cactusEnabled;
+	public static int cactusDistance;
 	
 	public static boolean lilypadEnabled;
+	public static int lilypadDistance;
 	public static double lilypadHOffset;
 	public static int lilypadChance;
 	
 	public static boolean reedEnabled;
+	public static int reedDistance;
 	public static double reedHOffset;
 	public static double reedHeightMin;
 	public static double reedHeightMax;
@@ -71,6 +76,7 @@ public class Config {
 	public static boolean reedShaderWind;
 	
 	public static boolean algaeEnabled;
+	public static int algaeDistance;
 	public static double algaeHOffset;
 	public static double algaeSize;
 	public static double algaeHeightMin;
@@ -78,6 +84,7 @@ public class Config {
 	public static int algaePopulation;
 	
 	public static boolean coralEnabled;
+	public static int coralDistance;
 	public static boolean coralShallowWater;
 	public static int coralPopulation;
 	public static int coralChance;
@@ -110,6 +117,7 @@ public class Config {
 	public static int soulFXTrailDensity;
 	
 	public static boolean netherrackEnabled;
+	public static int netherrackDistance;
     public static double netherrackHOffset;
     public static double netherrackHeightMin;
     public static double netherrackHeightMax;
@@ -119,6 +127,7 @@ public class Config {
 	public static boolean ctxGrassAggressiveEnabled;
 	
 	public static boolean logsEnabled;
+	public static int logsDistance;
 	public static double logsSmallRadius;
 	public static double logsLargeRadius;
 	public static boolean logsConnect;
@@ -140,6 +149,7 @@ public class Config {
 	/** Extract the config properties to static value fields for quick access */
 	public static void updateValues() {
         leavesEnabled = getBoolean(Category.extraLeaves, "enabled", true, "betterfoliage.enabled");
+        leavesDistance = getInt(Category.extraLeaves, "distance", 1000, 1, 1000, "betterfoliage.distance");
         leavesSkew = getBoolean(Category.extraLeaves, "skewMode", false, "betterfoliage.leavesMode");
         leavesHOffset = getDouble(Category.extraLeaves, "hOffset", 0.2, 0.0, 0.4, "betterfoliage.hOffset");
         leavesVOffset = getDouble(Category.extraLeaves, "vOffset", 0.1, 0.0, 0.4, "betterfoliage.vOffset");
@@ -147,6 +157,7 @@ public class Config {
         leavesDense = getBoolean(Category.extraLeaves, "dense", false, "betterfoliage.leaves.dense");
 
         grassEnabled = getBoolean(Category.shortGrass, "enabled", true, "betterfoliage.shortGrass.grassEnabled");
+        grassDistance = getInt(Category.shortGrass, "distance", 1000, 1, 1000, "betterfoliage.distance");
         grassHOffset = getDouble(Category.shortGrass, "hOffset", 0.2, 0.0, 0.4, "betterfoliage.hOffset");
         grassHeightMin = getDouble(Category.shortGrass, "heightMin", 0.6, 0.1, 2.5, "betterfoliage.minHeight");
         grassHeightMax = getDouble(Category.shortGrass, "heightMax", 0.8, 0.1, 2.5, "betterfoliage.maxHeight");
@@ -158,12 +169,15 @@ public class Config {
         grassSnowEnabled = getBoolean(Category.shortGrass, "snowEnabled", true, "betterfoliage.shortGrass.grassSnowEnabled");
         
         cactusEnabled = getBoolean(Category.cactus, "enabled", true, "betterfoliage.enabled");
+        cactusDistance = getInt(Category.cactus, "distance", 1000, 1, 1000, "betterfoliage.distance");
 
         lilypadEnabled = getBoolean(Category.lilypad, "enabled", true, "betterfoliage.enabled");
+        lilypadDistance = getInt(Category.lilypad, "distance", 1000, 1, 1000, "betterfoliage.distance");
         lilypadHOffset = getDouble(Category.lilypad, "hOffset", 0.1, 0.0, 0.25, "betterfoliage.hOffset");
         lilypadChance = getInt(Category.lilypad, "flowerChance", 16, 0, 64, "betterfoliage.lilypad.flowerChance");
 
         reedEnabled = getBoolean(Category.reed, "enabled", true, "betterfoliage.enabled");
+        reedDistance = getInt(Category.reed, "distance", 1000, 1, 1000, "betterfoliage.distance");
         reedHOffset = getDouble(Category.reed, "hOffset", 0.2, 0.0, 0.4, "betterfoliage.hOffset");
         reedHeightMin = getDouble(Category.reed, "heightMin", 2.0, 1.5, 3.5, "betterfoliage.minHeight");
         reedHeightMax = getDouble(Category.reed, "heightMax", 2.5, 1.5, 3.5, "betterfoliage.maxHeight");
@@ -173,6 +187,7 @@ public class Config {
         reedShaderWind = getBoolean(Category.reed, "shaderWind", true, "betterfoliage.shaderWind");
         
         algaeEnabled = getBoolean(Category.algae, "enabled", true, "betterfoliage.enabled");
+        algaeDistance = getInt(Category.algae, "distance", 1000, 1, 1000, "betterfoliage.distance");
         algaeHOffset = getDouble(Category.algae, "hOffset", 0.1, 0.0, 0.25, "betterfoliage.hOffset");
         algaeSize = getDouble(Category.algae, "size", 1.0, 0.5, 1.5, "betterfoliage.size");
         algaeHeightMin = getDouble(Category.algae, "heightMin", 0.5, 0.1, 1.5, "betterfoliage.minHeight");
@@ -182,6 +197,7 @@ public class Config {
         algaeBiomeList = getIntList(Category.algae, "algaeBiomeList", algaeBiomeList, "betterfoliage.algae.biomeList");
         
         coralEnabled = getBoolean(Category.coral, "enabled", true, "betterfoliage.enabled");
+        coralDistance = getInt(Category.coral, "distance", 1000, 1, 1000, "betterfoliage.distance");
         coralShallowWater = getBoolean(Category.coral, "shallowWater", false, "betterfoliage.coral.shallowWater");
         coralHOffset = getDouble(Category.coral, "hOffset", 0.2, 0.0, 0.4, "betterfoliage.hOffset");
         coralVOffset = getDouble(Category.coral, "vOffset", 0.1, 0.0, 0.4, "betterfoliage.vOffset");
@@ -215,6 +231,7 @@ public class Config {
         soulFXTrailDensity = getInt(Category.risingSoul, "trailDensity", 3, 1, 16, "betterfoliage.risingSoul.trailDensity");
         
         netherrackEnabled = getBoolean(Category.netherrack, "enabled", true, "betterfoliage.enabled");
+        netherrackDistance = getInt(Category.netherrack, "distance", 1000, 1, 1000, "betterfoliage.distance");
         netherrackHOffset = getDouble(Category.netherrack, "hOffset", 0.2, 0.0, 0.4, "betterfoliage.hOffset");
         netherrackHeightMin = getDouble(Category.netherrack, "heightMin", 0.6, 0.1, 1.5, "betterfoliage.minHeight");
         netherrackHeightMax = getDouble(Category.netherrack, "heightMax", 0.8, 0.1, 1.5, "betterfoliage.maxHeight");
@@ -225,6 +242,7 @@ public class Config {
         ctxGrassAggressiveEnabled= getBoolean(Category.connectedGrass, "aggressive", true, "betterfoliage.connectedGrass.aggressive");
 		
         logsEnabled = getBoolean(Category.roundLogs, "enabled", true, "betterfoliage.enabled");
+        logsDistance = getInt(Category.roundLogs, "distance", 1000, 1, 1000, "betterfoliage.distance");
         logsSmallRadius = getDouble(Category.roundLogs, "smallRadius", 0.25, 0.0, 0.5, "betterfoliage.roundLogs.smallRadius");
         logsLargeRadius = getDouble(Category.roundLogs, "largeRadius", 0.45, 0.0, 0.5, "betterfoliage.roundLogs.largeRadius");
         logsConnect = getBoolean(Category.roundLogs, "connect", true, "betterfoliage.roundLogs.connect");
@@ -244,17 +262,17 @@ public class Config {
         
 		for (Category category : Category.values()) rawConfig.setCategoryLanguageKey(category.toString(), String.format("betterfoliage.%s", category.toString()));
 		
-		setOrder(Category.extraLeaves, "enabled", "dense", "skewMode", "hOffset", "vOffset", "size");
-		setOrder(Category.shortGrass, "enabled", "myceliumEnabled", "snowEnabled", "useGenerated", "hOffset", "heightMin", "heightMax", "size", "shaderWind");
-		setOrder(Category.lilypad, "enabled", "hOffset", "flowerChance");
-		setOrder(Category.reed, "enabled", "hOffset", "heightMin", "heightMax", "population", "biomeList", "shaderWind");
-		setOrder(Category.algae, "enabled", "hOffset", "heightMin", "heightMax", "size", "population", "biomeList");
-		setOrder(Category.coral, "enabled", "shallowWater", "hOffset", "vOffset", "size", "crustSize", "population", "chance", "biomeList");
-		setOrder(Category.netherrack, "enabled", "hOffset", "heightMin", "heightMax", "size");
+		setOrder(Category.extraLeaves, "enabled", "distance", "dense", "skewMode", "hOffset", "vOffset", "size");
+		setOrder(Category.shortGrass, "enabled", "distance", "myceliumEnabled", "snowEnabled", "useGenerated", "hOffset", "heightMin", "heightMax", "size", "shaderWind");
+		setOrder(Category.lilypad, "enabled", "distance", "hOffset", "flowerChance");
+		setOrder(Category.reed, "enabled", "distance", "hOffset", "heightMin", "heightMax", "population", "biomeList", "shaderWind");
+		setOrder(Category.algae, "enabled", "distance", "hOffset", "heightMin", "heightMax", "size", "population", "biomeList");
+		setOrder(Category.coral, "enabled", "distance", "shallowWater", "hOffset", "vOffset", "size", "crustSize", "population", "chance", "biomeList");
+		setOrder(Category.netherrack, "enabled", "distance", "hOffset", "heightMin", "heightMax", "size");
 		setOrder(Category.fallingLeaves, "enabled", "chance", "size", "lifetime", "speed", "windStrength", "stormStrength", "perturb", "opacityHack");
 		setOrder(Category.risingSoul, "enabled", "chance", "speed", "perturb", "headSize", "trailSize", "sizeDecay", "opacity", "opacityDecay", "lifetime", "trailLength", "trailDensity");
 		setOrder(Category.connectedGrass, "classic", "aggressive");
-		setOrder(Category.roundLogs, "enabled", "connect", "connectGrass", "smallRadius", "largeRadius");
+		setOrder(Category.roundLogs, "enabled", "distance", "connect", "connectGrass", "smallRadius", "largeRadius");
 	}
 	
 	public static void getDefaultBiomes() {

@@ -13,6 +13,7 @@ import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
@@ -620,5 +621,11 @@ public class RenderBlockAOBase extends RenderBlocks {
         }
     }
 	
-	
+	protected int getCameraDistance(int x, int y, int z) {
+		EntityLivingBase camera = Minecraft.getMinecraft().renderViewEntity;
+		int result = Math.abs(x - MathHelper.floor_double(camera.posX));
+		result += Math.abs(y - MathHelper.floor_double(camera.posY));
+		result += Math.abs(z - MathHelper.floor_double(camera.posZ));
+		return result;
+	}
 }

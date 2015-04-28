@@ -36,7 +36,7 @@ public class RenderBlockCactus extends RenderBlockAOBase implements IRenderBlock
 	}
 	
 	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
-		return Config.cactusEnabled && block == Blocks.cactus;
+		return Config.cactusEnabled && block == Blocks.cactus && getCameraDistance(x, y, z) <= Config.cactusDistance;
 	}
 	
 	public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer) {

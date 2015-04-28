@@ -40,7 +40,7 @@ public class RenderBlockGrass extends RenderBlockAOBase implements IRenderBlockD
 	
 	
 	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
-		return Config.grass.matchesID(block);
+		return Config.grass.matchesID(block) && getCameraDistance(x, y, z) <= Config.grassDistance;
 	}
 	
 	public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer) {

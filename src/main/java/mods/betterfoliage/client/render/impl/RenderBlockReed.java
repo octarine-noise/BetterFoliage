@@ -33,6 +33,7 @@ public class RenderBlockReed extends RenderBlockAOBase implements IRenderBlockDe
 	
 	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
 		if (!Config.reedEnabled) return false;
+		if (getCameraDistance(x, y, z) > Config.reedDistance) return false;
 		if (!(Config.dirt.matchesID(block))) return false;
 		if (!Config.reedBiomeList.contains(blockAccess.getBiomeGenForCoords(x, z).biomeID)) return false;
 		if (blockAccess.getBlock(x, y + 1, z).getMaterial() != Material.water) return false;

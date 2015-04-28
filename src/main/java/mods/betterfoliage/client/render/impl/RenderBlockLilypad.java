@@ -28,7 +28,7 @@ public class RenderBlockLilypad extends RenderBlockAOBase implements IRenderBloc
 	}
 	
 	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
-		return Config.lilypadEnabled && block == Blocks.waterlily;
+		return Config.lilypadEnabled && block == Blocks.waterlily && getCameraDistance(x, y, z) <= Config.lilypadDistance;
 	}
 	
 	public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer) {

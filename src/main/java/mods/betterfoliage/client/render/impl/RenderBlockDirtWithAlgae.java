@@ -31,6 +31,7 @@ public class RenderBlockDirtWithAlgae extends RenderBlockAOBase implements IRend
 	
 	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
 		if (!Config.algaeEnabled) return false;
+		if (getCameraDistance(x, y, z) > Config.algaeDistance) return false;
 		if (!Config.dirt.matchesID(block)) return false;
 		if (!Config.algaeBiomeList.contains(blockAccess.getBiomeGenForCoords(x, z).biomeID)) return false;
 		if (blockAccess.getBlock(x, y + 1, z).getMaterial() != Material.water) return false;

@@ -30,6 +30,7 @@ public class RenderBlockLeaves extends RenderBlockAOBase implements IRenderBlock
 	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
 		if (!Config.leavesEnabled) return false;
 		if (original > 0 && original < 42) return false;
+		if (getCameraDistance(x, y, z) > Config.leavesDistance) return false;
 		return Config.leaves.matchesID(block) && !isBlockSurrounded(blockAccess, x, y, z);
 	}
 	

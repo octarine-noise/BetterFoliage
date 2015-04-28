@@ -24,7 +24,7 @@ public class RenderBlockLogs extends RenderBlockAOBase implements IRenderBlockDe
     }
     
 	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
-		return Config.logsEnabled && Config.logs.matchesID(block);
+		return Config.logsEnabled && Config.logs.matchesID(block) && getCameraDistance(x, y, z) <= Config.logsDistance;
 	}
 	
 	public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer) {

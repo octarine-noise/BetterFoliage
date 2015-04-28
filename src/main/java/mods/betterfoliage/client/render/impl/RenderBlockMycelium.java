@@ -27,6 +27,7 @@ public class RenderBlockMycelium extends RenderBlockAOBase implements IRenderBlo
 	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
 		if (!Config.myceliumEnabled) return false;
 		if (block != Blocks.mycelium) return false;
+		if (getCameraDistance(x, y, z) > Config.grassDistance) return false;
 		if (!blockAccess.isAirBlock(x, y + 1, z)) return false;
 		return true;
 	}
