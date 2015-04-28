@@ -12,6 +12,7 @@ import mods.betterfoliage.client.util.RenderUtils;
 import mods.betterfoliage.common.config.Config;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.IIcon;
@@ -29,6 +30,7 @@ public class RenderBlockGrass extends RenderBlockAOBase implements IRenderBlockD
     
 	public IconSet grassIcons = new IconSet("bettergrassandleaves", "better_grass_long_%d");
 	public IconSet snowGrassIcons = new IconSet("bettergrassandleaves", "better_grass_snowed_%d");
+	public IconSet hangingGrassIcons = new IconSet("bettergrassandleaves", "better_grass_side_%d");
 	public IIcon grassGenIcon;
 	public IIcon snowGrassGenIcon;
 	
@@ -40,7 +42,7 @@ public class RenderBlockGrass extends RenderBlockAOBase implements IRenderBlockD
 	
 	
 	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
-		return Config.grass.matchesID(block) && getCameraDistance(x, y, z) <= Config.grassDistance;
+		return Config.grass.matchesID(block);
 	}
 	
 	public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer) {
@@ -62,12 +64,28 @@ public class RenderBlockGrass extends RenderBlockAOBase implements IRenderBlockD
 		boolean useTextureColor = (avgColor != null);
 		
 		renderWorldBlockBase(2, world, x, y, z, block, modelId, renderer);
-		if (!Config.grassEnabled) return true;
-		if (isSnowTop && !Config.grassSnowEnabled) return true;
 		
 		boolean isAirTop = blockAccess.isAirBlock(x, y + 1, z);
+		int distance = getCameraDistance(x, y, z);
 		
-		if (isSnowTop || isAirTop) {
+		if (Config.hangingGrassEnabled && distance <= Config.hangingGrassDistance) {
+			// render hanging grass
+			Double3 blockCenter = new Double3(x + 0.5, y + 0.5, z + 0.5);
+			int iconVariation = getSemiRandomFromPos(x, y, z, 2);
+			
+			Tessellator.instance.setBrightness(getBrightness(block, x, y + 1, z));
+			if (isSnowTop)
+				Tessellator.instance.setColorOpaque(230, 230, 230);
+			else
+				Tessellator.instance.setColorOpaque_I(useTextureColor ? avgColor : blockColor);
+			
+			if (!blockAccess.getBlock(x + 1, y, z).isOpaqueCube()) renderHangingGrass(blockCenter, ForgeDirection.EAST, Config.hangingGrassSize, Config.hangingGrassSeparation, hangingGrassIcons.get(iconVariation));
+			if (!blockAccess.getBlock(x - 1, y, z).isOpaqueCube()) renderHangingGrass(blockCenter, ForgeDirection.WEST, Config.hangingGrassSize, Config.hangingGrassSeparation, hangingGrassIcons.get(iconVariation));
+			if (!blockAccess.getBlock(x, y, z + 1).isOpaqueCube()) renderHangingGrass(blockCenter, ForgeDirection.SOUTH, Config.hangingGrassSize, Config.hangingGrassSeparation, hangingGrassIcons.get(iconVariation));
+			if (!blockAccess.getBlock(x, y, z - 1).isOpaqueCube()) renderHangingGrass(blockCenter, ForgeDirection.NORTH, Config.hangingGrassSize, Config.hangingGrassSeparation, hangingGrassIcons.get(iconVariation));
+		}
+		
+		if (Config.grassEnabled && distance <= Config.grassDistance && (isAirTop || (isSnowTop && Config.grassSnowEnabled))) {
 			// render short grass
 			int iconVariation = getSemiRandomFromPos(x, y, z, 0);
 			int heightVariation = getSemiRandomFromPos(x, y, z, 1);
@@ -94,9 +112,28 @@ public class RenderBlockGrass extends RenderBlockAOBase implements IRenderBlockD
 			Tessellator.instance.setBrightness(getBrightness(block, x, y + 1, z));
 			renderCrossedSideQuads(new Double3(x + 0.5, y + 1.0 + (isSnowTop ? 0.0625 : 0.0), z + 0.5), ForgeDirection.UP, scale, halfHeight, pRot[iconVariation], Config.grassHOffset, shortGrassIcon, 0, false);
 		}
+		
 		return true;
 	}
 
+	protected void renderHangingGrass(Double3 blockCenter, ForgeDirection face, double length, double separation, IIcon icon) {
+		Double3 edgeCenter = blockCenter.add(new Double3(face).scale(0.5)).add(0.0, 0.5, 0.0);
+		Double3 edge = new Double3(faceDir1[face.ordinal()]).scale(0.5);
+		Double3 extrude = new Double3(face).scale(separation).add(0.0, -length, 0.0);
+		
+		ShadingValues shP = null;
+		ShadingValues shN = null;
+		if (Minecraft.isAmbientOcclusionEnabled() && !noShading) {
+			shP = getAoLookup(ForgeDirection.UP, face, faceDir1[face.ordinal()]);
+			shN = getAoLookup(ForgeDirection.UP, face, faceDir1[face.getOpposite().ordinal()]);
+		}
+		
+		Double3 vert1 = edgeCenter.add(edge);
+		Double3 vert2 = edgeCenter.sub(edge);
+		renderQuad(icon, vert1, vert2, vert2.add(extrude), vert1.add(extrude), uValues, vValues, shP, shN, shN, shP);
+//		renderQuadWithShading(icon, edgeCenter.add(extrude.scale(0.5)), edge.inverse(), extrude.scale(0.5), 2, faceAOPP, faceAONP, faceAONP, faceAOPP);
+	}
+	
 	protected void checkConnectedGrass(int x, int y, int z) {
 	    if (isSnowTop) {
 	        connectXP = false;
@@ -182,10 +219,12 @@ public class RenderBlockGrass extends RenderBlockAOBase implements IRenderBlockD
 		
 		grassIcons.registerIcons(event.map);
 		snowGrassIcons.registerIcons(event.map);
+		hangingGrassIcons.registerIcons(event.map);
 		grassGenIcon = event.map.registerIcon("bf_shortgrass:minecraft:tallgrass");
 		snowGrassGenIcon = event.map.registerIcon("bf_shortgrass_snow:minecraft:tallgrass");
 		BetterFoliage.log.info(String.format("Found %d short grass textures", grassIcons.numLoaded));
 		BetterFoliage.log.info(String.format("Found %d snowy grass textures", snowGrassIcons.numLoaded));
+		BetterFoliage.log.info(String.format("Found %d hanging grass textures", hangingGrassIcons.numLoaded));
 	}
 
 }

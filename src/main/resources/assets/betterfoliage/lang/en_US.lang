@@ -66,6 +66,12 @@ betterfoliage.shortGrass.grassEnabled.tooltip=Is this feature enabled for grass 
 betterfoliage.shortGrass.grassSnowEnabled=Enable under snow
 betterfoliage.shortGrass.grassSnowEnabled.tooltip=Enable on snowed grass blocks?
 
+betterfoliage.hangingGrass=Hanging Grass
+betterfoliage.hangingGrass.tooltip=Grass tufts hanging down from the top edges of grass blocks
+
+betterfoliage.hangingGrass.separation=Separation
+betterfoliage.hangingGrass.separation.tooltip=How much the hanging grass stands out from the block
+
 betterfoliage.cactus=Better Cactus
 betterfoliage.cactus.tooltip=Enhance cactus with extra bits and smooth shading
 

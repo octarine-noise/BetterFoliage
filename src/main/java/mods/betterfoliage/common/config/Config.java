@@ -26,7 +26,7 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 public class Config {
 
 	public enum Category {
-	    blockTypes, extraLeaves, shortGrass, cactus, lilypad, reed, algae, coral, netherrack, fallingLeaves, risingSoul, connectedGrass, roundLogs;
+	    blockTypes, extraLeaves, shortGrass, hangingGrass, cactus, lilypad, reed, algae, coral, netherrack, fallingLeaves, risingSoul, connectedGrass, roundLogs;
 	}
 	
 	/** {@link Configuration} object bound to the config file */
@@ -58,6 +58,11 @@ public class Config {
 	public static boolean grassShaderWind;
 	public static boolean myceliumEnabled;
 	public static boolean grassSnowEnabled;
+	
+	public static boolean hangingGrassEnabled;
+	public static int hangingGrassDistance;
+	public static double hangingGrassSize;
+	public static double hangingGrassSeparation;
 	
 	public static boolean cactusEnabled;
 	public static int cactusDistance;
@@ -168,6 +173,11 @@ public class Config {
         myceliumEnabled = getBoolean(Category.shortGrass, "myceliumEnabled", true, "betterfoliage.shortGrass.myceliumEnabled");
         grassSnowEnabled = getBoolean(Category.shortGrass, "snowEnabled", true, "betterfoliage.shortGrass.grassSnowEnabled");
         
+        hangingGrassEnabled = getBoolean(Category.hangingGrass, "enabled", false, "betterfoliage.enabled");
+        hangingGrassDistance = getInt(Category.hangingGrass, "distance", 1000, 1, 1000, "betterfoliage.distance");
+        hangingGrassSize = getDouble(Category.hangingGrass, "size", 0.75, 0.25, 1.5, "betterfoliage.size");
+        hangingGrassSeparation = getDouble(Category.hangingGrass, "separation", 0.25, 0.0, 0.5, "betterfoliage.hangingGrass.separation");
+        
         cactusEnabled = getBoolean(Category.cactus, "enabled", true, "betterfoliage.enabled");
         cactusDistance = getInt(Category.cactus, "distance", 1000, 1, 1000, "betterfoliage.distance");
 
@@ -241,7 +251,7 @@ public class Config {
         ctxGrassClassicEnabled = getBoolean(Category.connectedGrass, "classic", true, "betterfoliage.connectedGrass.classic");
         ctxGrassAggressiveEnabled= getBoolean(Category.connectedGrass, "aggressive", true, "betterfoliage.connectedGrass.aggressive");
 		
-        logsEnabled = getBoolean(Category.roundLogs, "enabled", true, "betterfoliage.enabled");
+        logsEnabled = getBoolean(Category.roundLogs, "enabled", false, "betterfoliage.enabled");
         logsDistance = getInt(Category.roundLogs, "distance", 1000, 1, 1000, "betterfoliage.distance");
         logsSmallRadius = getDouble(Category.roundLogs, "smallRadius", 0.25, 0.0, 0.5, "betterfoliage.roundLogs.smallRadius");
         logsLargeRadius = getDouble(Category.roundLogs, "largeRadius", 0.45, 0.0, 0.5, "betterfoliage.roundLogs.largeRadius");
@@ -264,6 +274,7 @@ public class Config {
 		
 		setOrder(Category.extraLeaves, "enabled", "distance", "dense", "skewMode", "hOffset", "vOffset", "size");
 		setOrder(Category.shortGrass, "enabled", "distance", "myceliumEnabled", "snowEnabled", "useGenerated", "hOffset", "heightMin", "heightMax", "size", "shaderWind");
+		setOrder(Category.hangingGrass, "enabled", "distance", "size", "separation");
 		setOrder(Category.lilypad, "enabled", "distance", "hOffset", "flowerChance");
 		setOrder(Category.reed, "enabled", "distance", "hOffset", "heightMin", "heightMax", "population", "biomeList", "shaderWind");
 		setOrder(Category.algae, "enabled", "distance", "hOffset", "heightMin", "heightMax", "size", "population", "biomeList");
