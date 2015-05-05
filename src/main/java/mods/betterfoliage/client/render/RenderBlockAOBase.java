@@ -623,6 +623,7 @@ public class RenderBlockAOBase extends RenderBlocks {
 	
 	protected int getCameraDistance(int x, int y, int z) {
 		EntityLivingBase camera = Minecraft.getMinecraft().renderViewEntity;
+		if (camera == null) return 0;
 		int result = Math.abs(x - MathHelper.floor_double(camera.posX));
 		result += Math.abs(y - MathHelper.floor_double(camera.posY));
 		result += Math.abs(z - MathHelper.floor_double(camera.posZ));
