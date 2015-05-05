@@ -39,7 +39,7 @@ public class GrassTextures implements IIconRegister {
 	 */
 	public IIcon registerIcon(String resourceLocation) {
 		TextureAtlasSprite original = blockTextures.getTextureExtry(resourceLocation);
-		if (original != null) {
+		if (original != null && !resourceLocation.startsWith("MISSING_ICON_BLOCK_")) {
 			BetterFoliage.log.debug(String.format("Found grass texture: %s", resourceLocation));
 		} else {
 			BetterFoliage.log.warn(String.format("Invalid grass texture: %s", resourceLocation));
