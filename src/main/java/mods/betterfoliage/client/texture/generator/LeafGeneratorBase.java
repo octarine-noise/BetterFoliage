@@ -55,15 +55,15 @@ public abstract class LeafGeneratorBase extends BlockTextureGenerator {
 		ResourceLocation originalNoDirs = unwrapResource(resourceLocation);
 		ResourceLocation originalWithDirs = new ResourceLocation(originalNoDirs.getResourceDomain(), "textures/" + originalNoDirs.getResourcePath());
 		
-		// use animation metadata as-is
-		if (resourceLocation.getResourcePath().toLowerCase().endsWith(".mcmeta")) return resourceManager.getResource(originalWithDirs);
-		
 		// check for provided texture
 		ResourceLocation handDrawnLocation = new ResourceLocation(nonGeneratedDomain, String.format(handDrawnLocationFormat, originalNoDirs.getResourceDomain(), originalNoDirs.getResourcePath().substring(7))); 
 		if (ResourceUtils.resourceExists(handDrawnLocation)) {
 			drawnCounter++;
 			return resourceManager.getResource(handDrawnLocation);
 		}
+		
+		// use animation metadata as-is
+		if (resourceLocation.getResourcePath().toLowerCase().endsWith(".mcmeta")) return resourceManager.getResource(originalWithDirs);
 		
 		// generate our own
 		if (!ResourceUtils.resourceExists(originalWithDirs)) return getMissingResource();
