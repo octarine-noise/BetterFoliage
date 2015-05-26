@@ -56,6 +56,7 @@ public class Config {
 	public static boolean grassShaderWind;
 	public static boolean myceliumEnabled;
 	public static boolean grassSnowEnabled;
+	public static double grassSaturationThreshold;
 	
 	public static boolean cactusEnabled;
 	
@@ -158,6 +159,7 @@ public class Config {
         grassShaderWind = getBoolean(Category.shortGrass, "shaderWind", true, "betterfoliage.shaderWind");
         myceliumEnabled = getBoolean(Category.shortGrass, "myceliumEnabled", true, "betterfoliage.shortGrass.myceliumEnabled");
         grassSnowEnabled = getBoolean(Category.shortGrass, "snowEnabled", true, "betterfoliage.shortGrass.grassSnowEnabled");
+        grassSaturationThreshold = getDouble(Category.shortGrass, "saturationThreshold", 0.1, 0.0, 1.0, "betterfoliage.shortGrass.grassSaturationThreshold");
         
         cactusEnabled = getBoolean(Category.cactus, "enabled", true, "betterfoliage.enabled");
 
@@ -247,7 +249,7 @@ public class Config {
 		for (Category category : Category.values()) rawConfig.setCategoryLanguageKey(category.toString(), String.format("betterfoliage.%s", category.toString()));
 		
 		setOrder(Category.extraLeaves, "enabled", "dense", "skewMode", "hOffset", "vOffset", "size");
-		setOrder(Category.shortGrass, "enabled", "myceliumEnabled", "snowEnabled", "useGenerated", "hOffset", "heightMin", "heightMax", "size", "shaderWind");
+		setOrder(Category.shortGrass, "enabled", "myceliumEnabled", "snowEnabled", "useGenerated", "hOffset", "heightMin", "heightMax", "size", "shaderWind", "saturationThreshold");
 		setOrder(Category.lilypad, "enabled", "hOffset", "flowerChance");
 		setOrder(Category.reed, "enabled", "hOffset", "heightMin", "heightMax", "population", "biomeList", "shaderWind");
 		setOrder(Category.algae, "enabled", "hOffset", "heightMin", "heightMax", "size", "population", "biomeList");
@@ -352,6 +354,7 @@ public class Config {
 	    if (event.modID.equals(BetterFoliage.MOD_ID)) {
 	        updateValues();
 	        boolean blocksUpdated = rawConfig.getCategory(Category.blockTypes.toString()).hasChanged();
+	        blocksUpdated |= rawConfig.getCategory(Category.shortGrass.toString()).get("saturationThreshold").hasChanged();
 	        if (rawConfig.hasChanged()) rawConfig.save();
 	        
 	        if (blocksUpdated)

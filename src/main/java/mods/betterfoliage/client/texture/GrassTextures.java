@@ -102,7 +102,7 @@ public class GrassTextures {
             TextureAtlasSprite baseGrassTexture = blockTextures.getTextureExtry(baseTextureLocation.toString());
             Color4 averageColor = ResourceUtils.calculateTextureColor(baseGrassTexture);
             entry.getValue().averageColor = averageColor.withHSVBrightness(1.0f);
-            entry.getValue().useTextureColor = averageColor.getSaturation() > 0.1;
+            entry.getValue().useTextureColor = averageColor.getSaturation() > Config.grassSaturationThreshold;
         }
     }
     
