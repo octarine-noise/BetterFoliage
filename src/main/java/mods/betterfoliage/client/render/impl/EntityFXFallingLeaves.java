@@ -54,7 +54,7 @@ public class EntityFXFallingLeaves extends EntityFX {
 		if (leafInfo != null) {
 			particleIcon = leafInfo.particleIcons.get(rand.nextInt(1024));
 			calculateParticleColor(leafInfo.averageColor, block.colorMultiplier(world, x, y, z));
-		} else if (!BetterFoliageClient.leafTextures.erroredTextures.contains(blockIcon)){
+		} else if (blockIcon != null && !BetterFoliageClient.leafTextures.erroredTextures.contains(blockIcon)){
 			BetterFoliageClient.leafTextures.erroredTextures.add(blockIcon);
 			BetterFoliage.log.warn(String.format("Error creating leaf particle: unknown texture %s", blockIcon.getIconName()));
 		}
