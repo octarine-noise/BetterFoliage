@@ -65,15 +65,15 @@ public abstract class LeafGeneratorBase extends BlockTextureGenerator {
 		IResourceManager resourceManager = Minecraft.getMinecraft().getResourceManager();
 		ResourceLocation originalResource = ResourceUtils.unwrapResource(resourceLocation);
 		
-		// use animation metadata as-is
-		if (resourceLocation.getResourcePath().toLowerCase().endsWith(".mcmeta")) return resourceManager.getResource(originalResource);
-		
 		// check for provided texture
 		ResourceLocation customLocation = getCustomLocation(originalResource);
 		if (ResourceUtils.resourceExists(customLocation)) {
 			drawnCounter++;
 			return resourceManager.getResource(customLocation);
 		}
+		
+		// use animation metadata as-is
+		if (resourceLocation.getResourcePath().toLowerCase().endsWith(".mcmeta")) return resourceManager.getResource(originalResource);
 		
 		// generate our own
 		if (!ResourceUtils.resourceExists(originalResource)) {
