@@ -65,6 +65,8 @@ betterfoliage.shortGrass.grassEnabled=Enable Grass
 betterfoliage.shortGrass.grassEnabled.tooltip=Is this feature enabled for grass blocks?
 betterfoliage.shortGrass.grassSnowEnabled=Enable under snow
 betterfoliage.shortGrass.grassSnowEnabled.tooltip=Enable on snowed grass blocks?
+betterfoliage.shortGrass.grassSaturationThreshold=Saturation threshold
+betterfoliage.shortGrass.grassSaturationThreshold.tooltip=Color saturation cutoff between "colorless" blocks (using biome color) and "colorful" blocks (using their own specific color)
 
 betterfoliage.hangingGrass=Hanging Grass
 betterfoliage.hangingGrass.tooltip=Grass tufts hanging down from the top edges of grass blocks

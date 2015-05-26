@@ -49,7 +49,7 @@ public class GrassTextures implements IIconRegister {
 		// get texture color
 		int avgColor = RenderUtils.calculateTextureColor(original);
 		float[] hsbVals = Color.RGBtoHSB((avgColor >> 16) & 0xFF, (avgColor >> 8) & 0xFF, avgColor & 0xFF, null);
-		if (hsbVals[1] > 0.1) {
+		if (hsbVals[1] > Config.grassSaturationThreshold) {
 			// non-grey texture
 			hsbVals[2] = 1.0f;
 			iconColors.put(original, Color.HSBtoRGB(hsbVals[0], hsbVals[1], hsbVals[2]));

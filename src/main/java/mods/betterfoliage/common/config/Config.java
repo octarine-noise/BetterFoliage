@@ -58,6 +58,7 @@ public class Config {
 	public static boolean grassShaderWind;
 	public static boolean myceliumEnabled;
 	public static boolean grassSnowEnabled;
+	public static double grassSaturationThreshold;
 	
 	public static boolean hangingGrassEnabled;
 	public static int hangingGrassDistance;
@@ -172,6 +173,7 @@ public class Config {
         grassShaderWind = getBoolean(Category.shortGrass, "shaderWind", true, "betterfoliage.shaderWind");
         myceliumEnabled = getBoolean(Category.shortGrass, "myceliumEnabled", true, "betterfoliage.shortGrass.myceliumEnabled");
         grassSnowEnabled = getBoolean(Category.shortGrass, "snowEnabled", true, "betterfoliage.shortGrass.grassSnowEnabled");
+        grassSaturationThreshold = getDouble(Category.shortGrass, "saturationThreshold", 0.1, 0.0, 1.0, "betterfoliage.shortGrass.grassSaturationThreshold");
         
         hangingGrassEnabled = getBoolean(Category.hangingGrass, "enabled", false, "betterfoliage.enabled");
         hangingGrassDistance = getInt(Category.hangingGrass, "distance", 1000, 1, 1000, "betterfoliage.distance");
@@ -273,7 +275,7 @@ public class Config {
 		for (Category category : Category.values()) rawConfig.setCategoryLanguageKey(category.toString(), String.format("betterfoliage.%s", category.toString()));
 		
 		setOrder(Category.extraLeaves, "enabled", "distance", "dense", "skewMode", "hOffset", "vOffset", "size");
-		setOrder(Category.shortGrass, "enabled", "distance", "myceliumEnabled", "snowEnabled", "useGenerated", "hOffset", "heightMin", "heightMax", "size", "shaderWind");
+		setOrder(Category.shortGrass, "enabled", "distance", "myceliumEnabled", "snowEnabled", "useGenerated", "hOffset", "heightMin", "heightMax", "size", "shaderWind", "saturationThreshold");
 		setOrder(Category.hangingGrass, "enabled", "distance", "size", "separation");
 		setOrder(Category.lilypad, "enabled", "distance", "hOffset", "flowerChance");
 		setOrder(Category.reed, "enabled", "distance", "hOffset", "heightMin", "heightMax", "population", "biomeList", "shaderWind");
@@ -375,6 +377,7 @@ public class Config {
 	    if (event.modID.equals(BetterFoliage.MOD_ID)) {
 	        updateValues();
 	        boolean blocksUpdated = rawConfig.getCategory(Category.blockTypes.toString()).hasChanged();
+	        blocksUpdated |= rawConfig.getCategory(Category.shortGrass.toString()).get("saturationThreshold").hasChanged();
 	        if (rawConfig.hasChanged()) rawConfig.save();
 	        
 	        if (blocksUpdated)
