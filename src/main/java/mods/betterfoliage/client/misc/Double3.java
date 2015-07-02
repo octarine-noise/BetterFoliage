@@ -46,4 +46,9 @@ public class Double3 {
 	public Double3 inverse() {
 		return new Double3(-x, -y, -z);
 	}
+	
+	@Override
+	public String toString() {
+		return String.format("(%.2f, %.2f, %.2f)", x, y, z);
+	}
 }

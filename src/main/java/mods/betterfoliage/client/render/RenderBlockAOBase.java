@@ -43,13 +43,20 @@ public class RenderBlockAOBase extends RenderBlocks {
 		public float red;
 		public float green;
 		public float blue;
+		
 		public void setGray(float value) {
 			red = value; green = value; blue = value;
 		}
+		
 		public void setColor(int value) {
 			red = ((value >> 16) & 0xFF) / 256.0f;
 			green = ((value >> 8) & 0xFF) / 256.0f;
 			blue = (value & 0xFF) / 256.0f;
+		}
+		
+		@Override
+		public String toString() {
+			return String.format("Br(%d, %d, %d), Col(%.2f, %.2f, %.2f)", (brightness >> 16) & 0xFF, (brightness >> 8) & 0xFF, (brightness & 0xFF), red, green, blue);
 		}
 	}
 	
@@ -207,7 +214,7 @@ public class RenderBlockAOBase extends RenderBlocks {
 		setAOPassCounters(pass);
 		setRenderBoundsFromBlock(block);
 		ISimpleBlockRenderingHandler handler = RenderUtils.getRenderingHandler(block.getRenderType());
-		if (handler != null) {
+		if (handler != null && block.getRenderType() != 0) {
 			handler.renderWorldBlock(world, x, y, z, block, block.getRenderType(), this);
 		} else {
 			renderStandardBlock(block, x, y, z);			
