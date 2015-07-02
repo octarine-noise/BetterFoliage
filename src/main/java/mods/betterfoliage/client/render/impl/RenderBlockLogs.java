@@ -29,17 +29,21 @@ public class RenderBlockLogs extends BFAbstractRenderer {
 	}
 	
     public boolean isBlockEligible(IBlockAccess blockAccess, IBlockState blockState, BlockPos pos) {
-    	return Config.logsEnabled && Config.logs.matchesID(blockState.getBlock());
+    	boolean result = Config.logsEnabled && Config.logs.matchesID(blockState.getBlock());
+    	
+    	// fallback to regular rendering if not a proper log
+    	LogInfo logInfo = BetterFoliageClient.logRegistry.logInfoMap.get(blockState);
+    	result &= (logInfo != null && logInfo.sideTexture != null && logInfo.endTexture != null);
+    	
+    	return result;
     }
 
     @Override
     public boolean renderBlock(IBlockAccess blockAccess, IBlockState blockState, BlockPos pos, WorldRenderer worldRenderer, boolean useAO, EnumWorldBlockLayer layer) {
     	if (layer != EnumWorldBlockLayer.SOLID) return false;
     	
-    	LogInfo logInfo = BetterFoliageClient.logRegistry.logInfoMap.get(blockState);
-    	if (logInfo == null || logInfo.sideTexture == null || logInfo.endTexture == null) return false;
-    	
     	// set axes
+    	LogInfo logInfo = BetterFoliageClient.logRegistry.logInfoMap.get(blockState);
     	Double3 blockPos = new Double3(pos);
     	EnumFacing logVertDir = logInfo.verticalDir;
     	EnumFacing logHorzDir1, logHorzDir2;
