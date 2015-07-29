@@ -13,6 +13,7 @@ import mods.betterfoliage.common.config.Config;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.BFAbstractRenderer;
+import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
@@ -47,7 +48,7 @@ public class RenderBlockSandWithCoral extends BFAbstractRenderer {
     }
 
 	@Override
-    public boolean renderBlock(IBlockAccess blockAccess, IBlockState blockState, BlockPos pos, WorldRenderer worldRenderer, boolean useAO, EnumWorldBlockLayer layer) {
+    public boolean renderBlock(BlockRendererDispatcher dispatcher, IBlockAccess blockAccess, IBlockState blockState, BlockPos pos, WorldRenderer worldRenderer, boolean useAO, EnumWorldBlockLayer layer) {
 		if (layer != EnumWorldBlockLayer.CUTOUT_MIPPED) return false;
 	        
 		Double3 blockCenter = new Double3(pos).add(0.5, 0.5, 0.5);

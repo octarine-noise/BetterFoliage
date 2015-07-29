@@ -37,6 +37,7 @@ public abstract class BFAbstractRenderer extends BlockModelRenderer {
     public PerturbationSource random = new PerturbationSource();
     
     /** Render feature for a block. It's still OK
+     * @param dispatcher renderer dispatcher
      * @param blockAccess world instance
      * @param blockState block state
      * @param pos position
@@ -45,7 +46,7 @@ public abstract class BFAbstractRenderer extends BlockModelRenderer {
      * @param layer render layer
      * @return true if drawing took place
      */
-    public abstract boolean renderBlock(IBlockAccess blockAccess, IBlockState blockState, BlockPos pos, WorldRenderer worldRenderer, boolean useAO, EnumWorldBlockLayer layer);
+    public abstract boolean renderBlock(BlockRendererDispatcher dispatcher, IBlockAccess blockAccess, IBlockState blockState, BlockPos pos, WorldRenderer worldRenderer, boolean useAO, EnumWorldBlockLayer layer);
     
     /** Determing if a block is eligible for this feature.
      * This method gets called for <i>every block</i>, so it needs to fail-fast if the answer is false.

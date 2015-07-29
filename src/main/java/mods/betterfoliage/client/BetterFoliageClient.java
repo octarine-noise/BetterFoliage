@@ -10,6 +10,7 @@ import mods.betterfoliage.client.render.impl.EntityFXFallingLeaves;
 import mods.betterfoliage.client.render.impl.EntityFXRisingSoul;
 import mods.betterfoliage.client.render.impl.RenderBlockDirtWithAlgae;
 import mods.betterfoliage.client.render.impl.RenderBlockCactus;
+import mods.betterfoliage.client.render.impl.RenderBlockDirtWithLog;
 import mods.betterfoliage.client.render.impl.RenderBlockLogs;
 import mods.betterfoliage.client.render.impl.RenderBlockSandWithCoral;
 import mods.betterfoliage.client.render.impl.RenderBlockGrass;
@@ -79,6 +80,7 @@ public class BetterFoliageClient {
 		registerRenderer(new RenderBlockReed());
 		registerRenderer(new RenderBlockNetherrack());
 		registerRenderer(new RenderBlockLogs());
+		registerRenderer(new RenderBlockDirtWithLog());
 		
 		MinecraftForge.EVENT_BUS.register(wind);
 		FMLCommonHandler.instance().bus().register(wind);
@@ -156,7 +158,7 @@ public class BetterFoliageClient {
 		boolean useAO = Minecraft.isAmbientOcclusionEnabled() && state.getBlock().getLightValue() == 0;
 		for(BFAbstractRenderer renderer : renderers) if (renderer.isBlockEligible(blockAccess, state, pos)) {
 			if (!renderer.isStandardRenderBlocked && canBlockRender) hasRendered = dispatcher.renderBlock(state, pos, blockAccess, worldRenderer);
-			if (renderer.renderBlock(blockAccess, state, pos, worldRenderer, useAO, layer)) hasRendered = true;
+			if (renderer.renderBlock(dispatcher, blockAccess, state, pos, worldRenderer, useAO, layer)) hasRendered = true;
 			return hasRendered;
 		}
 	    return canBlockRender ? dispatcher.renderBlock(state, pos, blockAccess, worldRenderer) : false;

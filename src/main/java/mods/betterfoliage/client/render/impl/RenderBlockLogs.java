@@ -12,6 +12,7 @@ import mods.betterfoliage.common.config.Config;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.BFAbstractRenderer;
+import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.BlockPos;
@@ -39,7 +40,7 @@ public class RenderBlockLogs extends BFAbstractRenderer {
     }
 
     @Override
-    public boolean renderBlock(IBlockAccess blockAccess, IBlockState blockState, BlockPos pos, WorldRenderer worldRenderer, boolean useAO, EnumWorldBlockLayer layer) {
+    public boolean renderBlock(BlockRendererDispatcher dispatcher, IBlockAccess blockAccess, IBlockState blockState, BlockPos pos, WorldRenderer worldRenderer, boolean useAO, EnumWorldBlockLayer layer) {
     	if (layer != EnumWorldBlockLayer.SOLID) return false;
     	
     	// set axes

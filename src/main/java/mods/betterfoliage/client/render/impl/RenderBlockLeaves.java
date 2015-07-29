@@ -16,6 +16,7 @@ import mods.betterfoliage.common.config.Config;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.BFAbstractRenderer;
+import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumWorldBlockLayer;
@@ -60,7 +61,7 @@ public class RenderBlockLeaves extends BFAbstractRenderer {
     }
 
     @Override
-    public boolean renderBlock(IBlockAccess blockAccess, IBlockState blockState, BlockPos pos, WorldRenderer worldRenderer, boolean useAO, EnumWorldBlockLayer layer) {
+    public boolean renderBlock(BlockRendererDispatcher dispatcher, IBlockAccess blockAccess, IBlockState blockState, BlockPos pos, WorldRenderer worldRenderer, boolean useAO, EnumWorldBlockLayer layer) {
     	if (layer != EnumWorldBlockLayer.CUTOUT_MIPPED) return false;
     	if (isBlockObscured(blockAccess, pos)) return false;
     	
