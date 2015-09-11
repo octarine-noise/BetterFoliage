@@ -63,7 +63,7 @@ public class RenderBlockGrass extends RenderBlockAOBase implements IRenderBlockD
 		Integer avgColor = BetterFoliageClient.grassTextures.iconColors.get(grassTopIcon);
 		boolean useTextureColor = (avgColor != null);
 		
-		renderWorldBlockBase(2, world, x, y, z, block, modelId, renderer);
+		if (renderWorldBlockBase(2, world, x, y, z, block, modelId, renderer)) return true;
 		
 		boolean isAirTop = blockAccess.isAirBlock(x, y + 1, z);
 		int distance = getCameraDistance(x, y, z);

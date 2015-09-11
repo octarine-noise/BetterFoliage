@@ -6,39 +6,43 @@ import mods.betterfoliage.client.render.RenderBlockAOBase;
 import mods.betterfoliage.client.util.RenderUtils;
 import mods.betterfoliage.common.config.Config;
 import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.world.IBlockAccess;
+import net.minecraftforge.common.util.ForgeDirection;
 import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-/** Accepts dirt blocks with grass on top if aggressive connected grass is enabled.<br/>
- *  Renders the grass block in place of dirt.
+/** Accepts dirt blocks with wooden log on top if rounded log grass is enabled.<br/>
+ *  Renders the dirt block with a grass top texture.
  * @author octarine-noise
  */
 @SideOnly(Side.CLIENT)
-public class RenderBlockDirtWithGrassSide extends RenderBlockAOBase implements IRenderBlockDecorator {
+public class RenderBlockDirtWithLogTop extends RenderBlockAOBase implements IRenderBlockDecorator {
 
-	public RenderBlockDirtWithGrassSide() {
+	public static final ForgeDirection[] sides = {ForgeDirection.NORTH, ForgeDirection.SOUTH, ForgeDirection.WEST, ForgeDirection.EAST};
+	
+	public RenderBlockDirtWithLogTop() {
 		skipFaces = true;
 	}
 	
 	@Override
 	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
-	    Material top2Material = blockAccess.getBlock(x, y + 2, z).getMaterial();
-		return Config.ctxGrassAggressiveEnabled &&
-		       top2Material != Material.snow &&
-		       top2Material != Material.craftedSnow &&
+		return Config.logsEnabled && Config.logsConnectGrass &&
 			   Config.dirt.matchesID(block) &&
-			   Config.grass.matchesID(blockAccess.getBlock(x, y + 1, z));
+			   Config.logs.matchesID(blockAccess.getBlock(x, y + 1, z));
 	}
 	
 	@Override
 	public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer) {
-		// fake grass block @(0, +1, 0) at render location
+		ForgeDirection offset = ForgeDirection.UNKNOWN;
+		
+		// try to find grass block in neighborhood
+		for(ForgeDirection dir : sides) if (Config.grass.matchesID(world.getBlock(x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ))) offset = dir; 
+
+		// render offset block at render location
 		IBlockAccess originalBA = renderer.blockAccess;
-		renderer.blockAccess = new OffsetBlockAccess(world, x, y, z, 0, 1, 0);
+		renderer.blockAccess = new OffsetBlockAccess(world, x, y, z, offset.offsetX, offset.offsetY, offset.offsetZ);
 		
 		Block renderBlock = renderer.blockAccess.getBlock(x, y, z);
 		boolean result;

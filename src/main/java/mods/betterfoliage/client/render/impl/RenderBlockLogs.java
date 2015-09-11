@@ -39,8 +39,7 @@ public class RenderBlockLogs extends RenderBlockAOBase implements IRenderBlockDe
         }
 		
 		// get AO data, bail if rendering block breaking
-		renderWorldBlockBase(1, world, x, y, z, block, modelId, renderer);
-		if (renderer.hasOverrideBlockTexture()) return true;
+		if (renderWorldBlockBase(1, world, x, y, z, block, modelId, renderer)) return true;
 
 		// set axes
 		Double3 blockPos = new Double3(x, y, z);

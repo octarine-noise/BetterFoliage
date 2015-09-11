@@ -34,7 +34,7 @@ public class RenderBlockMycelium extends RenderBlockAOBase implements IRenderBlo
 	
 	public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer) {
 		blockAccess = world;
-		renderWorldBlockBase(1, world, x, y, z, block, modelId, renderer);
+		if (renderWorldBlockBase(1, world, x, y, z, block, modelId, renderer)) return true;
 		
 		int iconVariation = getSemiRandomFromPos(x, y, z, 0);
 		IIcon renderIcon = myceliumIcons.get(iconVariation);

@@ -40,7 +40,7 @@ public class RenderBlockSandWithCoral extends RenderBlockAOBase implements IRend
 	
 	public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer) {
 		blockAccess = world;
-		renderWorldBlockBase(1, world, x, y, z, block, modelId, renderer);
+		if (renderWorldBlockBase(1, world, x, y, z, block, modelId, renderer)) return true;
 		
 		Double3 blockCenter = new Double3(x + 0.5, y + 0.5, z + 0.5);
 		double offset = pRand[getSemiRandomFromPos(x, y, z, 6)] * Config.coralVOffset;

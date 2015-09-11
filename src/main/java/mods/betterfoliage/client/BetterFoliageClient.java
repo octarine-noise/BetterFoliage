@@ -14,8 +14,8 @@ import mods.betterfoliage.client.render.impl.EntityFXFallingLeaves;
 import mods.betterfoliage.client.render.impl.EntityFXRisingSoul;
 import mods.betterfoliage.client.render.impl.RenderBlockCactus;
 import mods.betterfoliage.client.render.impl.RenderBlockDirtWithAlgae;
-import mods.betterfoliage.client.render.impl.RenderBlockDirtWithGrassSide;
 import mods.betterfoliage.client.render.impl.RenderBlockDirtWithGrassTop;
+import mods.betterfoliage.client.render.impl.RenderBlockDirtWithLogTop;
 import mods.betterfoliage.client.render.impl.RenderBlockGrass;
 import mods.betterfoliage.client.render.impl.RenderBlockLeaves;
 import mods.betterfoliage.client.render.impl.RenderBlockLilypad;
@@ -76,8 +76,8 @@ public class BetterFoliageClient {
 		registerRenderer(new RenderBlockReed());
 		registerRenderer(new RenderBlockDirtWithAlgae());
 		registerRenderer(new RenderBlockSandWithCoral());
-		registerRenderer(new RenderBlockDirtWithGrassSide());
 		registerRenderer(new RenderBlockDirtWithGrassTop());
+		registerRenderer(new RenderBlockDirtWithLogTop());
 		registerRenderer(new RenderBlockLogs());
 
 		MinecraftForge.EVENT_BUS.register(wind);

@@ -200,12 +200,23 @@ public class RenderBlockAOBase extends RenderBlocks {
 		return 0;
 	}
 	
-	protected void renderWorldBlockBase(int pass, IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer) {
+	/** Render a block normally, and extract AO data
+	 * @param pass extract data from rendering pass with this index
+	 * @param world the World
+	 * @param x x coord
+	 * @param y y coord
+	 * @param z z coord
+	 * @param block the block
+	 * @param modelId render ID of block
+	 * @param renderer the renderer to use
+	 * @return true if rendering block breaking overlay
+	 */
+	protected boolean renderWorldBlockBase(int pass, IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer) {
 		// use original renderer for block breaking overlay
 		if (renderer.hasOverrideBlockTexture()) {
 			renderer.setRenderBoundsFromBlock(block);
 			renderer.renderStandardBlock(block, x, y, z);
-			return;
+			return true;
 		}
 		
 		// render block
@@ -219,6 +230,7 @@ public class RenderBlockAOBase extends RenderBlocks {
 		} else {
 			renderStandardBlock(block, x, y, z);			
 		}
+		return false;
 	}
 	
 	protected void renderStandardBlockAsItem(RenderBlocks renderer, Block p_147800_1_, int p_147800_2_, float p_147800_3_) {

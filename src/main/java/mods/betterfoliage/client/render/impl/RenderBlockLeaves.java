@@ -36,7 +36,7 @@ public class RenderBlockLeaves extends RenderBlockAOBase implements IRenderBlock
 	
 	public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer) {
 		blockAccess = world;
-		renderWorldBlockBase(1, world, x, y, z, block, modelId, renderer);
+		if (renderWorldBlockBase(1, world, x, y, z, block, modelId, renderer)) return true;
 		
 		// find generated texture to render with, assume the
 		// "true" texture of the block is the one on the north size
