@@ -25,7 +25,7 @@ public class RenderBlockDirtWithLog extends BFAbstractRenderer {
 	}
 	
     public boolean isBlockEligible(IBlockAccess blockAccess, IBlockState blockState, BlockPos pos) {
-    	if (!Config.logsEnabled && Config.logsConnectGrass) return false;
+    	if (!(Config.logsEnabled && Config.logsConnectGrass)) return false;
         
         if (!Config.dirt.matchesID(blockState.getBlock())) return false;
         if (!Config.logs.matchesID(blockAccess.getBlockState(pos.up()).getBlock())) return false;
@@ -43,8 +43,7 @@ public class RenderBlockDirtWithLog extends BFAbstractRenderer {
 	        	return renderModel(offsetBlockAccess, model, state, pos, worldRenderer);
     		}
     	}
-
-    	return false;
+    	return dispatcher.renderBlock(blockState, pos, blockAccess, worldRenderer);
     }
     
 }
