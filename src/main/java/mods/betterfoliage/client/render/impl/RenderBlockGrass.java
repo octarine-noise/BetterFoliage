@@ -50,7 +50,7 @@ public class RenderBlockGrass extends RenderBlockAOBase implements IRenderBlockD
 		
 		// check for special case rendering
 		currentMode = RenderMode.DEFAULT;
-		if (TerraFirmaCraftIntegration.isTFCGrass(block)) currentMode = RenderMode.TFC;
+		if (TerraFirmaCraftIntegration.isTFCBlock(block)) currentMode = RenderMode.TFC;
 		
 		// check for connected grass
 		Material topMaterial = blockAccess.getBlock(x, y + 1, z).getMaterial();

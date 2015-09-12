@@ -1,6 +1,7 @@
 package mods.betterfoliage.client.render.impl;
 
 import mods.betterfoliage.client.integration.CLCIntegration;
+import mods.betterfoliage.client.integration.TerraFirmaCraftIntegration;
 import mods.betterfoliage.client.misc.Double3;
 import mods.betterfoliage.client.render.IRenderBlockDecorator;
 import mods.betterfoliage.client.render.RenderBlockAOBase;
@@ -30,6 +31,7 @@ public class RenderBlockLogs extends RenderBlockAOBase implements IRenderBlockDe
 	public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer) {
 		blockAccess = world;
 		ForgeDirection logVertDir = getLogVerticalDir(blockAccess, x, y, z);
+		if (TerraFirmaCraftIntegration.isTFCBlock(block)) logVertDir = TerraFirmaCraftIntegration.getLogVerticalDir(blockAccess, x, y, z);
 
 		// use default renderer if we cannot determine log orientation 
 		if (logVertDir == ForgeDirection.UNKNOWN) {
