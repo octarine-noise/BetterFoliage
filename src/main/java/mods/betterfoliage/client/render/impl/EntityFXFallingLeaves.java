@@ -58,6 +58,8 @@ public class EntityFXFallingLeaves extends EntityFX {
 			BetterFoliageClient.leafTextures.erroredTextures.add(blockIcon);
 			BetterFoliage.log.warn(String.format("Error creating leaf particle: unknown texture %s", blockIcon.getIconName()));
 		}
+		
+		if (!Config.globalEnabled) setDead();
 	}
 
 	public void addToRenderer(EffectRenderer renderer) {

@@ -117,6 +117,8 @@ public class BetterFoliageClient {
 	}
 	
 	public static int getRenderTypeOverride(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
+		if (!Config.globalEnabled) return original;
+		
 		// universal sign for DON'T RENDER ME!
 		if (original == -1) return original;
 		
@@ -128,26 +130,26 @@ public class BetterFoliageClient {
 	}
 	
 	public static boolean shouldRenderBlockSideOverride(boolean original, IBlockAccess blockAccess, int x, int y, int z, int side) {
-	    return original || (Config.logsEnabled && Config.logs.matchesID(blockAccess.getBlock(x, y, z)));
+	    return original || (Config.globalEnabled && Config.logsEnabled && Config.logs.matchesID(blockAccess.getBlock(x, y, z)));
 	}
 	
 	public static float getAmbientOcclusionLightValueOverride(float original, Block block) {
-	    if (Config.logsEnabled && Config.logs.matchesID(block)) return 1.0f;
+	    if (Config.globalEnabled && Config.logsEnabled && Config.logs.matchesID(block)) return 1.0f;
 	    return original;
 	}
 	
     public static boolean getUseNeighborBrightnessOverride(boolean original, Block block) {
-        return original || (Config.logsEnabled && Config.logs.matchesID(block));
+        return original || (Config.globalEnabled && Config.logsEnabled && Config.logs.matchesID(block));
     }
 	   
 	public static void onRandomDisplayTick(Block block, World world, int x, int y, int z) {
-	    if (Config.soulFXEnabled) {
+	    if (Config.globalEnabled && Config.soulFXEnabled) {
 	        if (world.getBlock(x, y, z) == Blocks.soul_sand && Math.random() < Config.soulFXChance) {
 	            Minecraft.getMinecraft().effectRenderer.addEffect(new EntityFXRisingSoul(world, x, y, z));
 	            return;
 	        }
 	    }
-	    if (Config.leafFXEnabled) {
+	    if (Config.globalEnabled && Config.leafFXEnabled) {
 	        if (Config.leaves.matchesID(block) && world.isAirBlock(x, y - 1, z) && Math.random() < Config.leafFXChance) {
 	            new EntityFXFallingLeaves(world, x, y, z).addToRenderer(Minecraft.getMinecraft().effectRenderer);
 	            return;

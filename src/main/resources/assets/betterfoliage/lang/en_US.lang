@@ -1,6 +1,9 @@
 key.betterfoliage.gui=Open Settings
 betterfoliage.arrayEntryDisplay=%d entries
 
+betterfoliage.global.enabled=Enable Mod
+betterfoliage.global.enabled.tooltip=If set to false, BetterFoliage will not render anything
+
 betterfoliage.enabled=Enable
 betterfoliage.enabled.tooltip=Is this feature enabled?
 betterfoliage.hOffset=Horizontal offset

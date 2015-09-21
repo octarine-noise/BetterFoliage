@@ -57,6 +57,8 @@ public class EntityFXRisingSoul extends EntityFX {
         
         particleTrail.addFirst(new Double3(posX, posY, posZ));
         while (particleTrail.size() > Config.soulFXTrailLength) particleTrail.removeLast();
+        
+        if (!Config.globalEnabled) setDead();
     }
     
     @Override

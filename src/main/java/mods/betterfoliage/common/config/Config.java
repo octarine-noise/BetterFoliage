@@ -40,6 +40,8 @@ public class Config {
     public static BlockMatcher logs = new BlockMatcher();
     
 	// extracted config values
+    public static boolean globalEnabled;
+    
 	public static boolean leavesEnabled;
 	public static int leavesDistance;
 	public static boolean leavesSkew;
@@ -154,6 +156,8 @@ public class Config {
 	
 	/** Extract the config properties to static value fields for quick access */
 	public static void updateValues() {
+		globalEnabled = getBoolean("global", "enabled", true, "betterfoliage.global.enabled");
+		
         leavesEnabled = getBoolean(Category.extraLeaves, "enabled", true, "betterfoliage.enabled");
         leavesDistance = getInt(Category.extraLeaves, "distance", 1000, 1, 1000, "betterfoliage.distance");
         leavesSkew = getBoolean(Category.extraLeaves, "skewMode", false, "betterfoliage.leavesMode");
@@ -298,6 +302,7 @@ public class Config {
 	@SuppressWarnings("rawtypes")
 	public static List<IConfigElement> getConfigRootElements() {
 		List<IConfigElement> result = Lists.newLinkedList();
+		result.add(new ConfigElement<Boolean>(rawConfig.get("global", "enabled", true)));
 		for (Category category : Category.values()) {
 			ConfigElement<?> element = new ConfigElement(rawConfig.getCategory(category.toString()));
 			result.add(element);
@@ -347,7 +352,11 @@ public class Config {
 	}
 	    
     protected static boolean getBoolean(Category category, String key, boolean defaultValue, String langKey) {
-        Property prop = rawConfig.get(category.toString(), key, defaultValue);
+    	return getBoolean(category.toString(), key, defaultValue, langKey);
+    }
+    
+    protected static boolean getBoolean(String category, String key, boolean defaultValue, String langKey) {
+        Property prop = rawConfig.get(category, key, defaultValue);
         prop.setLanguageKey(langKey);
         return prop.getBoolean();
     }
