@@ -9,6 +9,7 @@ import javax.imageio.ImageIO;
 import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.client.BetterFoliageClient;
 import mods.betterfoliage.client.integration.ShadersModIntegration;
+import mods.betterfoliage.client.util.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.TextureStitchEvent;
@@ -53,11 +54,11 @@ public class LeafGenerator extends LeafGeneratorBase {
     		if (!ShadersModIntegration.isSpecialTexture(originalResource)) {
     			// load alpha mask of appropriate size
     			BufferedImage maskImage = loadLeafMaskImage(defaultMask, size * 2);
-    			int scale = size * 2 / maskImage.getWidth();
+    			if (maskImage == null) maskImage = loadLeafMaskImage(defaultMask,  RenderUtils.nextPowerOf2(size * 2));
     			
     			for (int x = 0; x < genIcon.getWidth(); x++) for (int y = 0; y < genIcon.getHeight(); y++) {
     				long origPixel = genIcon.getRGB(x, y) & 0xFFFFFFFFl;
-    				long maskPixel = maskImage.getRGB(x / scale, y / scale) & 0xFF000000l | 0x00FFFFFF;
+    				long maskPixel = maskImage.getRGB(x * maskImage.getWidth() / genIcon.getWidth(), y * maskImage.getWidth() / genIcon.getWidth()) & 0xFF000000l | 0x00FFFFFF;
     				genIcon.setRGB(x, y, (int) (origPixel & maskPixel));
     			}
     		}

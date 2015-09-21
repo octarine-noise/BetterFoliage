@@ -107,4 +107,8 @@ public class RenderUtils {
 		    return null;
 		}
 	}
+	
+	public static int nextPowerOf2(int x) {
+		return 1 << (x == 0 ? 0 : 32 - Integer.numberOfLeadingZeros(x - 1));
+	}
 }
