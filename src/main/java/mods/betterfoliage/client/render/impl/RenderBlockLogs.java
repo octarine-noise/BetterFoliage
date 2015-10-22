@@ -31,7 +31,6 @@ public class RenderBlockLogs extends RenderBlockAOBase implements IRenderBlockDe
 	public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer) {
 		blockAccess = world;
 		ForgeDirection logVertDir = getLogVerticalDir(blockAccess, x, y, z);
-		if (TerraFirmaCraftIntegration.isTFCBlock(block)) logVertDir = TerraFirmaCraftIntegration.getLogVerticalDir(blockAccess, x, y, z);
 
 		// use default renderer if we cannot determine log orientation 
 		if (logVertDir == ForgeDirection.UNKNOWN) {
@@ -99,6 +98,9 @@ public class RenderBlockLogs extends RenderBlockAOBase implements IRenderBlockDe
 	}
 
     protected ForgeDirection getLogVerticalDir(IBlockAccess blockAccess, int x, int y, int z) {
+    	// support TFC logs
+    	if (TerraFirmaCraftIntegration.isTFCBlock(blockAccess.getBlock(x, y, z))) return TerraFirmaCraftIntegration.getLogVerticalDir(blockAccess, x, y, z);
+    	
     	// standard way as done by BlockRotatedPillar
         switch((blockAccess.getBlockMetadata(x, y, z) >> 2) & 3) {
             case 0: return ForgeDirection.UP;
