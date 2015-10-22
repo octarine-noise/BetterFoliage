@@ -35,6 +35,13 @@ betterfoliage.blockTypes.cropWhitelist=Crop Whitelist
 betterfoliage.blockTypes.cropBlacklist=Crop Blacklist
 betterfoliage.blockTypes.logWhitelist=Wood Log Whitelist
 betterfoliage.blockTypes.logBlacklist=Wood Log Blacklist
+betterfoliage.blockTypes.sandWhitelist=Sand Whitelist
+betterfoliage.blockTypes.sandBlacklist=Sand Blacklist
+betterfoliage.blockTypes.lilypadWhitelist=Lilypad Whitelist
+betterfoliage.blockTypes.lilypadBlacklist=Lilypad Blacklist
+betterfoliage.blockTypes.cactusWhitelist=Cactus Whitelist
+betterfoliage.blockTypes.cactusBlacklist=Cactus Blacklist
+
 
 betterfoliage.blockTypes.dirtWhitelist.tooltip=Blocks recognized as Dirt. Has an impact on Reeds, Algae, Connected Grass
 betterfoliage.blockTypes.dirtBlacklist.tooltip=Blocks never accepted as Dirt. Has an impact on Reeds, Algae, Connected Grass
@@ -46,6 +53,12 @@ betterfoliage.blockTypes.cropWhitelist.tooltip=Blocks recognized as crops. Crops
 betterfoliage.blockTypes.cropBlacklist.tooltip=Blocks never accepted as crops. Crops will render with tallgrass block ID in shader programs
 betterfoliage.blockTypes.logWhitelist.tooltip=Blocks recognized as wooden logs. Has an impact on Rounded Logs
 betterfoliage.blockTypes.logBlacklist.tooltip=Blocks never accepted as wooden logs. Has an impact on Rounded Logs
+betterfoliage.blockTypes.sandWhitelist.tooltip=Blocks recognized as Sand. Has an impact on Coral
+betterfoliage.blockTypes.sandBlacklist.tooltip=Blocks never accepted Sand. Has an impact on Coral
+betterfoliage.blockTypes.lilypadWhitelist.tooltip=Blocks recognized as Lilypad. Has an impact on Better Lilypad
+betterfoliage.blockTypes.lilypadBlacklist.tooltip=Blocks never accepted Lilypad. Has an impact on Better Lilypad
+betterfoliage.blockTypes.cactusWhitelist.tooltip=Blocks recognized as Cactus. Has an impact on Better Cactus
+betterfoliage.blockTypes.cactusBlacklist.tooltip=Blocks never accepted Cactus. Has an impact on Better Cactus
 
 betterfoliage.extraLeaves=Extra Leaves
 betterfoliage.extraLeaves.tooltip=Extra round leaves on leaf blocks

@@ -38,6 +38,9 @@ public class Config {
     public static BlockMatcher dirt = new BlockMatcher();
     public static BlockMatcher grass = new BlockMatcher();
     public static BlockMatcher logs = new BlockMatcher();
+    public static BlockMatcher sand = new BlockMatcher();
+    public static BlockMatcher lilypad = new BlockMatcher();
+    public static BlockMatcher cactus = new BlockMatcher();
     
 	// extracted config values
     public static boolean globalEnabled;
@@ -269,6 +272,9 @@ public class Config {
         updateBlockMatcher(leaves, Category.blockTypes, "leavesWhitelist", "betterfoliage.blockTypes.leavesWhitelist", "leavesBlacklist", "betterfoliage.blockTypes.leavesBlacklist", new ResourceLocation("betterfoliage:classesLeavesDefault.cfg"));
         updateBlockMatcher(crops, Category.blockTypes, "cropWhitelist", "betterfoliage.blockTypes.cropWhitelist", "cropBlacklist", "betterfoliage.blockTypes.cropBlacklist", new ResourceLocation("betterfoliage:classesCropDefault.cfg"));
         updateBlockMatcher(logs, Category.blockTypes, "logWhitelist", "betterfoliage.blockTypes.logWhitelist", "logBlacklist", "betterfoliage.blockTypes.logBlacklist", new ResourceLocation("betterfoliage:classesLogDefault.cfg"));
+        updateBlockMatcher(sand, Category.blockTypes, "sandWhitelist", "betterfoliage.blockTypes.sandWhitelist", "sandBlacklist", "betterfoliage.blockTypes.sandBlacklist", new ResourceLocation("betterfoliage:classesSandDefault.cfg"));
+        updateBlockMatcher(lilypad, Category.blockTypes, "lilypadWhitelist", "betterfoliage.blockTypes.lilypadWhitelist", "lilypadBlacklist", "betterfoliage.blockTypes.lilypadBlacklist", new ResourceLocation("betterfoliage:classesLilypadDefault.cfg"));
+        updateBlockMatcher(cactus, Category.blockTypes, "cactusWhitelist", "betterfoliage.blockTypes.cactusWhitelist", "cactusBlacklist", "betterfoliage.blockTypes.cactusBlacklist", new ResourceLocation("betterfoliage:classesCactusDefault.cfg"));
         
         rawConfig.getCategory(Category.extraLeaves.toString()).get("skewMode").setConfigEntryClass(AlternateTextBooleanEntry.class);
         rawConfig.getCategory(Category.extraLeaves.toString()).get("dense").setConfigEntryClass(AlternateTextBooleanEntry.class);

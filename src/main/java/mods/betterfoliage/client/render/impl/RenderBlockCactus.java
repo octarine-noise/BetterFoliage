@@ -10,7 +10,6 @@ import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.init.Blocks;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.client.event.TextureStitchEvent;
@@ -36,7 +35,7 @@ public class RenderBlockCactus extends RenderBlockAOBase implements IRenderBlock
 	}
 	
 	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
-		return Config.cactusEnabled && block == Blocks.cactus && getCameraDistance(x, y, z) <= Config.cactusDistance;
+		return Config.cactusEnabled && Config.cactus.matchesID(block) && getCameraDistance(x, y, z) <= Config.cactusDistance;
 	}
 	
 	public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer) {

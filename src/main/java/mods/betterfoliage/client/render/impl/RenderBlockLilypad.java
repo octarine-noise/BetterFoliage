@@ -9,7 +9,6 @@ import mods.betterfoliage.common.config.Config;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.init.Blocks;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -28,7 +27,7 @@ public class RenderBlockLilypad extends RenderBlockAOBase implements IRenderBloc
 	}
 	
 	public boolean isBlockAccepted(IBlockAccess blockAccess, int x, int y, int z, Block block, int original) {
-		return Config.lilypadEnabled && block == Blocks.waterlily && getCameraDistance(x, y, z) <= Config.lilypadDistance;
+		return Config.lilypadEnabled && Config.lilypad.matchesID(block) && getCameraDistance(x, y, z) <= Config.lilypadDistance;
 	}
 	
 	public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer) {
