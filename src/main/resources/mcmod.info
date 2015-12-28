@@ -1,0 +1,8 @@
+[{
+  "modid": "BetterFoliage",
+  "name": "Better Foliage",
+  "version": "$version",
+  "mcversion": "$mcversion",
+  "description": "Leafier leaves and grassier grass",
+  "authorList" : ["octarine-noise (code)", "Meringue (textures)"]
+}]
