@@ -4,6 +4,7 @@ import com.google.common.collect.LinkedListMultimap
 import mods.octarinecore.metaprog.reflectField
 import mods.octarinecore.metaprog.reflectFieldsOfType
 import mods.octarinecore.metaprog.reflectNestedObjects
+import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.common.config.ConfigElement
 import net.minecraftforge.common.config.Configuration
 import net.minecraftforge.common.config.Property
@@ -33,7 +34,7 @@ import kotlin.reflect.KProperty
  */
 abstract class DelegatingConfig(val modId: String, val langPrefix: String) {
 
-    init { FMLCommonHandler.instance().bus().register(this) }
+    init { MinecraftForge.EVENT_BUS.register(this) }
 
     /** The [Configuration] backing this config object. */
     var config: Configuration? = null

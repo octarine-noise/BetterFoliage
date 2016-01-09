@@ -5,6 +5,7 @@ import mods.octarinecore.common.*
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.WorldRenderer
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.EnumFacing.*
 
@@ -39,6 +40,12 @@ class ModelRenderer() : ShadingContext() {
         rotation = rot
         aoEnabled = Minecraft.isAmbientOcclusionEnabled()
 
+        // make sure we have space in the buffer for our quads plus one
+        worldRenderer.apply {
+            rawIntBuffer.position(bufferSize)
+            growBuffer((model.quads.size * 4 + 1) * vertexFormat.func_181719_f())
+        }
+
         model.quads.forEachIndexed { quadIdx, quad ->
             val drawIcon = icon(this, quadIdx, quad)
             if (drawIcon != null) {
@@ -49,11 +56,13 @@ class ModelRenderer() : ShadingContext() {
                     val shader = if (aoEnabled && !forceFlat) vert.aoShader else vert.flatShader
                     shader.shade(this, temp)
                     temp.postProcess(this, quadIdx, quad, vertIdx, vert)
-                    worldRenderer.setTextureUV(temp.u, temp.v)
-                    worldRenderer.setBrightness(temp.brightness)
-                    worldRenderer.setColorOpaque_F(temp.red, temp.green, temp.blue)
-                    worldRenderer.addVertex(temp.x, temp.y, temp.z)
 
+                    worldRenderer
+                        .pos(temp.x, temp.y, temp.z)
+                        .color(temp.red, temp.green, temp.blue, 1.0f)
+                        .tex(temp.u, temp.v)
+                        .lightmap(temp.brightness shr 16 and 65535, temp.brightness and 65535)
+                        .endVertex()
                 }
             }
         }
@@ -92,6 +101,8 @@ class RenderVertex() {
     var red: Float = 0.0f
     var green: Float = 0.0f
     var blue: Float = 0.0f
+
+    val rawData = IntArray(7)
 
     fun init(vertex: Vertex, rot: Rotation, trans: Double3): RenderVertex {
         val result = vertex.xyz.rotate(rot) + trans
@@ -140,6 +151,7 @@ class RenderVertex() {
         green = (color shr 8 and 255) / 256.0f
         blue = (color and 255) / 256.0f
     }
+
 }
 
 val allFaces: (EnumFacing) -> Boolean = { true }

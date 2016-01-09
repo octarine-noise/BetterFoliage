@@ -12,50 +12,52 @@ object Refs {
     // Java
     val Map = ClassRef("java.util.Map")
     val List = ClassRef("java.util.List")
+    val Random = ClassRef("java.util.Random")
 
     // Minecraft
-    val IBlockAccess = ClassRef("net.minecraft.world.IBlockAccess", "ard")
-    val IBlockState = ClassRef("net.minecraft.block.state.IBlockState", "bec")
-    val BlockPos = ClassRef("net.minecraft.util.BlockPos", "dt")
-    val EnumWorldBlockLayer = ClassRef("net.minecraft.util.EnumWorldBlockLayer", "aql")
-    val EnumFacing = ClassRef("net.minecraft.util.EnumFacing", "ej")
+    val IBlockAccess = ClassRef("net.minecraft.world.IBlockAccess", "adq")
+    val IBlockState = ClassRef("net.minecraft.block.state.IBlockState", "alz")
+    val BlockPos = ClassRef("net.minecraft.util.BlockPos", "cj")
+    val EnumWorldBlockLayer = ClassRef("net.minecraft.util.EnumWorldBlockLayer", "adf")
+    val EnumFacing = ClassRef("net.minecraft.util.EnumFacing", "cq")
 
-    val Block = ClassRef("net.minecraft.block.Block", "atr")
+    val World = ClassRef("net.minecraft.world.World", "adm")
+    val WorldClient = ClassRef("net.minecraft.client.multiplayer.WorldClient", "bdb")
+    val doVoidFogParticles = MethodRef(WorldClient, "doVoidFogParticles", "func_73029_E", "b", ClassRef.void, ClassRef.int, ClassRef.int, ClassRef.int)
+
+    val Block = ClassRef("net.minecraft.block.Block", "afh")
     val canRenderInLayer = MethodRef(Block, "canRenderInLayer", ClassRef.boolean, EnumWorldBlockLayer)
     val getAmbientOcclusionLightValue = MethodRef(Block, "getAmbientOcclusionLightValue", "func_149685_I", "f", ClassRef.float)
     val getUseNeighborBrightness = MethodRef(Block, "getUseNeighborBrightness", "func_149710_n", "q", ClassRef.boolean)
     val shouldSideBeRendered = MethodRef(Block, "shouldSideBeRendered", "func_149646_a", "a", ClassRef.boolean, IBlockAccess, BlockPos, EnumFacing)
+    val randomDisplayTick = MethodRef(Block, "randomDisplayTick", "func_180655_c", "c", ClassRef.void, World, BlockPos, IBlockState, Random)
 
-    val BlockModelRenderer = ClassRef("net.minecraft.client.renderer.BlockModelRenderer", "cln")
-    val AmbientOcclusionFace = ClassRef("net.minecraft.client.renderer.BlockModelRenderer\$AmbientOcclusionFace", "clq")
-    val ChunkCompileTaskGenerator = ClassRef("net.minecraft.client.renderer.chunk.ChunkCompileTaskGenerator", "coa")
-    val WorldRenderer = ClassRef("net.minecraft.client.renderer.WorldRenderer", "civ")
+    val BlockModelRenderer = ClassRef("net.minecraft.client.renderer.BlockModelRenderer", "bgf")
+    val AmbientOcclusionFace = ClassRef("net.minecraft.client.renderer.BlockModelRenderer\$AmbientOcclusionFace", "bgf\$b")
+    val ChunkCompileTaskGenerator = ClassRef("net.minecraft.client.renderer.chunk.ChunkCompileTaskGenerator", "bhn")
+    val WorldRenderer = ClassRef("net.minecraft.client.renderer.WorldRenderer", "bfd")
     val AOF_constructor = MethodRef(AmbientOcclusionFace, "<init>", ClassRef.void, BlockModelRenderer)
 
-    val RenderChunk = ClassRef("net.minecraft.client.renderer.chunk.RenderChunk", "cop")
+    val RenderChunk = ClassRef("net.minecraft.client.renderer.chunk.RenderChunk", "bht")
     val rebuildChunk = MethodRef(RenderChunk, "rebuildChunk", "func_178581_b", "b", ClassRef.void, ClassRef.float, ClassRef.float, ClassRef.float, ChunkCompileTaskGenerator)
 
-    val BlockRendererDispatcher = ClassRef("net.minecraft.client.renderer.BlockRendererDispatcher", "cll")
+    val BlockRendererDispatcher = ClassRef("net.minecraft.client.renderer.BlockRendererDispatcher", "bgd")
     val renderBlock = MethodRef(BlockRendererDispatcher, "renderBlock", "func_175018_a", "a", ClassRef.boolean, IBlockState, BlockPos, IBlockAccess, WorldRenderer)
-
-    val World = ClassRef("net.minecraft.world.World", "aqu")
-    val WorldClient = ClassRef("net.minecraft.client.multiplayer.WorldClient", "cen")
-    val doVoidFogParticles = MethodRef(WorldClient, "doVoidFogParticles", "func_73029_E", "b", ClassRef.void, ClassRef.int, ClassRef.int, ClassRef.int)
 
     //    val IMetadataSerializer = ClassRef("net.minecraft.client.resources.data.IMetadataSerializer", "brw")
     //    val SimpleReloadableResourceManager = ClassRef("net.minecraft.client.resources.SimpleReloadableResourceManager", "brg")
     //    val metadataSerializer = FieldRef(SimpleReloadableResourceManager, "rmMetadataSerializer", "field_110547_c", "f", IMetadataSerializer)
 
-    val TextureAtlasSprite = ClassRef("net.minecraft.client.renderer.texture.TextureAtlasSprite", "bqd")
+    val TextureAtlasSprite = ClassRef("net.minecraft.client.renderer.texture.TextureAtlasSprite", "bmi")
 
-    val IRegistry = ClassRef("net.minecraft.util.IRegistry", "ez")
+    val IRegistry = ClassRef("net.minecraft.util.IRegistry", "db")
     val ModelLoader = ClassRef("net.minecraftforge.client.model.ModelLoader")
     val stateModels = FieldRef(ModelLoader, "stateModels", Map)
     val setupModelRegistry = MethodRef(ModelLoader, "setupModelRegistry", "func_177570_a", "a", IRegistry)
 
     val IModel = ClassRef("net.minecraftforge.client.model.IModel", "")
-    val ModelBlock = ClassRef("net.minecraft.client.renderer.block.model.ModelBlock", "cmc")
-    val ModelResourceLocation = ClassRef("net.minecraft.client.renderer.block.model.ModelResourceLocation", "cmc")
+    val ModelBlock = ClassRef("net.minecraft.client.renderer.block.model.ModelBlock", "bgl")
+    val ModelResourceLocation = ClassRef("net.minecraft.client.renderer.block.model.ModelResourceLocation", "bov")
     val VanillaModelWrapper = ClassRef("net.minecraftforge.client.model.ModelLoader\$VanillaModelWrapper")
     val model_VMW = FieldRef(VanillaModelWrapper, "model", ModelBlock)
     val location_VMW = FieldRef(VanillaModelWrapper, "location", ModelBlock)

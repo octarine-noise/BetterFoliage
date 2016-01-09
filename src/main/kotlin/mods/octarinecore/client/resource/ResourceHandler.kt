@@ -40,10 +40,7 @@ open class ResourceHandler(val modId: String) {
     // ============================
     // Self-registration
     // ============================
-    init {
-        MinecraftForge.EVENT_BUS.register(this)
-        FMLCommonHandler.instance().bus().register(this)
-    }
+    init { MinecraftForge.EVENT_BUS.register(this) }
 
     // ============================
     // Resource declarations

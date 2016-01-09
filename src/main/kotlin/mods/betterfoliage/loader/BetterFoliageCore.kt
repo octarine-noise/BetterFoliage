@@ -28,11 +28,11 @@ class BetterFoliageTransformer : Transformer() {
         // what: invoke BF code for every random display tick
         // why: allows us to catch random display ticks, without touching block code
         transformMethod(Refs.doVoidFogParticles) {
-            find(IINC)?.insertBefore {
+            find(invokeRef(Refs.randomDisplayTick))?.insertAfter {
                 log.info("Applying random display tick call hook")
                 varinsn(ALOAD, 0)
                 varinsn(ALOAD, 13)
-                varinsn(ALOAD, if (isOptifinePresent) 8 else 12)
+                varinsn(ALOAD, 8)
                 invokeStatic(Refs.onRandomDisplayTick)
             } ?: log.warn("Failed to apply random display tick call hook!")
         }
@@ -93,7 +93,7 @@ class BetterFoliageTransformer : Transformer() {
         transformMethod(Refs.rebuildChunk) {
             find(invokeRef(Refs.renderBlock))?.replace {
                 log.info("Applying RenderChunk block render override")
-                varinsn(ALOAD, if (isOptifinePresent) 21 else 18)
+                varinsn(ALOAD, 21)
                 invokeStatic(Refs.renderWorldBlock)
             }
             if (isOptifinePresent) {

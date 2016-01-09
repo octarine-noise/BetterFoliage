@@ -99,7 +99,6 @@ object LeafWindTracker {
 
     init {
         MinecraftForge.EVENT_BUS.register(this)
-        FMLCommonHandler.instance().bus().register(this)
     }
 
     fun changeWind(world: World) {

@@ -2,6 +2,7 @@ package mods.octarinecore.client.resource
 
 import mods.octarinecore.metaprog.reflectField
 import net.minecraft.client.resources.IResourcePack
+import net.minecraft.client.resources.data.IMetadataSection
 import net.minecraft.client.resources.data.IMetadataSerializer
 import net.minecraft.client.resources.data.PackMetadataSection
 import net.minecraft.util.ChatComponentText
@@ -26,8 +27,8 @@ class GeneratorPack(val name: String, vararg val generators: GeneratorBase) : IR
     override fun getPackName() = name
     override fun getPackImage() = null
     override fun getResourceDomains() = HashSet(generators.map { it.domain })
-    override fun getPackMetadata(serializer: IMetadataSerializer?, type: String?) =
-            if (type == "pack") PackMetadataSection(ChatComponentText("Generated resources"), 1) else null
+    override fun <T: IMetadataSection> getPackMetadata(serializer: IMetadataSerializer?, type: String?) =
+        if (type == "pack") PackMetadataSection(ChatComponentText("Generated resources"), 1) as? T else null
 
     override fun resourceExists(location: ResourceLocation?): Boolean =
             if (location == null) false
@@ -42,7 +43,9 @@ class GeneratorPack(val name: String, vararg val generators: GeneratorBase) : IR
             }.map { it.getInputStream(location) }
             .filterNotNull().first()
 
-    operator fun get(location: ResourceLocation?) = getInputStream(location)
+//    override fun <T : IMetadataSection?> getPackMetadata(p_135058_1_: IMetadataSerializer?, p_135058_2_: String?): T {
+//        return if (type == "pack") PackMetadataSection(ChatComponentText("Generated resources"), 1) else null
+//    }
 }
 
 /**

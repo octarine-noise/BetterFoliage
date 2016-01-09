@@ -24,11 +24,11 @@ object BetterFoliageMod {
     const val MOD_NAME = "Better Foliage"
     const val DOMAIN = "betterfoliage"
     const val LEGACY_DOMAIN = "bettergrassandleaves"
-    const val MC_VERSIONS = "[1.8]"
+    const val MC_VERSIONS = "[1.8.8]"
     const val GUI_FACTORY = "mods.betterfoliage.client.gui.ConfigGuiFactory"
 
-    var log: Logger? = null
-    var config: Configuration? = null
+    lateinit var log: Logger
+    lateinit var config: Configuration
 
     @JvmStatic
     @Mod.InstanceFactory
@@ -45,7 +45,7 @@ object BetterFoliageMod {
     @Mod.EventHandler
     fun postInit(event: FMLPostInitializationEvent) {
         if (FMLCommonHandler.instance().effectiveSide == Side.CLIENT) {
-            Config.attach(config!!)
+            Config.attach(config)
             Client.log(INFO, "BetterFoliage initialized")
         }
     }

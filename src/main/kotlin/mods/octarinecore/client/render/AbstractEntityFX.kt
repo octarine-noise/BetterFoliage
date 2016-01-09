@@ -82,11 +82,42 @@ abstract class AbstractEntityFX(world: World, x: Double, y: Double, z: Double) :
         val v2 = if (rotation == 0) billboardRot.second * size else
             Double3.weight(billboardRot.first, -sin[rotation and 63] * size, billboardRot.second, cos[rotation and 63] * size)
 
-        worldRenderer.setColorRGBA_F(this.particleRed, this.particleGreen, this.particleBlue, alpha)
-        worldRenderer.addVertexWithUV(center.x - v1.x, center.y - v1.y, center.z - v1.z, maxU, maxV)
-        worldRenderer.addVertexWithUV(center.x - v2.x, center.y - v2.y, center.z - v2.z, maxU, minV)
-        worldRenderer.addVertexWithUV(center.x + v1.x, center.y + v1.y, center.z + v1.z, minU, minV)
-        worldRenderer.addVertexWithUV(center.x + v2.x, center.y + v2.y, center.z + v2.z, minU, maxV)
+        val renderBrightness = this.getBrightnessForRender(partialTickTime)
+        val brLow = renderBrightness shr 16 and 65535
+        val brHigh = renderBrightness and 65535
+
+        worldRenderer
+            .pos(center.x - v1.x, center.y - v1.y, center.z - v1.z)
+            .tex(maxU, maxV)
+            .color(particleRed, particleGreen, particleBlue, alpha)
+            .lightmap(brLow, brHigh)
+            .endVertex()
+
+        worldRenderer
+            .pos(center.x - v2.x, center.y - v2.y, center.z - v2.z)
+            .tex(maxU, minV)
+            .color(particleRed, particleGreen, particleBlue, alpha)
+            .lightmap(brLow, brHigh)
+            .endVertex()
+
+        worldRenderer
+            .pos(center.x + v1.x, center.y + v1.y, center.z + v1.z)
+            .tex(minU, minV)
+            .color(particleRed, particleGreen, particleBlue, alpha)
+            .lightmap(brLow, brHigh)
+            .endVertex()
+
+        worldRenderer
+            .pos(center.x + v2.x, center.y + v2.y, center.z + v2.z)
+            .tex(minU, maxV)
+            .color(particleRed, particleGreen, particleBlue, alpha)
+            .lightmap(brLow, brHigh)
+            .endVertex()
+
+//        worldRenderer.addVertexWithUV(center.x - v1.x, center.y - v1.y, center.z - v1.z, maxU, maxV)
+//        worldRenderer.addVertexWithUV(center.x - v2.x, center.y - v2.y, center.z - v2.z, maxU, minV)
+//        worldRenderer.addVertexWithUV(center.x + v1.x, center.y + v1.y, center.z + v1.z, minU, minV)
+//        worldRenderer.addVertexWithUV(center.x + v2.x, center.y + v2.y, center.z + v2.z, minU, maxV)
     }
 
     override fun getFXLayer() = 1
