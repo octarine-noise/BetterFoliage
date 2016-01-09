@@ -1,14 +1,14 @@
 package mods.betterfoliage.client.config
 
-import cpw.mods.fml.client.event.ConfigChangedEvent
-import cpw.mods.fml.relauncher.Side
-import cpw.mods.fml.relauncher.SideOnly
 import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.gui.BiomeListConfigEntry
-import mods.octarinecore.config.*
+import mods.octarinecore.common.config.*
 import mods.octarinecore.metaprog.reflectField
 import net.minecraft.client.Minecraft
 import net.minecraft.world.biome.BiomeGenBase
+import net.minecraftforge.fml.client.event.ConfigChangedEvent
+import net.minecraftforge.fml.relauncher.Side
+import net.minecraftforge.fml.relauncher.SideOnly
 
 // BetterFoliage-specific property delegates
 private fun featureEnable() = boolean(true).lang("enabled")

@@ -1,13 +1,12 @@
 package mods.octarinecore.client.resource
 
-import cpw.mods.fml.client.FMLClientHandler
-import mods.betterfoliage.loader.Refs
 import mods.octarinecore.metaprog.reflectField
 import net.minecraft.client.resources.IResourcePack
 import net.minecraft.client.resources.data.IMetadataSerializer
 import net.minecraft.client.resources.data.PackMetadataSection
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ResourceLocation
+import net.minecraftforge.fml.client.FMLClientHandler
 import java.io.InputStream
 import java.util.*
 
@@ -21,7 +20,6 @@ import java.util.*
 class GeneratorPack(val name: String, vararg val generators: GeneratorBase) : IResourcePack {
 
     init {
-        // add to the default resource packs
         FMLClientHandler.instance().reflectField<MutableList<IResourcePack>>("resourcePackList")!!.add(this)
     }
 
@@ -107,16 +105,8 @@ class ParameterList(val params: Map<String, String>, val value: String?) {
     }
 }
 
-/**
- * [GeneratorBase] returning parametrized generated resources.
- *
- * @param[domain] Resource domain of generator.
- */
 abstract class ParameterBasedGenerator(domain: String) : GeneratorBase(domain) {
-    /** @see [IResourcePack.resourceExists] */
     abstract fun resourceExists(params: ParameterList): Boolean
-
-    /** @see [IResourcePack.getInputStream] */
     abstract fun getInputStream(params: ParameterList): InputStream?
 
     override fun resourceExists(location: ResourceLocation?) =

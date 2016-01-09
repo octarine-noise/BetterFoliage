@@ -1,19 +1,20 @@
 package mods.betterfoliage.client
 
-import cpw.mods.fml.client.FMLClientHandler
-import cpw.mods.fml.relauncher.Side
-import cpw.mods.fml.relauncher.SideOnly
 import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.gui.ConfigGuiFactory
-import mods.betterfoliage.client.integration.CLCIntegration
 import mods.betterfoliage.client.integration.ShadersModIntegration
-import mods.betterfoliage.client.integration.TFCIntegration
 import mods.betterfoliage.client.render.*
-import mods.betterfoliage.client.texture.*
+import mods.betterfoliage.client.texture.GrassGenerator
+import mods.betterfoliage.client.texture.GrassRegistry
+import mods.betterfoliage.client.texture.LeafGenerator
+import mods.betterfoliage.client.texture.LeafRegistry
 import mods.octarinecore.client.KeyHandler
 import mods.octarinecore.client.resource.CenteringTextureGenerator
 import mods.octarinecore.client.resource.GeneratorPack
 import net.minecraft.client.Minecraft
+import net.minecraftforge.fml.client.FMLClientHandler
+import net.minecraftforge.fml.relauncher.Side
+import net.minecraftforge.fml.relauncher.SideOnly
 import org.apache.logging.log4j.Level
 
 /**
@@ -65,9 +66,7 @@ object Client {
         GrassRegistry,
         LeafWindTracker,
         RisingSoulTextures,
-        TFCIntegration,
-        ShadersModIntegration,
-        CLCIntegration
+        ShadersModIntegration
     )
 
     fun log(level: Level, msg: String) = BetterFoliageMod.log!!.log(level, msg)

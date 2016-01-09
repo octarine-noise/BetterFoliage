@@ -3,9 +3,15 @@ package mods.betterfoliage.client.render
 import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.Config
+import mods.betterfoliage.client.integration.ShadersModIntegration
 import mods.octarinecore.client.render.*
-import net.minecraft.client.renderer.RenderBlocks
-import net.minecraftforge.common.util.ForgeDirection.*
+import mods.octarinecore.common.Int3
+import mods.octarinecore.common.Rotation
+import net.minecraft.client.renderer.BlockRendererDispatcher
+import net.minecraft.client.renderer.WorldRenderer
+import net.minecraft.util.EnumFacing.DOWN
+import net.minecraft.util.EnumFacing.UP
+import net.minecraft.util.EnumWorldBlockLayer
 import org.apache.logging.log4j.Level
 
 class RenderLilypad : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
@@ -21,8 +27,8 @@ class RenderLilypad : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
         .setFlatShader(FlatOffsetNoColor(Int3.zero))
         .toCross(UP).addAll()
     }
-    val rootIcon = iconSet(BetterFoliageMod.LEGACY_DOMAIN, "better_lilypad_roots_%d")
-    val flowerIcon = iconSet(BetterFoliageMod.LEGACY_DOMAIN, "better_lilypad_flower_%d")
+    val rootIcon = iconSet(BetterFoliageMod.LEGACY_DOMAIN, "blocks/better_lilypad_roots_%d")
+    val flowerIcon = iconSet(BetterFoliageMod.LEGACY_DOMAIN, "blocks/better_lilypad_flower_%d")
     val perturbs = vectorSet(64) { modelIdx -> xzDisk(modelIdx) * Config.lilypad.hOffset }
 
     override fun afterStitch() {
@@ -35,21 +41,27 @@ class RenderLilypad : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
         ctx.cameraDistance < Config.lilypad.distance &&
         Config.blocks.lilypad.matchesID(ctx.block)
 
-    override fun render(ctx: BlockContext, parent: RenderBlocks): Boolean {
-        if (renderWorldBlockBase(parent, face = alwaysRender)) return true
+    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: WorldRenderer, layer: EnumWorldBlockLayer): Boolean {
+        renderWorldBlockBase(ctx, dispatcher, renderer, null)
+        modelRenderer.updateShading(Int3.zero, allFaces)
 
         val rand = ctx.semiRandomArray(5)
-        modelRenderer.render(
-            rootModel.model,
-            Rotation.identity,
-            ctx.blockCenter.add(perturbs[rand[2]]),
-            forceFlat = true,
-            icon = { ctx, qi, q -> rootIcon[rand[qi and 1]]!! },
-            rotateUV = { 0 },
-            postProcess = noPost
-        )
+
+        ShadersModIntegration.grass(renderer) {
+            modelRenderer.render(
+                renderer,
+                rootModel.model,
+                Rotation.identity,
+                ctx.blockCenter.add(perturbs[rand[2]]),
+                forceFlat = true,
+                icon = { ctx, qi, q -> rootIcon[rand[qi and 1]]!! },
+                rotateUV = { 0 },
+                postProcess = noPost
+            )
+        }
 
         if (rand[3] < Config.lilypad.flowerChance) modelRenderer.render(
+            renderer,
             flowerModel.model,
             Rotation.identity,
             ctx.blockCenter.add(perturbs[rand[4]]),

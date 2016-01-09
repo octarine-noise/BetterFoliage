@@ -1,21 +1,20 @@
 package mods.betterfoliage.client.texture
 
-import cpw.mods.fml.common.FMLCommonHandler
-import cpw.mods.fml.common.eventhandler.SubscribeEvent
-import cpw.mods.fml.relauncher.Side
-import cpw.mods.fml.relauncher.SideOnly
 import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.Config
+import mods.octarinecore.client.resource.BlockTextureInspector
 import mods.octarinecore.client.resource.IconSet
 import mods.octarinecore.client.resource.averageColor
-import net.minecraft.block.Block
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.client.renderer.texture.TextureMap
-import net.minecraft.util.IIcon
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.event.TextureStitchEvent
 import net.minecraftforge.common.MinecraftForge
-import org.apache.logging.log4j.Level.*
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.relauncher.Side
+import net.minecraftforge.fml.relauncher.SideOnly
+import org.apache.logging.log4j.Level.INFO
+import org.apache.logging.log4j.Level.WARN
 
 const val defaultLeafColor = 0
 
@@ -36,49 +35,24 @@ class LeafInfo(
 
 /** Collects and manages rendering-related information for leaf blocks. */
 @SideOnly(Side.CLIENT)
-object LeafRegistry {
+object LeafRegistry : BlockTextureInspector<LeafInfo>() {
 
-    val leaves: MutableMap<IIcon, LeafInfo> = hashMapOf()
     val particles: MutableMap<String, IconSet> = hashMapOf()
-    val typeMappings = TextureMatcher()
+    val typeMappings = TextureMatcher().apply { loadMappings(ResourceLocation("betterfoliage", "leafTypeMappings.cfg")) }
 
     init {
-        MinecraftForge.EVENT_BUS.register(this)
+        matchClassAndModel(Config.blocks.leaves, "minecraft:block/leaves", listOf("all"))
     }
 
-    @SubscribeEvent
-    fun handleTextureReload(event: TextureStitchEvent.Pre) {
-        if (event.map.textureType != 0) return
-        leaves.clear()
-        particles.clear()
-        typeMappings.loadMappings(ResourceLocation("betterfoliage", "leafTypeMappings.cfg"))
-        Client.log(INFO, "Generating leaf textures")
-
-        IconSet("betterfoliage", "falling_leaf_default_%d").let {
-            it.onStitch(event.map)
-            particles.put("default", it)
-        }
-
-        Block.blockRegistry.forEach { block ->
-            if (Config.blocks.leaves.matchesClass(block as Block)) {
-                block.registerBlockIcons { location ->
-                    val original = event.map.getTextureExtry(location)
-                    Client.log(DEBUG, "Found leaf texture: $location")
-                    registerLeaf(event.map, original)
-                    return@registerBlockIcons original
-                }
-            }
-        }
-    }
-
-    fun registerLeaf(atlas: TextureMap, icon: TextureAtlasSprite) {
-        var leafType = typeMappings.getType(icon) ?: "default"
-        val generated = atlas.registerIcon(
-            Client.genLeaves.generatedResource(icon.iconName, "type" to leafType).toString()
+    override fun processTextures(textures: List<TextureAtlasSprite>, atlas: TextureMap): LeafInfo {
+        val texture = textures[0]
+        var leafType = typeMappings.getType(texture) ?: "default"
+        val generated = atlas.registerSprite(
+            Client.genLeaves.generatedResource(texture.iconName, "type" to leafType)
         )
 
         if (leafType !in particles.keys) {
-            val particleSet = IconSet("betterfoliage", "falling_leaf_${leafType}_%d")
+            val particleSet = IconSet("betterfoliage", "blocks/falling_leaf_${leafType}_%d")
             particleSet.onStitch(atlas)
             if (particleSet.num == 0) {
                 Client.log(WARN, "Leaf particle textures not found for leaf type: $leafType")
@@ -88,7 +62,6 @@ object LeafRegistry {
             }
         }
 
-        val leafInfo = LeafInfo(generated as TextureAtlasSprite, leafType)
-        leaves.put(icon, leafInfo)
+        return LeafInfo(generated as TextureAtlasSprite, leafType)
     }
 }

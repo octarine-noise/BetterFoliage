@@ -2,9 +2,13 @@ package mods.betterfoliage.client.render
 
 import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.config.Config
-import mods.octarinecore.client.render.*
-import net.minecraft.block.material.Material
-import net.minecraft.client.renderer.RenderBlocks
+import mods.octarinecore.client.render.AbstractBlockRenderingHandler
+import mods.octarinecore.client.render.BlockContext
+import mods.octarinecore.client.render.withOffset
+import mods.octarinecore.common.Int3
+import net.minecraft.client.renderer.BlockRendererDispatcher
+import net.minecraft.client.renderer.WorldRenderer
+import net.minecraft.util.EnumWorldBlockLayer
 
 class RenderConnectedGrass : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
     override fun isEligible(ctx: BlockContext) =
@@ -13,10 +17,10 @@ class RenderConnectedGrass : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_
         Config.blocks.grass.matchesID(ctx.block(up1)) &&
         (Config.connectedGrass.snowEnabled || !ctx.block(up2).isSnow)
 
-    override fun render(ctx: BlockContext, parent: RenderBlocks): Boolean {
+    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: WorldRenderer, layer: EnumWorldBlockLayer): Boolean {
         return ctx.withOffset(Int3.zero, up1) {
             ctx.withOffset(up1, up2) {
-                renderWorldBlockBase(parent, face = alwaysRender)
+                renderWorldBlockBase(ctx, dispatcher, renderer, null)
             }
         }
     }

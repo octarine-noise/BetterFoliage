@@ -24,6 +24,15 @@ inline fun <T> MutableList<T>.exchange(idx1: Int, idx2: Int) {
 /** Cross product of this [Iterable] with the parameter. */
 fun <A, B> Iterable<A>.cross(other: Iterable<B>) = flatMap { a -> other.map { b -> a to b } }
 
+inline fun <C, R, T> Iterable<T>.mapAs(transform: (C) -> R) = map { transform(it as C) }
+
+inline fun <T1, T2> forEachNested(list1: Iterable<T1>, list2: Iterable<T2>, func: (T1, T2)-> Unit) =
+    list1.forEach { e1 ->
+        list2.forEach { e2 ->
+            func(e1, e2)
+        }
+    }
+
 /**
  * Property-level delegate backed by a [ThreadLocal].
  *

@@ -1,24 +1,26 @@
 package mods.octarinecore.client.render
 
-import net.minecraftforge.common.util.ForgeDirection
+import mods.octarinecore.common.*
+import net.minecraft.util.EnumFacing
+
 
 const val defaultCornerDimming = 0.5f
 const val defaultEdgeDimming = 0.8f
 
 // ================================
-// Resolvers for automatic shading
+// Shader instantiation lambdas
 // ================================
-fun cornerAo(fallbackAxis: Axis): (ForgeDirection, ForgeDirection, ForgeDirection)->Shader = { face, dir1, dir2 ->
+fun cornerAo(fallbackAxis: EnumFacing.Axis): (EnumFacing, EnumFacing, EnumFacing)->Shader = { face, dir1, dir2 ->
     val fallbackDir = listOf(face, dir1, dir2).find { it.axis == fallbackAxis }!!
     CornerSingleFallback(face, dir1, dir2, fallbackDir)
 }
-val cornerFlat = { face: ForgeDirection, dir1: ForgeDirection, dir2: ForgeDirection -> FaceFlat(face) }
-fun cornerAoTri(func: (AoData, AoData)-> AoData) = { face: ForgeDirection, dir1: ForgeDirection, dir2: ForgeDirection ->
+val cornerFlat = { face: EnumFacing, dir1: EnumFacing, dir2: EnumFacing -> FaceFlat(face) }
+fun cornerAoTri(func: (AoData, AoData)-> AoData) = { face: EnumFacing, dir1: EnumFacing, dir2: EnumFacing ->
     CornerTri(face, dir1, dir2, func)
 }
 val cornerAoMaxGreen = cornerAoTri { s1, s2 -> if (s1.green > s2.green) s1 else s2 }
 
-fun cornerInterpolate(edgeAxis: Axis, weight: Float, dimming: Float): (ForgeDirection, ForgeDirection, ForgeDirection)->Shader = { dir1, dir2, dir3 ->
+fun cornerInterpolate(edgeAxis: EnumFacing.Axis, weight: Float, dimming: Float): (EnumFacing, EnumFacing, EnumFacing)->Shader = { dir1, dir2, dir3 ->
     val edgeDir = listOf(dir1, dir2, dir3).find { it.axis == edgeAxis }!!
     val faceDirs = listOf(dir1, dir2, dir3).filter { it.axis != edgeAxis }
     CornerInterpolateDimming(faceDirs[0], faceDirs[1], edgeDir, weight, dimming)
@@ -32,14 +34,15 @@ object NoShader : Shader {
     override fun rotate(rot: Rotation) = this
 }
 
-class CornerSingleFallback(val face: ForgeDirection, val dir1: ForgeDirection, val dir2: ForgeDirection, val fallbackDir: ForgeDirection, val fallbackDimming: Float = defaultCornerDimming) : Shader {
+class CornerSingleFallback(val face: EnumFacing, val dir1: EnumFacing, val dir2: EnumFacing, val fallbackDir: EnumFacing, val fallbackDimming: Float = defaultCornerDimming) : Shader {
     val offset = Int3(fallbackDir)
     override fun shade(context: ShadingContext, vertex: RenderVertex) {
         val shading = context.aoShading(face, dir1, dir2)
         if (shading.valid)
             vertex.shade(shading)
-        else
-            vertex.shade(context.blockBrightness(offset) brMul fallbackDimming, context.blockColor(offset) colorMul fallbackDimming)
+        else context.blockData(offset).let {
+            vertex.shade(it.brightness brMul fallbackDimming, it.color colorMul fallbackDimming)
+        }
     }
     override fun rotate(rot: Rotation) = CornerSingleFallback(face.rotate(rot), dir1.rotate(rot), dir2.rotate(rot), fallbackDir.rotate(rot), fallbackDimming)
 }
@@ -53,7 +56,7 @@ inline fun accumulate(v1: AoData?, v2: AoData?, func: ((AoData, AoData)-> AoData
     return null
 }
 
-class CornerTri(val face: ForgeDirection, val dir1: ForgeDirection, val dir2: ForgeDirection,
+class CornerTri(val face: EnumFacing, val dir1: EnumFacing, val dir2: EnumFacing,
                 val func: ((AoData, AoData)-> AoData)) : Shader {
     override fun shade(context: ShadingContext, vertex: RenderVertex) {
         var acc = accumulate(
@@ -69,17 +72,18 @@ class CornerTri(val face: ForgeDirection, val dir1: ForgeDirection, val dir2: Fo
     override fun rotate(rot: Rotation) = CornerTri(face.rotate(rot), dir1.rotate(rot), dir2.rotate(rot), func)
 }
 
-class EdgeInterpolateFallback(val face: ForgeDirection, val edgeDir: ForgeDirection, val pos: Double, val fallbackDimming: Float = defaultEdgeDimming): Shader {
+class EdgeInterpolateFallback(val face: EnumFacing, val edgeDir: EnumFacing, val pos: Double, val fallbackDimming: Float = defaultEdgeDimming): Shader {
     val offset = Int3(edgeDir)
     val edgeAxis = axes.find { it != face.axis && it != edgeDir.axis }!!
     val weightN = (0.5 - pos).toFloat()
     val weightP = (0.5 + pos).toFloat()
 
     override fun shade(context: ShadingContext, vertex: RenderVertex) {
-        val shadingP = context.aoShading(face, edgeDir, (edgeAxis to Dir.P).face)
-        val shadingN = context.aoShading(face, edgeDir, (edgeAxis to Dir.N).face)
-        if (!shadingP.valid && !shadingN.valid)
-            return vertex.shade(context.blockBrightness(offset) brMul fallbackDimming, context.blockColor(offset) colorMul fallbackDimming)
+        val shadingP = context.aoShading(face, edgeDir, (edgeAxis to EnumFacing.AxisDirection.POSITIVE).face)
+        val shadingN = context.aoShading(face, edgeDir, (edgeAxis to EnumFacing.AxisDirection.NEGATIVE).face)
+        if (!shadingP.valid && !shadingN.valid) context.blockData(offset).let {
+            return vertex.shade(it.brightness brMul fallbackDimming, it.color colorMul fallbackDimming)
+        }
         if (!shadingP.valid) return vertex.shade(shadingN)
         if (!shadingN.valid) return vertex.shade(shadingP)
         vertex.shade(shadingP, shadingN, weightP, weightN)
@@ -87,7 +91,7 @@ class EdgeInterpolateFallback(val face: ForgeDirection, val edgeDir: ForgeDirect
     override fun rotate(rot: Rotation) = EdgeInterpolateFallback(face.rotate(rot), edgeDir.rotate(rot), pos)
 }
 
-class CornerInterpolateDimming(val face1: ForgeDirection, val face2: ForgeDirection, val edgeDir: ForgeDirection,
+class CornerInterpolateDimming(val face1: EnumFacing, val face2: EnumFacing, val edgeDir: EnumFacing,
                                val weight: Float, val dimming: Float, val fallbackDimming: Float = defaultCornerDimming) : Shader {
     val offset = Int3(edgeDir)
     override fun shade(context: ShadingContext, vertex: RenderVertex) {
@@ -95,8 +99,9 @@ class CornerInterpolateDimming(val face1: ForgeDirection, val face2: ForgeDirect
         var shading2 = context.aoShading(face2, edgeDir, face1)
         var weight1 = weight
         var weight2 = 1.0f - weight
-        if (!shading1.valid && !shading2.valid)
-            return vertex.shade(context.blockBrightness(offset) brMul fallbackDimming, context.blockColor(offset) colorMul fallbackDimming)
+        if (!shading1.valid && !shading2.valid) context.blockData(offset).let {
+            return vertex.shade(it.brightness brMul fallbackDimming, it.color colorMul fallbackDimming)
+        }
         if (!shading1.valid) { shading1 = shading2; weight1 *= dimming }
         if (!shading2.valid) { shading2 = shading1; weight2 *= dimming }
         vertex.shade(shading1, shading2, weight1, weight2)
@@ -106,7 +111,7 @@ class CornerInterpolateDimming(val face1: ForgeDirection, val face2: ForgeDirect
         CornerInterpolateDimming(face1.rotate(rot), face2.rotate(rot), edgeDir.rotate(rot), weight, dimming, fallbackDimming)
 }
 
-class FaceCenter(val face: ForgeDirection): Shader {
+class FaceCenter(val face: EnumFacing): Shader {
     override fun shade(context: ShadingContext, vertex: RenderVertex) {
         vertex.red = 0.0f; vertex.green = 0.0f; vertex.blue = 0.0f;
         val b = IntArray(4)
@@ -123,25 +128,27 @@ class FaceCenter(val face: ForgeDirection): Shader {
     override fun rotate(rot: Rotation) = FaceCenter(face.rotate(rot))
 }
 
-class FaceFlat(val face: ForgeDirection): Shader {
+class FaceFlat(val face: EnumFacing): Shader {
     override fun shade(context: ShadingContext, vertex: RenderVertex) {
-        val color = context.blockColor(Int3.zero)
-        vertex.shade(context.blockBrightness(face.offset), color)
+        val color = context.blockData(Int3.zero).color
+        vertex.shade(context.blockData(face.offset).brightness, color)
     }
     override fun rotate(rot: Rotation): Shader = FaceFlat(face.rotate(rot))
 }
 
 class FlatOffset(val offset: Int3): Shader {
     override fun shade(context: ShadingContext, vertex: RenderVertex)  {
-        vertex.brightness = context.blockBrightness(offset)
-        vertex.setColor(context.blockColor(offset))
+        context.blockData(offset).let {
+            vertex.brightness = it.brightness
+            vertex.setColor(it.color)
+        }
     }
     override fun rotate(rot: Rotation): Shader = this
 }
 
 class FlatOffsetNoColor(val offset: Int3): Shader {
     override fun shade(context: ShadingContext, vertex: RenderVertex)  {
-        vertex.brightness = context.blockBrightness(offset)
+        vertex.brightness = context.blockData(offset).brightness
         vertex.red = 1.0f; vertex.green = 1.0f; vertex.blue = 1.0f
     }
     override fun rotate(rot: Rotation): Shader = this

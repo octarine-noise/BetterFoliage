@@ -18,7 +18,8 @@ import java.lang.Math.*
 import javax.imageio.ImageIO
 
 /** Concise getter for the Minecraft resource manager. */
-val resourceManager: SimpleReloadableResourceManager get() = Minecraft.getMinecraft().resourceManager as SimpleReloadableResourceManager
+val resourceManager: SimpleReloadableResourceManager get() =
+    Minecraft.getMinecraft().resourceManager as SimpleReloadableResourceManager
 
 /** Append a string to the [ResourceLocation]'s path. */
 operator fun ResourceLocation.plus(str: String) = ResourceLocation(resourceDomain, resourcePath + str)
@@ -86,5 +87,5 @@ val TextureAtlasSprite.averageColor: Int? get() {
  * Get the actual location of a texture from the name of its [TextureAtlasSprite].
  */
 fun textureLocation(iconName: String) = ResourceLocation(iconName).let {
-    ResourceLocation(it.resourceDomain, "textures/blocks/${it.resourcePath}")
+    ResourceLocation(it.resourceDomain, "textures/${it.resourcePath}")
 }

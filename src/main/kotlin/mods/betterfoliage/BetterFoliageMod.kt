@@ -1,19 +1,15 @@
 package mods.betterfoliage
 
-import cpw.mods.fml.common.FMLCommonHandler
-import cpw.mods.fml.common.Mod
-import cpw.mods.fml.common.event.FMLPostInitializationEvent
-import cpw.mods.fml.common.event.FMLPreInitializationEvent
-import cpw.mods.fml.common.network.NetworkCheckHandler
-import cpw.mods.fml.relauncher.Side
 import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.Config
-import mods.betterfoliage.client.integration.ShadersModIntegration
-import mods.betterfoliage.client.integration.TFCIntegration
-import mods.betterfoliage.loader.Refs
-import mods.octarinecore.metaprog.ClassRef
 import net.minecraftforge.common.config.Configuration
-import org.apache.logging.log4j.Level.*
+import net.minecraftforge.fml.common.FMLCommonHandler
+import net.minecraftforge.fml.common.Mod
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent
+import net.minecraftforge.fml.common.network.NetworkCheckHandler
+import net.minecraftforge.fml.relauncher.Side
+import org.apache.logging.log4j.Level.INFO
 import org.apache.logging.log4j.Logger
 
 @Mod(
@@ -28,7 +24,7 @@ object BetterFoliageMod {
     const val MOD_NAME = "Better Foliage"
     const val DOMAIN = "betterfoliage"
     const val LEGACY_DOMAIN = "bettergrassandleaves"
-    const val MC_VERSIONS = "[1.7.10]"
+    const val MC_VERSIONS = "[1.8]"
     const val GUI_FACTORY = "mods.betterfoliage.client.gui.ConfigGuiFactory"
 
     var log: Logger? = null

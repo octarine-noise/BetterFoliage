@@ -1,54 +1,33 @@
 package mods.octarinecore.client.render
 
-import mods.octarinecore.minmax
+import mods.octarinecore.common.Int3
+import mods.octarinecore.common.plus
+import net.minecraft.util.BlockPos
+import net.minecraft.util.EnumFacing
 import net.minecraft.world.IBlockAccess
-import net.minecraftforge.common.util.ForgeDirection
 
 /**
  * Delegating [IBlockAccess] that fakes a _modified_ location to return values from a _target_ location.
  * All other locations are handled normally.
  *
  * @param[original] the [IBlockAccess] that is delegated to
- * @param[xModded] x coordinate of the _modified_ location
- * @param[yModded] y coordinate of the _modified_ location
- * @param[zModded] z coordinate of the _modified_ location
- * @param[xTarget] x coordinate of the _target_ location
- * @param[yTarget] y coordinate of the _target_ location
- * @param[zTarget] z coordinate of the _target_ location
  */
-class OffsetBlockAccess(val original: IBlockAccess,
-                        @JvmField val xModded: Int, @JvmField val yModded: Int, @JvmField val zModded: Int,
-                        @JvmField val xTarget: Int, @JvmField val yTarget: Int, @JvmField val zTarget: Int) : IBlockAccess {
+@Suppress("NOTHING_TO_INLINE")
+class OffsetBlockAccess(val original: IBlockAccess, val modded: BlockPos, val target: BlockPos) : IBlockAccess {
 
-    inline fun <reified T> withOffset(x: Int, y: Int, z: Int, func: (Int,Int,Int)->T): T {
-        if (x == xModded && y == yModded && z == zModded) {
-            return func(xTarget, yTarget, zTarget)
-        } else {
-            return func(x, y, z)
-        }
-    }
+    inline fun actualPos(pos: BlockPos?) =
+        if (pos != null && pos.x == modded.x && pos.y == modded.y && pos.z == modded.z) target else pos
 
-    override fun getBlock(x: Int, y: Int, z: Int) = withOffset(x, y, z)
-        { xAct, yAct, zAct -> original.getBlock(xAct, yAct, zAct) }
-    override fun getBlockMetadata(x: Int, y: Int, z: Int) = withOffset(x, y, z)
-        { xAct, yAct, zAct -> original.getBlockMetadata(xAct, yAct, zAct) }
-    override fun getTileEntity(x: Int, y: Int, z: Int) = withOffset(x, y, z)
-        { xAct, yAct, zAct -> original.getTileEntity(xAct, yAct, zAct) }
-    override fun isSideSolid(x: Int, y: Int, z: Int, side: ForgeDirection?, _default: Boolean) = withOffset(x, y, z)
-        { xAct, yAct, zAct -> original.isSideSolid(xAct, yAct, zAct, side, _default) }
-    override fun isAirBlock(x: Int, y: Int, z: Int) = withOffset(x, y, z)
-        { xAct, yAct, zAct -> original.isAirBlock(xAct, yAct, zAct) }
-    override fun getLightBrightnessForSkyBlocks(x: Int, y: Int, z: Int, side: Int) = withOffset(x, y, z)
-        { xAct, yAct, zAct -> original.getLightBrightnessForSkyBlocks(xAct, yAct, zAct, side) }
-    override fun isBlockProvidingPowerTo(x: Int, y: Int, z: Int, side: Int) = withOffset(x, y, z)
-        { xAct, yAct, zAct -> original.isBlockProvidingPowerTo(xAct, yAct, zAct, side) }
-    override fun getBiomeGenForCoords(x: Int, z: Int) = withOffset(x, 0, z)
-        { xAct, yAct, zAct -> original.getBiomeGenForCoords(xAct, zAct) }
-
-    override fun getHeight() = original.height
     override fun extendedLevelsInChunkCache() = original.extendedLevelsInChunkCache()
+    override fun getBiomeGenForCoords(pos: BlockPos?) = original.getBiomeGenForCoords(actualPos(pos))
+    override fun getBlockState(pos: BlockPos?) = original.getBlockState(actualPos(pos))
+    override fun getCombinedLight(pos: BlockPos?, lightValue: Int) = original.getCombinedLight(actualPos(pos), lightValue)
+    override fun getStrongPower(pos: BlockPos?, direction: EnumFacing?) = original.getStrongPower(actualPos(pos), direction)
+    override fun getTileEntity(pos: BlockPos?) = original.getTileEntity(actualPos(pos))
+    override fun getWorldType() = original.worldType
+    override fun isAirBlock(pos: BlockPos?) = original.isAirBlock(actualPos(pos))
+    override fun isSideSolid(pos: BlockPos?, side: EnumFacing?, _default: Boolean) = original.isSideSolid(actualPos(pos), side, _default)
 }
-
 /**
  * Temporarily replaces the [IBlockAccess] used by this [BlockContext] and the corresponding [ExtendedRenderBlocks]
  * to use an [OffsetBlockAccess] while executing this lambda.
@@ -59,10 +38,8 @@ class OffsetBlockAccess(val original: IBlockAccess,
  */
 inline fun <reified T> BlockContext.withOffset(modded: Int3, target: Int3, func: () -> T): T {
     val original = world!!
-    world = OffsetBlockAccess(original, x + modded.x, y + modded.y, z + modded.z, x + target.x, y + target.y, z + target.z)
-    renderBlocks.blockAccess = world
+    world = OffsetBlockAccess(original, pos + modded, pos + target)
     val result = func()
     world = original
-    renderBlocks.blockAccess = original
     return result
 }

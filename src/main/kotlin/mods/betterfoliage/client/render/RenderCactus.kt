@@ -4,8 +4,13 @@ import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.Config
 import mods.octarinecore.client.render.*
-import net.minecraft.client.renderer.RenderBlocks
-import net.minecraftforge.common.util.ForgeDirection.*
+import mods.octarinecore.client.resource.BlockTextureInspector
+import mods.octarinecore.common.Int3
+import mods.octarinecore.common.Rotation
+import net.minecraft.client.renderer.BlockRendererDispatcher
+import net.minecraft.client.renderer.WorldRenderer
+import net.minecraft.util.EnumFacing.*
+import net.minecraft.util.EnumWorldBlockLayer
 import org.apache.logging.log4j.Level
 
 class RenderCactus : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
@@ -13,8 +18,13 @@ class RenderCactus : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
     val cactusStemRadius = 0.4375
     val cactusArmRotation = listOf(NORTH, SOUTH, EAST, WEST).map { Rotation.rot90[it.ordinal] }
 
-    val iconCross = iconStatic(BetterFoliageMod.LEGACY_DOMAIN, "better_cactus")
-    val iconArm = iconSet(BetterFoliageMod.LEGACY_DOMAIN, "better_cactus_arm_%d")
+    val iconCross = iconStatic(BetterFoliageMod.LEGACY_DOMAIN, "blocks/better_cactus")
+    val iconArm = iconSet(BetterFoliageMod.LEGACY_DOMAIN, "blocks/better_cactus_arm_%d")
+    val iconBase = object : ColumnTextures(Config.blocks.cactus) {
+        init {
+            matchClassAndModel(matcher, "block/cactus", listOf("top", "bottom", "side"))
+        }
+    }
 
     val modelStem = model {
         horizontalRectangle(x1 = -cactusStemRadius, x2 = cactusStemRadius, z1 = -cactusStemRadius, z2 = cactusStemRadius, y = 0.5)
@@ -53,18 +63,23 @@ class RenderCactus : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
         ctx.cameraDistance < Config.cactus.distance &&
         Config.blocks.cactus.matchesID(ctx.block)
 
-    override fun render(ctx: BlockContext, parent: RenderBlocks): Boolean {
+    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: WorldRenderer, layer: EnumWorldBlockLayer): Boolean {
         // get AO data
-        if (renderWorldBlockBase(parent, face = neverRender)) return true
+        modelRenderer.updateShading(Int3.zero, allFaces)
+        val icons = iconBase[ctx.blockState(Int3.zero)] ?: return renderWorldBlockBase(ctx, dispatcher, renderer, null)
 
         modelRenderer.render(
+            renderer,
             modelStem.model,
             Rotation.identity,
-            icon = { ctx, qi, q -> ctx.icon(forgeDirs[qi])},
+            icon = { ctx, qi, q -> when(qi) {
+                0 -> icons.bottomTexture; 1 -> icons.topTexture; else -> icons.sideTexture
+            } },
             rotateUV = { 0 },
             postProcess = noPost
         )
         modelRenderer.render(
+            renderer,
             modelCross[ctx.random(0)],
             Rotation.identity,
             icon = { ctx, qi, q -> iconCross.icon!!},
@@ -72,6 +87,7 @@ class RenderCactus : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
             postProcess = noPost
         )
         modelRenderer.render(
+            renderer,
             modelArm[ctx.random(1)],
             cactusArmRotation[ctx.random(2) % 4],
             icon = { ctx2, qi, q -> iconArm[ctx.random(3)]!!},

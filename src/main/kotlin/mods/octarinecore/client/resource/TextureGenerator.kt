@@ -39,9 +39,7 @@ abstract class TextureGenerator(domain: String) : ParameterBasedGenerator(domain
         }
     )
 
-    /**
-     * Get the type and location of the texture resource encoded by the given [ParameterList].
-     */
+    /** Get the type and location of the texture resource encoded by the given [ParameterList]. */
     fun targetResource(params: ParameterList): Pair<ResourceType, ResourceLocation>? {
         val baseTexture =
             if (listOf("dom", "path").all { it in params }) ResourceLocation(params["dom"]!!, params["path"]!!)

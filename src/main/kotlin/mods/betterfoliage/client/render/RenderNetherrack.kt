@@ -4,16 +4,19 @@ import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.Config
 import mods.octarinecore.client.render.*
+import mods.octarinecore.common.Int3
+import mods.octarinecore.common.Rotation
 import mods.octarinecore.random
-import net.minecraft.client.renderer.RenderBlocks
+import net.minecraft.client.renderer.BlockRendererDispatcher
+import net.minecraft.client.renderer.WorldRenderer
 import net.minecraft.init.Blocks
-import net.minecraftforge.common.util.ForgeDirection.DOWN
-import net.minecraftforge.common.util.ForgeDirection.UP
+import net.minecraft.util.EnumWorldBlockLayer
+import net.minecraft.util.EnumFacing.*
 import org.apache.logging.log4j.Level.INFO
 
 class RenderNetherrack : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
 
-    val netherrackIcon = iconSet(BetterFoliageMod.LEGACY_DOMAIN, "better_netherrack_%d")
+    val netherrackIcon = iconSet(BetterFoliageMod.LEGACY_DOMAIN, "blocks/better_netherrack_%d")
     val netherrackModel = modelSet(64) { modelIdx ->
         verticalRectangle(x1 = -0.5, z1 = 0.5, x2 = 0.5, z2 = -0.5, yTop = -0.5,
         yBottom = -0.5 - random(Config.netherrack.heightMin, Config.netherrack.heightMax))
@@ -33,12 +36,14 @@ class RenderNetherrack : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) 
         ctx.cameraDistance < Config.netherrack.distance
     }
 
-    override fun render(ctx: BlockContext, parent: RenderBlocks): Boolean {
-        if (renderWorldBlockBase(parent, face = alwaysRender)) return true
+    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: WorldRenderer, layer: EnumWorldBlockLayer): Boolean {
+        renderWorldBlockBase(ctx, dispatcher, renderer, null)
         if (ctx.block(down1).isOpaqueCube) return true
+        modelRenderer.updateShading(Int3.zero, allFaces)
 
         val rand = ctx.semiRandomArray(2)
         modelRenderer.render(
+            renderer,
             netherrackModel[rand[0]],
             Rotation.identity,
             icon = { ctx, qi, q -> netherrackIcon[rand[qi and 1]]!! },

@@ -1,9 +1,11 @@
 package mods.octarinecore.client.render
 
+import mods.octarinecore.common.*
 import mods.octarinecore.minmax
 import mods.octarinecore.replace
-import net.minecraftforge.common.util.ForgeDirection
-import java.lang.Math.*
+import net.minecraft.util.EnumFacing
+import java.lang.Math.max
+import java.lang.Math.min
 
 /**
  * Vertex UV coordinates
@@ -57,7 +59,7 @@ data class Quad(val v1: Vertex, val v2: Vertex, val v3: Vertex, val v4: Vertex) 
     val normal: Double3 get() = (v2.xyz - v1.xyz).cross(v4.xyz - v1.xyz).normalize
 
     fun move(trans: Double3) = transformV { it.copy(xyz = it.xyz + trans) }
-    fun move(trans: Pair<Double, ForgeDirection>) = move(Double3(trans.second) * trans.first)
+    fun move(trans: Pair<Double, EnumFacing>) = move(Double3(trans.second) * trans.first)
     fun scale (scale: Double) = transformV { it.copy(xyz = it.xyz * scale) }
     fun scale (scale: Double3) = transformV { it.copy(xyz = Double3(it.xyz.x * scale.x, it.xyz.y * scale.y, it.xyz.z * scale.z)) }
     fun scaleUV (scale: Double) = transformV { it.copy(uv = UV(it.uv.u * scale, it.uv.v * scale)) }
@@ -115,7 +117,7 @@ class Model() {
         )
     }
 
-    fun faceQuad(face: ForgeDirection): Quad {
+    fun faceQuad(face: EnumFacing): Quad {
         val base = face.vec * 0.5
         val top = faceCorners[face.ordinal].topLeft.first.vec * 0.5
         val left = faceCorners[face.ordinal].topLeft.second.vec * 0.5

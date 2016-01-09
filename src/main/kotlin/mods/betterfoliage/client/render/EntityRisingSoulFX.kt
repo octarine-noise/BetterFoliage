@@ -1,22 +1,23 @@
 package mods.betterfoliage.client.render
 
-import cpw.mods.fml.relauncher.Side
-import cpw.mods.fml.relauncher.SideOnly
 import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.Config
 import mods.octarinecore.client.render.AbstractEntityFX
-import mods.octarinecore.client.render.Double3
 import mods.octarinecore.client.resource.ResourceHandler
+import mods.octarinecore.common.Double3
 import mods.octarinecore.forEachPairIndexed
-import net.minecraft.client.renderer.Tessellator
+import net.minecraft.client.renderer.WorldRenderer
+import net.minecraft.util.BlockPos
 import net.minecraft.util.MathHelper
 import net.minecraft.world.World
-import org.apache.logging.log4j.Level.*
+import net.minecraftforge.fml.relauncher.Side
+import net.minecraftforge.fml.relauncher.SideOnly
+import org.apache.logging.log4j.Level.INFO
 import java.util.*
 
-class EntityRisingSoulFX(world: World, x: Int, y: Int, z: Int) :
-AbstractEntityFX(world, x.toDouble() + 0.5, y.toDouble() + 1.0, z.toDouble() + 0.5) {
+class EntityRisingSoulFX(world: World, pos: BlockPos) :
+AbstractEntityFX(world, pos.x.toDouble() + 0.5, pos.y.toDouble() + 1.0, pos.z.toDouble() + 0.5) {
 
     val particleTrail: Deque<Double3> = linkedListOf()
     val initialPhase = rand.nextInt(64)
@@ -40,11 +41,11 @@ AbstractEntityFX(world, x.toDouble() + 0.5, y.toDouble() + 1.0, z.toDouble() + 0
         if (!Config.enabled) setDead()
     }
 
-    override fun render(tessellator: Tessellator, partialTickTime: Float) {
+    override fun render(worldRenderer: WorldRenderer, partialTickTime: Float) {
         var alpha = Config.risingSoul.opacity
         if (particleAge > particleMaxAge - 40) alpha *= (particleMaxAge - particleAge) / 40.0f
 
-        renderParticleQuad(tessellator, partialTickTime,
+        renderParticleQuad(worldRenderer, partialTickTime,
             size = Config.risingSoul.headSize * 0.25,
             alpha = alpha
         )
@@ -53,7 +54,7 @@ AbstractEntityFX(world, x.toDouble() + 0.5, y.toDouble() + 1.0, z.toDouble() + 0
         particleTrail.forEachPairIndexed { idx, current, previous ->
             scale *= Config.risingSoul.sizeDecay
             alpha *= Config.risingSoul.opacityDecay
-            if (idx % Config.risingSoul.trailDensity == 0) renderParticleQuad(tessellator, partialTickTime,
+            if (idx % Config.risingSoul.trailDensity == 0) renderParticleQuad(worldRenderer, partialTickTime,
                 currentPos = current,
                 prevPos = previous,
                 size = scale,
@@ -66,8 +67,8 @@ AbstractEntityFX(world, x.toDouble() + 0.5, y.toDouble() + 1.0, z.toDouble() + 0
 
 @SideOnly(Side.CLIENT)
 object RisingSoulTextures : ResourceHandler(BetterFoliageMod.MOD_ID) {
-    val headIcons = iconSet(BetterFoliageMod.LEGACY_DOMAIN, "rising_soul_%d")
-    val trackIcon = iconStatic(BetterFoliageMod.LEGACY_DOMAIN, "soul_track")
+    val headIcons = iconSet(BetterFoliageMod.LEGACY_DOMAIN, "blocks/rising_soul_%d")
+    val trackIcon = iconStatic(BetterFoliageMod.LEGACY_DOMAIN, "blocks/soul_track")
 
     override fun afterStitch() {
         Client.log(INFO, "Registered ${headIcons.num} soul particle textures")

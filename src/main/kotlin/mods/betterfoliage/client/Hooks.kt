@@ -2,32 +2,33 @@
 @file:SideOnly(Side.CLIENT)
 package mods.betterfoliage.client
 
-import cpw.mods.fml.relauncher.Side
-import cpw.mods.fml.relauncher.SideOnly
 import mods.betterfoliage.client.config.Config
 import mods.betterfoliage.client.render.EntityFallingLeavesFX
 import mods.betterfoliage.client.render.EntityRisingSoulFX
+import mods.betterfoliage.client.render.down1
+import mods.betterfoliage.client.render.up1
 import mods.octarinecore.client.render.blockContext
+import mods.octarinecore.client.resource.LoadModelDataEvent
+import mods.octarinecore.common.plus
 import net.minecraft.block.Block
-import net.minecraft.client.Minecraft
+import net.minecraft.block.state.IBlockState
+import net.minecraft.client.renderer.BlockRendererDispatcher
+import net.minecraft.client.renderer.WorldRenderer
 import net.minecraft.init.Blocks
+import net.minecraft.util.BlockPos
+import net.minecraft.util.EnumFacing
+import net.minecraft.util.EnumWorldBlockLayer
+import net.minecraft.util.EnumWorldBlockLayer.CUTOUT
+import net.minecraft.util.EnumWorldBlockLayer.CUTOUT_MIPPED
 import net.minecraft.world.IBlockAccess
 import net.minecraft.world.World
+import net.minecraftforge.client.model.ModelLoader
+import net.minecraftforge.common.MinecraftForge
+import net.minecraftforge.fml.relauncher.Side
+import net.minecraftforge.fml.relauncher.SideOnly
 
-fun getRenderTypeOverride(blockAccess: IBlockAccess, x: Int, y: Int, z: Int, block: Block, original: Int): Int {
-    if (!Config.enabled) return original;
-
-    // universal sign for DON'T RENDER ME!
-    if (original == -1) return original;
-
-    return blockContext.let { ctx ->
-        ctx.set(blockAccess, x, y, z)
-        Client.renderers.find { it.isEligible(ctx) }?.renderId ?: original
-    }
-}
-
-fun shouldRenderBlockSideOverride(original: Boolean, blockAccess: IBlockAccess, x: Int, y: Int, z: Int, side: Int): Boolean {
-    return original || (Config.enabled && Config.roundLogs.enabled && Config.blocks.logs.matchesID(blockAccess.getBlock(x, y, z)));
+fun shouldRenderBlockSideOverride(original: Boolean, blockAccess: IBlockAccess, pos: BlockPos, side: EnumFacing): Boolean {
+    return original || (Config.enabled && Config.roundLogs.enabled && Config.blocks.logs.matchesID(blockAccess.getBlockState(pos).block));
 }
 
 fun getAmbientOcclusionLightValueOverride(original: Float, block: Block): Float {
@@ -39,20 +40,58 @@ fun getUseNeighborBrightnessOverride(original: Boolean, block: Block): Boolean {
     return original || (Config.enabled && Config.roundLogs.enabled && Config.blocks.logs.matchesID(block));
 }
 
-fun onRandomDisplayTick(block: Block, world: World, x: Int, y: Int, z: Int) {
+fun onRandomDisplayTick(world: World, state: IBlockState, pos: BlockPos) {
     if (Config.enabled &&
         Config.risingSoul.enabled &&
-        block == Blocks.soul_sand &&
-        world.isAirBlock(x, y + 1, z) &&
+        state.block == Blocks.soul_sand &&
+        world.isAirBlock(pos + up1) &&
         Math.random() < Config.risingSoul.chance) {
-            EntityRisingSoulFX(world, x, y, z).addIfValid()
+            EntityRisingSoulFX(world, pos).addIfValid()
     }
 
     if (Config.enabled &&
         Config.fallingLeaves.enabled &&
-        Config.blocks.leaves.matchesID(block) &&
-        world.isAirBlock(x, y - 1, z) &&
+        Config.blocks.leaves.matchesID(state.block) &&
+        world.isAirBlock(pos + down1) &&
         Math.random() < Config.fallingLeaves.chance) {
-            EntityFallingLeavesFX(world, x, y, z).addIfValid()
+            EntityFallingLeavesFX(world, pos).addIfValid()
     }
+}
+
+fun onAfterLoadModelDefinitions(loader: ModelLoader) {
+    MinecraftForge.EVENT_BUS.post(LoadModelDataEvent(loader))
+}
+
+fun renderWorldBlock(dispatcher: BlockRendererDispatcher,
+                     state: IBlockState,
+                     pos: BlockPos,
+                     blockAccess: IBlockAccess,
+                     worldRenderer: WorldRenderer,
+                     layer: EnumWorldBlockLayer
+): Boolean {
+    val isCutout = layer == CUTOUT_MIPPED || layer == CUTOUT
+    val needsCutout = state.block.canRenderInLayer(CUTOUT_MIPPED) || state.block.canRenderInLayer(CUTOUT)
+    val canRender = (isCutout && needsCutout) || state.block.canRenderInLayer(layer)
+
+    blockContext.let { ctx ->
+        ctx.set(blockAccess, pos)
+        Client.renderers.forEach { renderer ->
+            if (renderer.isEligible(ctx)) {
+                return if (renderer.moveToCutout) {
+                    if (isCutout) renderer.render(ctx, dispatcher, worldRenderer, layer) else false
+                } else {
+                    renderer.render(ctx, dispatcher, worldRenderer, layer)
+                }
+            }
+        }
+    }
+    return if (canRender) dispatcher.renderBlock(state, pos, blockAccess, worldRenderer) else false
+}
+
+fun canRenderBlockInLayer(block: Block, layer: EnumWorldBlockLayer): Boolean {
+    if (layer == CUTOUT_MIPPED && !block.canRenderInLayer(CUTOUT)) {
+        return true
+    }
+    return block.canRenderInLayer(layer)
+
 }

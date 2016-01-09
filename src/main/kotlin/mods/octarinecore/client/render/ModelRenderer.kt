@@ -1,10 +1,12 @@
 package mods.octarinecore.client.render
 
+import mods.octarinecore.client.resource.resourceManager
+import mods.octarinecore.common.*
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.Tessellator
-import net.minecraft.util.IIcon
-import net.minecraftforge.common.util.ForgeDirection
-import net.minecraftforge.common.util.ForgeDirection.*
+import net.minecraft.client.renderer.WorldRenderer
+import net.minecraft.client.renderer.texture.TextureAtlasSprite
+import net.minecraft.util.EnumFacing
+import net.minecraft.util.EnumFacing.*
 
 class ModelRenderer() : ShadingContext() {
 
@@ -25,11 +27,12 @@ class ModelRenderer() : ShadingContext() {
      * @param[postProcess] lambda to perform arbitrary modifications on the [RenderVertex] just before it goes to the [Tessellator]
      */
     inline fun render(
+        worldRenderer: WorldRenderer,
         model: Model,
         rot: Rotation,
         trans: Double3 = blockContext.blockCenter,
         forceFlat: Boolean = false,
-        icon: (ShadingContext, Int, Quad) -> IIcon,
+        icon: (ShadingContext, Int, Quad) -> TextureAtlasSprite?,
         rotateUV: (Quad) -> Int,
         postProcess: RenderVertex.(ShadingContext, Int, Quad, Int, Vertex) -> Unit
     ) {
@@ -38,17 +41,19 @@ class ModelRenderer() : ShadingContext() {
 
         model.quads.forEachIndexed { quadIdx, quad ->
             val drawIcon = icon(this, quadIdx, quad)
-            val uvRot = rotateUV(quad)
-            quad.verts.forEachIndexed { vertIdx, vert ->
-                temp.init(vert)
-                temp.rotate(rotation).translate(trans).rotateUV(uvRot).setIcon(drawIcon)
-                val shader = if (aoEnabled && !forceFlat) vert.aoShader else vert.flatShader
-                shader.shade(this, temp)
-                temp.postProcess(this, quadIdx, quad, vertIdx, vert)
-                Tessellator.instance.apply {
-                    setBrightness(temp.brightness)
-                    setColorOpaque_F(temp.red, temp.green, temp.blue)
-                    addVertexWithUV(temp.x, temp.y, temp.z, temp.u, temp.v)
+            if (drawIcon != null) {
+                val uvRot = rotateUV(quad)
+                quad.verts.forEachIndexed { vertIdx, vert ->
+                    temp.init(vert)
+                    temp.rotate(rotation).translate(trans).rotateUV(uvRot).setIcon(drawIcon)
+                    val shader = if (aoEnabled && !forceFlat) vert.aoShader else vert.flatShader
+                    shader.shade(this, temp)
+                    temp.postProcess(this, quadIdx, quad, vertIdx, vert)
+                    worldRenderer.setTextureUV(temp.u, temp.v)
+                    worldRenderer.setBrightness(temp.brightness)
+                    worldRenderer.setColorOpaque_F(temp.red, temp.green, temp.blue)
+                    worldRenderer.addVertex(temp.x, temp.y, temp.z)
+
                 }
             }
         }
@@ -61,13 +66,16 @@ class ModelRenderer() : ShadingContext() {
 open class ShadingContext {
     var rotation = Rotation.identity
     var aoEnabled = Minecraft.isAmbientOcclusionEnabled()
+    val aoFaces = Array(6) { AoFaceData(forgeDirs[it]) }
 
-    fun aoShading(face: ForgeDirection, corner1: ForgeDirection, corner2: ForgeDirection) =
-        renderBlocks.capture.aoShading(face.rotate(rotation), corner1.rotate(rotation), corner2.rotate(rotation))
+    fun updateShading(offset: Int3, predicate: (EnumFacing) -> Boolean = { true }) {
+        forgeDirs.forEach { if (predicate(it)) aoFaces[it.ordinal].update(offset) }
+    }
 
-    fun blockColor(offset: Int3) = blockContext.blockColor(offset.rotate(rotation))
-    fun blockBrightness(offset: Int3) = blockContext.blockBrightness(offset.rotate(rotation))
-    fun icon(face: ForgeDirection) = blockContext.icon(face.rotate(rotation))
+    fun aoShading(face: EnumFacing, corner1: EnumFacing, corner2: EnumFacing) =
+        aoFaces[face.rotate(rotation).ordinal][corner1.rotate(rotation), corner2.rotate(rotation)]
+
+    fun blockData(offset: Int3) = blockContext.blockData(offset.rotate(rotation), 0)
 }
 
 /**
@@ -112,7 +120,7 @@ class RenderVertex() {
             else -> { return this }
         }
     }
-    inline fun setIcon(icon: IIcon): RenderVertex {
+    inline fun setIcon(icon: TextureAtlasSprite): RenderVertex {
         u = (icon.maxU - icon.minU) * (u + 0.5) + icon.minU
         v = (icon.maxV - icon.minV) * (v + 0.5) + icon.minV
         return this
@@ -133,6 +141,9 @@ class RenderVertex() {
         blue = (color and 255) / 256.0f
     }
 }
+
+val allFaces: (EnumFacing) -> Boolean = { true }
+val topOnly: (EnumFacing) -> Boolean = { it == UP }
 
 /** Perform no post-processing */
 val noPost: RenderVertex.(ShadingContext, Int, Quad, Int, Vertex) -> Unit = { ctx, qi, q, vi, v -> }

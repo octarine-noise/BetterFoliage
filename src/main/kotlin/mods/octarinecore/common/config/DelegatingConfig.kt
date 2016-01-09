@@ -1,17 +1,17 @@
-package mods.octarinecore.config
+package mods.octarinecore.common.config
 
 import com.google.common.collect.LinkedListMultimap
-import cpw.mods.fml.client.config.GuiConfigEntries
-import cpw.mods.fml.client.config.IConfigElement
-import cpw.mods.fml.client.event.ConfigChangedEvent
-import cpw.mods.fml.common.FMLCommonHandler
-import cpw.mods.fml.common.eventhandler.SubscribeEvent
 import mods.octarinecore.metaprog.reflectField
 import mods.octarinecore.metaprog.reflectFieldsOfType
 import mods.octarinecore.metaprog.reflectNestedObjects
 import net.minecraftforge.common.config.ConfigElement
 import net.minecraftforge.common.config.Configuration
 import net.minecraftforge.common.config.Property
+import net.minecraftforge.fml.client.config.GuiConfigEntries
+import net.minecraftforge.fml.client.config.IConfigElement
+import net.minecraftforge.fml.client.event.ConfigChangedEvent
+import net.minecraftforge.fml.common.FMLCommonHandler
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.reflect.KProperty
 
 // ============================
@@ -37,7 +37,7 @@ abstract class DelegatingConfig(val modId: String, val langPrefix: String) {
 
     /** The [Configuration] backing this config object. */
     var config: Configuration? = null
-    val rootGuiElements = linkedListOf<IConfigElement<*>>()
+    val rootGuiElements = linkedListOf<IConfigElement>()
 
     /** Attach this config object to the given [Configuration] and update all properties. */
     fun attach(config: Configuration) {
@@ -50,7 +50,7 @@ abstract class DelegatingConfig(val modId: String, val langPrefix: String) {
             property.attach(config, langPrefix, category, name)
             property.guiProperties.forEach { guiProperty ->
                 property.guiClass?.let { guiProperty.setConfigEntryClass(it) }
-                if (category == "global") rootGuiElements.add(ConfigElement.getTypedElement(guiProperty))
+                if (category == "global") rootGuiElements.add(ConfigElement(guiProperty))
                 else subProperties.put(category, guiProperty.name)
             }
         }
@@ -58,7 +58,7 @@ abstract class DelegatingConfig(val modId: String, val langPrefix: String) {
             val configCategory = config.getCategory(category)
             configCategory.setLanguageKey("$langPrefix.$category")
             configCategory.setPropertyOrder(subProperties[category])
-            rootGuiElements.add(ConfigElement<String>(configCategory))
+            rootGuiElements.add(ConfigElement(configCategory))
         }
         save()
     }
@@ -118,7 +118,7 @@ abstract class ConfigPropertyBase {
     var lang: String? = null
 
     /** GUI class to use. */
-    var guiClass: Class<out GuiConfigEntries.IConfigEntry<*>>? = null
+    var guiClass: Class<out GuiConfigEntries.IConfigEntry>? = null
 
     /** @return true if the property has changed. */
     abstract val hasChanged: Boolean

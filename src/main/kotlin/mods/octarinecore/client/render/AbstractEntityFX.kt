@@ -1,10 +1,12 @@
 package mods.octarinecore.client.render
 
 import mods.octarinecore.PI2
+import mods.octarinecore.common.Double3
 import net.minecraft.client.Minecraft
 import net.minecraft.client.particle.EntityFX
-import net.minecraft.client.renderer.Tessellator
-import net.minecraft.util.IIcon
+import net.minecraft.client.renderer.WorldRenderer
+import net.minecraft.client.renderer.texture.TextureAtlasSprite
+import net.minecraft.entity.Entity
 import net.minecraft.world.World
 
 abstract class AbstractEntityFX(world: World, x: Double, y: Double, z: Double) : EntityFX(world, x, y, z) {
@@ -30,7 +32,7 @@ abstract class AbstractEntityFX(world: World, x: Double, y: Double, z: Double) :
     }
 
     /** Render the particle. */
-    abstract fun render(tessellator: Tessellator, partialTickTime: Float)
+    abstract fun render(worldRenderer: WorldRenderer, partialTickTime: Float)
 
     /** Update particle on world tick. */
     abstract fun update()
@@ -41,12 +43,11 @@ abstract class AbstractEntityFX(world: World, x: Double, y: Double, z: Double) :
     /** Add the particle to the effect renderer if it is valid. */
     fun addIfValid() { if (isValid) Minecraft.getMinecraft().effectRenderer.addEffect(this) }
 
-    override fun renderParticle(tessellator: Tessellator, partialTickTime: Float, rotX: Float, rotZ: Float, rotYZ: Float, rotXY: Float, rotXZ: Float) {
+    override fun renderParticle(worldRenderer: WorldRenderer, entity: Entity, partialTickTime: Float, rotX: Float, rotZ: Float, rotYZ: Float, rotXY: Float, rotXZ: Float) {
         billboardRot.first.setTo(rotX + rotXY, rotZ, rotYZ + rotXZ)
         billboardRot.second.setTo(rotX - rotXY, -rotZ, rotYZ - rotXZ)
-        render(tessellator, partialTickTime)
+        render(worldRenderer, partialTickTime)
     }
-
     /**
      * Render a particle quad.
      *
@@ -60,13 +61,13 @@ abstract class AbstractEntityFX(world: World, x: Double, y: Double, z: Double) :
      * @param[isMirrored] mirror particle texture along V-axis
      * @param[alpha] aplha blending
      */
-    fun renderParticleQuad(tessellator: Tessellator,
+    fun renderParticleQuad(worldRenderer: WorldRenderer,
                            partialTickTime: Float,
                            currentPos: Double3 = this.currentPos,
                            prevPos: Double3 = this.prevPos,
                            size: Double = particleScale.toDouble(),
                            rotation: Int = 0,
-                           icon: IIcon = particleIcon,
+                           icon: TextureAtlasSprite = particleIcon,
                            isMirrored: Boolean = false,
                            alpha: Float = this.particleAlpha) {
 
@@ -81,11 +82,11 @@ abstract class AbstractEntityFX(world: World, x: Double, y: Double, z: Double) :
         val v2 = if (rotation == 0) billboardRot.second * size else
             Double3.weight(billboardRot.first, -sin[rotation and 63] * size, billboardRot.second, cos[rotation and 63] * size)
 
-        tessellator.setColorRGBA_F(this.particleRed, this.particleGreen, this.particleBlue, alpha)
-        tessellator.addVertexWithUV(center.x - v1.x, center.y - v1.y, center.z - v1.z, maxU, maxV)
-        tessellator.addVertexWithUV(center.x - v2.x, center.y - v2.y, center.z - v2.z, maxU, minV)
-        tessellator.addVertexWithUV(center.x + v1.x, center.y + v1.y, center.z + v1.z, minU, minV)
-        tessellator.addVertexWithUV(center.x + v2.x, center.y + v2.y, center.z + v2.z, minU, maxV)
+        worldRenderer.setColorRGBA_F(this.particleRed, this.particleGreen, this.particleBlue, alpha)
+        worldRenderer.addVertexWithUV(center.x - v1.x, center.y - v1.y, center.z - v1.z, maxU, maxV)
+        worldRenderer.addVertexWithUV(center.x - v2.x, center.y - v2.y, center.z - v2.z, maxU, minV)
+        worldRenderer.addVertexWithUV(center.x + v1.x, center.y + v1.y, center.z + v1.z, minU, minV)
+        worldRenderer.addVertexWithUV(center.x + v2.x, center.y + v2.y, center.z + v2.z, minU, maxV)
     }
 
     override fun getFXLayer() = 1

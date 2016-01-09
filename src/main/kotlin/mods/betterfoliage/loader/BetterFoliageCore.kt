@@ -1,67 +1,40 @@
 package mods.betterfoliage.loader
 
-import cpw.mods.fml.relauncher.FMLLaunchHandler
-import cpw.mods.fml.relauncher.IFMLLoadingPlugin
-import mods.octarinecore.metaprog.*
+import mods.octarinecore.metaprog.ASMPlugin
+import mods.octarinecore.metaprog.Transformer
+import mods.octarinecore.metaprog.allAvailable
+import net.minecraftforge.fml.relauncher.FMLLaunchHandler
+import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin
 import org.objectweb.asm.Opcodes.*
 
 @IFMLLoadingPlugin.TransformerExclusions(
     "mods.betterfoliage.loader",
     "mods.octarinecore.metaprog",
     "kotlin",
-    "mods.betterfoliage.kotlin"
+    "mods.octarinecore.kotlin"
 )
 class BetterFoliageLoader : ASMPlugin(BetterFoliageTransformer::class.java)
 
 class BetterFoliageTransformer : Transformer() {
+
+    val isOptifinePresent = allAvailable(Refs.OptifineClassTransformer)
 
     init {
         if (FMLLaunchHandler.side().isClient) setupClient()
     }
 
     fun setupClient() {
-        // where: RenderBlocks.renderBlockByRenderType()
-        // what: invoke BF code to overrule the return value of Block.getRenderType()
-        // why: allows us to use custom block renderers for any block, without touching block code
-        transformMethod(Refs.renderBlockByRenderType) {
-            find(varinsn(ISTORE, 5))?.insertAfter {
-                log.info("Applying block render type override")
-                varinsn(ALOAD, 0)
-                getField(Refs.blockAccess)
-                varinsn(ILOAD, 2)
-                varinsn(ILOAD, 3)
-                varinsn(ILOAD, 4)
-                varinsn(ALOAD, 1)
-                varinsn(ILOAD, 5)
-                invokeStatic(Refs.getRenderTypeOverride)
-                varinsn(ISTORE, 5)
-            } ?: log.warn("Failed to apply block render type override!")
-        }
-
         // where: WorldClient.doVoidFogParticles(), right before the end of the loop
         // what: invoke BF code for every random display tick
         // why: allows us to catch random display ticks, without touching block code
         transformMethod(Refs.doVoidFogParticles) {
             find(IINC)?.insertBefore {
                 log.info("Applying random display tick call hook")
-                varinsn(ALOAD, 10)
                 varinsn(ALOAD, 0)
-                varinsn(ILOAD, 7)
-                varinsn(ILOAD, 8)
-                varinsn(ILOAD, 9)
+                varinsn(ALOAD, 13)
+                varinsn(ALOAD, if (isOptifinePresent) 8 else 12)
                 invokeStatic(Refs.onRandomDisplayTick)
             } ?: log.warn("Failed to apply random display tick call hook!")
-        }
-
-        // where: shadersmodcore.client.Shaders.pushEntity()
-        // what: invoke BF code to overrule block data
-        // why: allows us to change the block ID seen by shader programs
-        transformMethod(Refs.pushEntity) {
-            find(IASTORE)?.insertBefore {
-                log.info("Applying Shaders.pushEntity() block id override")
-                varinsn(ALOAD, 1)
-                invokeStatic(Refs.getBlockIdOverride)
-            } ?: log.warn("Failed to apply Shaders.pushEntity() block id override!")
         }
 
         // where: Block.getAmbientOcclusionLightValue()
@@ -95,12 +68,67 @@ class BetterFoliageTransformer : Transformer() {
             find(IRETURN)?.insertBefore {
                 log.info("Applying Block.shouldSideBeRendered() override")
                 varinsn(ALOAD, 1)
-                varinsn(ILOAD, 2)
-                varinsn(ILOAD, 3)
-                varinsn(ILOAD, 4)
-                varinsn(ILOAD, 5)
+                varinsn(ALOAD, 2)
+                varinsn(ALOAD, 3)
                 invokeStatic(Refs.shouldRenderBlockSideOverride)
             } ?: log.warn("Failed to apply Block.shouldSideBeRendered() override!")
+        }
+
+        // where: ModelLoader.setupModelRegistry(), right before the textures are loaded
+        // what: invoke handler code with ModelLoader instance
+        // why: allows us to iterate the unbaked models in ModelLoader in time to register textures
+        transformMethod(Refs.setupModelRegistry) {
+            find(invokeName("addAll"))?.insertAfter {
+                log.info("Applying ModelLoader lifecycle callback")
+                varinsn(ALOAD, 0)
+                invokeStatic(Refs.onAfterLoadModelDefinitions)
+            }
+        }
+
+        // where: RenderChunk.rebuildChunk()
+        // what: replace call to BlockRendererDispatcher.renderBlock()
+        // why: allows us to perform additional rendering for each block
+        // what: invoke code to overrule result of Block.canRenderInLayer()
+        // why: allows us to render transparent quads for blocks which are only on the SOLID layer
+        transformMethod(Refs.rebuildChunk) {
+            find(invokeRef(Refs.renderBlock))?.replace {
+                log.info("Applying RenderChunk block render override")
+                varinsn(ALOAD, if (isOptifinePresent) 21 else 18)
+                invokeStatic(Refs.renderWorldBlock)
+            }
+            if (isOptifinePresent) {
+                find(varinsn(ISTORE, 22))?.insertBefore {
+                    log.info("Applying RenderChunk block layer override")
+                    insn(POP)
+                    varinsn(ALOAD, 17)
+                    varinsn(ALOAD, 21)
+                    invokeStatic(Refs.canRenderBlockInLayer)
+                }
+            } else {
+                find(invokeRef(Refs.canRenderInLayer))?.replace {
+                    log.info("Applying RenderChunk block layer override")
+                    invokeStatic(Refs.canRenderBlockInLayer)
+                }
+            }
+        }
+
+        // where: net.minecraft.client.renderer.BlockModelRenderer$AmbientOcclusionFace
+        // what: make constructor public
+        // why: use vanilla AO calculation at will without duplicating code
+        transformMethod(Refs.AOF_constructor) {
+            log.info("Setting AmbientOcclusionFace constructor public")
+            makePublic()
+        }
+
+        // where: shadersmod.client.SVertexBuilder.pushEntity()
+        // what: invoke code to overrule block data
+        // why: allows us to change the block ID seen by shader programs
+        transformMethod(Refs.pushEntity_state) {
+            find(invokeRef(Refs.pushEntity_num))?.insertBefore {
+                log.info("Applying SVertexBuilder.pushEntity() block ID override")
+                varinsn(ALOAD, 0)
+                invokeStatic(Refs.getBlockIdOverride)
+            } ?: log.warn("Failed to apply SVertexBuilder.pushEntity() block ID override!")
         }
     }
 }

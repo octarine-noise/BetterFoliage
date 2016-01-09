@@ -3,8 +3,9 @@ package mods.betterfoliage.client.render
 
 import mods.betterfoliage.client.config.Config
 import mods.octarinecore.client.render.*
+import mods.octarinecore.common.Double3
 import mods.octarinecore.exchange
-import net.minecraftforge.common.util.ForgeDirection.*
+import net.minecraft.util.EnumFacing.*
 
 /** Weight of the same-side AO values on the outer edges of the 45deg chamfered column faces. */
 const val chamferAffinity = 0.9f

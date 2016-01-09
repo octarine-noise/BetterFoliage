@@ -1,9 +1,9 @@
 package mods.betterfoliage.loader
 
-import cpw.mods.fml.relauncher.FMLInjectionData
 import mods.octarinecore.metaprog.ClassRef
 import mods.octarinecore.metaprog.FieldRef
 import mods.octarinecore.metaprog.MethodRef
+import net.minecraftforge.fml.relauncher.FMLInjectionData
 
 /** Singleton object holding references to foreign code elements. */
 object Refs {
@@ -14,58 +14,76 @@ object Refs {
     val List = ClassRef("java.util.List")
 
     // Minecraft
-    val IBlockAccess = ClassRef("net.minecraft.world.IBlockAccess", "ahl")
+    val IBlockAccess = ClassRef("net.minecraft.world.IBlockAccess", "ard")
+    val IBlockState = ClassRef("net.minecraft.block.state.IBlockState", "bec")
+    val BlockPos = ClassRef("net.minecraft.util.BlockPos", "dt")
+    val EnumWorldBlockLayer = ClassRef("net.minecraft.util.EnumWorldBlockLayer", "aql")
+    val EnumFacing = ClassRef("net.minecraft.util.EnumFacing", "ej")
 
-    val Block = ClassRef("net.minecraft.block.Block", "aji")
-    val getAmbientOcclusionLightValue = MethodRef(Block, "getAmbientOcclusionLightValue", "func_149685_I", "I", ClassRef.float)
-    val getUseNeighborBrightness = MethodRef(Block, "getUseNeighborBrightness", "func_149710_n", "n", ClassRef.boolean)
-    val shouldSideBeRendered = MethodRef(Block, "shouldSideBeRendered", "func_149646_a", "a", ClassRef.boolean, IBlockAccess, ClassRef.int, ClassRef.int, ClassRef.int, ClassRef.int)
+    val Block = ClassRef("net.minecraft.block.Block", "atr")
+    val canRenderInLayer = MethodRef(Block, "canRenderInLayer", ClassRef.boolean, EnumWorldBlockLayer)
+    val getAmbientOcclusionLightValue = MethodRef(Block, "getAmbientOcclusionLightValue", "func_149685_I", "f", ClassRef.float)
+    val getUseNeighborBrightness = MethodRef(Block, "getUseNeighborBrightness", "func_149710_n", "q", ClassRef.boolean)
+    val shouldSideBeRendered = MethodRef(Block, "shouldSideBeRendered", "func_149646_a", "a", ClassRef.boolean, IBlockAccess, BlockPos, EnumFacing)
 
-    val RenderBlocks = ClassRef("net.minecraft.client.renderer.RenderBlocks", "blm")
-    val blockAccess = FieldRef(RenderBlocks, "blockAccess", null, "a", IBlockAccess)
-    val renderBlockByRenderType = MethodRef(RenderBlocks, "renderBlockByRenderType", null, "b", ClassRef.boolean, Block, ClassRef.int, ClassRef.int, ClassRef.int)
+    val BlockModelRenderer = ClassRef("net.minecraft.client.renderer.BlockModelRenderer", "cln")
+    val AmbientOcclusionFace = ClassRef("net.minecraft.client.renderer.BlockModelRenderer\$AmbientOcclusionFace", "clq")
+    val ChunkCompileTaskGenerator = ClassRef("net.minecraft.client.renderer.chunk.ChunkCompileTaskGenerator", "coa")
+    val WorldRenderer = ClassRef("net.minecraft.client.renderer.WorldRenderer", "civ")
+    val AOF_constructor = MethodRef(AmbientOcclusionFace, "<init>", ClassRef.void, BlockModelRenderer)
 
-    val WorldClient = ClassRef("net.minecraft.client.multiplayer.WorldClient", "bjf")
-    val doVoidFogParticles = MethodRef(WorldClient, "doVoidFogParticles", null, "C", ClassRef.void, ClassRef.int, ClassRef.int, ClassRef.int)
+    val RenderChunk = ClassRef("net.minecraft.client.renderer.chunk.RenderChunk", "cop")
+    val rebuildChunk = MethodRef(RenderChunk, "rebuildChunk", "func_178581_b", "b", ClassRef.void, ClassRef.float, ClassRef.float, ClassRef.float, ChunkCompileTaskGenerator)
 
-    val World =  ClassRef("net.minecraft.world.World", "ahb")
+    val BlockRendererDispatcher = ClassRef("net.minecraft.client.renderer.BlockRendererDispatcher", "cll")
+    val renderBlock = MethodRef(BlockRendererDispatcher, "renderBlock", "func_175018_a", "a", ClassRef.boolean, IBlockState, BlockPos, IBlockAccess, WorldRenderer)
 
-    val TextureMap = ClassRef("net.minecraft.client.renderer.texture.TextureMap", "bpr")
-    val mapRegisteredSprites = FieldRef(TextureMap, "mapRegisteredSprites", "field_110574_e", "bpr", Map)
+    val World = ClassRef("net.minecraft.world.World", "aqu")
+    val WorldClient = ClassRef("net.minecraft.client.multiplayer.WorldClient", "cen")
+    val doVoidFogParticles = MethodRef(WorldClient, "doVoidFogParticles", "func_73029_E", "b", ClassRef.void, ClassRef.int, ClassRef.int, ClassRef.int)
 
-    val IMetadataSerializer = ClassRef("net.minecraft.client.resources.data.IMetadataSerializer", "brw")
-    val SimpleReloadableResourceManager = ClassRef("net.minecraft.client.resources.SimpleReloadableResourceManager", "brg")
-    val metadataSerializer = FieldRef(SimpleReloadableResourceManager, "rmMetadataSerializer", "field_110547_c", "f", IMetadataSerializer)
+    //    val IMetadataSerializer = ClassRef("net.minecraft.client.resources.data.IMetadataSerializer", "brw")
+    //    val SimpleReloadableResourceManager = ClassRef("net.minecraft.client.resources.SimpleReloadableResourceManager", "brg")
+    //    val metadataSerializer = FieldRef(SimpleReloadableResourceManager, "rmMetadataSerializer", "field_110547_c", "f", IMetadataSerializer)
 
-    val IIcon = ClassRef("net.minecraft.util.IIcon", "rf")
     val TextureAtlasSprite = ClassRef("net.minecraft.client.renderer.texture.TextureAtlasSprite", "bqd")
+
+    val IRegistry = ClassRef("net.minecraft.util.IRegistry", "ez")
+    val ModelLoader = ClassRef("net.minecraftforge.client.model.ModelLoader")
+    val stateModels = FieldRef(ModelLoader, "stateModels", Map)
+    val setupModelRegistry = MethodRef(ModelLoader, "setupModelRegistry", "func_177570_a", "a", IRegistry)
+
+    val IModel = ClassRef("net.minecraftforge.client.model.IModel", "")
+    val ModelBlock = ClassRef("net.minecraft.client.renderer.block.model.ModelBlock", "cmc")
+    val ModelResourceLocation = ClassRef("net.minecraft.client.renderer.block.model.ModelResourceLocation", "cmc")
+    val VanillaModelWrapper = ClassRef("net.minecraftforge.client.model.ModelLoader\$VanillaModelWrapper")
+    val model_VMW = FieldRef(VanillaModelWrapper, "model", ModelBlock)
+    val location_VMW = FieldRef(VanillaModelWrapper, "location", ModelBlock)
+    val WeightedPartWrapper = ClassRef("net.minecraftforge.client.model.ModelLoader\$WeightedPartWrapper")
+    val model_WPW = FieldRef(WeightedPartWrapper, "model", IModel)
+    val WeightedRandomModel = ClassRef("net.minecraftforge.client.model.ModelLoader\$WeightedRandomModel")
+    val models_WRM = FieldRef(WeightedRandomModel, "models", List)
 
     // Better Foliage
     val BetterFoliageHooks = ClassRef("mods.betterfoliage.client.Hooks")
     val getAmbientOcclusionLightValueOverride = MethodRef(BetterFoliageHooks, "getAmbientOcclusionLightValueOverride", ClassRef.float, ClassRef.float, Block)
     val getUseNeighborBrightnessOverride = MethodRef(BetterFoliageHooks, "getUseNeighborBrightnessOverride", ClassRef.boolean, ClassRef.boolean, Block)
-    val shouldRenderBlockSideOverride = MethodRef(BetterFoliageHooks, "shouldRenderBlockSideOverride", ClassRef.boolean, ClassRef.boolean, IBlockAccess, ClassRef.int, ClassRef.int, ClassRef.int, ClassRef.int)
-    val getRenderTypeOverride = MethodRef(BetterFoliageHooks, "getRenderTypeOverride", ClassRef.int, IBlockAccess, ClassRef.int, ClassRef.int, ClassRef.int, Block, ClassRef.int)
-    val onRandomDisplayTick = MethodRef(BetterFoliageHooks, "onRandomDisplayTick", ClassRef.void, Block, World, ClassRef.int, ClassRef.int, ClassRef.int)
-
-    // Shaders mod
-    val Shaders = ClassRef("shadersmodcore.client.Shaders")
-    val pushEntity = MethodRef(Shaders, "pushEntity", ClassRef.void, RenderBlocks, Block, ClassRef.int, ClassRef.int, ClassRef.int)
-    val pushEntity_I = MethodRef(Shaders, "pushEntity", ClassRef.void, ClassRef.int)
-    val popEntity = MethodRef(Shaders, "popEntity", ClassRef.void)
-
-    val ShadersModIntegration = ClassRef("mods.betterfoliage.client.integration.ShadersModIntegration")
-    val getBlockIdOverride = MethodRef(ShadersModIntegration, "getBlockIdOverride", ClassRef.int, ClassRef.int, Block)
+    val shouldRenderBlockSideOverride = MethodRef(BetterFoliageHooks, "shouldRenderBlockSideOverride", ClassRef.boolean, ClassRef.boolean, IBlockAccess, BlockPos, EnumFacing)
+    val onRandomDisplayTick = MethodRef(BetterFoliageHooks, "onRandomDisplayTick", ClassRef.void, World, IBlockState, BlockPos)
+    val onAfterLoadModelDefinitions = MethodRef(BetterFoliageHooks, "onAfterLoadModelDefinitions", ClassRef.void, ModelLoader)
+    val renderWorldBlock = MethodRef(BetterFoliageHooks, "renderWorldBlock", ClassRef.boolean, BlockRendererDispatcher, IBlockState, BlockPos, IBlockAccess, WorldRenderer, EnumWorldBlockLayer)
+    val canRenderBlockInLayer = MethodRef(BetterFoliageHooks, "canRenderBlockInLayer", ClassRef.boolean, Block, EnumWorldBlockLayer)
 
     // Optifine
-    val ConnectedTextures = ClassRef("ConnectedTextures")
-    val getConnectedTexture = MethodRef(ConnectedTextures, "getConnectedTexture", IIcon, IBlockAccess, Block, ClassRef.int, ClassRef.int, ClassRef.int, ClassRef.int, IIcon)
-    val CTBlockProperties = FieldRef(ConnectedTextures, "blockProperties", null)
-    val CTTileProperties = FieldRef(ConnectedTextures, "tileProperties", null)
+    val OptifineClassTransformer = ClassRef("optifine.OptiFineClassTransformer")
 
-    val ConnectedProperties = ClassRef("ConnectedProperties")
-    val CPTileIcons = FieldRef(ConnectedProperties, "tileIcons", null)
+    // ShadersMod
+    val SVertexBuilder = ClassRef("shadersmod.client.SVertexBuilder")
+    val sVertexBuilder = FieldRef(WorldRenderer, "sVertexBuilder", SVertexBuilder)
+    val pushEntity_state = MethodRef(SVertexBuilder, "pushEntity", ClassRef.void, IBlockState, BlockPos, IBlockAccess, WorldRenderer)
+    val pushEntity_num = MethodRef(SVertexBuilder, "pushEntity", ClassRef.void, ClassRef.long)
+    val popEntity = MethodRef(SVertexBuilder, "popEntity", ClassRef.void)
 
-    // Colored Lights Core
-    val CLCLoadingPlugin = ClassRef("coloredlightscore.src.asm.ColoredLightsCoreLoadingPlugin")
+    val ShadersModIntegration = ClassRef("mods.betterfoliage.client.integration.ShadersModIntegration")
+    val getBlockIdOverride = MethodRef(ShadersModIntegration, "getBlockIdOverride", ClassRef.long, ClassRef.long, IBlockState)
 }

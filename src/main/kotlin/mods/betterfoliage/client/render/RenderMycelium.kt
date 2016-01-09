@@ -3,15 +3,22 @@ package mods.betterfoliage.client.render
 import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.Config
-import mods.octarinecore.client.render.*
+import mods.octarinecore.client.render.AbstractBlockRenderingHandler
+import mods.octarinecore.client.render.BlockContext
+import mods.octarinecore.client.render.modelRenderer
+import mods.octarinecore.client.render.noPost
+import mods.octarinecore.common.Double3
+import mods.octarinecore.common.Rotation
 import net.minecraft.block.material.Material
-import net.minecraft.client.renderer.RenderBlocks
+import net.minecraft.client.renderer.BlockRendererDispatcher
+import net.minecraft.client.renderer.WorldRenderer
 import net.minecraft.init.Blocks
+import net.minecraft.util.EnumWorldBlockLayer
 import org.apache.logging.log4j.Level.INFO
 
 class RenderMycelium : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
 
-    val myceliumIcon = iconSet(BetterFoliageMod.LEGACY_DOMAIN, "better_mycel_%d")
+    val myceliumIcon = iconSet(BetterFoliageMod.LEGACY_DOMAIN, "blocks/better_mycel_%d")
     val myceliumModel = modelSet(64, RenderGrass.grassTopQuads)
 
     override fun afterStitch() {
@@ -24,17 +31,17 @@ class RenderMycelium : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
         ctx.cameraDistance < Config.shortGrass.distance
     }
 
-    override fun render(ctx: BlockContext, parent: RenderBlocks): Boolean {
-        val isSnowed = ctx.block(up1).material.let {
-            it == Material.snow || it == Material.craftedSnow
-        }
+    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: WorldRenderer, layer: EnumWorldBlockLayer): Boolean {
+        val isSnowed = ctx.block(up1).isSnow
 
-        if (renderWorldBlockBase(parent, face = alwaysRender)) return true
+        renderWorldBlockBase(ctx, dispatcher, renderer, null)
+
         if (isSnowed && !Config.shortGrass.snowEnabled) return true
         if (ctx.block(up1).isOpaqueCube) return true
 
         val rand = ctx.semiRandomArray(2)
         modelRenderer.render(
+            renderer,
             myceliumModel[rand[0]],
             Rotation.identity,
             ctx.blockCenter + (if (isSnowed) snowOffset else Double3.zero),

@@ -1,31 +1,31 @@
 package mods.betterfoliage.client.render
 
-import cpw.mods.fml.common.FMLCommonHandler
-import cpw.mods.fml.common.eventhandler.SubscribeEvent
-import cpw.mods.fml.common.gameevent.TickEvent
-import cpw.mods.fml.relauncher.Side
-import cpw.mods.fml.relauncher.SideOnly
 import mods.betterfoliage.client.config.Config
 import mods.betterfoliage.client.texture.LeafRegistry
 import mods.octarinecore.PI2
 import mods.octarinecore.client.render.AbstractEntityFX
-import mods.octarinecore.client.render.Double3
 import mods.octarinecore.client.render.HSB
+import mods.octarinecore.common.Double3
 import mods.octarinecore.minmax
 import mods.octarinecore.random
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.Tessellator
+import net.minecraft.client.renderer.WorldRenderer
+import net.minecraft.util.BlockPos
 import net.minecraft.util.MathHelper
 import net.minecraft.world.World
 import net.minecraftforge.common.MinecraftForge
-import net.minecraftforge.common.util.ForgeDirection.DOWN
 import net.minecraftforge.event.world.WorldEvent
+import net.minecraftforge.fml.common.FMLCommonHandler
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
+import net.minecraftforge.fml.relauncher.Side
+import net.minecraftforge.fml.relauncher.SideOnly
 import org.lwjgl.opengl.GL11
 import java.lang.Math.*
 import java.util.*
 
-class EntityFallingLeavesFX(world: World, x: Int, y: Int, z: Int) :
-AbstractEntityFX(world, x.toDouble() + 0.5, y.toDouble(), z.toDouble() + 0.5) {
+class EntityFallingLeavesFX(world: World, pos: BlockPos) :
+AbstractEntityFX(world, pos.x.toDouble() + 0.5, pos.y.toDouble(), pos.z.toDouble() + 0.5) {
 
     companion object {
         @JvmStatic val biomeBrightnessMultiplier = 0.5f
@@ -41,10 +41,10 @@ AbstractEntityFX(world, x.toDouble() + 0.5, y.toDouble(), z.toDouble() + 0.5) {
         motionY = -Config.fallingLeaves.speed
         particleScale = Config.fallingLeaves.size.toFloat() * 0.1f
 
-        val block = world.getBlock(x, y, z)
-        LeafRegistry.leaves[block.getIcon(world, x, y, z, DOWN.ordinal)]?.let {
+        val state = world.getBlockState(pos)
+        LeafRegistry[world.getBlockState(pos)]?.let {
             particleIcon = it.particleTextures[rand.nextInt(1024)]
-            calculateParticleColor(it.averageColor, block.colorMultiplier(world, x, y, z))
+            calculateParticleColor(it.averageColor, state.block.colorMultiplier(world, pos))
         }
     }
 
@@ -67,9 +67,9 @@ AbstractEntityFX(world, x.toDouble() + 0.5, y.toDouble(), z.toDouble() + 0.5) {
         }
     }
 
-    override fun render(tessellator: Tessellator, partialTickTime: Float) {
+    override fun render(worldRenderer: WorldRenderer, partialTickTime: Float) {
         if (Config.fallingLeaves.opacityHack) GL11.glDepthMask(true)
-        renderParticleQuad(tessellator, partialTickTime, rotation = particleRot, isMirrored = isMirrored)
+        renderParticleQuad(worldRenderer, partialTickTime, rotation = particleRot, isMirrored = isMirrored)
     }
 
     fun calculateParticleColor(textureAvgColor: Int, blockColor: Int) {

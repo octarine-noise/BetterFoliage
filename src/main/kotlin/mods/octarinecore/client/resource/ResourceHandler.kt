@@ -1,13 +1,11 @@
 package mods.octarinecore.client.resource
 
-import cpw.mods.fml.client.event.ConfigChangedEvent
-import cpw.mods.fml.common.FMLCommonHandler
-import cpw.mods.fml.common.eventhandler.SubscribeEvent
-import mods.octarinecore.client.render.Double3
-import mods.octarinecore.client.render.Int3
 import mods.octarinecore.client.render.Model
-import net.minecraft.client.renderer.texture.IIconRegister
-import net.minecraft.util.IIcon
+import mods.octarinecore.common.Double3
+import mods.octarinecore.common.Int3
+import net.minecraft.client.renderer.texture.TextureAtlasSprite
+import net.minecraft.client.renderer.texture.TextureMap
+import net.minecraft.util.BlockPos
 import net.minecraft.util.MathHelper
 import net.minecraft.util.ResourceLocation
 import net.minecraft.world.World
@@ -15,12 +13,15 @@ import net.minecraft.world.gen.NoiseGeneratorSimplex
 import net.minecraftforge.client.event.TextureStitchEvent
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.event.world.WorldEvent
+import net.minecraftforge.fml.client.event.ConfigChangedEvent
+import net.minecraftforge.fml.common.FMLCommonHandler
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.*
 
 // ============================
 // Resource types
 // ============================
-interface IStitchListener { fun onStitch(atlas: IIconRegister) }
+interface IStitchListener { fun onStitch(atlas: TextureMap) }
 interface IConfigChangeListener { fun onConfigChange() }
 interface IWorldLoadListener { fun onWorldLoad(world: World) }
 
@@ -61,10 +62,8 @@ open class ResourceHandler(val modId: String) {
     // ============================
     @SubscribeEvent
     fun onStitch(event: TextureStitchEvent.Pre) {
-        if (event.map.textureType == 0) {
-            resources.forEach { (it as? IStitchListener)?.onStitch(event.map) }
-            afterStitch()
-        }
+        resources.forEach { (it as? IStitchListener)?.onStitch(event.map) }
+        afterStitch()
     }
 
     @SubscribeEvent
@@ -81,8 +80,8 @@ open class ResourceHandler(val modId: String) {
 // Resource container classes
 // ============================
 class IconHolder(val domain: String, val name: String) : IStitchListener {
-    var icon: IIcon? = null
-    override fun onStitch(atlas: IIconRegister) { icon = atlas.registerIcon("$domain:$name") }
+    var icon: TextureAtlasSprite? = null
+    override fun onStitch(atlas: TextureMap) { icon = atlas.registerSprite(ResourceLocation(domain, name)) }
 }
 
 class ModelHolder(val init: Model.()->Unit): IConfigChangeListener {
@@ -91,14 +90,14 @@ class ModelHolder(val init: Model.()->Unit): IConfigChangeListener {
 }
 
 class IconSet(val domain: String, val namePattern: String) : IStitchListener {
-    val icons = arrayOfNulls<IIcon>(16)
+    val icons = arrayOfNulls<TextureAtlasSprite>(16)
     var num = 0
 
-    override fun onStitch(atlas: IIconRegister) {
+    override fun onStitch(atlas: TextureMap) {
         num = 0;
         (0..15).forEach { idx ->
-            val locReal = ResourceLocation(domain, "textures/blocks/${namePattern.format(idx)}.png")
-            if (resourceManager[locReal] != null) icons[num++] = atlas.registerIcon("$domain:${namePattern.format(idx)}")
+            val locReal = ResourceLocation(domain, "textures/${namePattern.format(idx)}.png")
+            if (resourceManager[locReal] != null) icons[num++] = atlas.registerSprite(ResourceLocation(domain, namePattern.format(idx)))
         }
     }
 
@@ -123,4 +122,5 @@ class SimplexNoise() : IWorldLoadListener {
     }
     operator fun get(x: Int, z: Int) = MathHelper.floor_double((noise.func_151605_a(x.toDouble(), z.toDouble()) + 1.0) * 32.0)
     operator fun get(pos: Int3) = get(pos.x, pos.z)
+    operator fun get(pos: BlockPos) = get(pos.x, pos.z)
 }

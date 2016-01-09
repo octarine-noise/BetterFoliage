@@ -64,6 +64,7 @@ open class ClassRef(val mcpName: String, val obfName: String) : Resolvable<Class
 
     companion object {
         val int = ClassRefPrimitive("I", Int::class.java)
+        val long = ClassRefPrimitive("J", Long::class.java)
         val float = ClassRefPrimitive("F", Float::class.java)
         val boolean = ClassRefPrimitive("Z", Boolean::class.java)
         val void = ClassRefPrimitive("V", null)
@@ -73,6 +74,8 @@ open class ClassRef(val mcpName: String, val obfName: String) : Resolvable<Class
     open fun asmDescriptor(namespace: Namespace) = "L${name(namespace).replace(".", "/")};"
 
     override fun resolve() = listOf(mcpName, obfName).map { getJavaClass(it) }.filterNotNull().firstOrNull()
+
+    fun isInstance(obj: Any) = element?.isInstance(obj) ?: false
 }
 
 /**

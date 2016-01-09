@@ -1,41 +1,52 @@
-package mods.octarinecore.client.render
+package mods.octarinecore.common
 
-import mods.octarinecore.client.render.Axis.*
-import mods.octarinecore.client.render.Dir.N
-import mods.octarinecore.client.render.Dir.P
 import mods.octarinecore.cross
-import net.minecraftforge.common.util.ForgeDirection
-import net.minecraftforge.common.util.ForgeDirection.*
+import net.minecraft.util.BlockPos
+import net.minecraft.util.EnumFacing
+import net.minecraft.util.EnumFacing.*
+import net.minecraft.util.EnumFacing.Axis.*
+import net.minecraft.util.EnumFacing.AxisDirection.*
 
 // ================================
 // Axes and directions
 // ================================
-enum class Axis { X, Y, Z }
-enum class Dir { P, N }
 val axes = listOf(X, Y, Z)
-val axisDirs = listOf(P, N)
-val forgeDirs = ForgeDirection.VALID_DIRECTIONS
+val axisDirs = listOf(POSITIVE, NEGATIVE)
+val EnumFacing.dir: AxisDirection get() = axisDirection
+val AxisDirection.sign: String get() = when(this) { POSITIVE -> "+"; NEGATIVE -> "-" }
+val forgeDirs = EnumFacing.values()
 val forgeDirOffsets = forgeDirs.map { Int3(it) }
-val ForgeDirection.axis: Axis get() = when(this) {EAST, WEST -> X; UP, DOWN -> Y; else -> Z }
-val ForgeDirection.dir: Dir get() = when(this) {UP, SOUTH, EAST -> P; else -> N }
-val Pair<Axis, Dir>.face: ForgeDirection get() = when(this) {
-    X to P -> EAST; X to N -> WEST; Y to P -> UP; Y to N -> DOWN; Z to P -> SOUTH; Z to N -> NORTH; else -> UNKNOWN
+val Pair<Axis, AxisDirection>.face: EnumFacing get() = when(this) {
+    X to POSITIVE -> EAST; X to NEGATIVE -> WEST;
+    Y to POSITIVE -> UP; Y to NEGATIVE -> DOWN;
+    Z to POSITIVE -> SOUTH; else -> NORTH;
 }
-val ForgeDirection.perpendiculars: List<ForgeDirection> get() =
+val EnumFacing.perpendiculars: List<EnumFacing> get() =
     axes.filter { it != this.axis }.cross(axisDirs).map { it.face }
-val ForgeDirection.offset: Int3 get() = forgeDirOffsets[ordinal]
+val EnumFacing.offset: Int3 get() = forgeDirOffsets[ordinal]
+
+/** Old ForgeDirection rotation matrix yanked from 1.7.10 */
+val ROTATION_MATRIX: Array<IntArray> get() = arrayOf(
+    intArrayOf(0, 1, 4, 5, 3, 2, 6),
+    intArrayOf(0, 1, 5, 4, 2, 3, 6),
+    intArrayOf(5, 4, 2, 3, 0, 1, 6),
+    intArrayOf(4, 5, 2, 3, 1, 0, 6),
+    intArrayOf(2, 3, 1, 0, 4, 5, 6),
+    intArrayOf(3, 2, 0, 1, 4, 5, 6)
+)
 
 // ================================
 // Vectors
 // ================================
-operator fun ForgeDirection.times(scale: Double) =
-    Double3(offsetX.toDouble() * scale, offsetY.toDouble() * scale, offsetZ.toDouble() * scale)
-val ForgeDirection.vec: Double3 get() = Double3(offsetX.toDouble(), offsetY.toDouble(), offsetZ.toDouble())
+operator fun EnumFacing.times(scale: Double) =
+    Double3(directionVec.x.toDouble() * scale, directionVec.y.toDouble() * scale, directionVec.z.toDouble() * scale)
+val EnumFacing.vec: Double3 get() = Double3(directionVec.x.toDouble(), directionVec.y.toDouble(), directionVec.z.toDouble())
+operator fun BlockPos.plus(other: Int3) = BlockPos(x + other.x, y + other.y, z + other.z)
 
 /** 3D vector of [Double]s. Offers both mutable operations, and immutable operations in operator notation. */
 data class Double3(var x: Double, var y: Double, var z: Double) {
     constructor(x: Float, y: Float, z: Float) : this(x.toDouble(), y.toDouble(), z.toDouble())
-    constructor(dir: ForgeDirection) : this(dir.offsetX.toDouble(), dir.offsetY.toDouble(), dir.offsetZ.toDouble())
+    constructor(dir: EnumFacing) : this(dir.directionVec.x.toDouble(), dir.directionVec.y.toDouble(), dir.directionVec.z.toDouble())
     companion object {
         val zero: Double3 get() = Double3(0.0, 0.0, 0.0)
         fun weight(v1: Double3, weight1: Double, v2: Double3, weight2: Double) =
@@ -79,16 +90,16 @@ data class Double3(var x: Double, var y: Double, var z: Double) {
     infix fun cross(o: Double3) = Double3(y * o.z - z * o.y, z * o.x - x * o.z, x * o.y - y * o.x)
     val length: Double get() = Math.sqrt(x * x + y * y + z * z)
     val normalize: Double3 get() = (1.0 / length).let { Double3(x * it, y * it, z * it) }
-    val nearestCardinal: ForgeDirection get() = nearestAngle(this, forgeDirs.asIterable()) { it.vec }.first
+    val nearestCardinal: EnumFacing get() = nearestAngle(this, forgeDirs.asIterable()) { it.vec }.first
 }
 
 /** 3D vector of [Int]s. Offers both mutable operations, and immutable operations in operator notation. */
 data class Int3(var x: Int, var y: Int, var z: Int) {
-    constructor(dir: ForgeDirection) : this(dir.offsetX, dir.offsetY, dir.offsetZ)
-    constructor(offset: Pair<Int, ForgeDirection>) : this(
-        offset.first * offset.second.offsetX,
-        offset.first * offset.second.offsetY,
-        offset.first * offset.second.offsetZ
+    constructor(dir: EnumFacing) : this(dir.directionVec.x, dir.directionVec.y, dir.directionVec.z)
+    constructor(offset: Pair<Int, EnumFacing>) : this(
+        offset.first * offset.second.directionVec.x,
+        offset.first * offset.second.directionVec.y,
+        offset.first * offset.second.directionVec.z
     )
     companion object {
         val zero = Int3(0, 0, 0)
@@ -96,10 +107,10 @@ data class Int3(var x: Int, var y: Int, var z: Int) {
 
     // immutable operations
     operator fun plus(other: Int3) = Int3(x + other.x, y + other.y, z + other.z)
-    operator fun plus(other: Pair<Int, ForgeDirection>) = Int3(
-        x + other.first * other.second.offsetX,
-        y + other.first * other.second.offsetY,
-        z + other.first * other.second.offsetZ
+    operator fun plus(other: Pair<Int, EnumFacing>) = Int3(
+        x + other.first * other.second.directionVec.x,
+        y + other.first * other.second.directionVec.y,
+        z + other.first * other.second.directionVec.z
     )
     operator fun unaryMinus() = Int3(-x, -y, -z)
     operator fun minus(other: Int3) = Int3(x - other.x, y - other.y, z - other.z)
@@ -132,17 +143,17 @@ data class Int3(var x: Int, var y: Int, var z: Int) {
 // ================================
 // Rotation
 // ================================
-val ForgeDirection.rotations: Array<ForgeDirection> get() =
-    Array(6) { idx -> ForgeDirection.values()[ForgeDirection.ROTATION_MATRIX[ordinal][idx]] }
-fun ForgeDirection.rotate(rot: Rotation) = rot.forward[ordinal]
-fun rot(axis: ForgeDirection) = Rotation.rot90[axis.ordinal]
+val EnumFacing.rotations: Array<EnumFacing> get() =
+    Array(6) { idx -> EnumFacing.values()[ROTATION_MATRIX[ordinal][idx]] }
+fun EnumFacing.rotate(rot: Rotation) = rot.forward[ordinal]
+fun rot(axis: EnumFacing) = Rotation.rot90[axis.ordinal]
 
 /**
  * Class representing an arbitrary rotation (or combination of rotations) around cardinal axes by 90 degrees.
  * In effect, a permutation of [ForgeDirection]s.
  */
 @Suppress("NOTHING_TO_INLINE")
-class Rotation(val forward: Array<ForgeDirection>, val reverse: Array<ForgeDirection>) {
+class Rotation(val forward: Array<EnumFacing>, val reverse: Array<EnumFacing>) {
     operator fun plus(other: Rotation) = Rotation(
         Array(6) { idx -> forward[other.forward[idx].ordinal] },
         Array(6) { idx -> other.reverse[reverse[idx].ordinal] }
@@ -150,9 +161,9 @@ class Rotation(val forward: Array<ForgeDirection>, val reverse: Array<ForgeDirec
     operator fun unaryMinus() = Rotation(reverse, forward)
     operator fun times(num: Int) = when(num % 4) { 1 -> this; 2 -> this + this; 3 -> -this; else -> identity }
 
-    inline fun rotatedComponent(dir: ForgeDirection, x: Int, y: Int, z: Int) =
+    inline fun rotatedComponent(dir: EnumFacing, x: Int, y: Int, z: Int) =
         when(reverse[dir.ordinal]) { EAST -> x; WEST -> -x; UP -> y; DOWN -> -y; SOUTH -> z; NORTH -> -z; else -> 0 }
-    inline fun rotatedComponent(dir: ForgeDirection, x: Double, y: Double, z: Double) =
+    inline fun rotatedComponent(dir: EnumFacing, x: Double, y: Double, z: Double) =
         when(reverse[dir.ordinal]) { EAST -> x; WEST -> -x; UP -> y; DOWN -> -y; SOUTH -> z; NORTH -> -z; else -> 0.0 }
 
     companion object {
@@ -177,7 +188,7 @@ val boxEdges = forgeDirs.flatMap { face1 -> forgeDirs.filter { it.axis > face1.a
  * @param[objPos] lambda to calculate the position of an object
  * @return [Pair] of (object, distance)
  */
-fun <T> nearestPosition(vertex: Double3, objs: Iterable<T>, objPos: (T)->Double3): Pair<T, Double>  =
+fun <T> nearestPosition(vertex: Double3, objs: Iterable<T>, objPos: (T)-> Double3): Pair<T, Double>  =
         objs.map { it to (objPos(it) - vertex).length }.minBy { it.second }!!
 
 /**
@@ -188,14 +199,14 @@ fun <T> nearestPosition(vertex: Double3, objs: Iterable<T>, objPos: (T)->Double3
  * @param[objAngle] lambda to calculate the orientation of an object
  * @return [Pair] of (object, normalized dot product)
  */
-fun <T> nearestAngle(vector: Double3, objs: Iterable<T>, objAngle: (T)->Double3): Pair<T, Double> =
+fun <T> nearestAngle(vector: Double3, objs: Iterable<T>, objAngle: (T)-> Double3): Pair<T, Double> =
         objs.map { it to objAngle(it).dot(vector) }.maxBy { it.second }!!
 
-data class FaceCorners(val topLeft: Pair<ForgeDirection, ForgeDirection>,
-                       val topRight: Pair<ForgeDirection, ForgeDirection>,
-                       val bottomLeft: Pair<ForgeDirection, ForgeDirection>,
-                       val bottomRight: Pair<ForgeDirection, ForgeDirection>) {
-    constructor(top: ForgeDirection, left: ForgeDirection) :
+data class FaceCorners(val topLeft: Pair<EnumFacing, EnumFacing>,
+                       val topRight: Pair<EnumFacing, EnumFacing>,
+                       val bottomLeft: Pair<EnumFacing, EnumFacing>,
+                       val bottomRight: Pair<EnumFacing, EnumFacing>) {
+    constructor(top: EnumFacing, left: EnumFacing) :
     this(top to left, top to left.opposite, top.opposite to left, top.opposite to left.opposite)
 
     val asArray = arrayOf(topLeft, topRight, bottomLeft, bottomRight)
@@ -208,7 +219,5 @@ val faceCorners = forgeDirs.map { when(it) {
     NORTH -> FaceCorners(WEST, UP)
     SOUTH -> FaceCorners(UP, WEST)
     WEST -> FaceCorners(SOUTH, UP)
-    EAST ->FaceCorners(SOUTH, DOWN)
-    else -> FaceCorners(UNKNOWN, UNKNOWN)
+    EAST -> FaceCorners(SOUTH, DOWN)
 }}
-

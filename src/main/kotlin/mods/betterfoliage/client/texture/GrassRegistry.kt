@@ -1,19 +1,19 @@
 package mods.betterfoliage.client.texture
 
-import cpw.mods.fml.common.eventhandler.SubscribeEvent
-import cpw.mods.fml.relauncher.Side
-import cpw.mods.fml.relauncher.SideOnly
 import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.Config
 import mods.octarinecore.client.render.HSB
-import mods.octarinecore.client.resource.averageColor
-import net.minecraft.block.Block
+import mods.octarinecore.client.resource.*
+import net.minecraft.block.state.IBlockState
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.client.renderer.texture.TextureMap
-import net.minecraft.util.IIcon
+import net.minecraft.client.resources.model.ModelResourceLocation
 import net.minecraftforge.client.event.TextureStitchEvent
+import net.minecraftforge.client.model.IModel
 import net.minecraftforge.common.MinecraftForge
-import org.apache.logging.log4j.Level.DEBUG
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.relauncher.Side
+import net.minecraftforge.fml.relauncher.SideOnly
 import org.apache.logging.log4j.Level.INFO
 
 const val defaultGrassColor = 0
@@ -34,36 +34,21 @@ class GrassInfo(
 
 /** Collects and manages rendering-related information for grass blocks. */
 @SideOnly(Side.CLIENT)
-object GrassRegistry {
-
-    val grass: MutableMap<IIcon, GrassInfo> = hashMapOf()
+object GrassRegistry : BlockTextureInspector<GrassInfo>() {
 
     init {
-        MinecraftForge.EVENT_BUS.register(this)
+        matchClassAndModel(Config.blocks.grass, "block/grass", listOf("top"))
+        matchClassAndModel(Config.blocks.grass, "block/cube_bottom_top", listOf("top"))
     }
 
-    @SubscribeEvent
-    fun handleTextureReload(event: TextureStitchEvent.Pre) {
-        if (event.map.textureType != 0) return
-        grass.clear()
+    override fun onAfterModelLoad() {
+        super.onAfterModelLoad()
         Client.log(INFO, "Inspecting grass textures")
-
-        Block.blockRegistry.forEach { block ->
-            if (Config.blocks.grass.matchesClass(block as Block)) {
-                block.registerBlockIcons { location ->
-                    val original = event.map.getTextureExtry(location)
-                    Client.log(DEBUG, "Found grass texture: $location")
-                    registerGrass(event.map, original)
-                    return@registerBlockIcons original
-                }
-            }
-        }
     }
 
-    fun registerGrass(atlas: TextureMap, icon: TextureAtlasSprite) {
-        val hsb = HSB.fromColor(icon.averageColor ?: defaultGrassColor)
+    override fun processTextures(textures: List<TextureAtlasSprite>, atlas: TextureMap): GrassInfo {
+        val hsb = HSB.fromColor(textures[0].averageColor ?: defaultGrassColor)
         val overrideColor = if (hsb.saturation > Config.shortGrass.saturationThreshold) hsb.copy(brightness = 0.8f).asColor else null
-        grass.put(icon, GrassInfo(icon, overrideColor))
+        return GrassInfo(textures[0], overrideColor)
     }
-
 }

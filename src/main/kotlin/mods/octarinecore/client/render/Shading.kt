@@ -1,7 +1,11 @@
 package mods.octarinecore.client.render
 
-import net.minecraftforge.common.util.ForgeDirection
-import java.lang.Math.*
+import mods.octarinecore.common.*
+import net.minecraft.client.BFBlockModelRenderer
+import net.minecraft.util.EnumFacing
+import net.minecraft.util.EnumFacing.*
+import java.lang.Math.min
+import java.util.*
 
 /** Holds shading values for block corners as calculated by vanilla Minecraft rendering. */
 class AoData() {
@@ -22,8 +26,55 @@ class AoData() {
         this.blue = blue
     }
 
+    fun set(brightness: Int, colorMultiplier: Float) {
+        this.valid = true
+        this.brightness = brightness
+        this.red = colorMultiplier
+        this.green = colorMultiplier
+        this.blue = colorMultiplier
+    }
+
     companion object {
         val black = AoData();
+    }
+}
+
+class AoFaceData(val face: EnumFacing) {
+    val ao = BFBlockModelRenderer.getVanillaAoObject()
+    val top = faceCorners[face.ordinal].topLeft.first
+    val left = faceCorners[face.ordinal].topLeft.second
+
+    val topLeft = AoData()
+    val topRight = AoData()
+    val bottomLeft = AoData()
+    val bottomRight = AoData()
+    val ordered = when(face) {
+        DOWN -> listOf(topLeft, bottomLeft, bottomRight, topRight)
+        UP -> listOf(bottomRight, topRight, topLeft, bottomLeft)
+        NORTH -> listOf(bottomLeft, bottomRight, topRight, topLeft)
+        SOUTH -> listOf(topLeft, bottomLeft, bottomRight, topRight)
+        WEST -> listOf(bottomLeft, bottomRight, topRight, topLeft)
+        EAST -> listOf(topRight, topLeft, bottomLeft, bottomRight)
+    }
+
+    fun update(offset: Int3, useBounds: Boolean = false) {
+        val ctx = blockContext
+        val blockState = ctx.blockState(offset)
+        val quadBounds: FloatArray = FloatArray(12)
+        val flags = BitSet(3).apply { set(0) }
+
+        ao.updateVertexBrightness(ctx.world, blockState.block, ctx.pos + offset, face, quadBounds, flags)
+        ordered.forEachIndexed { idx, aoData -> aoData.set(ao.vertexBrightness[idx], ao.vertexColorMultiplier[idx]) }
+    }
+
+    operator fun get(dir1: EnumFacing, dir2: EnumFacing): AoData {
+        val isTop = top == dir1 || top == dir2
+        val isLeft = left == dir1 || left == dir2
+        return if (isTop) {
+            if (isLeft) topLeft else topRight
+        } else {
+            if (isLeft) bottomLeft else bottomRight
+        }
     }
 }
 
@@ -81,9 +132,9 @@ interface Shader {
  * @param[corner] shader instantiation lambda for corner vertices
  * @param[edge] shader instantiation lambda for edge midpoint vertices
  */
-fun faceOrientedAuto(overrideFace: ForgeDirection? = null,
-                     corner: ((ForgeDirection, ForgeDirection, ForgeDirection)->Shader)? = null,
-                     edge: ((ForgeDirection, ForgeDirection)->Shader)? = null) =
+fun faceOrientedAuto(overrideFace: EnumFacing? = null,
+                     corner: ((EnumFacing, EnumFacing, EnumFacing)->Shader)? = null,
+                     edge: ((EnumFacing, EnumFacing)->Shader)? = null) =
     fun(quad: Quad, vertex: Vertex): Shader {
         val quadFace = overrideFace ?: quad.normal.nearestCardinal
         val nearestCorner = nearestPosition(vertex.xyz, faceCorners[quadFace.ordinal].asList) {
@@ -108,8 +159,8 @@ fun faceOrientedAuto(overrideFace: ForgeDirection? = null,
  * @param[overrideEdge] assume the given edge instead of going by the _quad_ normal
  * @param[corner] shader instantiation lambda
  */
-fun edgeOrientedAuto(overrideEdge: Pair<ForgeDirection, ForgeDirection>? = null,
-                     corner: (ForgeDirection, ForgeDirection, ForgeDirection)->Shader) =
+fun edgeOrientedAuto(overrideEdge: Pair<EnumFacing, EnumFacing>? = null,
+                     corner: (EnumFacing, EnumFacing, EnumFacing)->Shader) =
     fun(quad: Quad, vertex: Vertex): Shader {
         val edgeDir = overrideEdge ?: nearestAngle(quad.normal, boxEdges) { it.first.vec + it.second.vec }.first
         val nearestFace = nearestPosition(vertex.xyz, edgeDir.toList()) { it.vec }.first
@@ -119,11 +170,11 @@ fun edgeOrientedAuto(overrideEdge: Pair<ForgeDirection, ForgeDirection>? = null,
         return corner(nearestFace, nearestCorner.first, nearestCorner.second)
     }
 
-fun faceOrientedInterpolate(overrideFace: ForgeDirection? = null) =
+fun faceOrientedInterpolate(overrideFace: EnumFacing? = null) =
     fun(quad: Quad, vertex: Vertex): Shader {
         val resolver = faceOrientedAuto(overrideFace, edge = { face, edgeDir ->
             val axis = axes.find { it != face.axis && it != edgeDir.axis }!!
-            val vec = Double3((axis to Dir.P).face)
+            val vec = Double3((axis to EnumFacing.AxisDirection.POSITIVE).face)
             val pos = vertex.xyz.dot(vec)
             EdgeInterpolateFallback(face, edgeDir, pos)
         })

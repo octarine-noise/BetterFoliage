@@ -1,11 +1,35 @@
 package mods.betterfoliage.client.render
 
+import mods.betterfoliage.client.config.BlockMatcher
 import mods.betterfoliage.client.render.AbstractRenderColumn.BlockType.*
 import mods.betterfoliage.client.render.AbstractRenderColumn.QuadrantType.*
 import mods.octarinecore.client.render.*
-import net.minecraft.block.Block
-import net.minecraft.client.renderer.RenderBlocks
-import net.minecraftforge.common.util.ForgeDirection.*
+import mods.octarinecore.client.resource.BlockTextureInspector
+import mods.octarinecore.common.Int3
+import mods.octarinecore.common.Rotation
+import mods.octarinecore.common.face
+import mods.octarinecore.common.rot
+import net.minecraft.block.state.IBlockState
+import net.minecraft.client.renderer.BlockRendererDispatcher
+import net.minecraft.client.renderer.WorldRenderer
+import net.minecraft.client.renderer.texture.TextureAtlasSprite
+import net.minecraft.client.renderer.texture.TextureMap
+import net.minecraft.util.EnumFacing
+import net.minecraft.util.EnumFacing.*
+import net.minecraft.util.EnumWorldBlockLayer
+
+data class ColumnInfo(val topTexture: TextureAtlasSprite,
+                      val bottomTexture: TextureAtlasSprite,
+                      val sideTexture: TextureAtlasSprite)
+
+open class ColumnTextures(val matcher: BlockMatcher) : BlockTextureInspector<ColumnInfo>() {
+    init {
+        matchClassAndModel(matcher, "block/column_side", listOf("end", "end", "side"))
+        matchClassAndModel(matcher, "block/cube_column", listOf("end", "end", "side"))
+    }
+    override fun processTextures(textures: List<TextureAtlasSprite>, atlas: TextureMap) =
+        ColumnInfo(textures[0], textures[1], textures[2])
+}
 
 /** Index of SOUTH-EAST quadrant. */
 const val SE = 0
@@ -30,7 +54,7 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
     // ============================
     abstract val radiusSmall: Double
     abstract val radiusLarge: Double
-    abstract val surroundPredicate: (Block) -> Boolean
+    abstract val surroundPredicate: (IBlockState) -> Boolean
     abstract val connectPerpendicular: Boolean
     abstract val connectSolids: Boolean
     abstract val lenientConnect: Boolean
@@ -89,26 +113,26 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
     val transitionTop = model { mix(sideRoundLarge.model, sideRoundSmall.model) { it > 1 } }
     val transitionBottom = model { mix(sideRoundSmall.model, sideRoundLarge.model) { it > 1 } }
 
-    val sideTexture = { ctx: ShadingContext, qi: Int, q: Quad -> if ((qi and 1) == 0) ctx.icon(SOUTH) else ctx.icon(EAST) }
-    val upTexture = { ctx: ShadingContext, qi: Int, q: Quad -> ctx.icon(UP) }
-    val downTexture = { ctx: ShadingContext, qi: Int, q: Quad -> ctx.icon(DOWN) }
-
     inline fun continous(q1: QuadrantType, q2: QuadrantType) =
         q1 == q2 || ((q1 == SQUARE || q1 == INVISIBLE) && (q2 == SQUARE || q2 == INVISIBLE))
 
-    abstract val axisFunc: (Block, Int)->Axis
-    abstract val blockPredicate: (Block, Int)->Boolean
+    abstract val axisFunc: (IBlockState)->EnumFacing.Axis
+    abstract val blockPredicate: (IBlockState)->Boolean
+
+    abstract val sideTexture: (ShadingContext, Int, Quad)->TextureAtlasSprite?
+    abstract val upTexture: (ShadingContext, Int, Quad)->TextureAtlasSprite?
+    abstract val downTexture: (ShadingContext, Int, Quad)->TextureAtlasSprite?
 
     @Suppress("NON_EXHAUSTIVE_WHEN")
-    override fun render(ctx: BlockContext, parent: RenderBlocks): Boolean {
+    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: WorldRenderer, layer: EnumWorldBlockLayer): Boolean {
         if (ctx.isSurroundedBy(surroundPredicate) ) return false
 
         // get AO data
-        if (renderWorldBlockBase(parent, face = neverRender)) return true
+        modelRenderer.updateShading(Int3.zero, allFaces)
 
         // check log neighborhood
         val logAxis = ctx.blockAxis
-        val baseRotation = rotationFromUp[(logAxis to Dir.P).face.ordinal]
+        val baseRotation = rotationFromUp[(logAxis to AxisDirection.POSITIVE).face.ordinal]
 
         val upType = ctx.blockType(baseRotation, logAxis, Int3(0, 1, 0))
         val downType = ctx.blockType(baseRotation, logAxis, Int3(0, -1, 0))
@@ -141,6 +165,7 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
             }
 
             if (sideModel != null) modelRenderer.render(
+                renderer,
                 sideModel,
                 rotation,
                 blockContext.blockCenter,
@@ -192,6 +217,7 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
             }
 
             if (upModel != null) modelRenderer.render(
+                renderer,
                 upModel,
                 rotation,
                 blockContext.blockCenter,
@@ -200,6 +226,7 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
                 postProcess = noPost
             )
             if (downModel != null) modelRenderer.render(
+                renderer,
                 downModel,
                 rotation,
                 blockContext.blockCenter,
@@ -283,19 +310,18 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
     }
 
     /** Get the axis of the block */
-    val BlockContext.blockAxis: Axis get() = axisFunc(block(Int3.zero), meta(Int3.zero))
+    val BlockContext.blockAxis: Axis get() = axisFunc(blockState(Int3.zero))
 
     /**
      * Get the type of the block at the given offset in a rotated reference frame.
      */
     fun BlockContext.blockType(rotation: Rotation, axis: Axis, offset: Int3): BlockType {
         val offsetRot = offset.rotate(rotation)
-        val logBlock = block(offsetRot)
-        val logMeta = meta(offsetRot)
-        return if (!blockPredicate(logBlock, logMeta)) {
-            if (logBlock.isOpaqueCube) SOLID else NONSOLID
+        val state = blockState(offsetRot)
+        return if (!blockPredicate(state)) {
+            if (state.block.isOpaqueCube) SOLID else NONSOLID
         } else {
-            if (axisFunc(logBlock, logMeta) == axis) PARALLEL else PERPENDICULAR
+            if (axisFunc(state) == axis) PARALLEL else PERPENDICULAR
         }
     }
 }

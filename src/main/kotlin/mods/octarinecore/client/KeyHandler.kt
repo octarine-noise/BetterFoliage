@@ -1,10 +1,10 @@
 package mods.octarinecore.client
 
-import cpw.mods.fml.client.registry.ClientRegistry
-import cpw.mods.fml.common.FMLCommonHandler
-import cpw.mods.fml.common.eventhandler.SubscribeEvent
-import cpw.mods.fml.common.gameevent.InputEvent
 import net.minecraft.client.settings.KeyBinding
+import net.minecraftforge.fml.client.registry.ClientRegistry
+import net.minecraftforge.fml.common.FMLCommonHandler
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.InputEvent
 
 class KeyHandler(val modId: String, val defaultKey: Int, val lang: String, val action: (InputEvent.KeyInputEvent)->Unit) {
 

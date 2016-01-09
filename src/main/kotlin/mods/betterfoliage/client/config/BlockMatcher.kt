@@ -1,11 +1,10 @@
 package mods.betterfoliage.client.config
 
-import cpw.mods.fml.common.eventhandler.SubscribeEvent
 import mods.octarinecore.client.gui.NonVerboseArrayEntry
 import mods.octarinecore.client.resource.get
 import mods.octarinecore.client.resource.getLines
 import mods.octarinecore.client.resource.resourceManager
-import mods.octarinecore.config.ConfigPropertyBase
+import mods.octarinecore.common.config.ConfigPropertyBase
 import mods.octarinecore.metaprog.getJavaClass
 import net.minecraft.block.Block
 import net.minecraft.client.multiplayer.WorldClient
@@ -13,6 +12,7 @@ import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.common.config.Configuration
 import net.minecraftforge.common.config.Property
 import net.minecraftforge.event.world.WorldEvent
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 /**
  * Match blocks based on their class names. Caches block IDs for faster lookup.

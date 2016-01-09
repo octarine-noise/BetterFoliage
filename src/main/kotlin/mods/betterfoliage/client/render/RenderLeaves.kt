@@ -6,11 +6,16 @@ import mods.betterfoliage.client.integration.ShadersModIntegration
 import mods.betterfoliage.client.texture.LeafRegistry
 import mods.octarinecore.PI2
 import mods.octarinecore.client.render.*
+import mods.octarinecore.common.Double3
+import mods.octarinecore.common.Int3
+import mods.octarinecore.common.Rotation
+import mods.octarinecore.common.vec
 import mods.octarinecore.random
 import net.minecraft.block.material.Material
-import net.minecraft.client.renderer.RenderBlocks
-import net.minecraftforge.common.util.ForgeDirection.DOWN
-import net.minecraftforge.common.util.ForgeDirection.UP
+import net.minecraft.client.renderer.BlockRendererDispatcher
+import net.minecraft.client.renderer.WorldRenderer
+import net.minecraft.util.EnumFacing.UP
+import net.minecraft.util.EnumWorldBlockLayer
 import java.lang.Math.cos
 import java.lang.Math.sin
 
@@ -23,7 +28,7 @@ class RenderLeaves : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
         .scale(Config.leaves.size)
         .toCross(UP).addAll()
     }
-    val snowedIcon = iconSet(BetterFoliageMod.LEGACY_DOMAIN, "better_leaves_snowed_%d")
+    val snowedIcon = iconSet(BetterFoliageMod.LEGACY_DOMAIN, "blocks/better_leaves_snowed_%d")
 
     val perturbs = vectorSet(64) { idx ->
         val angle = PI2 * idx / 64.0
@@ -37,27 +42,30 @@ class RenderLeaves : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
         ctx.cameraDistance < Config.leaves.distance &&
         Config.blocks.leaves.matchesID(ctx.block)
 
-    override fun render(ctx: BlockContext, parent: RenderBlocks): Boolean {
+    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: WorldRenderer, layer: EnumWorldBlockLayer): Boolean {
         val isSnowed = ctx.block(up1).material.let {
             it == Material.snow || it == Material.craftedSnow
         }
+        renderWorldBlockBase(ctx, dispatcher, renderer, null)
+        val leafInfo = LeafRegistry[ctx.blockState(Int3.zero)] ?: return true
+        val blockColor = ctx.blockData(Int3.zero, 0).color
 
-        if (renderWorldBlockBase(parent, face = alwaysRender)) return true
-
-        val leafInfo = LeafRegistry.leaves[ctx.icon(DOWN)]
-        if (leafInfo != null) ShadersModIntegration.leaves {
+        modelRenderer.updateShading(Int3.zero, allFaces)
+        ShadersModIntegration.leaves(renderer) {
             val rand = ctx.semiRandomArray(2)
             (if (Config.leaves.dense) denseLeavesRot else normalLeavesRot).forEach { rotation ->
                 modelRenderer.render(
+                    renderer,
                     leavesModel.model,
                     rotation,
                     ctx.blockCenter + perturbs[rand[0]],
                     icon = { ctx, qi, q -> leafInfo.roundLeafTexture },
                     rotateUV = { q -> rand[1] },
-                    postProcess = noPost
+                    postProcess = { ctx, qi, q, vi, v -> multiplyColor(blockColor) }
                 )
             }
             if (isSnowed) modelRenderer.render(
+                renderer,
                 leavesModel.model,
                 Rotation.identity,
                 ctx.blockCenter + perturbs[rand[0]],

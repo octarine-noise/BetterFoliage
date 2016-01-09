@@ -1,12 +1,12 @@
 apply plugin: "forge"
-apply plugin: "kotlin"
+apply plugin: 'kotlin'
 
 group = 'com.github.octarine-noise'
 version = "2.0"
-archivesBaseName = rootProject.name + '-MC1.7.10'
+archivesBaseName = rootProject.name + '-MC1.8'
 
 buildscript {
-    ext.kotlin_version = '1.0.0-beta-4583'
+    ext.kotlin_version = '1.0.0-beta-4584'
     repositories {
         mavenCentral()
         maven {
@@ -29,10 +29,12 @@ configurations {
 }
 dependencies {
     shade "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+
 }
 minecraft {
-    version = '1.7.10-10.13.4.1448-1.7.10'
-    srgExtra "PK: kotlin mods/betterfoliage/kotlin"
+    version = '1.8-11.14.3.1502'
+    mappings = 'stable_18'
+    srgExtra "PK: kotlin mods/octarinecore/kotlin"
 }
 
 processResources {
@@ -55,6 +57,7 @@ jar {
     manifest {
         attributes "FMLCorePlugin": "mods.betterfoliage.loader.BetterFoliageLoader"
         attributes "FMLCorePluginContainsFMLMod": "mods.betterfoliage.BetterFoliageMod"
+        attributes "FMLAT": "BetterFoliage_at.cfg"
     }
     configurations.shade.each { dep ->
         from(project.zipTree(dep)){
