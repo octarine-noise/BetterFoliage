@@ -5,7 +5,7 @@ import mods.octarinecore.client.gui.NonVerboseArrayEntry
 import mods.octarinecore.client.resource.get
 import mods.octarinecore.client.resource.getLines
 import mods.octarinecore.client.resource.resourceManager
-import mods.octarinecore.config.ConfigPropertyBase
+import mods.octarinecore.common.config.ConfigPropertyBase
 import mods.octarinecore.metaprog.getJavaClass
 import net.minecraft.block.Block
 import net.minecraft.client.multiplayer.WorldClient

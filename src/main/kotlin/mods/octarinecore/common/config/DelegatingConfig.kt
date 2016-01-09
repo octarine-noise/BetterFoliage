@@ -1,4 +1,4 @@
-package mods.octarinecore.config
+package mods.octarinecore.common.config
 
 import com.google.common.collect.LinkedListMultimap
 import cpw.mods.fml.client.config.GuiConfigEntries

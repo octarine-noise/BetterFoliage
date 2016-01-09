@@ -5,7 +5,7 @@ import cpw.mods.fml.relauncher.Side
 import cpw.mods.fml.relauncher.SideOnly
 import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.gui.BiomeListConfigEntry
-import mods.octarinecore.config.*
+import mods.octarinecore.common.config.*
 import mods.octarinecore.metaprog.reflectField
 import net.minecraft.client.Minecraft
 import net.minecraft.world.biome.BiomeGenBase
