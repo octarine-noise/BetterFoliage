@@ -38,10 +38,16 @@ class LeafInfo(
 object LeafRegistry : BlockTextureInspector<LeafInfo>() {
 
     val particles: MutableMap<String, IconSet> = hashMapOf()
-    val typeMappings = TextureMatcher().apply { loadMappings(ResourceLocation("betterfoliage", "leafTypeMappings.cfg")) }
+    val typeMappings = TextureMatcher().apply { loadMappings(ResourceLocation("betterfoliage", "leafTextureMappings.cfg")) }
 
     init {
         matchClassAndModel(Config.blocks.leaves, "minecraft:block/leaves", listOf("all"))
+    }
+
+    override fun onAfterModelLoad() {
+        super.onAfterModelLoad()
+        Client.log(INFO, "Inspecting leaf textures")
+        particles.clear()
     }
 
     override fun processTextures(textures: List<TextureAtlasSprite>, atlas: TextureMap): LeafInfo {
