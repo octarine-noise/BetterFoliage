@@ -147,10 +147,10 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
             // set rotation for the current quadrant
             val rotation = baseRotation + quadrantRotation
 
-            // disallow sharp discontinuities in the chamfer radius
+            // disallow sharp discontinuities in the chamfer radius, or tapering-in where inappropriate
             if (quadrants[idx] == LARGE_RADIUS &&
-                upType == PARALLEL && quadrantsTop[idx] == SMALL_RADIUS &&
-                downType == PARALLEL && quadrantsBottom[idx] == SMALL_RADIUS) {
+                upType == PARALLEL && quadrantsTop[idx] != LARGE_RADIUS &&
+                downType == PARALLEL && quadrantsBottom[idx] != LARGE_RADIUS) {
                 quadrants[idx] = SMALL_RADIUS
             }
 
