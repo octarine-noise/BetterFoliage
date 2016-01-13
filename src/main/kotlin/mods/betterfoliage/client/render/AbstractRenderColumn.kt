@@ -154,6 +154,8 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
             var downModel: Model? = null
             var upIcon = upTexture
             var downIcon = downTexture
+            var shouldRotateUp = true
+            var shouldRotateDown = true
 
             when (upType) {
                 NONSOLID -> upModel = flatTop(quadrants[idx])
@@ -163,6 +165,7 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
                     } else {
                         upIcon = sideTexture
                         upModel = extendTop(quadrants[idx])
+                        shouldRotateUp = false
                     }
                 }
                 PARALLEL -> {
@@ -181,6 +184,7 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
                     } else {
                         downIcon = sideTexture
                         downModel = extendBottom(quadrants[idx])
+                        shouldRotateDown = false
                     }
                 }
                 PARALLEL -> {
@@ -196,7 +200,7 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
                 rotation,
                 blockContext.blockCenter,
                 icon = upIcon,
-                rotateUV = { 0 },
+                rotateUV = { if (shouldRotateUp) idx else 0 },
                 postProcess = noPost
             )
             if (downModel != null) modelRenderer.render(
@@ -204,7 +208,7 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
                 rotation,
                 blockContext.blockCenter,
                 icon = downIcon,
-                rotateUV = { 0 },
+                rotateUV = { if (shouldRotateDown) 3 - idx else 0 },
                 postProcess = noPost
             )
         }
