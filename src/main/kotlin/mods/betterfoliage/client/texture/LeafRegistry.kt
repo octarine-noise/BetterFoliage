@@ -51,7 +51,7 @@ object LeafRegistry {
         if (event.map.textureType != 0) return
         leaves.clear()
         particles.clear()
-        typeMappings.loadMappings(ResourceLocation("betterfoliage", "leafTypeMappings.cfg"))
+        typeMappings.loadMappings(ResourceLocation("betterfoliage", "leafTextureMappings.cfg"))
         Client.log(INFO, "Generating leaf textures")
 
         IconSet("betterfoliage", "falling_leaf_default_%d").let {
