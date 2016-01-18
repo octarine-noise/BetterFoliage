@@ -93,16 +93,16 @@ class BetterFoliageTransformer : Transformer() {
         transformMethod(Refs.rebuildChunk) {
             find(invokeRef(Refs.renderBlock))?.replace {
                 log.info("Applying RenderChunk block render override")
-                varinsn(ALOAD, 21)
+                varinsn(ALOAD, if (isOptifinePresent) 24 else 21)
                 invokeStatic(Refs.renderWorldBlock)
             }
             if (isOptifinePresent) {
-                find(varinsn(ISTORE, 22))?.insertBefore {
+                find(varinsn(ISTORE, 25))?.insertAfter {
                     log.info("Applying RenderChunk block layer override")
-                    insn(POP)
-                    varinsn(ALOAD, 17)
-                    varinsn(ALOAD, 21)
+                    varinsn(ALOAD, 20)
+                    varinsn(ALOAD, 24)
                     invokeStatic(Refs.canRenderBlockInLayer)
+                    varinsn(ISTORE, 25)
                 }
             } else {
                 find(invokeRef(Refs.canRenderInLayer))?.replace {
