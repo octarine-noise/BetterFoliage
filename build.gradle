@@ -3,7 +3,7 @@ apply plugin: 'kotlin'
 
 group = 'com.github.octarine-noise'
 version = "2.0.2"
-archivesBaseName = rootProject.name + '-MC1.8.8'
+archivesBaseName = rootProject.name + '-MC1.8.x'
 
 buildscript {
     ext.kotlin_version = '1.0.0-beta-4584'
