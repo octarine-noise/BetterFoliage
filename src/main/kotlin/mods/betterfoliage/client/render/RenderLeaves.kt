@@ -14,8 +14,10 @@ import mods.octarinecore.random
 import net.minecraft.block.material.Material
 import net.minecraft.client.renderer.BlockRendererDispatcher
 import net.minecraft.client.renderer.WorldRenderer
+import net.minecraft.util.EnumFacing
 import net.minecraft.util.EnumFacing.UP
 import net.minecraft.util.EnumWorldBlockLayer
+import net.minecraft.util.EnumFacing.Axis
 import java.lang.Math.cos
 import java.lang.Math.sin
 
@@ -23,7 +25,7 @@ class RenderLeaves : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
 
     val leavesModel = model {
         verticalRectangle(x1 = -0.5, z1 = 0.5, x2 = 0.5, z2 = -0.5, yBottom = -0.5 * 1.41, yTop = 0.5 * 1.41)
-        .setAoShader(edgeOrientedAuto(corner = cornerAoMaxGreen))
+        .setAoShader(edgeOrientedAuto(corner = cornerAo(Axis.Y)))
         .setFlatShader(FlatOffset(Int3.zero))
         .scale(Config.leaves.size)
         .toCross(UP).addAll()

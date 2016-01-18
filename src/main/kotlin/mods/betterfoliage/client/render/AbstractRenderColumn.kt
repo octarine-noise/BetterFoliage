@@ -147,10 +147,10 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
             // set rotation for the current quadrant
             val rotation = baseRotation + quadrantRotation
 
-            // disallow sharp discontinuities in the chamfer radius
+            // disallow sharp discontinuities in the chamfer radius, or tapering-in where inappropriate
             if (quadrants[idx] == LARGE_RADIUS &&
-                upType == PARALLEL && quadrantsTop[idx] == SMALL_RADIUS &&
-                downType == PARALLEL && quadrantsBottom[idx] == SMALL_RADIUS) {
+                upType == PARALLEL && quadrantsTop[idx] != LARGE_RADIUS &&
+                downType == PARALLEL && quadrantsBottom[idx] != LARGE_RADIUS) {
                 quadrants[idx] = SMALL_RADIUS
             }
 
@@ -179,6 +179,8 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
             var downModel: Model? = null
             var upIcon = upTexture
             var downIcon = downTexture
+            var shouldRotateUp = true
+            var shouldRotateDown = true
 
             when (upType) {
                 NONSOLID -> upModel = flatTop(quadrants[idx])
@@ -188,6 +190,7 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
                     } else {
                         upIcon = sideTexture
                         upModel = extendTop(quadrants[idx])
+                        shouldRotateUp = false
                     }
                 }
                 PARALLEL -> {
@@ -206,6 +209,7 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
                     } else {
                         downIcon = sideTexture
                         downModel = extendBottom(quadrants[idx])
+                        shouldRotateDown = false
                     }
                 }
                 PARALLEL -> {
@@ -222,7 +226,7 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
                 rotation,
                 blockContext.blockCenter,
                 icon = upIcon,
-                rotateUV = { 0 },
+                rotateUV = { if (shouldRotateUp) idx else 0 },
                 postProcess = noPost
             )
             if (downModel != null) modelRenderer.render(
@@ -231,7 +235,7 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
                 rotation,
                 blockContext.blockCenter,
                 icon = downIcon,
-                rotateUV = { 0 },
+                rotateUV = { if (shouldRotateDown) 3 - idx else 0 },
                 postProcess = noPost
             )
         }
