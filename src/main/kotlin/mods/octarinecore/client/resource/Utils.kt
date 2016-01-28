@@ -87,5 +87,6 @@ val TextureAtlasSprite.averageColor: Int? get() {
  * Get the actual location of a texture from the name of its [TextureAtlasSprite].
  */
 fun textureLocation(iconName: String) = ResourceLocation(iconName).let {
-    ResourceLocation(it.resourceDomain, "textures/${it.resourcePath}")
+    if (it.resourcePath.startsWith("mcpatcher")) it
+    else ResourceLocation(it.resourceDomain, "textures/${it.resourcePath}")
 }

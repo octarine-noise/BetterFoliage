@@ -27,7 +27,7 @@ open class ColumnTextures(val matcher: BlockMatcher) : BlockTextureInspector<Col
         matchClassAndModel(matcher, "block/column_side", listOf("end", "end", "side"))
         matchClassAndModel(matcher, "block/cube_column", listOf("end", "end", "side"))
     }
-    override fun processTextures(textures: List<TextureAtlasSprite>, atlas: TextureMap) =
+    override fun processTextures(state: IBlockState, textures: List<TextureAtlasSprite>, atlas: TextureMap) =
         ColumnInfo(textures[0], textures[1], textures[2])
 }
 

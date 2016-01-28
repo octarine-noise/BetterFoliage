@@ -2,16 +2,17 @@ package mods.betterfoliage.client.render
 
 import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.config.Config
+import mods.betterfoliage.client.integration.OptifineCTM
 import mods.octarinecore.client.render.BlockContext
 import mods.octarinecore.client.render.Quad
 import mods.octarinecore.client.render.ShadingContext
-import mods.octarinecore.client.resource.BlockTextureInspector
+import mods.octarinecore.client.render.blockContext
 import mods.octarinecore.common.Int3
+import mods.octarinecore.common.rotate
+import mods.octarinecore.tryDefault
 import net.minecraft.block.BlockLog
 import net.minecraft.block.state.IBlockState
-import net.minecraft.client.renderer.texture.TextureAtlasSprite
-import net.minecraft.client.renderer.texture.TextureMap
-import net.minecraft.util.EnumFacing.Axis
+import net.minecraft.util.EnumFacing.*
 
 class RenderLog : AbstractRenderColumn(BetterFoliageMod.MOD_ID) {
 
@@ -21,7 +22,8 @@ class RenderLog : AbstractRenderColumn(BetterFoliageMod.MOD_ID) {
         Config.blocks.logs.matchesID(ctx.block)
 
     override var axisFunc = { state: IBlockState ->
-        when (state.getValue(BlockLog.LOG_AXIS).toString()) {
+        val axis = tryDefault("none") { state.getValue(BlockLog.LOG_AXIS).toString() }
+        when (axis) {
             "x" -> Axis.X
             "z" -> Axis.Z
             else -> Axis.Y
@@ -40,12 +42,20 @@ class RenderLog : AbstractRenderColumn(BetterFoliageMod.MOD_ID) {
     override val radiusSmall: Double get() = Config.roundLogs.radiusSmall
 
     override val downTexture = { ctx: ShadingContext, idx: Int, quad: Quad ->
-        columnTextures[ctx.blockData(Int3.zero).state]?.bottomTexture
+        columnTextures[ctx.blockData(Int3.zero).state]?.bottomTexture?.let { base ->
+            OptifineCTM.override(base, blockContext, DOWN.rotate(ctx.rotation))
+        }
     }
+
     override val sideTexture = { ctx: ShadingContext, idx: Int, quad: Quad ->
-        columnTextures[ctx.blockData(Int3.zero).state]?.sideTexture
+        columnTextures[ctx.blockData(Int3.zero).state]?.sideTexture?.let { base ->
+            OptifineCTM.override(base, blockContext, (if ((idx and 1) == 0) SOUTH else EAST).rotate(ctx.rotation))
+        }
     }
+
     override val upTexture = { ctx: ShadingContext, idx: Int, quad: Quad ->
-        columnTextures[ctx.blockData(Int3.zero).state]?.topTexture
+        columnTextures[ctx.blockData(Int3.zero).state]?.topTexture?.let { base ->
+            OptifineCTM.override(base, blockContext, UP.rotate(ctx.rotation))
+        }
     }
 }

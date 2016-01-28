@@ -2,6 +2,7 @@ package mods.betterfoliage.client.render
 
 import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.config.Config
+import mods.betterfoliage.client.integration.OptifineCTM
 import mods.betterfoliage.client.integration.ShadersModIntegration
 import mods.betterfoliage.client.texture.LeafRegistry
 import mods.octarinecore.PI2
@@ -15,9 +16,8 @@ import net.minecraft.block.material.Material
 import net.minecraft.client.renderer.BlockRendererDispatcher
 import net.minecraft.client.renderer.WorldRenderer
 import net.minecraft.util.EnumFacing
-import net.minecraft.util.EnumFacing.UP
+import net.minecraft.util.EnumFacing.*
 import net.minecraft.util.EnumWorldBlockLayer
-import net.minecraft.util.EnumFacing.Axis
 import java.lang.Math.cos
 import java.lang.Math.sin
 
@@ -49,7 +49,7 @@ class RenderLeaves : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
             it == Material.snow || it == Material.craftedSnow
         }
         renderWorldBlockBase(ctx, dispatcher, renderer, null)
-        val leafInfo = LeafRegistry[ctx.blockState(Int3.zero)] ?: return true
+        val leafInfo = LeafRegistry[ctx, DOWN] ?: return false
         val blockColor = ctx.blockData(Int3.zero, 0).color
 
         modelRenderer.updateShading(Int3.zero, allFaces)

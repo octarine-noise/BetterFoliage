@@ -3,15 +3,11 @@ package mods.betterfoliage.client.texture
 import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.Config
 import mods.octarinecore.client.render.HSB
-import mods.octarinecore.client.resource.*
+import mods.octarinecore.client.resource.BlockTextureInspector
+import mods.octarinecore.client.resource.averageColor
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.client.renderer.texture.TextureMap
-import net.minecraft.client.resources.model.ModelResourceLocation
-import net.minecraftforge.client.event.TextureStitchEvent
-import net.minecraftforge.client.model.IModel
-import net.minecraftforge.common.MinecraftForge
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
 import org.apache.logging.log4j.Level.INFO
@@ -46,7 +42,7 @@ object GrassRegistry : BlockTextureInspector<GrassInfo>() {
         Client.log(INFO, "Inspecting grass textures")
     }
 
-    override fun processTextures(textures: List<TextureAtlasSprite>, atlas: TextureMap): GrassInfo {
+    override fun processTextures(state: IBlockState, textures: List<TextureAtlasSprite>, atlas: TextureMap): GrassInfo {
         val hsb = HSB.fromColor(textures[0].averageColor ?: defaultGrassColor)
         val overrideColor = if (hsb.saturation > Config.shortGrass.saturationThreshold) hsb.copy(brightness = 0.8f).asColor else null
         return GrassInfo(textures[0], overrideColor)

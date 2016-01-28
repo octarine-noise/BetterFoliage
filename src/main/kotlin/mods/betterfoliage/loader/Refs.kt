@@ -16,6 +16,7 @@ object Refs {
     // Minecraft
     val IBlockAccess = ClassRef("net.minecraft.world.IBlockAccess", "ard")
     val IBlockState = ClassRef("net.minecraft.block.state.IBlockState", "bec")
+    val BlockStateBase = ClassRef("net.minecraft.block.state.BlockStateBase", "bea")
     val BlockPos = ClassRef("net.minecraft.util.BlockPos", "dt")
     val EnumWorldBlockLayer = ClassRef("net.minecraft.util.EnumWorldBlockLayer", "aql")
     val EnumFacing = ClassRef("net.minecraft.util.EnumFacing", "ej")
@@ -76,6 +77,18 @@ object Refs {
 
     // Optifine
     val OptifineClassTransformer = ClassRef("optifine.OptiFineClassTransformer")
+
+    val RenderEnv = ClassRef("RenderEnv")
+    val RenderEnv_reset = MethodRef(RenderEnv, "reset", ClassRef.void, IBlockAccess, IBlockState, BlockPos)
+    val ConnectedTextures = ClassRef("ConnectedTextures")
+    val getConnectedTexture = MethodRef(ConnectedTextures, "getConnectedTextureMultiPass", TextureAtlasSprite, IBlockAccess, IBlockState, BlockPos, EnumFacing, TextureAtlasSprite, RenderEnv)
+    val CTblockProperties = FieldRef(ConnectedTextures, "blockProperties", null)
+    val CTtileProperties = FieldRef(ConnectedTextures, "tileProperties", null)
+
+    val ConnectedProperties = ClassRef("ConnectedProperties")
+    val CPtileIcons = FieldRef(ConnectedProperties, "tileIcons", null)
+    val CPmatchesBlock = MethodRef(ConnectedProperties, "matchesBlock", ClassRef.boolean, BlockStateBase)
+    val CPmatchesIcon = MethodRef(ConnectedProperties, "matchesIcon", ClassRef.boolean, TextureAtlasSprite)
 
     // ShadersMod
     val SVertexBuilder = ClassRef("shadersmod.client.SVertexBuilder")

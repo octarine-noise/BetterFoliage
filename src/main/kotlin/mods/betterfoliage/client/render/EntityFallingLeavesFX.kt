@@ -11,6 +11,7 @@ import mods.octarinecore.random
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.WorldRenderer
 import net.minecraft.util.BlockPos
+import net.minecraft.util.EnumFacing.*
 import net.minecraft.util.MathHelper
 import net.minecraft.world.World
 import net.minecraftforge.common.MinecraftForge
@@ -42,7 +43,7 @@ AbstractEntityFX(world, pos.x.toDouble() + 0.5, pos.y.toDouble(), pos.z.toDouble
         particleScale = Config.fallingLeaves.size.toFloat() * 0.1f
 
         val state = world.getBlockState(pos)
-        LeafRegistry[world.getBlockState(pos)]?.let {
+        LeafRegistry[state, world, pos, DOWN]?.let {
             particleIcon = it.particleTextures[rand.nextInt(1024)]
             calculateParticleColor(it.averageColor, state.block.colorMultiplier(world, pos))
         }

@@ -3,6 +3,7 @@ package mods.betterfoliage.client.render
 import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.Config
+import mods.betterfoliage.client.integration.OptifineCTM
 import mods.betterfoliage.client.integration.ShadersModIntegration
 import mods.betterfoliage.client.texture.GrassRegistry
 import mods.octarinecore.client.render.*
@@ -55,6 +56,8 @@ class RenderGrass : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
         val connectedGrass = isConnected && Config.connectedGrass.enabled && (!isSnowed || Config.connectedGrass.snowEnabled)
 
         val grassInfo = GrassRegistry[ctx.blockState(Int3.zero)] ?: return renderWorldBlockBase(ctx, dispatcher, renderer, layer)
+        val grassTopTexture = OptifineCTM.override(grassInfo.grassTopTexture, ctx, UP)
+
         val blockColor = ctx.blockData(Int3.zero, 0).color
 
         if (connectedGrass) {
@@ -67,7 +70,7 @@ class RenderGrass : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
                 fullCube,
                 Rotation.identity,
                 ctx.blockCenter,
-                icon =  { ctx, qi, q -> grassInfo.grassTopTexture },
+                icon =  { ctx, qi, q -> grassTopTexture },
                 rotateUV = { 2 },
                 postProcess = { ctx, qi, q, vi, v ->
                     if (isSnowed) { if(!ctx.aoEnabled) setGrey(1.4f) }
