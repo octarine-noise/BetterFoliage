@@ -53,7 +53,7 @@ class RenderGrass : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
             renderWorldBlockBase(parent, face = alwaysRender)
             return true
         }
-        val cubeTexture = if (isSnowed) ctx.icon(up1, UP) else null ?: grassInfo.grassTopTexture
+        val cubeTexture = if (isSnowed) ctx.icon(UP, up1) else null ?: grassInfo.grassTopTexture
         val blockColor = ctx.blockColor(Int3.zero)
 
         if (connectedGrass) {

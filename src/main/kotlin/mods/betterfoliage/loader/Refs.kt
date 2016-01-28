@@ -60,11 +60,13 @@ object Refs {
     // Optifine
     val ConnectedTextures = ClassRef("ConnectedTextures")
     val getConnectedTexture = MethodRef(ConnectedTextures, "getConnectedTexture", IIcon, IBlockAccess, Block, ClassRef.int, ClassRef.int, ClassRef.int, ClassRef.int, IIcon)
-    val CTBlockProperties = FieldRef(ConnectedTextures, "blockProperties", null)
-    val CTTileProperties = FieldRef(ConnectedTextures, "tileProperties", null)
+    val CTblockProperties = FieldRef(ConnectedTextures, "blockProperties", null)
+    val CTtileProperties = FieldRef(ConnectedTextures, "tileProperties", null)
 
     val ConnectedProperties = ClassRef("ConnectedProperties")
-    val CPTileIcons = FieldRef(ConnectedProperties, "tileIcons", null)
+    val CPmatchBlocks = FieldRef(ConnectedProperties, "matchBlocks", null)
+    val CPmatchTileIcons = FieldRef(ConnectedProperties, "matchTileIcons", null)
+    val CPtileIcons = FieldRef(ConnectedProperties, "tileIcons", null)
 
     // Colored Lights Core
     val CLCLoadingPlugin = ClassRef("coloredlightscore.src.asm.ColoredLightsCoreLoadingPlugin")

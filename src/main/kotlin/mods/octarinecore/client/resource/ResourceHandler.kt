@@ -97,6 +97,7 @@ class IconSet(val domain: String, val namePattern: String) : IStitchListener {
     override fun onStitch(atlas: IIconRegister) {
         num = 0;
         (0..15).forEach { idx ->
+            icons[idx] = null
             val locReal = ResourceLocation(domain, "textures/blocks/${namePattern.format(idx)}.png")
             if (resourceManager[locReal] != null) icons[num++] = atlas.registerIcon("$domain:${namePattern.format(idx)}")
         }

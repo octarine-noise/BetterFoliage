@@ -1,6 +1,7 @@
 package mods.octarinecore.client.resource
 
 import mods.octarinecore.client.resource.ResourceType.*
+import mods.octarinecore.stripStart
 import net.minecraft.client.resources.IResource
 import net.minecraft.util.ResourceLocation
 import java.awt.image.BufferedImage
@@ -44,7 +45,8 @@ abstract class TextureGenerator(domain: String) : ParameterBasedGenerator(domain
      */
     fun targetResource(params: ParameterList): Pair<ResourceType, ResourceLocation>? {
         val baseTexture =
-            if (listOf("dom", "path").all { it in params }) ResourceLocation(params["dom"]!!, params["path"]!!)
+            if (listOf("dom", "path").all { it in params })
+                ResourceLocation(params["dom"]!!, params["path"]!!)
             else return null
         return when(params.value?.toLowerCase()) {
             "generate.png" -> COLOR to baseTexture + ".png"

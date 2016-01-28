@@ -1,11 +1,13 @@
 package mods.betterfoliage.client.texture
 
 import cpw.mods.fml.common.FMLCommonHandler
+import cpw.mods.fml.common.eventhandler.EventPriority
 import cpw.mods.fml.common.eventhandler.SubscribeEvent
 import cpw.mods.fml.relauncher.Side
 import cpw.mods.fml.relauncher.SideOnly
 import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.Config
+import mods.betterfoliage.client.integration.OptifineCTM
 import mods.octarinecore.client.resource.IconSet
 import mods.octarinecore.client.resource.averageColor
 import net.minecraft.block.Block
@@ -46,7 +48,7 @@ object LeafRegistry {
         MinecraftForge.EVENT_BUS.register(this)
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOW)
     fun handleTextureReload(event: TextureStitchEvent.Pre) {
         if (event.map.textureType != 0) return
         leaves.clear()
@@ -59,13 +61,29 @@ object LeafRegistry {
             particles.put("default", it)
         }
 
+        //OptifineIntegration.dumpCTMData()
+
         Block.blockRegistry.forEach { block ->
             if (Config.blocks.leaves.matchesClass(block as Block)) {
                 block.registerBlockIcons { location ->
                     val original = event.map.getTextureExtry(location)
-                    Client.log(DEBUG, "Found leaf texture: $location")
+                    Client.log(INFO, "Found leaf texture: $location")
                     registerLeaf(event.map, original)
+
+                    if (OptifineCTM.isAvailable) OptifineCTM.getAllCTM(original).let { ctmIcons ->
+                        if (ctmIcons.isNotEmpty()) {
+                            Client.log(INFO, "Found ${ctmIcons.size} CTM variants for texture ${original.iconName}")
+                            ctmIcons.forEach { registerLeaf(event.map, it as TextureAtlasSprite) }
+                        }
+                    }
                     return@registerBlockIcons original
+                }
+
+                if (OptifineCTM.isAvailable) OptifineCTM.getAllCTM(block).let { ctmIcons ->
+                    if (ctmIcons.isNotEmpty()) {
+                        Client.log(INFO, "Found ${ctmIcons.size} CTM variants for block ${Block.getIdFromBlock(block)}")
+                        ctmIcons.forEach { registerLeaf(event.map, it as TextureAtlasSprite) }
+                    }
                 }
             }
         }
@@ -76,19 +94,21 @@ object LeafRegistry {
         val generated = atlas.registerIcon(
             Client.genLeaves.generatedResource(icon.iconName, "type" to leafType).toString()
         )
+        leafType = registerParticle(atlas, leafType)
+        leaves.put(icon, LeafInfo(generated as TextureAtlasSprite, leafType))
+    }
 
+    fun registerParticle(atlas: TextureMap, leafType: String): String {
         if (leafType !in particles.keys) {
             val particleSet = IconSet("betterfoliage", "falling_leaf_${leafType}_%d")
             particleSet.onStitch(atlas)
             if (particleSet.num == 0) {
                 Client.log(WARN, "Leaf particle textures not found for leaf type: $leafType")
-                leafType == "default"
+                return "default"
             } else {
                 particles.put(leafType, particleSet)
             }
         }
-
-        val leafInfo = LeafInfo(generated as TextureAtlasSprite, leafType)
-        leaves.put(icon, leafInfo)
+        return leafType
     }
 }

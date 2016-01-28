@@ -1,7 +1,9 @@
 package mods.betterfoliage.client.texture
 
+import mods.betterfoliage.client.Client
 import mods.octarinecore.client.resource.*
 import net.minecraft.util.ResourceLocation
+import org.apache.logging.log4j.Level
 import java.awt.image.BufferedImage
 
 /**

@@ -1,6 +1,7 @@
 @file:JvmName("Utils")
 package mods.octarinecore.client.resource
 
+import mods.betterfoliage.client.Client
 import mods.octarinecore.PI2
 import mods.octarinecore.client.render.HSB
 import mods.octarinecore.tryDefault
@@ -10,6 +11,7 @@ import net.minecraft.client.resources.IResource
 import net.minecraft.client.resources.IResourceManager
 import net.minecraft.client.resources.SimpleReloadableResourceManager
 import net.minecraft.util.ResourceLocation
+import org.apache.logging.log4j.Level
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -29,7 +31,7 @@ operator fun IResourceManager.get(domain: String, path: String): IResource? = ge
 operator fun IResourceManager.get(location: ResourceLocation): IResource? = tryDefault(null) { getResource(location) }
 
 /** Load an image resource. */
-fun IResource.loadImage() = ImageIO.read(this.inputStream)
+fun IResource.loadImage() = tryDefault(null) { ImageIO.read(this.inputStream) }
 
 /** Get the lines of a text resource. */
 fun IResource.getLines(): List<String> {
@@ -86,5 +88,6 @@ val TextureAtlasSprite.averageColor: Int? get() {
  * Get the actual location of a texture from the name of its [TextureAtlasSprite].
  */
 fun textureLocation(iconName: String) = ResourceLocation(iconName).let {
-    ResourceLocation(it.resourceDomain, "textures/blocks/${it.resourcePath}")
+    if (it.resourcePath.startsWith("mcpatcher")) it
+    else ResourceLocation(it.resourceDomain, "textures/blocks/${it.resourcePath}")
 }

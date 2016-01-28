@@ -136,7 +136,7 @@ class MethodRef(val parentClass: ClassRef,
  * @param[mcpName] MCP name of the field
  * @param[srgName] SRG name of the field
  * @param[obfName] obfuscated name of the field
- * @param[type] reference to the field type
+ * @param[type] reference to the field type. Only necessary for transformation, not reflection
  */
 class FieldRef(val parentClass: ClassRef,
                val mcpName: String,

@@ -3,6 +3,8 @@ package mods.octarinecore.client.render
 
 import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler
 import cpw.mods.fml.client.registry.RenderingRegistry
+import mods.betterfoliage.client.integration.OptifineCTM
+import mods.betterfoliage.loader.Refs
 import mods.octarinecore.ThreadLocalDelegate
 import mods.octarinecore.client.resource.ResourceHandler
 import net.minecraft.block.Block
@@ -129,10 +131,11 @@ class BlockContext() {
     /** Get the biome ID at the block position. */
     val biomeId: Int get() = world!!.getBiomeGenForCoords(x, z).biomeID
 
-    /** Get the texture on a given face of the block being rendered. */
-    fun icon(face: ForgeDirection) = block(Int3.zero).getIcon(face.ordinal, meta(Int3.zero))
     /** Get the texture on a given face of the block at the given offset. */
-    fun icon(offset: Int3, face: ForgeDirection) = block(offset).getIcon(face.ordinal, meta(offset))
+    fun icon(face: ForgeDirection, offset: Int3 = Int3.zero) = block(offset).getIcon(face.ordinal, meta(offset)).let {
+        if (!OptifineCTM.isAvailable) it
+        else Refs.getConnectedTexture.invokeStatic(world!!, block(offset), x + offset.x, y + offset.y, z + offset.z, face.ordinal, it) as IIcon
+    }
 
     /** Get the centerpoint of the block being rendered. */
     val blockCenter: Double3 get() = Double3(x + 0.5, y + 0.5, z + 0.5)
