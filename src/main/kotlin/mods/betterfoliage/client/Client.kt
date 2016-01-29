@@ -2,6 +2,7 @@ package mods.betterfoliage.client
 
 import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.gui.ConfigGuiFactory
+import mods.betterfoliage.client.integration.OptifineCTM
 import mods.betterfoliage.client.integration.ShadersModIntegration
 import mods.betterfoliage.client.render.*
 import mods.betterfoliage.client.texture.GrassGenerator
@@ -66,7 +67,8 @@ object Client {
         GrassRegistry,
         LeafWindTracker,
         RisingSoulTextures,
-        ShadersModIntegration
+        ShadersModIntegration,
+        OptifineCTM
     )
 
     fun log(level: Level, msg: String) = BetterFoliageMod.log!!.log(level, msg)

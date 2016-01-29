@@ -93,6 +93,7 @@ class IconSet(val domain: String, val namePattern: String) : IStitchListener {
     override fun onStitch(atlas: TextureMap) {
         num = 0;
         (0..15).forEach { idx ->
+            icons[idx] = null
             val locReal = ResourceLocation(domain, "textures/${namePattern.format(idx)}.png")
             if (resourceManager[locReal] != null) icons[num++] = atlas.registerSprite(ResourceLocation(domain, namePattern.format(idx)))
         }

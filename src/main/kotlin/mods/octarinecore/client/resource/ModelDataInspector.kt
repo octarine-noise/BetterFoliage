@@ -17,6 +17,7 @@ import net.minecraftforge.client.model.IModel
 import net.minecraftforge.client.model.ModelLoader
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.eventhandler.Event
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class LoadModelDataEvent(val loader: ModelLoader) : Event()
@@ -33,7 +34,7 @@ abstract class ModelDataInspector {
     @SubscribeEvent
     fun handleLoadModelData(event: LoadModelDataEvent) {
         val stateMappings = Block.blockRegistry.flatMap { block ->
-            ((event.loader.blockModelShapes.blockStateMapper.blockStateMap[block]as? IStateMapper ?: DefaultStateMapper())
+            ((event.loader.blockModelShapes.blockStateMapper.blockStateMap[block] as? IStateMapper ?: DefaultStateMapper())
                 .putStateModelLocations(block as Block) as Map<IBlockState, ModelResourceLocation>).entries
         }
         val stateModels = Refs.stateModels.get(event.loader) as Map<ModelResourceLocation, IModel>
@@ -48,7 +49,7 @@ abstract class ModelDataInspector {
         }
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOW)
     fun handleTextureReload(event: TextureStitchEvent.Pre) { onStitch(event.map) }
 }
 
@@ -56,17 +57,17 @@ abstract class BlockTextureInspector<T> : ModelDataInspector() {
 
     val state2Names = hashMapOf<IBlockState, Iterable<String>>()
     val modelMappings = linkedListOf<Pair<(IBlockState, IModel)->Boolean, Iterable<String>>>()
-    val infoMap = hashMapOf<IBlockState, T>()
+    val stateMap = hashMapOf<IBlockState, T>()
 
     fun match(textureNames: Iterable<String>, predicate: (IBlockState, IModel)->Boolean) =
         modelMappings.add(predicate to textureNames)
     fun matchClassAndModel(blockClass: BlockMatcher, modelLocation: String, textureNames: Iterable<String>) =
         match(textureNames) { state, model -> blockClass.matchesClass(state.block) && model.derivesFromModel(modelLocation) }
 
-    operator fun get(state: IBlockState) = infoMap[state]
+    operator fun get(state: IBlockState) = stateMap[state]
 
     override fun onAfterModelLoad() {
-        infoMap.clear()
+        stateMap.clear()
     }
 
     override fun processModelDefinition(state: IBlockState, modelDefLoc: ModelResourceLocation, model: IModel) {
@@ -89,14 +90,14 @@ abstract class BlockTextureInspector<T> : ModelDataInspector() {
             val textures = textureNames.map { atlas.getTextureExtry(ResourceLocation(it).toString()) }
             if (textures.all { it != null }) {
                 state2Texture.put(state, textures)
-                if (textures !in texture2Info) texture2Info.put(textures, processTextures(textures, atlas))
+                if (textures !in texture2Info) texture2Info.put(textures, processTextures(state, textures, atlas))
             }
         }
-        state2Texture.forEach { state, texture -> infoMap.put(state, texture2Info[texture]!!) }
+        state2Texture.forEach { state, texture -> stateMap.put(state, texture2Info[texture]!!) }
         state2Names.clear()
     }
 
-    abstract fun processTextures(textures: List<TextureAtlasSprite>, atlas: TextureMap): T
+    abstract fun processTextures(state: IBlockState, textures: List<TextureAtlasSprite>, atlas: TextureMap): T
 }
 
 @Suppress("UNCHECKED_CAST")
