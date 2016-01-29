@@ -22,11 +22,13 @@ class RenderLog : AbstractRenderColumn(BetterFoliageMod.MOD_ID) {
         Config.blocks.logs.matchesID(ctx.block)
 
     override var axisFunc = { state: IBlockState ->
-        val axis = tryDefault("none") { state.getValue(BlockLog.LOG_AXIS).toString() }
+        val axis = tryDefault(null) { state.getValue(BlockLog.LOG_AXIS).toString() } ?:
+            state.properties.entries.find { it.key.getName().toLowerCase() == "axis" }?.let { it.value.toString() }
         when (axis) {
             "x" -> Axis.X
+            "y" -> Axis.Y
             "z" -> Axis.Z
-            else -> Axis.Y
+            else -> null
         }
     }
 

@@ -6,7 +6,7 @@ version = "2.0.3"
 archivesBaseName = rootProject.name + '-MC1.8.x'
 
 buildscript {
-    ext.kotlin_version = '1.0.0-beta-4584'
+    ext.kotlin_version = '1.0.0-beta-4589'
     repositories {
         mavenCentral()
         maven {
@@ -34,6 +34,7 @@ dependencies {
 minecraft {
     version = '1.8.8-11.15.0.1655'
     mappings = 'stable_20'
+    runDir = 'run'
 }
 
 processResources {

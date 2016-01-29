@@ -18,7 +18,8 @@ fun Model.columnSide(radius: Double, yBottom: Double, yTop: Double, transform: (
     listOf(
         verticalRectangle(x1 = 0.0, z1 = 0.5, x2 = 0.5 - radius, z2 = 0.5, yBottom = yBottom, yTop = yTop)
         .clampUV(minU = 0.0, maxU = 0.5 - radius)
-        .setAoShader(faceOrientedInterpolate(overrideFace = SOUTH)),
+        .setAoShader(faceOrientedInterpolate(overrideFace = SOUTH))
+        .setAoShader(faceOrientedAuto(corner = cornerAo(Axis.Y)), predicate = { v, vi -> vi == 1 || vi == 2}),
 
         verticalRectangle(x1 = 0.5 - radius, z1 = 0.5, x2 = 0.5 - halfRadius, z2 = 0.5 - halfRadius, yBottom = yBottom, yTop = yTop)
         .clampUV(minU = 0.5 - radius)
@@ -44,6 +45,7 @@ fun Model.columnSide(radius: Double, yBottom: Double, yTop: Double, transform: (
         verticalRectangle(x1 = 0.5, z1 = 0.5 - radius, x2 = 0.5, z2 = 0.0, yBottom = yBottom, yTop = yTop)
         .clampUV(minU = radius - 0.5, maxU = 0.0)
         .setAoShader(faceOrientedInterpolate(overrideFace = EAST))
+        .setAoShader(faceOrientedAuto(corner = cornerAo(Axis.Y)), predicate = { v, vi -> vi == 0 || vi == 3})
     ).forEach { transform(it.setFlatShader(FaceFlat(EAST))).add() }
 
     quads.exchange(1, 2)
@@ -64,7 +66,7 @@ fun Model.columnSideSquare(yBottom: Double, yTop: Double, transform: (Quad) -> Q
         verticalRectangle(x1 = 0.5, z1 = 0.5, x2 = 0.5, z2 = 0.0, yBottom = yBottom, yTop = yTop)
         .clampUV(maxU = 0.0)
         .setAoShader(faceOrientedInterpolate(overrideFace = EAST))
-        .setAoShader(faceOrientedAuto(corner = cornerAo(Axis.Y)), predicate = { v, vi -> vi == 1 || vi == 2})
+        .setAoShader(faceOrientedAuto(corner = cornerAo(Axis.Y)), predicate = { v, vi -> vi == 0 || vi == 3})
     ).forEach {
         transform(it.setFlatShader(faceOrientedAuto(corner = cornerFlat))).add()
     }
