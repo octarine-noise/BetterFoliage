@@ -45,6 +45,19 @@ fun brSum(multiplier: Float?, vararg brightness: Int): Int {
     return result
 }
 
+fun brWeighted(br1: Int, weight1: Float, br2: Int, weight2: Float): Int {
+    val w1int = (weight1 * 256.0f + 0.5f).toInt()
+    val w2int = (weight2 * 256.0f + 0.5f).toInt()
+    var result = 0
+    brightnessComponents.forEachIndexed { idx, shift ->
+        val comp1 = (br1 shr shift) and 15
+        val comp2 = (br2 shr shift) and 15
+        val compWeighted = (comp1 * w1int + comp2 * w2int) / 256
+        result = result or ((compWeighted and 15) shl shift)
+    }
+    return result
+}
+
 data class HSB(var hue: Float, var saturation: Float, var brightness: Float) {
     companion object {
         fun fromColor(color: Int): HSB {
