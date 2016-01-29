@@ -55,7 +55,7 @@ interface Shader {
         red = min(shading1.red * weight1 + shading2.red * weight2, 1.0f)
         green = min(shading1.green * weight1 + shading2.green * weight2, 1.0f)
         blue = min(shading1.blue * weight1 + shading2.blue * weight2, 1.0f)
-        brightness = brSum(null, shading1.brightness brMul weight1, shading2.brightness brMul weight2)
+        brightness = brWeighted(shading1.brightness, weight1, shading2.brightness, weight2)
     }
 
     /**
