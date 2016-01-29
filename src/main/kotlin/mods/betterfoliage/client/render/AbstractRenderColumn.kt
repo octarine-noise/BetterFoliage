@@ -116,7 +116,7 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
     inline fun continous(q1: QuadrantType, q2: QuadrantType) =
         q1 == q2 || ((q1 == SQUARE || q1 == INVISIBLE) && (q2 == SQUARE || q2 == INVISIBLE))
 
-    abstract val axisFunc: (IBlockState)->EnumFacing.Axis
+    abstract val axisFunc: (IBlockState)->EnumFacing.Axis?
     abstract val blockPredicate: (IBlockState)->Boolean
 
     abstract val sideTexture: (ShadingContext, Int, Quad)->TextureAtlasSprite?
@@ -131,7 +131,7 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
         modelRenderer.updateShading(Int3.zero, allFaces)
 
         // check log neighborhood
-        val logAxis = ctx.blockAxis
+        val logAxis = ctx.blockAxis ?: return renderWorldBlockBase(ctx, dispatcher, renderer, layer)
         val baseRotation = rotationFromUp[(logAxis to AxisDirection.POSITIVE).face.ordinal]
 
         val upType = ctx.blockType(baseRotation, logAxis, Int3(0, 1, 0))
@@ -314,7 +314,7 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
     }
 
     /** Get the axis of the block */
-    val BlockContext.blockAxis: Axis get() = axisFunc(blockState(Int3.zero))
+    val BlockContext.blockAxis: Axis? get() = axisFunc(blockState(Int3.zero))
 
     /**
      * Get the type of the block at the given offset in a rotated reference frame.
