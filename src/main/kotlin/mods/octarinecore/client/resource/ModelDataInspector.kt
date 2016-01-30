@@ -42,10 +42,7 @@ abstract class ModelDataInspector {
         onAfterModelLoad()
 
         stateMappings.forEach { mapping ->
-            val model = stateModels[mapping.value]
-            if (model != null) {
-                val result = processModelDefinition(mapping.key, mapping.value, model)
-            }
+            stateModels[mapping.value]?.let { processModelDefinition(mapping.key, mapping.value, it) }
         }
     }
 
