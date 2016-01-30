@@ -210,3 +210,5 @@ betterfoliage.roundLogs.dimming=Dimming
 betterfoliage.roundLogs.dimming.tooltip=Amount to darken obscured log faces
 betterfoliage.roundLogs.zProtection=Z-Protection
 betterfoliage.roundLogs.zProtection.tooltip=Amount to scale parallel log connection bits to stop Z-fighting (flickering). Try to set it as high as possible without having glitches.
+betterfoliage.roundLogs.defaultY=Default to vertical
+betterfoliage.roundLogs.defaultY.tooltip=If true, log blocks where the orientation cannot be determined will be rendered as vertical. Otherwise, they will be rendered as cube blocks.

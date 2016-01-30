@@ -28,7 +28,7 @@ class RenderLog : AbstractRenderColumn(BetterFoliageMod.MOD_ID) {
             "x" -> Axis.X
             "y" -> Axis.Y
             "z" -> Axis.Z
-            else -> null
+            else -> if (Config.roundLogs.defaultY) Axis.Y else null
         }
     }
 

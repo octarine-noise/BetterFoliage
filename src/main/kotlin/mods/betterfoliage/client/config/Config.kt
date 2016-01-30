@@ -84,6 +84,7 @@ object Config : DelegatingConfig(BetterFoliageMod.MOD_ID, BetterFoliageMod.DOMAI
         val lenientConnect by boolean(true)
         val connectPerpendicular by boolean(true)
         val connectGrass by boolean(true)
+        val defaultY by boolean(false)
         val zProtection by double(min = 0.9, default = 0.99)
     }
 
