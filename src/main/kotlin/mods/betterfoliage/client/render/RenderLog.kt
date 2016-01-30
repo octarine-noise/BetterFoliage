@@ -1,5 +1,6 @@
 package mods.betterfoliage.client.render
 
+import com.google.common.collect.ImmutableMap
 import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.config.Config
 import mods.betterfoliage.client.integration.OptifineCTM
@@ -11,6 +12,7 @@ import mods.octarinecore.common.Int3
 import mods.octarinecore.common.rotate
 import mods.octarinecore.tryDefault
 import net.minecraft.block.BlockLog
+import net.minecraft.block.properties.IProperty
 import net.minecraft.block.state.IBlockState
 import net.minecraft.util.EnumFacing.*
 
@@ -29,7 +31,7 @@ class RenderLog : AbstractRenderColumn(BetterFoliageMod.MOD_ID) {
             "x" -> Axis.X
             "y" -> Axis.Y
             "z" -> Axis.Z
-            else -> null
+            else -> if (Config.roundLogs.defaultY) Axis.Y else null
         }
     }
 

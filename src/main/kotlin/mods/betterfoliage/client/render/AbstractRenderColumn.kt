@@ -26,6 +26,7 @@ open class ColumnTextures(val matcher: BlockMatcher) : BlockTextureInspector<Col
     init {
         matchClassAndModel(matcher, "block/column_side", listOf("end", "end", "side"))
         matchClassAndModel(matcher, "block/cube_column", listOf("end", "end", "side"))
+        matchClassAndModel(matcher, "block/cube_all", listOf("all", "all", "all"))
     }
     override fun processTextures(state: IBlockState, textures: List<TextureAtlasSprite>, atlas: TextureMap) =
         ColumnInfo(textures[0], textures[1], textures[2])
@@ -131,7 +132,7 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
         modelRenderer.updateShading(Int3.zero, allFaces)
 
         // check log neighborhood
-        val logAxis = ctx.blockAxis ?: return renderWorldBlockBase(ctx, dispatcher, renderer, layer)
+        val logAxis = ctx.blockAxis ?: return renderWorldBlockBase(ctx, dispatcher, renderer, null)
         val baseRotation = rotationFromUp[(logAxis to AxisDirection.POSITIVE).face.ordinal]
 
         val upType = ctx.blockType(baseRotation, logAxis, Int3(0, 1, 0))
@@ -325,7 +326,7 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
         return if (!blockPredicate(state)) {
             if (state.block.isOpaqueCube) SOLID else NONSOLID
         } else {
-            if (axisFunc(state) == axis) PARALLEL else PERPENDICULAR
+            axisFunc(state)?.let { if (it == axis) PARALLEL else PERPENDICULAR } ?: SOLID
         }
     }
 }
