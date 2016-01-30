@@ -4,11 +4,15 @@ import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.Config
 import mods.betterfoliage.client.integration.ShadersModIntegration
+import mods.betterfoliage.client.integration.TFCIntegration
 import mods.betterfoliage.client.texture.GrassRegistry
+import mods.betterfoliage.client.texture.defaultGrassColor
 import mods.octarinecore.client.render.*
+import mods.octarinecore.client.resource.averageColor
 import mods.octarinecore.random
 import net.minecraft.block.material.Material
 import net.minecraft.client.renderer.RenderBlocks
+import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraftforge.common.util.ForgeDirection.UP
 import org.apache.logging.log4j.Level.INFO
 
@@ -96,8 +100,10 @@ class RenderGrass : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
                 else
                     { ctx: ShadingContext, qi: Int, q: Quad -> iconset[rand[qi and 1]]!! },
                 rotateUV = { 0 },
-                postProcess = if (isSnowed) whitewash else if (grassInfo.overrideColor == null) noPost else
-                    { ctx, qi, q, vi, v -> multiplyColor(grassInfo.overrideColor) }
+                postProcess = if (isSnowed) whitewash
+                    else if (grassInfo.overrideColor != null)  { ctx, qi, q, vi, v -> multiplyColor(grassInfo.overrideColor) }
+                    else if (TFCIntegration.grass.matchesID(ctx.block)) { ctx, qi, q, vi, v -> multiplyColor(blockColor) }
+                    else noPost
             )
         }
 
