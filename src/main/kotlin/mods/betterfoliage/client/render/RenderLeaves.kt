@@ -25,7 +25,7 @@ class RenderLeaves : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
 
     val leavesModel = model {
         verticalRectangle(x1 = -0.5, z1 = 0.5, x2 = 0.5, z2 = -0.5, yBottom = -0.5 * 1.41, yTop = 0.5 * 1.41)
-        .setAoShader(edgeOrientedAuto(corner = cornerAo(Axis.Y)))
+        .setAoShader(edgeOrientedAuto(corner = cornerAoMaxGreen))
         .setFlatShader(FlatOffset(Int3.zero))
         .scale(Config.leaves.size)
         .toCross(UP).addAll()
