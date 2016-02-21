@@ -35,7 +35,7 @@ abstract class IdListConfigEntry<T>(
         val requiresRestart = (childScreen as GuiConfig).entryList.saveConfigElements()
         val children = (childScreen as GuiConfig).configElements as List<ItemWrapperElement>
         val ids = children.filter { it.booleanValue == true }.map { it.item.itemId }
-        configElement.set(ids.sorted().toTypedArray())
+        (configElement as IConfigElement<Int>).set(ids.sorted().toTypedArray())
         return requiresRestart
     }
 

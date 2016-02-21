@@ -18,7 +18,7 @@ import java.util.*
 class EntityRisingSoulFX(world: World, x: Int, y: Int, z: Int) :
 AbstractEntityFX(world, x.toDouble() + 0.5, y.toDouble() + 1.0, z.toDouble() + 0.5) {
 
-    val particleTrail: Deque<Double3> = linkedListOf()
+    val particleTrail: Deque<Double3> = LinkedList<Double3>()
     val initialPhase = rand.nextInt(64)
 
     init {

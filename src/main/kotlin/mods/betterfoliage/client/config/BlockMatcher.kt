@@ -22,8 +22,8 @@ import net.minecraftforge.event.world.WorldEvent
  */
 class BlockMatcher(val domain: String, val path: String) : ConfigPropertyBase() {
 
-    val blackList = linkedListOf<Class<*>>()
-    val whiteList = linkedListOf<Class<*>>()
+    val blackList = mutableListOf<Class<*>>()
+    val whiteList = mutableListOf<Class<*>>()
     val blockIDs = hashSetOf<Int>()
     var blacklistProperty: Property? = null
     var whitelistProperty: Property? = null

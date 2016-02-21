@@ -33,7 +33,7 @@ interface IWorldLoadListener { fun onWorldLoad(world: World) }
  */
 open class ResourceHandler(val modId: String) {
 
-    val resources = linkedListOf<Any>()
+    val resources = mutableListOf<Any>()
     open fun afterStitch() {}
 
     // ============================
