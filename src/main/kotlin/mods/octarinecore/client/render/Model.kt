@@ -91,7 +91,7 @@ data class Quad(val v1: Vertex, val v2: Vertex, val v3: Vertex, val v4: Vertex) 
  */
 class Model() {
     constructor(other: List<Quad>) : this() { quads.addAll(other) }
-    val quads = linkedListOf<Quad>()
+    val quads = mutableListOf<Quad>()
 
     fun Quad.add() = quads.add(this)
     fun Iterable<Quad>.addAll() = forEach { quads.add(it) }

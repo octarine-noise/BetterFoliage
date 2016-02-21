@@ -53,7 +53,7 @@ abstract class ModelDataInspector {
 abstract class BlockTextureInspector<T> : ModelDataInspector() {
 
     val state2Names = hashMapOf<IBlockState, Iterable<String>>()
-    val modelMappings = linkedListOf<Pair<(IBlockState, IModel)->Boolean, Iterable<String>>>()
+    val modelMappings = mutableListOf<Pair<(IBlockState, IModel)->Boolean, Iterable<String>>>()
     val stateMap = hashMapOf<IBlockState, T>()
 
     fun match(textureNames: Iterable<String>, predicate: (IBlockState, IModel)->Boolean) =

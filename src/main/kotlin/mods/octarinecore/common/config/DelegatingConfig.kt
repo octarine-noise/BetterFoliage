@@ -37,7 +37,7 @@ abstract class DelegatingConfig(val modId: String, val langPrefix: String) {
 
     /** The [Configuration] backing this config object. */
     var config: Configuration? = null
-    val rootGuiElements = linkedListOf<IConfigElement>()
+    val rootGuiElements = mutableListOf<IConfigElement>()
 
     /** Attach this config object to the given [Configuration] and update all properties. */
     fun attach(config: Configuration) {
