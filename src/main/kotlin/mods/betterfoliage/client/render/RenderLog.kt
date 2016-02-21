@@ -39,6 +39,7 @@ class RenderLog : AbstractRenderColumn(BetterFoliageMod.MOD_ID) {
         init {
             matchClassAndModel(matcher, "plantmegapack:block/_cube_column", listOf("end", "end", "side"))
             matchClassAndModel(matcher, "plantmegapack:block/_column_side", listOf("end", "end", "side"))
+            matchClassAndModel(matcher, "cookingplus:block/palmlog", listOf("top", "top", "texture"))
         }
     }
 
