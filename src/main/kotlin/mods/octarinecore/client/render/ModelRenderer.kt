@@ -74,8 +74,15 @@ open class ShadingContext {
     var aoEnabled = Minecraft.isAmbientOcclusionEnabled()
     val aoFaces = Array(6) { AoFaceData(forgeDirs[it]) }
 
+    val EnumFacing.aoMultiplier: Float get() = when(this) {
+        UP -> 1.0f
+        DOWN -> 0.5f
+        NORTH, SOUTH -> 0.8f
+        EAST, WEST -> 0.6f
+    }
+
     fun updateShading(offset: Int3, predicate: (EnumFacing) -> Boolean = { true }) {
-        forgeDirs.forEach { if (predicate(it)) aoFaces[it.ordinal].update(offset) }
+        forgeDirs.forEach { if (predicate(it)) aoFaces[it.ordinal].update(offset, multiplier = it.aoMultiplier) }
     }
 
     fun aoShading(face: EnumFacing, corner1: EnumFacing, corner2: EnumFacing) =

@@ -79,7 +79,7 @@ abstract class TextureGenerator(domain: String) : ParameterBasedGenerator(domain
      */
     fun getMultisizeTexture(maxSize: Int, maskPath: (Int)->ResourceLocation): IResource? {
         var size = maxSize
-        val sizes = linkedListOf<Int>()
+        val sizes = mutableListOf<Int>()
         while(size > 2) { sizes.add(size); size /= 2 }
         return sizes.map { resourceManager[maskPath(it)] }.filterNotNull().firstOrNull()
     }

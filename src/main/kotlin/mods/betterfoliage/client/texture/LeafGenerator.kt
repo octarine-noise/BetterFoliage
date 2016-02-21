@@ -21,7 +21,7 @@ class LeafGenerator(domain: String) : TextureGenerator(domain) {
         val leafType = params["type"] ?: "default"
 
         val handDrawnLoc = target.second.stripStart("textures/").stripStart("blocks/").let {
-            ResourceLocation(BetterFoliageMod.DOMAIN, "textures/blocks/${it.resourceDomain}/${it.resourcePath}")
+            ResourceLocation(BetterFoliageMod.DOMAIN, "${it.resourceDomain}/textures/blocks/${it.resourcePath}")
         }
         resourceManager[handDrawnLoc]?.loadImage()?.let { return it }
 

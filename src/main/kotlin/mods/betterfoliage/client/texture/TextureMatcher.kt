@@ -17,7 +17,7 @@ class TextureMatcher() {
         }
     }
 
-    val mappings: MutableList<Mapping> = linkedListOf()
+    val mappings: MutableList<Mapping> = mutableListOf()
 
     fun getType(icon: TextureAtlasSprite): String? = mappings.filter { it.matches(icon) }.map { it.type }.firstOrNull()
 
