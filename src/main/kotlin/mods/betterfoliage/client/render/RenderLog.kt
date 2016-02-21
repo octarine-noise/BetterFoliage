@@ -32,7 +32,13 @@ class RenderLog : AbstractRenderColumn(BetterFoliageMod.MOD_ID) {
         }
     }
 
-    val columnTextures = ColumnTextures(Config.blocks.logs)
+    val columnTextures = object : ColumnTextures(Config.blocks.logs) {
+        init {
+            matchClassAndModel(matcher, "plantmegapack:block/_cube_column", listOf("end", "end", "side"))
+            matchClassAndModel(matcher, "plantmegapack:block/_column_side", listOf("end", "end", "side"))
+            matchClassAndModel(matcher, "cookingplus:block/palmlog", listOf("top", "top", "texture"))
+        }
+    }
 
     override val blockPredicate = { state: IBlockState -> Config.blocks.logs.matchesID(state.block) }
     override val surroundPredicate = { state: IBlockState -> state.block.isOpaqueCube && !Config.blocks.logs.matchesID(state.block) }
