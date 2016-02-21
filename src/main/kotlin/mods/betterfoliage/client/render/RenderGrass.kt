@@ -86,7 +86,7 @@ class RenderGrass : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
 
         if (!Config.shortGrass.grassEnabled) return true
         if (isSnowed && !Config.shortGrass.snowEnabled) return true
-        if (ctx.block(up1).material != Material.air) return true
+        if (ctx.block(up1).isOpaqueCube) return true
 
         // render grass quads
         val iconset = if (isSnowed) snowedIcons else normalIcons
@@ -103,7 +103,7 @@ class RenderGrass : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
                     if (Config.shortGrass.useGenerated) iconGen.icon!! else iconset[rand[qi and 1]]!!
                 },
                 rotateUV = { 0 },
-                postProcess = { ctx, qi, q, vi, v -> if (isSnowed) setGrey(1.4f) else multiplyColor(grassInfo.overrideColor ?: blockColor) }
+                postProcess = { ctx, qi, q, vi, v -> if (isSnowed) setGrey(1.0f) else multiplyColor(grassInfo.overrideColor ?: blockColor) }
             )
         }
 
