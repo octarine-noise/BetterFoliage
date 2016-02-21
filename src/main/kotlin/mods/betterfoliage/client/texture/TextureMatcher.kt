@@ -13,7 +13,7 @@ class TextureMatcher() {
         fun matches(icon: TextureAtlasSprite): Boolean {
             val iconLocation = ResourceLocation(icon.iconName)
             return (domain == null || domain == iconLocation.resourceDomain) &&
-                iconLocation.resourcePath.stripStart("blocks/").contains(path)
+                iconLocation.resourcePath.stripStart("blocks/").contains(path, ignoreCase = true)
         }
     }
 
