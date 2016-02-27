@@ -64,6 +64,7 @@ jar {
             exclude 'META-INF', 'META-INF/**'
         }
     }
+    exclude "optifine"
 }
 
 reobf {
