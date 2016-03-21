@@ -4,13 +4,12 @@ import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.Config
 import mods.octarinecore.client.render.*
-import mods.octarinecore.client.resource.BlockTextureInspector
 import mods.octarinecore.common.Int3
 import mods.octarinecore.common.Rotation
 import net.minecraft.client.renderer.BlockRendererDispatcher
-import net.minecraft.client.renderer.WorldRenderer
+import net.minecraft.client.renderer.VertexBuffer
+import net.minecraft.util.BlockRenderLayer
 import net.minecraft.util.EnumFacing.*
-import net.minecraft.util.EnumWorldBlockLayer
 import org.apache.logging.log4j.Level
 
 class RenderCactus : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
@@ -63,7 +62,7 @@ class RenderCactus : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
         ctx.cameraDistance < Config.cactus.distance &&
         Config.blocks.cactus.matchesID(ctx.block)
 
-    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: WorldRenderer, layer: EnumWorldBlockLayer): Boolean {
+    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: VertexBuffer, layer: BlockRenderLayer): Boolean {
         // get AO data
         modelRenderer.updateShading(Int3.zero, allFaces)
         val icons = iconBase[ctx.blockState(Int3.zero)] ?: return renderWorldBlockBase(ctx, dispatcher, renderer, null)

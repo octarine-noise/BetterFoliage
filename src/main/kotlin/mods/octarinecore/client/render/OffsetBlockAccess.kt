@@ -2,8 +2,8 @@ package mods.octarinecore.client.render
 
 import mods.octarinecore.common.Int3
 import mods.octarinecore.common.plus
-import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumFacing
+import net.minecraft.util.math.BlockPos
 import net.minecraft.world.IBlockAccess
 
 /**

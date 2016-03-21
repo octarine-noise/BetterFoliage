@@ -9,14 +9,13 @@ import mods.octarinecore.common.Double3
 import mods.octarinecore.minmax
 import mods.octarinecore.random
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.WorldRenderer
-import net.minecraft.util.BlockPos
-import net.minecraft.util.EnumFacing.*
-import net.minecraft.util.MathHelper
+import net.minecraft.client.renderer.VertexBuffer
+import net.minecraft.util.EnumFacing.DOWN
+import net.minecraft.util.math.BlockPos
+import net.minecraft.util.math.MathHelper
 import net.minecraft.world.World
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.FMLCommonHandler
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.relauncher.Side
@@ -35,31 +34,31 @@ AbstractEntityFX(world, pos.x.toDouble() + 0.5, pos.y.toDouble(), pos.z.toDouble
     var particleRot = rand.nextInt(64)
     var rotPositive = true
     val isMirrored = (rand.nextInt() and 1) == 1
-    var wasOnGround = false
+    var wasCollided = false
 
     init {
         particleMaxAge = MathHelper.floor_double(random(0.6, 1.0) * Config.fallingLeaves.lifetime * 20.0)
-        motionY = -Config.fallingLeaves.speed
+        ySpeed = -Config.fallingLeaves.speed
         particleScale = Config.fallingLeaves.size.toFloat() * 0.1f
 
         val state = world.getBlockState(pos)
         LeafRegistry[state, world, pos, DOWN]?.let {
-            particleIcon = it.particleTextures[rand.nextInt(1024)]
-            calculateParticleColor(it.averageColor, state.block.colorMultiplier(world, pos))
+            particleTexture = it.particleTextures[rand.nextInt(1024)]
+            calculateParticleColor(it.averageColor, Minecraft.getMinecraft().blockColors.colorMultiplier(state, world, pos, 0))
         }
     }
 
-    override val isValid: Boolean get() = (particleIcon != null)
+    override val isValid: Boolean get() = (particleTexture != null)
 
     override fun update() {
         if (rand.nextFloat() > 0.95f) rotPositive = !rotPositive
         if (particleAge > particleMaxAge - 20) particleAlpha = 0.05f * (particleMaxAge - particleAge)
 
-        if (onGround || wasOnGround) {
+        if (isCollided || wasCollided) {
             velocity.setTo(0.0, 0.0, 0.0)
-            if (!wasOnGround) {
+            if (!wasCollided) {
                 particleAge = Math.max(particleAge, particleMaxAge - 20)
-                wasOnGround = true
+                wasCollided = true
             }
         } else {
             velocity.setTo(cos[particleRot], 0.0, sin[particleRot]).mul(Config.fallingLeaves.perturb)
@@ -68,7 +67,7 @@ AbstractEntityFX(world, pos.x.toDouble() + 0.5, pos.y.toDouble(), pos.z.toDouble
         }
     }
 
-    override fun render(worldRenderer: WorldRenderer, partialTickTime: Float) {
+    override fun render(worldRenderer: VertexBuffer, partialTickTime: Float) {
         if (Config.fallingLeaves.opacityHack) GL11.glDepthMask(true)
         renderParticleQuad(worldRenderer, partialTickTime, rotation = particleRot, isMirrored = isMirrored)
     }

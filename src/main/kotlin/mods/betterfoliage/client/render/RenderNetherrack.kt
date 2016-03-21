@@ -8,9 +8,9 @@ import mods.octarinecore.common.Int3
 import mods.octarinecore.common.Rotation
 import mods.octarinecore.random
 import net.minecraft.client.renderer.BlockRendererDispatcher
-import net.minecraft.client.renderer.WorldRenderer
+import net.minecraft.client.renderer.VertexBuffer
 import net.minecraft.init.Blocks
-import net.minecraft.util.EnumWorldBlockLayer
+import net.minecraft.util.BlockRenderLayer
 import net.minecraft.util.EnumFacing.*
 import org.apache.logging.log4j.Level.INFO
 
@@ -36,9 +36,9 @@ class RenderNetherrack : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) 
         ctx.cameraDistance < Config.netherrack.distance
     }
 
-    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: WorldRenderer, layer: EnumWorldBlockLayer): Boolean {
+    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: VertexBuffer, layer: BlockRenderLayer): Boolean {
         renderWorldBlockBase(ctx, dispatcher, renderer, null)
-        if (ctx.block(down1).isOpaqueCube) return true
+        if (ctx.blockState(down1).isOpaqueCube) return true
         modelRenderer.updateShading(Int3.zero, allFaces)
 
         val rand = ctx.semiRandomArray(2)

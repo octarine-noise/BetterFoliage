@@ -13,13 +13,12 @@ import mods.octarinecore.common.plus
 import net.minecraft.block.Block
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.renderer.BlockRendererDispatcher
-import net.minecraft.client.renderer.WorldRenderer
+import net.minecraft.client.renderer.VertexBuffer
 import net.minecraft.init.Blocks
-import net.minecraft.util.BlockPos
+import net.minecraft.util.BlockRenderLayer
+import net.minecraft.util.BlockRenderLayer.*
 import net.minecraft.util.EnumFacing
-import net.minecraft.util.EnumWorldBlockLayer
-import net.minecraft.util.EnumWorldBlockLayer.CUTOUT
-import net.minecraft.util.EnumWorldBlockLayer.CUTOUT_MIPPED
+import net.minecraft.util.math.BlockPos
 import net.minecraft.world.IBlockAccess
 import net.minecraft.world.World
 import net.minecraftforge.client.model.ModelLoader
@@ -28,16 +27,16 @@ import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
 
 fun shouldRenderBlockSideOverride(original: Boolean, blockAccess: IBlockAccess, pos: BlockPos, side: EnumFacing): Boolean {
-    return original || (Config.enabled && Config.roundLogs.enabled && Config.blocks.logs.matchesID(blockAccess.getBlockState(pos).block));
+    return original && !(Config.enabled && Config.roundLogs.enabled && Config.blocks.logs.matchesID(blockAccess.getBlockState(pos).block));
 }
 
-fun getAmbientOcclusionLightValueOverride(original: Float, block: Block): Float {
-    if (Config.enabled && Config.roundLogs.enabled && Config.blocks.logs.matchesID(block)) return Config.roundLogs.dimming;
+fun getAmbientOcclusionLightValueOverride(original: Float, state: IBlockState): Float {
+    if (Config.enabled && Config.roundLogs.enabled && Config.blocks.logs.matchesID(state.block)) return Config.roundLogs.dimming;
     return original;
 }
 
-fun getUseNeighborBrightnessOverride(original: Boolean, block: Block): Boolean {
-    return original || (Config.enabled && Config.roundLogs.enabled && Config.blocks.logs.matchesID(block));
+fun getUseNeighborBrightnessOverride(original: Boolean, state: IBlockState): Boolean {
+    return original || (Config.enabled && Config.roundLogs.enabled && Config.blocks.logs.matchesID(state.block));
 }
 
 fun onRandomDisplayTick(world: World, state: IBlockState, pos: BlockPos) {
@@ -66,12 +65,13 @@ fun renderWorldBlock(dispatcher: BlockRendererDispatcher,
                      state: IBlockState,
                      pos: BlockPos,
                      blockAccess: IBlockAccess,
-                     worldRenderer: WorldRenderer,
-                     layer: EnumWorldBlockLayer
+                     worldRenderer: VertexBuffer,
+                     layer: BlockRenderLayer
 ): Boolean {
     val isCutout = layer == CUTOUT_MIPPED || layer == CUTOUT
     val needsCutout = state.block.canRenderInLayer(CUTOUT_MIPPED) || state.block.canRenderInLayer(CUTOUT)
     val canRender = (isCutout && needsCutout) || state.block.canRenderInLayer(layer)
+
 
     blockContext.let { ctx ->
         ctx.set(blockAccess, pos)
@@ -88,7 +88,7 @@ fun renderWorldBlock(dispatcher: BlockRendererDispatcher,
     return if (canRender) dispatcher.renderBlock(state, pos, blockAccess, worldRenderer) else false
 }
 
-fun canRenderBlockInLayer(block: Block, layer: EnumWorldBlockLayer): Boolean {
+fun canRenderBlockInLayer(block: Block, layer: BlockRenderLayer): Boolean {
     if (layer == CUTOUT_MIPPED && !block.canRenderInLayer(CUTOUT)) {
         return true
     }

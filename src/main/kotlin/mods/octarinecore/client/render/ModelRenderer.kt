@@ -2,12 +2,10 @@ package mods.octarinecore.client.render
 
 import mods.octarinecore.common.*
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.WorldRenderer
+import net.minecraft.client.renderer.VertexBuffer
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.EnumFacing.*
-import java.lang.Math.max
 
 class ModelRenderer() : ShadingContext() {
 
@@ -28,7 +26,7 @@ class ModelRenderer() : ShadingContext() {
      * @param[postProcess] lambda to perform arbitrary modifications on the [RenderVertex] just before it goes to the [Tessellator]
      */
     inline fun render(
-        worldRenderer: WorldRenderer,
+        worldRenderer: VertexBuffer,
         model: Model,
         rot: Rotation,
         trans: Double3 = blockContext.blockCenter,
@@ -88,7 +86,7 @@ open class ShadingContext {
     fun aoShading(face: EnumFacing, corner1: EnumFacing, corner2: EnumFacing) =
         aoFaces[face.rotate(rotation).ordinal][corner1.rotate(rotation), corner2.rotate(rotation)]
 
-    fun blockData(offset: Int3) = blockContext.blockData(offset.rotate(rotation), 0)
+    fun blockData(offset: Int3) = blockContext.blockData(offset.rotate(rotation))
 }
 
 /**
@@ -158,7 +156,7 @@ class RenderVertex() {
 
 }
 
-fun WorldRenderer.ensureSpaceForQuads(num: Int) {
+fun VertexBuffer.ensureSpaceForQuads(num: Int) {
     rawIntBuffer.position(bufferSize)
     growBuffer(num * vertexFormat.nextOffset)
 }

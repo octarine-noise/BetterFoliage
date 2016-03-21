@@ -71,6 +71,6 @@ object Client {
         OptifineCTM
     )
 
-    fun log(level: Level, msg: String) = BetterFoliageMod.log!!.log(level, msg)
+    fun log(level: Level, msg: String) = BetterFoliageMod.log.log(level, msg)
 }
 

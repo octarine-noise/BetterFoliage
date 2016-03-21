@@ -1,7 +1,7 @@
 package mods.octarinecore.client.gui
 
 import net.minecraft.client.resources.I18n
-import net.minecraft.util.EnumChatFormatting.AQUA
+import net.minecraft.util.text.TextFormatting.*
 import net.minecraftforge.fml.client.config.GuiConfig
 import net.minecraftforge.fml.client.config.GuiConfigEntries
 import net.minecraftforge.fml.client.config.IConfigElement

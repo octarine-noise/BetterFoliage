@@ -9,11 +9,10 @@ import mods.octarinecore.client.render.modelRenderer
 import mods.octarinecore.client.render.noPost
 import mods.octarinecore.common.Double3
 import mods.octarinecore.common.Rotation
-import net.minecraft.block.material.Material
 import net.minecraft.client.renderer.BlockRendererDispatcher
-import net.minecraft.client.renderer.WorldRenderer
+import net.minecraft.client.renderer.VertexBuffer
 import net.minecraft.init.Blocks
-import net.minecraft.util.EnumWorldBlockLayer
+import net.minecraft.util.BlockRenderLayer
 import org.apache.logging.log4j.Level.INFO
 
 class RenderMycelium : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
@@ -31,13 +30,13 @@ class RenderMycelium : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
         ctx.cameraDistance < Config.shortGrass.distance
     }
 
-    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: WorldRenderer, layer: EnumWorldBlockLayer): Boolean {
-        val isSnowed = ctx.block(up1).isSnow
+    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: VertexBuffer, layer: BlockRenderLayer): Boolean {
+        val isSnowed = ctx.blockState(up1).isSnow
 
         renderWorldBlockBase(ctx, dispatcher, renderer, null)
 
         if (isSnowed && !Config.shortGrass.snowEnabled) return true
-        if (ctx.block(up1).isOpaqueCube) return true
+        if (ctx.blockState(up1).isOpaqueCube) return true
 
         val rand = ctx.semiRandomArray(2)
         modelRenderer.render(

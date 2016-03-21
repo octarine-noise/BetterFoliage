@@ -3,7 +3,6 @@ package mods.betterfoliage.client.config
 import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.gui.BiomeListConfigEntry
 import mods.octarinecore.common.config.*
-import mods.octarinecore.metaprog.reflectField
 import net.minecraft.client.Minecraft
 import net.minecraft.world.biome.BiomeGenBase
 import net.minecraftforge.fml.client.event.ConfigChangedEvent
@@ -14,7 +13,10 @@ import net.minecraftforge.fml.relauncher.SideOnly
 private fun featureEnable() = boolean(true).lang("enabled")
 private fun distanceLimit() = int(min=1, max=1000, default=1000).lang("distance")
 fun biomeList(defaults: (BiomeGenBase) -> Boolean) = intList {
-    BiomeGenBase.getBiomeGenArray().filter { it != null && defaults(it) }.map { it.biomeID }.toTypedArray()
+    BiomeGenBase.biomeRegistry
+        .filter { it != null && defaults(it) }
+        .map { BiomeGenBase.biomeRegistry.getIDForObject(it) }
+        .toTypedArray()
 }.apply { guiClass = BiomeListConfigEntry::class.java }
 
 // Biome filter methods

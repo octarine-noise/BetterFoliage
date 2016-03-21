@@ -11,12 +11,11 @@ import mods.octarinecore.common.Double3
 import mods.octarinecore.common.Int3
 import mods.octarinecore.common.Rotation
 import mods.octarinecore.random
-import net.minecraft.block.material.Material
 import net.minecraft.client.renderer.BlockRendererDispatcher
-import net.minecraft.client.renderer.WorldRenderer
+import net.minecraft.client.renderer.VertexBuffer
+import net.minecraft.util.BlockRenderLayer
 import net.minecraft.util.EnumFacing.Axis
 import net.minecraft.util.EnumFacing.UP
-import net.minecraft.util.EnumWorldBlockLayer
 import org.apache.logging.log4j.Level.INFO
 
 class RenderGrass : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
@@ -50,15 +49,15 @@ class RenderGrass : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
         (Config.shortGrass.grassEnabled || Config.connectedGrass.enabled) &&
         Config.blocks.grass.matchesID(ctx.block)
 
-    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: WorldRenderer, layer: EnumWorldBlockLayer): Boolean {
+    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: VertexBuffer, layer: BlockRenderLayer): Boolean {
         val isConnected = ctx.block(down1).let { Config.blocks.dirt.matchesID(it) || Config.blocks.grass.matchesID(it) }
-        val isSnowed = ctx.block(up1).isSnow
+        val isSnowed = ctx.blockState(up1).isSnow
         val connectedGrass = isConnected && Config.connectedGrass.enabled && (!isSnowed || Config.connectedGrass.snowEnabled)
 
         val grassInfo = GrassRegistry[ctx.blockState(Int3.zero)] ?: return renderWorldBlockBase(ctx, dispatcher, renderer, layer)
         val grassTopTexture = OptifineCTM.override(grassInfo.grassTopTexture, ctx, UP)
 
-        val blockColor = ctx.blockData(Int3.zero, 0).color
+        val blockColor = ctx.blockData(Int3.zero).color
 
         if (connectedGrass) {
             // get full AO data
@@ -86,7 +85,7 @@ class RenderGrass : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
 
         if (!Config.shortGrass.grassEnabled) return true
         if (isSnowed && !Config.shortGrass.snowEnabled) return true
-        if (ctx.block(up1).isOpaqueCube) return true
+        if (ctx.blockState(up1).isOpaqueCube) return true
 
         // render grass quads
         val iconset = if (isSnowed) snowedIcons else normalIcons

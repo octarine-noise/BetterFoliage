@@ -10,10 +10,10 @@ import mods.octarinecore.common.forgeDirs
 import mods.octarinecore.random
 import net.minecraft.block.material.Material
 import net.minecraft.client.renderer.BlockRendererDispatcher
-import net.minecraft.client.renderer.WorldRenderer
+import net.minecraft.client.renderer.VertexBuffer
+import net.minecraft.util.BlockRenderLayer
 import net.minecraft.util.EnumFacing.Axis
 import net.minecraft.util.EnumFacing.UP
-import net.minecraft.util.EnumWorldBlockLayer
 import org.apache.logging.log4j.Level.INFO
 
 class RenderCoral : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
@@ -45,18 +45,18 @@ class RenderCoral : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
     override fun isEligible(ctx: BlockContext) =
         Config.enabled && Config.coral.enabled &&
         ctx.cameraDistance < Config.coral.distance &&
-        ctx.block(up2).material == Material.water &&
-        ctx.block(up1).material == Material.water &&
+        ctx.blockState(up2).material == Material.water &&
+        ctx.blockState(up1).material == Material.water &&
         Config.blocks.sand.matchesID(ctx.block) &&
         ctx.biomeId in Config.coral.biomes &&
         noise[ctx.pos] < Config.coral.population
 
-    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: WorldRenderer, layer: EnumWorldBlockLayer): Boolean {
+    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: VertexBuffer, layer: BlockRenderLayer): Boolean {
         renderWorldBlockBase(ctx, dispatcher, renderer, null)
         modelRenderer.updateShading(Int3.zero, allFaces)
 
         forgeDirs.forEachIndexed { idx, face ->
-            if (!ctx.block(forgeDirOffsets[idx]).isOpaqueCube && blockContext.random(idx) < Config.coral.chance) {
+            if (!ctx.blockState(forgeDirOffsets[idx]).isOpaqueCube && blockContext.random(idx) < Config.coral.chance) {
                 var variation = blockContext.random(6)
                 modelRenderer.render(
                     renderer,

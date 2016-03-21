@@ -7,9 +7,9 @@ import mods.octarinecore.client.render.AbstractEntityFX
 import mods.octarinecore.client.resource.ResourceHandler
 import mods.octarinecore.common.Double3
 import mods.octarinecore.forEachPairIndexed
-import net.minecraft.client.renderer.WorldRenderer
-import net.minecraft.util.BlockPos
-import net.minecraft.util.MathHelper
+import net.minecraft.client.renderer.VertexBuffer
+import net.minecraft.util.math.BlockPos
+import net.minecraft.util.math.MathHelper
 import net.minecraft.world.World
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
@@ -23,9 +23,9 @@ AbstractEntityFX(world, pos.x.toDouble() + 0.5, pos.y.toDouble() + 1.0, pos.z.to
     val initialPhase = rand.nextInt(64)
 
     init {
-        motionY = 0.1
+        ySpeed = 0.1
         particleGravity = 0.0f
-        particleIcon = RisingSoulTextures.headIcons[rand.nextInt(256)]
+        particleTexture = RisingSoulTextures.headIcons[rand.nextInt(256)]
         particleMaxAge = MathHelper.floor_double((0.6 + 0.4 * rand.nextDouble()) * Config.risingSoul.lifetime * 20.0)
     }
 
@@ -38,10 +38,10 @@ AbstractEntityFX(world, pos.x.toDouble() + 0.5, pos.y.toDouble() + 1.0, pos.z.to
         particleTrail.addFirst(currentPos.copy())
         while (particleTrail.size > Config.risingSoul.trailLength) particleTrail.removeLast()
 
-        if (!Config.enabled) setDead()
+        if (!Config.enabled) setExpired()
     }
 
-    override fun render(worldRenderer: WorldRenderer, partialTickTime: Float) {
+    override fun render(worldRenderer: VertexBuffer, partialTickTime: Float) {
         var alpha = Config.risingSoul.opacity
         if (particleAge > particleMaxAge - 40) alpha *= (particleMaxAge - particleAge) / 40.0f
 

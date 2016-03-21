@@ -4,7 +4,7 @@ import mods.octarinecore.PI2
 import mods.octarinecore.common.Double3
 import net.minecraft.client.Minecraft
 import net.minecraft.client.particle.EntityFX
-import net.minecraft.client.renderer.WorldRenderer
+import net.minecraft.client.renderer.VertexBuffer
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.entity.Entity
 import net.minecraft.world.World
@@ -25,14 +25,14 @@ abstract class AbstractEntityFX(world: World, x: Double, y: Double, z: Double) :
         super.onUpdate()
         currentPos.setTo(posX, posY, posZ)
         prevPos.setTo(prevPosX, prevPosY, prevPosZ)
-        velocity.setTo(motionX, motionY, motionZ)
+        velocity.setTo(xSpeed, ySpeed, zSpeed)
         update()
         posX = currentPos.x; posY = currentPos.y; posZ = currentPos.z;
-        motionX = velocity.x; motionY = velocity.y; motionZ = velocity.z;
+        xSpeed = velocity.x; ySpeed = velocity.y; zSpeed = velocity.z;
     }
 
     /** Render the particle. */
-    abstract fun render(worldRenderer: WorldRenderer, partialTickTime: Float)
+    abstract fun render(worldRenderer: VertexBuffer, partialTickTime: Float)
 
     /** Update particle on world tick. */
     abstract fun update()
@@ -43,7 +43,7 @@ abstract class AbstractEntityFX(world: World, x: Double, y: Double, z: Double) :
     /** Add the particle to the effect renderer if it is valid. */
     fun addIfValid() { if (isValid) Minecraft.getMinecraft().effectRenderer.addEffect(this) }
 
-    override fun renderParticle(worldRenderer: WorldRenderer, entity: Entity, partialTickTime: Float, rotX: Float, rotZ: Float, rotYZ: Float, rotXY: Float, rotXZ: Float) {
+    override fun renderParticle(worldRenderer: VertexBuffer, entity: Entity, partialTickTime: Float, rotX: Float, rotZ: Float, rotYZ: Float, rotXY: Float, rotXZ: Float) {
         billboardRot.first.setTo(rotX + rotXY, rotZ, rotYZ + rotXZ)
         billboardRot.second.setTo(rotX - rotXY, -rotZ, rotYZ - rotXZ)
         render(worldRenderer, partialTickTime)
@@ -61,13 +61,13 @@ abstract class AbstractEntityFX(world: World, x: Double, y: Double, z: Double) :
      * @param[isMirrored] mirror particle texture along V-axis
      * @param[alpha] aplha blending
      */
-    fun renderParticleQuad(worldRenderer: WorldRenderer,
+    fun renderParticleQuad(worldRenderer: VertexBuffer,
                            partialTickTime: Float,
                            currentPos: Double3 = this.currentPos,
                            prevPos: Double3 = this.prevPos,
                            size: Double = particleScale.toDouble(),
                            rotation: Int = 0,
-                           icon: TextureAtlasSprite = particleIcon,
+                           icon: TextureAtlasSprite = particleTexture,
                            isMirrored: Boolean = false,
                            alpha: Float = this.particleAlpha) {
 
@@ -113,11 +113,6 @@ abstract class AbstractEntityFX(world: World, x: Double, y: Double, z: Double) :
             .color(particleRed, particleGreen, particleBlue, alpha)
             .lightmap(brLow, brHigh)
             .endVertex()
-
-//        worldRenderer.addVertexWithUV(center.x - v1.x, center.y - v1.y, center.z - v1.z, maxU, maxV)
-//        worldRenderer.addVertexWithUV(center.x - v2.x, center.y - v2.y, center.z - v2.z, maxU, minV)
-//        worldRenderer.addVertexWithUV(center.x + v1.x, center.y + v1.y, center.z + v1.z, minU, minV)
-//        worldRenderer.addVertexWithUV(center.x + v2.x, center.y + v2.y, center.z + v2.z, minU, maxV)
     }
 
     override fun getFXLayer() = 1

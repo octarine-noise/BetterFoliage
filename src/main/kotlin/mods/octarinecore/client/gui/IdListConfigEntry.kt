@@ -2,8 +2,7 @@ package mods.octarinecore.client.gui
 
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.resources.I18n
-import net.minecraft.util.EnumChatFormatting.GOLD
-import net.minecraft.util.EnumChatFormatting.YELLOW
+import net.minecraft.util.text.TextFormatting.*
 import net.minecraftforge.fml.client.config.*
 
 /**

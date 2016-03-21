@@ -5,8 +5,8 @@ import net.minecraft.client.resources.IResourcePack
 import net.minecraft.client.resources.data.IMetadataSection
 import net.minecraft.client.resources.data.IMetadataSerializer
 import net.minecraft.client.resources.data.PackMetadataSection
-import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ResourceLocation
+import net.minecraft.util.text.TextComponentString
 import net.minecraftforge.fml.client.FMLClientHandler
 import java.io.InputStream
 import java.util.*
@@ -28,7 +28,7 @@ class GeneratorPack(val name: String, vararg val generators: GeneratorBase) : IR
     override fun getPackImage() = null
     override fun getResourceDomains() = HashSet(generators.map { it.domain })
     override fun <T: IMetadataSection> getPackMetadata(serializer: IMetadataSerializer?, type: String?) =
-        if (type == "pack") PackMetadataSection(ChatComponentText("Generated resources"), 1) as? T else null
+        if (type == "pack") PackMetadataSection(TextComponentString("Generated resources"), 1) as? T else null
 
     override fun resourceExists(location: ResourceLocation?): Boolean =
             if (location == null) false

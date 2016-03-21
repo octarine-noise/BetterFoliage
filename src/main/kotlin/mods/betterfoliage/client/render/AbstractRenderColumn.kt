@@ -11,12 +11,12 @@ import mods.octarinecore.common.face
 import mods.octarinecore.common.rot
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.renderer.BlockRendererDispatcher
-import net.minecraft.client.renderer.WorldRenderer
+import net.minecraft.client.renderer.VertexBuffer
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.client.renderer.texture.TextureMap
+import net.minecraft.util.BlockRenderLayer
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.EnumFacing.*
-import net.minecraft.util.EnumWorldBlockLayer
 
 data class ColumnInfo(val topTexture: TextureAtlasSprite,
                       val bottomTexture: TextureAtlasSprite,
@@ -125,7 +125,7 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
     abstract val downTexture: (ShadingContext, Int, Quad)->TextureAtlasSprite?
 
     @Suppress("NON_EXHAUSTIVE_WHEN")
-    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: WorldRenderer, layer: EnumWorldBlockLayer): Boolean {
+    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: VertexBuffer, layer: BlockRenderLayer): Boolean {
         if (ctx.isSurroundedBy(surroundPredicate) ) return false
 
         // get AO data
@@ -324,7 +324,7 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
         val offsetRot = offset.rotate(rotation)
         val state = blockState(offsetRot)
         return if (!blockPredicate(state)) {
-            if (state.block.isOpaqueCube) SOLID else NONSOLID
+            if (state.isOpaqueCube) SOLID else NONSOLID
         } else {
             axisFunc(state)?.let { if (it == axis) PARALLEL else PERPENDICULAR } ?: SOLID
         }

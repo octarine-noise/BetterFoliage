@@ -8,10 +8,10 @@ import mods.octarinecore.client.render.*
 import mods.octarinecore.common.Int3
 import mods.octarinecore.common.Rotation
 import net.minecraft.client.renderer.BlockRendererDispatcher
-import net.minecraft.client.renderer.WorldRenderer
+import net.minecraft.client.renderer.VertexBuffer
+import net.minecraft.util.BlockRenderLayer
 import net.minecraft.util.EnumFacing.DOWN
 import net.minecraft.util.EnumFacing.UP
-import net.minecraft.util.EnumWorldBlockLayer
 import org.apache.logging.log4j.Level
 
 class RenderLilypad : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
@@ -41,7 +41,7 @@ class RenderLilypad : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
         ctx.cameraDistance < Config.lilypad.distance &&
         Config.blocks.lilypad.matchesID(ctx.block)
 
-    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: WorldRenderer, layer: EnumWorldBlockLayer): Boolean {
+    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: VertexBuffer, layer: BlockRenderLayer): Boolean {
         renderWorldBlockBase(ctx, dispatcher, renderer, null)
         modelRenderer.updateShading(Int3.zero, allFaces)
 

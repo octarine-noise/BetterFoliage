@@ -2,7 +2,6 @@ package mods.betterfoliage.client.render
 
 import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.config.Config
-import mods.betterfoliage.client.integration.OptifineCTM
 import mods.betterfoliage.client.integration.ShadersModIntegration
 import mods.betterfoliage.client.texture.LeafRegistry
 import mods.octarinecore.PI2
@@ -14,10 +13,10 @@ import mods.octarinecore.common.vec
 import mods.octarinecore.random
 import net.minecraft.block.material.Material
 import net.minecraft.client.renderer.BlockRendererDispatcher
-import net.minecraft.client.renderer.WorldRenderer
-import net.minecraft.util.EnumFacing
-import net.minecraft.util.EnumFacing.*
-import net.minecraft.util.EnumWorldBlockLayer
+import net.minecraft.client.renderer.VertexBuffer
+import net.minecraft.util.BlockRenderLayer
+import net.minecraft.util.EnumFacing.DOWN
+import net.minecraft.util.EnumFacing.UP
 import java.lang.Math.cos
 import java.lang.Math.sin
 
@@ -44,13 +43,13 @@ class RenderLeaves : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
         ctx.cameraDistance < Config.leaves.distance &&
         Config.blocks.leaves.matchesID(ctx.block)
 
-    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: WorldRenderer, layer: EnumWorldBlockLayer): Boolean {
-        val isSnowed = ctx.block(up1).material.let {
+    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: VertexBuffer, layer: BlockRenderLayer): Boolean {
+        val isSnowed = ctx.blockState(up1).material.let {
             it == Material.snow || it == Material.craftedSnow
         }
         renderWorldBlockBase(ctx, dispatcher, renderer, null)
         val leafInfo = LeafRegistry[ctx, DOWN] ?: return false
-        val blockColor = ctx.blockData(Int3.zero, 0).color
+        val blockColor = ctx.blockData(Int3.zero).color
 
         modelRenderer.updateShading(Int3.zero, allFaces)
         ShadersModIntegration.leaves(renderer) {

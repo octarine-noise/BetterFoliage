@@ -11,11 +11,13 @@ import net.minecraft.block.Block
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.BlockRendererDispatcher
-import net.minecraft.client.renderer.WorldRenderer
-import net.minecraft.util.BlockPos
-import net.minecraft.util.EnumWorldBlockLayer
-import net.minecraft.util.MathHelper
+import net.minecraft.client.renderer.VertexBuffer
+import net.minecraft.client.renderer.color.BlockColors
+import net.minecraft.util.BlockRenderLayer
+import net.minecraft.util.math.BlockPos
+import net.minecraft.util.math.MathHelper
 import net.minecraft.world.IBlockAccess
+import net.minecraft.world.biome.BiomeGenBase
 
 /**
  * [ThreadLocal] instance of [BlockContext] representing the block being rendered.
@@ -27,6 +29,8 @@ val blockContext by ThreadLocalDelegate { BlockContext() }
  */
 val modelRenderer by ThreadLocalDelegate { ModelRenderer() }
 
+val blockColors = ThreadLocal<BlockColors>()
+
 abstract class AbstractBlockRenderingHandler(modId: String) : ResourceHandler(modId) {
 
     val moveToCutout: Boolean get() = true
@@ -35,15 +39,15 @@ abstract class AbstractBlockRenderingHandler(modId: String) : ResourceHandler(mo
     // Custom rendering
     // ============================
     abstract fun isEligible(ctx: BlockContext): Boolean
-    abstract fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: WorldRenderer, layer: EnumWorldBlockLayer): Boolean
+    abstract fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: VertexBuffer, layer: BlockRenderLayer): Boolean
 
     // ============================
     // Vanilla rendering wrapper
     // ============================
     /**
-     * Render the block in the current [BlockContext], and capture shading and texture data.
+     * Render the block in the current [BlockContext]
      */
-    fun renderWorldBlockBase(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: WorldRenderer, layer: EnumWorldBlockLayer?): Boolean {
+    fun renderWorldBlockBase(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: VertexBuffer, layer: BlockRenderLayer?): Boolean {
         ctx.blockState(Int3.zero).let {
             if (layer == null || it.block.canRenderInLayer(layer))
                 return dispatcher.renderBlock(it, ctx.pos, ctx.world, renderer)
@@ -68,18 +72,18 @@ class BlockContext() {
     val block: Block get() = block(Int3.zero)
     fun block(offset: Int3) = blockState(offset).block
     fun blockState(offset: Int3) = (pos + offset).let { world!!.getBlockState(it) }
-    fun blockData(offset: Int3, pass: Int) = (pos + offset).let { pos ->
+    fun blockData(offset: Int3) = (pos + offset).let { pos ->
         world!!.getBlockState(pos).let { state ->
             BlockData(
                 state,
-                state.block.colorMultiplier(world!!, pos, pass),
-                state.block.getMixedBrightnessForBlock(world!!, pos)
+                Minecraft.getMinecraft().blockColors.colorMultiplier(state, world!!, pos, 0),
+                state.block.getPackedLightmapCoords(state, world!!, pos)
             )
         }
     }
 
     /** Get the biome ID at the block position. */
-    val biomeId: Int get() = world!!.getBiomeGenForCoords(pos).biomeID
+    val biomeId: Int get() = BiomeGenBase.getIdForBiome(world!!.getBiomeGenForCoords(pos))
 
     /** Get the centerpoint of the block being rendered. */
     val blockCenter: Double3 get() = Double3(pos.x + 0.5, pos.y + 0.5, pos.z + 0.5)

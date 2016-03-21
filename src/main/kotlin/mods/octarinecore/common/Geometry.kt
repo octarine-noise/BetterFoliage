@@ -1,11 +1,12 @@
 package mods.octarinecore.common
 
 import mods.octarinecore.cross
-import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.EnumFacing.*
 import net.minecraft.util.EnumFacing.Axis.*
-import net.minecraft.util.EnumFacing.AxisDirection.*
+import net.minecraft.util.EnumFacing.AxisDirection.NEGATIVE
+import net.minecraft.util.EnumFacing.AxisDirection.POSITIVE
+import net.minecraft.util.math.BlockPos
 
 // ================================
 // Axes and directions

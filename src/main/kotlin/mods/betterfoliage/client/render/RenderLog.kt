@@ -41,7 +41,7 @@ class RenderLog : AbstractRenderColumn(BetterFoliageMod.MOD_ID) {
     }
 
     override val blockPredicate = { state: IBlockState -> Config.blocks.logs.matchesID(state.block) }
-    override val surroundPredicate = { state: IBlockState -> state.block.isOpaqueCube && !Config.blocks.logs.matchesID(state.block) }
+    override val surroundPredicate = { state: IBlockState -> state.isOpaqueCube && !Config.blocks.logs.matchesID(state.block) }
 
     override val connectPerpendicular: Boolean get() = Config.roundLogs.connectPerpendicular
     override val connectSolids: Boolean get() = Config.roundLogs.connectSolids

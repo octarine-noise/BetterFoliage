@@ -9,6 +9,7 @@ import mods.octarinecore.common.Rotation
 import mods.octarinecore.common.times
 import net.minecraft.block.Block
 import net.minecraft.block.material.Material
+import net.minecraft.block.state.IBlockState
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.EnumFacing.*
 
@@ -23,7 +24,7 @@ val denseLeavesRot = arrayOf(Rotation.identity, Rotation.rot90[EAST.ordinal], Ro
 val whitewash: RenderVertex.(ShadingContext, Int, Quad, Int, Vertex)->Unit = { ctx, qi, q, vi, v -> setGrey(1.4f) }
 val greywash: RenderVertex.(ShadingContext, Int, Quad, Int, Vertex)->Unit = { ctx, qi, q, vi, v -> setGrey(1.0f) }
 
-val Block.isSnow: Boolean get() = material.let { it == Material.snow || it == Material.craftedSnow }
+val IBlockState.isSnow: Boolean get() = material.let { it == Material.snow || it == Material.craftedSnow }
 
 fun Quad.toCross(rotAxis: EnumFacing, trans: (Quad)->Quad) =
     (0..3).map { rotIdx ->

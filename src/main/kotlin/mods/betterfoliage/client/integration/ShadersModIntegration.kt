@@ -7,7 +7,7 @@ import mods.octarinecore.metaprog.allAvailable
 import net.minecraft.block.Block
 import net.minecraft.block.BlockTallGrass
 import net.minecraft.block.state.IBlockState
-import net.minecraft.client.renderer.WorldRenderer
+import net.minecraft.client.renderer.VertexBuffer
 import net.minecraft.init.Blocks
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
@@ -25,7 +25,7 @@ object ShadersModIntegration {
 
     fun entityDataFor(blockState: IBlockState) =
         (Block.blockRegistry.getIDForObject(blockState.block).toLong() and 65535) or
-        ((blockState.block.renderType.toLong() and 65535) shl 16) or
+        ((blockState.renderType.ordinal.toLong() and 65535) shl 16) or
         (blockState.block.getMetaFromState(blockState).toLong() shl 32)
 
 
@@ -47,7 +47,7 @@ object ShadersModIntegration {
     }
 
     /** Quads rendered inside this block will behave as tallgrass blocks in shader programs. */
-    inline fun grass(renderer: WorldRenderer, enabled: Boolean = true, func: ()->Unit) {
+    inline fun grass(renderer: VertexBuffer, enabled: Boolean = true, func: ()->Unit) {
         if ((isPresent && enabled)) {
             val vertexBuilder = Refs.sVertexBuilder.get(renderer)!!
             Refs.pushEntity_num.invoke(vertexBuilder, tallGrassEntityData)
@@ -59,7 +59,7 @@ object ShadersModIntegration {
     }
 
     /** Quads rendered inside this block will behave as leaf blocks in shader programs. */
-    inline fun leaves(renderer: WorldRenderer, enabled: Boolean = true, func: ()->Unit) {
+    inline fun leaves(renderer: VertexBuffer, enabled: Boolean = true, func: ()->Unit) {
         if ((isPresent && enabled)) {
             val vertexBuilder = Refs.sVertexBuilder.get(renderer)!!
             Refs.pushEntity_num.invoke(vertexBuilder, leavesEntityData.toLong())
