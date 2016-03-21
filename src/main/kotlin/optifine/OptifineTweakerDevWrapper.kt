@@ -1,9 +1,12 @@
 package optifine
 
+import mods.octarinecore.tryDefault
 import net.minecraft.launchwrapper.IClassTransformer
 import net.minecraft.launchwrapper.ITweaker
 import net.minecraft.launchwrapper.LaunchClassLoader
 import java.io.File
+import java.net.URLClassLoader
+import java.util.zip.ZipFile
 
 class OptifineTweakerDevWrapper : ITweaker {
     override fun acceptOptions(p0: MutableList<String>?, p1: File?, p2: File?, p3: String?) { }
@@ -15,19 +18,21 @@ class OptifineTweakerDevWrapper : ITweaker {
 }
 
 /**
- * Wrapper around Optifine's class transformer.
+ * Replacement for OptiFine's class transformer. Implements the pre-1.8.x-H5 way of operation.
  *
  * This class is only used in development to debug cross-mod issues with Optifine, and
  * is not part of the release!
  */
 class OptifineTransformerDevWrapper : IClassTransformer {
 
-    val ofTransformer = Class.forName("optifine.OptiFineClassTransformer").newInstance() as IClassTransformer
+    val ofZip = (this.javaClass.classLoader as? URLClassLoader)?.urLs?.find {
+        val zipFile = tryDefault(null) { ZipFile(File(it.toURI())) }
+        zipFile?.getEntry("optifine/OptiFineClassTransformer.class") != null
+    }?.let { ZipFile(File(it.toURI())) }
 
     /**
-     * Call the Optifine transformer, but change dots to slashes in class names.
-     * This enables the Optifine transformer to load replacements from non-root locations in the jar file.
+     * Load replacement classes from the OptiFine Jar.
      */
     override fun transform(name: String?, transformedName: String?, classData: ByteArray?) =
-        ofTransformer.transform(name?.replace(".", "/"), transformedName, classData)
+        ofZip?.getEntry(name?.replace(".", "/") + ".class")?.let { ofZip.getInputStream(it).readBytes() } ?: classData
 }
