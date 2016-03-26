@@ -5,6 +5,7 @@ import mods.octarinecore.metaprog.Transformer
 import mods.octarinecore.metaprog.allAvailable
 import net.minecraftforge.fml.relauncher.FMLLaunchHandler
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin
+import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Opcodes.*
 
 @IFMLLoadingPlugin.TransformerExclusions(
@@ -93,16 +94,16 @@ class BetterFoliageTransformer : Transformer() {
         transformMethod(Refs.rebuildChunk) {
             find(invokeRef(Refs.renderBlock))?.replace {
                 log.info("Applying RenderChunk block render override")
-                varinsn(ALOAD, if (isOptifinePresent) 24 else 21)
+                varinsn(ALOAD, if (isOptifinePresent) 22 else 21)
                 invokeStatic(Refs.renderWorldBlock)
             }
             if (isOptifinePresent) {
-                find(varinsn(ISTORE, 25))?.insertAfter {
+                find(varinsn(ISTORE, 23))?.insertAfter {
                     log.info("Applying RenderChunk block layer override")
-                    varinsn(ALOAD, 20)
-                    varinsn(ALOAD, 24)
+                    varinsn(ALOAD, 19)
+                    varinsn(ALOAD, 22)
                     invokeStatic(Refs.canRenderBlockInLayer)
-                    varinsn(ISTORE, 25)
+                    varinsn(ISTORE, 23)
                 }
             } else {
                 find(invokeRef(Refs.canRenderInLayer))?.replace {
