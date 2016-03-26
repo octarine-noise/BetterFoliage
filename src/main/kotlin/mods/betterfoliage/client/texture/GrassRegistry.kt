@@ -5,6 +5,7 @@ import cpw.mods.fml.relauncher.Side
 import cpw.mods.fml.relauncher.SideOnly
 import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.Config
+import mods.betterfoliage.client.integration.OptifineCTM
 import mods.octarinecore.client.render.HSB
 import mods.octarinecore.client.resource.averageColor
 import net.minecraft.block.Block
@@ -54,7 +55,22 @@ object GrassRegistry {
                     val original = event.map.getTextureExtry(location)
                     Client.log(DEBUG, "Found grass texture: $location")
                     registerGrass(event.map, original)
+
+                    if (OptifineCTM.isAvailable) OptifineCTM.getAllCTM(original).let { ctmIcons ->
+                        if (ctmIcons.isNotEmpty()) {
+                            Client.log(INFO, "Found ${ctmIcons.size} CTM variants for texture ${original.iconName}")
+                            ctmIcons.forEach { registerGrass(event.map, it as TextureAtlasSprite) }
+                        }
+                    }
+
                     return@registerBlockIcons original
+                }
+
+                if (OptifineCTM.isAvailable) OptifineCTM.getAllCTM(block).let { ctmIcons ->
+                    if (ctmIcons.isNotEmpty()) {
+                        Client.log(INFO, "Found ${ctmIcons.size} CTM variants for block ${Block.getIdFromBlock(block)}")
+                        ctmIcons.forEach { registerGrass(event.map, it as TextureAtlasSprite) }
+                    }
                 }
             }
         }
