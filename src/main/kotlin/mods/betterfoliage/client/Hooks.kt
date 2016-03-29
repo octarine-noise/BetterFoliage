@@ -2,6 +2,7 @@
 @file:SideOnly(Side.CLIENT)
 package mods.betterfoliage.client
 
+import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.config.Config
 import mods.betterfoliage.client.render.EntityFallingLeavesFX
 import mods.betterfoliage.client.render.EntityRisingSoulFX
@@ -26,8 +27,14 @@ import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
 
-fun shouldRenderBlockSideOverride(original: Boolean, blockAccess: IBlockAccess, pos: BlockPos, side: EnumFacing): Boolean {
+fun doesSideBlockRenderingOverride(original: Boolean, blockAccess: IBlockAccess, pos: BlockPos, side: EnumFacing): Boolean {
     return original && !(Config.enabled && Config.roundLogs.enabled && Config.blocks.logs.matchesID(blockAccess.getBlockState(pos).block));
+}
+
+fun isOpaqueCubeOverride(original: Boolean, state: IBlockState): Boolean {
+    // caution: blocks are initialized and the method called before any mods are loaded
+    if (BetterFoliageMod.config == null) return original
+    return original && !(Config.enabled && Config.roundLogs.enabled && Config.blocks.logs.matchesID(state.block))
 }
 
 fun getAmbientOcclusionLightValueOverride(original: Float, state: IBlockState): Float {

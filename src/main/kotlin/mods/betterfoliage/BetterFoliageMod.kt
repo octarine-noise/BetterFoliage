@@ -28,7 +28,7 @@ object BetterFoliageMod {
     const val GUI_FACTORY = "mods.betterfoliage.client.gui.ConfigGuiFactory"
 
     lateinit var log: Logger
-    lateinit var config: Configuration
+    var config: Configuration? = null
 
     @JvmStatic
     @Mod.InstanceFactory
@@ -45,7 +45,7 @@ object BetterFoliageMod {
     @Mod.EventHandler
     fun postInit(event: FMLPostInitializationEvent) {
         if (FMLCommonHandler.instance().effectiveSide == Side.CLIENT) {
-            Config.attach(config)
+            Config.attach(config!!)
             Client.log(INFO, "BetterFoliage initialized")
         }
     }

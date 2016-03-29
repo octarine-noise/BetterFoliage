@@ -40,8 +40,7 @@ class BetterFoliageTransformer : Transformer() {
 
         // where: BlockStateContainer$StateImplementation.getAmbientOcclusionLightValue()
         // what: invoke BF code to overrule AO transparency value
-        // why: allows us to have light behave properly on non-solid log blocks without
-        //      messing with isOpaqueBlock(), which could have gameplay effects
+        // why: allows us to have light behave properly on non-solid log blocks
         transformMethod(Refs.getAmbientOcclusionLightValue) {
             find(FRETURN)?.insertBefore {
                 log.info("Applying getAmbientOcclusionLightValue() override")
@@ -63,16 +62,26 @@ class BetterFoliageTransformer : Transformer() {
 
         // where: BlockStateContainer$StateImplementation.doesSideBlockRendering()
         // what: invoke BF code to overrule condition
-        // why: allows us to make log blocks non-solid without
-        //      messing with isOpaqueBlock(), which could have gameplay effects
+        // why: allows us to make log blocks non-solid
         transformMethod(Refs.doesSideBlockRendering) {
             find(IRETURN)?.insertBefore {
                 log.info("Applying doesSideBlockRendering() override")
                 varinsn(ALOAD, 1)
                 varinsn(ALOAD, 2)
                 varinsn(ALOAD, 3)
-                invokeStatic(Refs.shouldRenderBlockSideOverride)
+                invokeStatic(Refs.doesSideBlockRenderingOverride)
             } ?: log.warn("Failed to apply doesSideBlockRendering() override!")
+        }
+
+        // where: BlockStateContainer$StateImplementation.isOpaqueCube()
+        // what: invoke BF code to overrule condition
+        // why: allows us to make log blocks non-solid
+        transformMethod(Refs.isOpaqueCube) {
+            find(IRETURN)?.insertBefore {
+                log.info("Applying isOpaqueCube() override")
+                varinsn(ALOAD, 0)
+                invokeStatic(Refs.isOpaqueCubeOverride)
+            } ?: log.warn("Failed to apply isOpaqueCube() override!")
         }
 
         // where: ModelLoader.setupModelRegistry(), right before the textures are loaded
