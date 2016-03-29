@@ -70,8 +70,8 @@ class RenderGrass : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
                 Rotation.identity,
                 ctx.blockCenter,
                 icon =  { ctx, qi, q -> grassTopTexture },
-                rotateUV = { 2 },
                 postProcess = { ctx, qi, q, vi, v ->
+                    rotateUV(2)
                     if (isSnowed) { if(!ctx.aoEnabled) setGrey(1.4f) }
                     else if (ctx.aoEnabled) multiplyColor(blockColor)
                 }
@@ -101,7 +101,6 @@ class RenderGrass : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
                 icon = { ctx: ShadingContext, qi: Int, q: Quad ->
                     if (Config.shortGrass.useGenerated) iconGen.icon!! else iconset[rand[qi and 1]]!!
                 },
-                rotateUV = { 0 },
                 postProcess = { ctx, qi, q, vi, v -> if (isSnowed) setGrey(1.0f) else multiplyColor(grassInfo.overrideColor ?: blockColor) }
             )
         }

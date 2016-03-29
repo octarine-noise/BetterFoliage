@@ -45,7 +45,6 @@ class RenderAlgae : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
                 algaeModels[rand[2]],
                 Rotation.identity,
                 icon = { ctx, qi, q -> algaeIcons[rand[qi and 1]]!! },
-                rotateUV = { 0 },
                 postProcess = noPost
             )
         }

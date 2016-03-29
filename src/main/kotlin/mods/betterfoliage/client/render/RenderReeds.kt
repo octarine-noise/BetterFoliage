@@ -62,7 +62,6 @@ class RenderReeds : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
                 Rotation.identity,
                 forceFlat = true,
                 icon = { ctx, qi, q -> reedIcons[iconVar]!! },
-                rotateUV = { 0 },
                 postProcess = noPost
             )
         }

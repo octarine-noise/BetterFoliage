@@ -32,7 +32,6 @@ class ModelRenderer() : ShadingContext() {
         trans: Double3 = blockContext.blockCenter,
         forceFlat: Boolean = false,
         icon: (ShadingContext, Int, Quad) -> TextureAtlasSprite?,
-        rotateUV: (Quad) -> Int,
         postProcess: RenderVertex.(ShadingContext, Int, Quad, Int, Vertex) -> Unit
     ) {
         rotation = rot
@@ -44,13 +43,12 @@ class ModelRenderer() : ShadingContext() {
         model.quads.forEachIndexed { quadIdx, quad ->
             val drawIcon = icon(this, quadIdx, quad)
             if (drawIcon != null) {
-                val uvRot = rotateUV(quad)
                 quad.verts.forEachIndexed { vertIdx, vert ->
-                    temp.init(vert)
-                    temp.rotate(rotation).translate(trans).rotateUV(uvRot).setIcon(drawIcon)
+                    temp.init(vert).rotate(rotation).translate(trans)
                     val shader = if (aoEnabled && !forceFlat) vert.aoShader else vert.flatShader
                     shader.shade(this, temp)
                     temp.postProcess(this, quadIdx, quad, vertIdx, vert)
+                    temp.setIcon(drawIcon)
 
                     worldRenderer
                         .pos(temp.x, temp.y, temp.z)
@@ -132,6 +130,10 @@ class RenderVertex() {
             3 -> { val t = -v; v = u; u = t; return this }
             else -> { return this }
         }
+    }
+    inline fun mirrorUV(mirrorU: Boolean, mirrorV: Boolean) {
+        if (mirrorU) u = -u
+        if (mirrorV) v = -v
     }
     inline fun setIcon(icon: TextureAtlasSprite): RenderVertex {
         u = (icon.maxU - icon.minU) * (u + 0.5) + icon.minU

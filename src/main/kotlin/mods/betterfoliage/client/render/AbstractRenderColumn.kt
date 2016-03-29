@@ -100,9 +100,9 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
         else -> null
     }
 
-    val bottomSquare = model { columnLidSquare() { it.rotate(rot(EAST) * 2 + rot(UP)) } }
-    val bottomRoundSmall = model { columnLid(radiusSmall) { it.rotate(rot(EAST) * 2 + rot(UP)) } }
-    val bottomRoundLarge = model { columnLid(radiusLarge) { it.rotate(rot(EAST) * 2 + rot(UP)) } }
+    val bottomSquare = model { columnLidSquare() { it.rotate(rot(EAST) * 2 + rot(UP)).mirrorUV(true, true) } }
+    val bottomRoundSmall = model { columnLid(radiusSmall) { it.rotate(rot(EAST) * 2 + rot(UP)).mirrorUV(true, true) } }
+    val bottomRoundLarge = model { columnLid(radiusLarge) { it.rotate(rot(EAST) * 2 + rot(UP)).mirrorUV(true, true) } }
     inline fun flatBottom(type: QuadrantType) = when(type) {
         SMALL_RADIUS -> bottomRoundSmall.model
         LARGE_RADIUS -> bottomRoundLarge.model
@@ -171,7 +171,6 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
                 rotation,
                 blockContext.blockCenter,
                 icon = sideTexture,
-                rotateUV = { 0 },
                 postProcess = noPost
             )
 
@@ -227,8 +226,10 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
                 rotation,
                 blockContext.blockCenter,
                 icon = upIcon,
-                rotateUV = { if (shouldRotateUp) idx else 0 },
-                postProcess = noPost
+                postProcess = { ctx, qi, q, vi, v ->
+                    rotateUV((if (shouldRotateUp) idx else 0) + (if (logAxis == Axis.X) 1 else 0))
+                    if (logAxis == Axis.X) mirrorUV(true, true)
+                }
             )
             if (downModel != null) modelRenderer.render(
                 renderer,
@@ -236,8 +237,10 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
                 rotation,
                 blockContext.blockCenter,
                 icon = downIcon,
-                rotateUV = { if (shouldRotateDown) 3 - idx else 0 },
-                postProcess = noPost
+                postProcess = { ctx, qi, q, vi, v ->
+                    rotateUV((if (shouldRotateDown) 3 - idx else 0) + (if (logAxis == Axis.X) 1 else 0))
+                    if (logAxis != Axis.Y) mirrorUV(true, true)
+                }
             )
         }
 

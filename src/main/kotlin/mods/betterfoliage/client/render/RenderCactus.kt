@@ -74,7 +74,6 @@ class RenderCactus : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
             icon = { ctx, qi, q -> when(qi) {
                 0 -> icons.bottomTexture; 1 -> icons.topTexture; else -> icons.sideTexture
             } },
-            rotateUV = { 0 },
             postProcess = noPost
         )
         modelRenderer.render(
@@ -82,7 +81,6 @@ class RenderCactus : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
             modelCross[ctx.random(0)],
             Rotation.identity,
             icon = { ctx, qi, q -> iconCross.icon!!},
-            rotateUV = { 0 },
             postProcess = noPost
         )
         modelRenderer.render(
@@ -90,7 +88,6 @@ class RenderCactus : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
             modelArm[ctx.random(1)],
             cactusArmRotation[ctx.random(2) % 4],
             icon = { ctx2, qi, q -> iconArm[ctx.random(3)]!!},
-            rotateUV = { 0 },
             postProcess = noPost
         )
         return true

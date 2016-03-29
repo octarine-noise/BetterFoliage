@@ -47,7 +47,6 @@ class RenderNetherrack : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) 
             netherrackModel[rand[0]],
             Rotation.identity,
             icon = { ctx, qi, q -> netherrackIcon[rand[qi and 1]]!! },
-            rotateUV = { 0 },
             postProcess = noPost
         )
 
