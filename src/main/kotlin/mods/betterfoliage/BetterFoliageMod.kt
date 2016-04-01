@@ -29,6 +29,7 @@ object BetterFoliageMod {
 
     lateinit var log: Logger
     var config: Configuration? = null
+    var isAfterPostInit = false
 
     @JvmStatic
     @Mod.InstanceFactory
@@ -47,6 +48,7 @@ object BetterFoliageMod {
         if (FMLCommonHandler.instance().effectiveSide == Side.CLIENT) {
             Config.attach(config!!)
             Client.log(INFO, "BetterFoliage initialized")
+            isAfterPostInit = true
         }
     }
 

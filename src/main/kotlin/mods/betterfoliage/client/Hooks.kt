@@ -32,8 +32,8 @@ fun doesSideBlockRenderingOverride(original: Boolean, blockAccess: IBlockAccess,
 }
 
 fun isOpaqueCubeOverride(original: Boolean, state: IBlockState): Boolean {
-    // caution: blocks are initialized and the method called before any mods are loaded
-    if (BetterFoliageMod.config == null) return original
+    // caution: blocks are initialized and the method called during startup
+    if (!BetterFoliageMod.isAfterPostInit) return original
     return original && !(Config.enabled && Config.roundLogs.enabled && Config.blocks.logs.matchesID(state.block))
 }
 
