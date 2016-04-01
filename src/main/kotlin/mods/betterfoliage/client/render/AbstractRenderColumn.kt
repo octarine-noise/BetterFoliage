@@ -159,8 +159,8 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
             val sideModel = when (quadrants[idx]) {
                 SMALL_RADIUS -> sideRoundSmall.model
                 LARGE_RADIUS -> if (upType == PARALLEL && quadrantsTop[idx] == SMALL_RADIUS) transitionTop.model
-                else if (downType == PARALLEL && quadrantsBottom[idx] == SMALL_RADIUS) transitionBottom.model
-                else sideRoundLarge.model
+                    else if (downType == PARALLEL && quadrantsBottom[idx] == SMALL_RADIUS) transitionBottom.model
+                    else sideRoundLarge.model
                 SQUARE -> sideSquare.model
                 else -> null
             }
@@ -179,8 +179,8 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
             var downModel: Model? = null
             var upIcon = upTexture
             var downIcon = downTexture
-            var shouldRotateUp = true
-            var shouldRotateDown = true
+            var isLidUp = true
+            var isLidDown = true
 
             when (upType) {
                 NONSOLID -> upModel = flatTop(quadrants[idx])
@@ -190,7 +190,7 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
                     } else {
                         upIcon = sideTexture
                         upModel = extendTop(quadrants[idx])
-                        shouldRotateUp = false
+                        isLidUp = false
                     }
                 }
                 PARALLEL -> {
@@ -209,7 +209,7 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
                     } else {
                         downIcon = sideTexture
                         downModel = extendBottom(quadrants[idx])
-                        shouldRotateDown = false
+                        isLidDown = false
                     }
                 }
                 PARALLEL -> {
@@ -227,8 +227,10 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
                 blockContext.blockCenter,
                 icon = upIcon,
                 postProcess = { ctx, qi, q, vi, v ->
-                    rotateUV((if (shouldRotateUp) idx else 0) + (if (logAxis == Axis.X) 1 else 0))
-                    if (logAxis == Axis.X) mirrorUV(true, true)
+                    if (isLidUp) {
+                        rotateUV(idx + if (logAxis == Axis.X) 1 else 0)
+                        if (logAxis == Axis.X) mirrorUV(true, true)
+                    }
                 }
             )
             if (downModel != null) modelRenderer.render(
@@ -238,8 +240,10 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
                 blockContext.blockCenter,
                 icon = downIcon,
                 postProcess = { ctx, qi, q, vi, v ->
-                    rotateUV((if (shouldRotateDown) 3 - idx else 0) + (if (logAxis == Axis.X) 1 else 0))
-                    if (logAxis != Axis.Y) mirrorUV(true, true)
+                    if (isLidDown) {
+                        rotateUV((if (logAxis == Axis.X) 0 else 3) - idx)
+                        if (logAxis != Axis.Y) mirrorUV(true, true)
+                    }
                 }
             )
         }
