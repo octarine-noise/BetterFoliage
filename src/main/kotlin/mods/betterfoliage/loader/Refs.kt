@@ -34,7 +34,7 @@ object Refs {
     val useNeighborBrightness = MethodRef(StateImplementation, "useNeighborBrightness", "func_185916_f", "f", ClassRef.boolean)
     val doesSideBlockRendering = MethodRef(StateImplementation, "doesSideBlockRendering", ClassRef.boolean, IBlockAccess, BlockPos, EnumFacing)
     val isOpaqueCube = MethodRef(StateImplementation, "isOpaqueCube", "", "p", ClassRef.boolean)
-    val randomDisplayTick = MethodRef(Block, "randomDisplayTick", "func_180655_c", "c", ClassRef.void, World, BlockPos, IBlockState, Random)
+    val randomDisplayTick = MethodRef(Block, "randomDisplayTick", "func_180655_c", "a", ClassRef.void, IBlockState, World, BlockPos, Random)
 
     val BlockModelRenderer = ClassRef("net.minecraft.client.renderer.BlockModelRenderer", "boe")
     val AmbientOcclusionFace = ClassRef("net.minecraft.client.renderer.BlockModelRenderer\$AmbientOcclusionFace", "boe\$b")
