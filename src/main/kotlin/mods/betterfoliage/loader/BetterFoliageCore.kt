@@ -110,6 +110,7 @@ class BetterFoliageTransformer : Transformer() {
                 find(varinsn(ISTORE, 23))?.insertAfter {
                     log.info("Applying RenderChunk block layer override")
                     varinsn(ALOAD, 19)
+                    varinsn(ALOAD, 20)
                     varinsn(ALOAD, 22)
                     invokeStatic(Refs.canRenderBlockInLayer)
                     varinsn(ISTORE, 23)

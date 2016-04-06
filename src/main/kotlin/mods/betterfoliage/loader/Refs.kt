@@ -29,7 +29,7 @@ object Refs {
 
     val Block = ClassRef("net.minecraft.block.Block", "ajt")
     val StateImplementation = ClassRef("net.minecraft.block.state.BlockStateContainer\$StateImplementation", "ard\$a")
-    val canRenderInLayer = MethodRef(Block, "canRenderInLayer", ClassRef.boolean, BlockRenderLayer)
+    val canRenderInLayer = MethodRef(Block, "canRenderInLayer", ClassRef.boolean, IBlockState, BlockRenderLayer)
     val getAmbientOcclusionLightValue = MethodRef(StateImplementation, "getAmbientOcclusionLightValue", "func_185892_j", "j", ClassRef.float)
     val useNeighborBrightness = MethodRef(StateImplementation, "useNeighborBrightness", "func_185916_f", "f", ClassRef.boolean)
     val doesSideBlockRendering = MethodRef(StateImplementation, "doesSideBlockRendering", ClassRef.boolean, IBlockAccess, BlockPos, EnumFacing)
@@ -75,7 +75,7 @@ object Refs {
     val onRandomDisplayTick = MethodRef(BetterFoliageHooks, "onRandomDisplayTick", ClassRef.void, World, IBlockState, BlockPos)
     val onAfterLoadModelDefinitions = MethodRef(BetterFoliageHooks, "onAfterLoadModelDefinitions", ClassRef.void, ModelLoader)
     val renderWorldBlock = MethodRef(BetterFoliageHooks, "renderWorldBlock", ClassRef.boolean, BlockRendererDispatcher, IBlockState, BlockPos, IBlockAccess, VertexBuffer, BlockRenderLayer)
-    val canRenderBlockInLayer = MethodRef(BetterFoliageHooks, "canRenderBlockInLayer", ClassRef.boolean, Block, BlockRenderLayer)
+    val canRenderBlockInLayer = MethodRef(BetterFoliageHooks, "canRenderBlockInLayer", ClassRef.boolean, Block, IBlockState, BlockRenderLayer)
 
     // Optifine
     val OptifineClassTransformer = ClassRef("optifine.OptiFineClassTransformer")

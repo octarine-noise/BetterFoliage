@@ -95,10 +95,10 @@ fun renderWorldBlock(dispatcher: BlockRendererDispatcher,
     return if (canRender) dispatcher.renderBlock(state, pos, blockAccess, worldRenderer) else false
 }
 
-fun canRenderBlockInLayer(block: Block, layer: BlockRenderLayer): Boolean {
-    if (layer == CUTOUT_MIPPED && !block.canRenderInLayer(CUTOUT)) {
+fun canRenderBlockInLayer(block: Block, state: IBlockState, layer: BlockRenderLayer): Boolean {
+    if (layer == CUTOUT_MIPPED && !block.canRenderInLayer(state, CUTOUT)) {
         return true
     }
-    return block.canRenderInLayer(layer)
+    return block.canRenderInLayer(state, layer)
 
 }
