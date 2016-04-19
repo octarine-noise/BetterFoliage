@@ -2,7 +2,7 @@ apply plugin: "forge"
 apply plugin: "kotlin"
 
 group = 'com.github.octarine-noise'
-version = "2.0.7"
+version = "2.0.9"
 archivesBaseName = rootProject.name + '-MC1.7.10'
 
 buildscript {
