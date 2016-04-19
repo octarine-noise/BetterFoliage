@@ -8,6 +8,7 @@ import cpw.mods.fml.relauncher.SideOnly
 import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.BlockMatcher
 import mods.betterfoliage.client.config.Config
+import mods.betterfoliage.client.config.SimpleBlockMatcher
 import mods.octarinecore.client.render.Axis
 import net.minecraft.block.Block
 import net.minecraft.client.multiplayer.WorldClient
@@ -49,25 +50,4 @@ object TFCIntegration {
             }
         }
     }
-}
-
-abstract class SimpleBlockMatcher() {
-
-    val blockIDs = hashSetOf<Int>()
-
-    abstract fun matchesClass(block: Block): Boolean
-    fun matchesID(block: Block) = blockIDs.contains(Block.blockRegistry.getIDForObject(block))
-    fun matchesID(blockId: Int) = blockIDs.contains(blockId)
-
-    fun updateIDs() {
-        blockIDs.clear()
-        Block.blockRegistry.forEach {
-            if (matchesClass(it as Block)) blockIDs.add(Block.blockRegistry.getIDForObject(it))
-        }
-    }
-
-    @SubscribeEvent(priority = EventPriority.LOW)
-    fun onWorldLoad(event: WorldEvent.Load) { if (event.world is WorldClient) updateIDs() }
-
-    init { MinecraftForge.EVENT_BUS.register(this) }
 }
