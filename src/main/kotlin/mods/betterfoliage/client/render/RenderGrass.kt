@@ -22,9 +22,9 @@ import org.apache.logging.log4j.Level.INFO
 class RenderGrass : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
 
     companion object {
-        @JvmStatic val grassTopQuads: Model.(Int)->Unit = { modelIdx ->
+        @JvmStatic fun grassTopQuads(heightMin: Double, heightMax: Double): Model.(Int)->Unit = { modelIdx ->
             verticalRectangle(x1 = -0.5, z1 = 0.5, x2 = 0.5, z2 = -0.5, yBottom = 0.5,
-                    yTop = 0.5 + random(Config.shortGrass.heightMin, Config.shortGrass.heightMax)
+                    yTop = 0.5 + random(heightMin, heightMax)
             )
             .setAoShader(faceOrientedAuto(overrideFace = UP, corner = cornerAo(Axis.Y)))
             .setFlatShader(faceOrientedAuto(overrideFace = UP, corner = cornerFlat))
@@ -37,7 +37,7 @@ class RenderGrass : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
     val normalGenIcon = iconStatic(Client.genGrass.generatedResource("minecraft:blocks/tallgrass", "snowed" to false))
     val snowedGenIcon = iconStatic(Client.genGrass.generatedResource("minecraft:blocks/tallgrass", "snowed" to true))
 
-    val grassModels = modelSet(64, grassTopQuads)
+    val grassModels = modelSet(64, grassTopQuads(Config.shortGrass.heightMin, Config.shortGrass.heightMax))
 
     override fun afterStitch() {
         Client.log(INFO, "Registered ${normalIcons.num} grass textures")

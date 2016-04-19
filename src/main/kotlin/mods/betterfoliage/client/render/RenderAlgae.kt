@@ -18,7 +18,7 @@ class RenderAlgae : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
     val noise = simplexNoise()
 
     val algaeIcons = iconSet(BetterFoliageMod.LEGACY_DOMAIN, "blocks/better_algae_%d")
-    val algaeModels = modelSet(64, RenderGrass.grassTopQuads)
+    val algaeModels = modelSet(64, RenderGrass.grassTopQuads(Config.algae.heightMin, Config.algae.heightMax))
 
     override fun afterStitch() {
         Client.log(INFO, "Registered ${algaeIcons.num} algae textures")

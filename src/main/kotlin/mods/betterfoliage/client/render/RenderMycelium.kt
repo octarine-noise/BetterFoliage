@@ -19,7 +19,7 @@ import org.apache.logging.log4j.Level.INFO
 class RenderMycelium : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
 
     val myceliumIcon = iconSet(BetterFoliageMod.LEGACY_DOMAIN, "blocks/better_mycel_%d")
-    val myceliumModel = modelSet(64, RenderGrass.grassTopQuads)
+    val myceliumModel = modelSet(64, RenderGrass.grassTopQuads(Config.shortGrass.heightMin, Config.shortGrass.heightMax))
 
     override fun afterStitch() {
         Client.log(INFO, "Registered ${myceliumIcon.num} mycelium textures")
