@@ -42,7 +42,8 @@ abstract class ModelDataInspector {
         onAfterModelLoad()
 
         stateMappings.forEach { mapping ->
-            stateModels[mapping.value]?.let { processModelDefinition(mapping.key, mapping.value, it) }
+            if (mapping.key.block != null)
+                stateModels[mapping.value]?.let { processModelDefinition(mapping.key, mapping.value, it) }
         }
     }
 

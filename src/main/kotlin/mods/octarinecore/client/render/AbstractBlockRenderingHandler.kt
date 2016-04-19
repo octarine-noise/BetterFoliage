@@ -29,7 +29,7 @@ val modelRenderer by ThreadLocalDelegate { ModelRenderer() }
 
 abstract class AbstractBlockRenderingHandler(modId: String) : ResourceHandler(modId) {
 
-    val moveToCutout: Boolean get() = true
+    open val moveToCutout: Boolean get() = true
 
     // ============================
     // Custom rendering
