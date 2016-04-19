@@ -76,9 +76,8 @@ fun renderWorldBlock(dispatcher: BlockRendererDispatcher,
                      layer: BlockRenderLayer
 ): Boolean {
     val isCutout = layer == CUTOUT_MIPPED || layer == CUTOUT
-    val needsCutout = state.block.canRenderInLayer(CUTOUT_MIPPED) || state.block.canRenderInLayer(CUTOUT)
-    val canRender = (isCutout && needsCutout) || state.block.canRenderInLayer(layer)
-
+    val needsCutout = state.block.canRenderInLayer(state, CUTOUT_MIPPED) || state.block.canRenderInLayer(state, CUTOUT)
+    val canRender = (isCutout && needsCutout) || state.block.canRenderInLayer(state, layer)
 
     blockContext.let { ctx ->
         ctx.set(blockAccess, pos)
