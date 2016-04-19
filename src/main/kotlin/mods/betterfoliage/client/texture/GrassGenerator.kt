@@ -20,10 +20,25 @@ class GrassGenerator(domain: String) : TextureGenerator(domain) {
 
         val baseTexture = resourceManager[target.second]?.loadImage() ?: return null
 
-        // draw bottom half of texture
         val result = BufferedImage(baseTexture.width, baseTexture.height, BufferedImage.TYPE_4BYTE_ABGR)
         val graphics = result.createGraphics()
-        graphics.drawImage(baseTexture, 0, 3 * baseTexture.height / 8, null)
+
+        val size = baseTexture.width
+        val frames = baseTexture.height / size
+
+        // iterate all frames
+        for (frame in 0 .. frames - 1) {
+            val baseFrame = baseTexture.getSubimage(0, size * frame, size, size)
+            val grassFrame = BufferedImage(size, size, BufferedImage.TYPE_4BYTE_ABGR)
+
+            // draw bottom half of texture
+            grassFrame.createGraphics().apply {
+                drawImage(baseFrame, 0, 3 * size / 8, null)
+            }
+
+            // add to animated png
+            graphics.drawImage(grassFrame, 0, size * frame, null)
+        }
 
         // blend with white if snowed
         if (isSnowed && target.first == ResourceType.COLOR) {
