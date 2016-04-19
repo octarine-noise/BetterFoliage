@@ -33,7 +33,7 @@ val blockColors = ThreadLocal<BlockColors>()
 
 abstract class AbstractBlockRenderingHandler(modId: String) : ResourceHandler(modId) {
 
-    val moveToCutout: Boolean get() = true
+    open val moveToCutout: Boolean get() = true
 
     // ============================
     // Custom rendering
