@@ -18,6 +18,8 @@ import net.minecraft.util.EnumFacing.*
 
 class RenderLog : AbstractRenderColumn(BetterFoliageMod.MOD_ID) {
 
+    override val moveToCutout: Boolean get() = false
+
     override fun isEligible(ctx: BlockContext) =
         Config.enabled && Config.roundLogs.enabled &&
         ctx.cameraDistance < Config.roundLogs.distance &&
