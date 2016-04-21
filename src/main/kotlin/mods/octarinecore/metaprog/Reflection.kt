@@ -125,7 +125,7 @@ class MethodRef(val parentClass: ClassRef,
         }
 
     /** Invoke this method using reflection. */
-    fun invoke(receiver: Any, vararg args: Any) = element?.invoke(receiver, *args)
+    fun invoke(receiver: Any, vararg args: Any?) = element?.invoke(receiver, *args)
 
     /** Invoke this static method using reflection. */
     fun invokeStatic(vararg args: Any) = element?.invoke(null, *args)

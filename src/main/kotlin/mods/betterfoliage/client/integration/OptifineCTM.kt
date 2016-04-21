@@ -48,7 +48,7 @@ object OptifineCTM {
         if (state !is BlockStateBase) return result
 
         connectedProperties.forEach { cp ->
-            if (Refs.CPmatchesBlock.invoke(cp, state) as Boolean &&
+            if (Refs.CPmatchesBlock.invoke(cp, Refs.getBlockId.invoke(state), Refs.getMetadata.invoke(state)) as Boolean &&
                 Refs.CPmatchesIcon.invoke(cp, icon) as Boolean) {
                 Client.log(INFO, "Match for block: ${state.toString()}, icon: ${icon.iconName} -> CP: ${cp.toString()}")
                 result.addAll(Refs.CPtileIcons.get(cp) as Array<TextureAtlasSprite>)

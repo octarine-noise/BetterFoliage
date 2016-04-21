@@ -80,6 +80,9 @@ object Refs {
     // Optifine
     val OptifineClassTransformer = ClassRef("optifine.OptiFineClassTransformer")
 
+    val getBlockId = MethodRef(BlockStateBase, "getBlockId", ClassRef.int);
+    val getMetadata = MethodRef(BlockStateBase, "getMetadata", ClassRef.int);
+
     val RenderEnv = ClassRef("RenderEnv")
     val RenderEnv_reset = MethodRef(RenderEnv, "reset", ClassRef.void, IBlockAccess, IBlockState, BlockPos)
     val ConnectedTextures = ClassRef("ConnectedTextures")
@@ -89,7 +92,7 @@ object Refs {
 
     val ConnectedProperties = ClassRef("ConnectedProperties")
     val CPtileIcons = FieldRef(ConnectedProperties, "tileIcons", null)
-    val CPmatchesBlock = MethodRef(ConnectedProperties, "matchesBlock", ClassRef.boolean, BlockStateBase)
+    val CPmatchesBlock = MethodRef(ConnectedProperties, "matchesBlock", ClassRef.boolean, ClassRef.int, ClassRef.int)
     val CPmatchesIcon = MethodRef(ConnectedProperties, "matchesIcon", ClassRef.boolean, TextureAtlasSprite)
 
     // ShadersMod
