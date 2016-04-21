@@ -1,78 +1,43 @@
-apply plugin: "net.minecraftforge.gradle.forge"
-apply plugin: 'kotlin'
-
-group = 'com.github.octarine-noise'
-version = "2.0.9"
-archivesBaseName = rootProject.name + '-MC1.9'
-
+//
+// Define MC and Kotlin versions to use, apply plugins
+//
 buildscript {
-    ext.kotlin_version = '1.0.0'
+    ext.kotlin_version = '1.0.1-2'
     repositories {
         mavenCentral()
-        maven {
-            name = "forge"
-            url = "http://files.minecraftforge.net/maven"
-        }
-        maven {
-            name = "sonatype"
-            url = "https://oss.sonatype.org/content/repositories/snapshots/"
-        }
+        maven { name = 'forge'; url = 'http://files.minecraftforge.net/maven' }
+        maven { name = "sonatype"; url = "https://oss.sonatype.org/content/repositories/snapshots/" }
     }
     dependencies {
         classpath "net.minecraftforge.gradle:ForgeGradle:2.1-SNAPSHOT"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
-configurations {
-    shade
-    compile.extendsFrom shade
-}
-dependencies {
-    shade "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
-}
-minecraft {
-    version = '1.9-12.16.0.1853-1.9'
-    mappings = 'snapshot_20160406'
-    runDir = 'run'
-}
+subprojects {
+    apply plugin: "net.minecraftforge.gradle.forge"
+    apply plugin: 'kotlin'
 
-processResources {
-    inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
-
-    from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
-        expand 'version':project.version, 'mcversion':project.minecraft.version
+    minecraft {
+        version = '1.9-12.16.0.1865-1.9'
+        mappings = 'snapshot_20160406'
+        runDir = 'run'
     }
-
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
-    }
-
-    into "${buildDir}/classes/main"
 }
 
-jar {
-    manifest {
-        attributes "FMLCorePlugin": "mods.betterfoliage.loader.BetterFoliageLoader"
-        attributes "FMLCorePluginContainsFMLMod": "mods.betterfoliage.BetterFoliageMod"
-        attributes "FMLAT": "BetterFoliage_at.cfg"
-    }
-    configurations.shade.each { dep ->
-        from(project.zipTree(dep)){
-            exclude 'META-INF', 'META-INF/**'
+def includeShadedDeps(cfg) {
+    project.copySpec {
+        cfg.each { dep ->
+            from(project.zipTree(dep)) {
+                exclude 'META-INF', 'META-INF/**'
+            }
         }
     }
-    exclude "optifine"
 }
 
-reobf {
-    jar {
-        extraLines "PK: kotlin mods/octarinecore/kotlin"
+def transformResources(proj) {
+    proj.copySpec {
+        from(proj.sourceSets.main.resources) { exclude 'mcmod.info' }
+        from(proj.sourceSets.main.resources) { include 'mcmod.info' expand 'version':proj.version, 'mcversion':proj.minecraft.version }
     }
-}
-
-repositories {
-    mavenCentral()
 }

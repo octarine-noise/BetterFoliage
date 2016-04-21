@@ -1,6 +1,6 @@
 package mods.betterfoliage.client.render
 
-import mods.betterfoliage.client.config.BlockMatcher
+import mods.octarinecore.common.config.BlockMatcher
 import mods.betterfoliage.client.render.AbstractRenderColumn.BlockType.*
 import mods.betterfoliage.client.render.AbstractRenderColumn.QuadrantType.*
 import mods.octarinecore.client.render.*

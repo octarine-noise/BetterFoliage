@@ -1,0 +1,33 @@
+group = 'com.github.octarine-noise'
+version = "2.0.10"
+
+dependencies {
+    compile project(":OctarineCore")
+}
+
+def manifestCfg = {
+    attributes "FMLCorePlugin": "mods.betterfoliage.loader.BetterFoliageLoader"
+    attributes "FMLCorePluginContainsFMLMod": "mods.betterfoliage.BetterFoliageMod"
+    attributes "FMLAT": "BetterFoliage_at.cfg"
+}
+
+processResources {
+    with transformResources(project)
+}
+
+jar {
+    manifest manifestCfg
+    exclude "optifine"
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    manifest manifestCfg
+    from(sourceSets.main.kotlin)
+    with transformResources(project)
+}
+
+artifacts {
+    archives jar
+    archives sourcesJar
+}

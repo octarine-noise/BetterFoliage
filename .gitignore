@@ -6,3 +6,4 @@ run/
 .gradle/
 build/
 classes/
+temp/

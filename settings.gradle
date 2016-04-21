@@ -1,2 +1,2 @@
-rootProject.name = 'BetterFoliage'
-
+include 'BetterFoliage'
+include 'OctarineCore'

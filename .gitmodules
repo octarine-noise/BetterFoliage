@@ -1,0 +1,3 @@
+[submodule "OctarineCore"]
+	path = OctarineCore
+	url = https://github.com/octarine-noise/OctarineCore.git
