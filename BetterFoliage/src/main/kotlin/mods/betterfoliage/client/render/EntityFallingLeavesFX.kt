@@ -2,12 +2,12 @@ package mods.betterfoliage.client.render
 
 import mods.betterfoliage.client.config.Config
 import mods.betterfoliage.client.texture.LeafRegistry
-import mods.octarinecore.PI2
-import mods.octarinecore.client.render.AbstractEntityFX
-import mods.octarinecore.client.render.HSB
-import mods.octarinecore.common.Double3
-import mods.octarinecore.minmax
-import mods.octarinecore.random
+import mods.octarinelib.PI2
+import mods.octarinelib.client.render.AbstractEntityFX
+import mods.octarinelib.client.render.HSB
+import mods.octarinelib.common.Double3
+import mods.octarinelib.minmax
+import mods.octarinelib.random
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.VertexBuffer
 import net.minecraft.util.EnumFacing.DOWN

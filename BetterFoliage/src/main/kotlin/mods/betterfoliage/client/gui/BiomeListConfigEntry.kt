@@ -1,6 +1,6 @@
 package mods.betterfoliage.client.gui
 
-import mods.octarinecore.client.gui.IdListConfigEntry
+import mods.octarinelib.client.gui.IdListConfigEntry
 import net.minecraft.world.biome.BiomeGenBase
 import net.minecraftforge.fml.client.config.GuiConfig
 import net.minecraftforge.fml.client.config.GuiConfigEntries

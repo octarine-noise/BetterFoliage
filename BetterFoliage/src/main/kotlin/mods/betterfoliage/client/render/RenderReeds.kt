@@ -4,10 +4,10 @@ import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.Config
 import mods.betterfoliage.client.integration.ShadersModIntegration
-import mods.octarinecore.client.render.*
-import mods.octarinecore.common.Int3
-import mods.octarinecore.common.Rotation
-import mods.octarinecore.random
+import mods.octarinelib.client.render.*
+import mods.octarinelib.common.Int3
+import mods.octarinelib.common.Rotation
+import mods.octarinelib.random
 import net.minecraft.block.material.Material
 import net.minecraft.client.renderer.BlockRendererDispatcher
 import net.minecraft.client.renderer.VertexBuffer

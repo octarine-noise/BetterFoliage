@@ -2,7 +2,7 @@ package mods.betterfoliage.client.config
 
 import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.gui.BiomeListConfigEntry
-import mods.octarinecore.common.config.*
+import mods.octarinelib.common.config.*
 import net.minecraft.client.Minecraft
 import net.minecraft.world.biome.BiomeGenBase
 import net.minecraftforge.fml.client.event.ConfigChangedEvent

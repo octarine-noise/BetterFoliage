@@ -2,11 +2,11 @@ package mods.betterfoliage.client.render
 
 import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.config.Config
-import mods.octarinecore.client.render.AbstractBlockRenderingHandler
-import mods.octarinecore.client.render.BlockContext
-import mods.octarinecore.client.render.withOffset
-import mods.octarinecore.common.Int3
-import mods.octarinecore.common.offset
+import mods.octarinelib.client.render.AbstractBlockRenderingHandler
+import mods.octarinelib.client.render.BlockContext
+import mods.octarinelib.client.render.withOffset
+import mods.octarinelib.common.Int3
+import mods.octarinelib.common.offset
 import net.minecraft.client.renderer.BlockRendererDispatcher
 import net.minecraft.client.renderer.VertexBuffer
 import net.minecraft.util.BlockRenderLayer

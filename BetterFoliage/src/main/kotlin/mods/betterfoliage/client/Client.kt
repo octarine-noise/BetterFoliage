@@ -9,9 +9,9 @@ import mods.betterfoliage.client.texture.GrassGenerator
 import mods.betterfoliage.client.texture.GrassRegistry
 import mods.betterfoliage.client.texture.LeafGenerator
 import mods.betterfoliage.client.texture.LeafRegistry
-import mods.octarinecore.client.KeyHandler
-import mods.octarinecore.client.resource.CenteringTextureGenerator
-import mods.octarinecore.client.resource.GeneratorPack
+import mods.octarinelib.client.KeyHandler
+import mods.octarinelib.client.resource.CenteringTextureGenerator
+import mods.octarinelib.client.resource.GeneratorPack
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.client.FMLClientHandler
 import net.minecraftforge.fml.relauncher.Side

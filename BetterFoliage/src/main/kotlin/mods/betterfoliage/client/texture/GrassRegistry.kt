@@ -2,9 +2,9 @@ package mods.betterfoliage.client.texture
 
 import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.Config
-import mods.octarinecore.client.render.HSB
-import mods.octarinecore.client.resource.BlockTextureInspector
-import mods.octarinecore.client.resource.averageColor
+import mods.octarinelib.client.render.HSB
+import mods.octarinelib.client.resource.BlockTextureInspector
+import mods.octarinelib.client.resource.averageColor
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.client.renderer.texture.TextureMap

@@ -3,10 +3,10 @@ package mods.betterfoliage.client.render
 import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.Config
-import mods.octarinecore.client.render.AbstractEntityFX
-import mods.octarinecore.client.resource.ResourceHandler
-import mods.octarinecore.common.Double3
-import mods.octarinecore.forEachPairIndexed
+import mods.octarinelib.client.render.AbstractEntityFX
+import mods.octarinelib.client.resource.ResourceHandler
+import mods.octarinelib.common.Double3
+import mods.octarinelib.forEachPairIndexed
 import net.minecraft.client.renderer.VertexBuffer
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.MathHelper

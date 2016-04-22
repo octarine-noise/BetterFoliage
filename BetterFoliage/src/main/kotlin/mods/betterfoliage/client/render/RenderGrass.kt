@@ -6,11 +6,11 @@ import mods.betterfoliage.client.config.Config
 import mods.betterfoliage.client.integration.OptifineCTM
 import mods.betterfoliage.client.integration.ShadersModIntegration
 import mods.betterfoliage.client.texture.GrassRegistry
-import mods.octarinecore.client.render.*
-import mods.octarinecore.common.Double3
-import mods.octarinecore.common.Int3
-import mods.octarinecore.common.Rotation
-import mods.octarinecore.random
+import mods.octarinelib.client.render.*
+import mods.octarinelib.common.Double3
+import mods.octarinelib.common.Int3
+import mods.octarinelib.common.Rotation
+import mods.octarinelib.random
 import net.minecraft.client.renderer.BlockRendererDispatcher
 import net.minecraft.client.renderer.VertexBuffer
 import net.minecraft.util.BlockRenderLayer

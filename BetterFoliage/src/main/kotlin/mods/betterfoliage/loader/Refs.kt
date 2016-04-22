@@ -1,8 +1,8 @@
 package mods.betterfoliage.loader
 
-import mods.octarinecore.metaprog.ClassRef
-import mods.octarinecore.metaprog.FieldRef
-import mods.octarinecore.metaprog.MethodRef
+import mods.octarinelib.metaprog.ClassRef
+import mods.octarinelib.metaprog.FieldRef
+import mods.octarinelib.metaprog.MethodRef
 import net.minecraftforge.fml.relauncher.FMLInjectionData
 
 /** Singleton object holding references to foreign code elements. */

@@ -3,9 +3,9 @@ package mods.betterfoliage.client.render
 import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.Config
-import mods.octarinecore.client.render.*
-import mods.octarinecore.common.Int3
-import mods.octarinecore.common.Rotation
+import mods.octarinelib.client.render.*
+import mods.octarinelib.common.Int3
+import mods.octarinelib.common.Rotation
 import net.minecraft.client.renderer.BlockRendererDispatcher
 import net.minecraft.client.renderer.VertexBuffer
 import net.minecraft.util.BlockRenderLayer

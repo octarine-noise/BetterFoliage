@@ -1,6 +1,6 @@
 package optifine
 
-import mods.octarinecore.tryDefault
+import mods.octarinelib.tryDefault
 import net.minecraft.launchwrapper.IClassTransformer
 import net.minecraft.launchwrapper.ITweaker
 import net.minecraft.launchwrapper.LaunchClassLoader

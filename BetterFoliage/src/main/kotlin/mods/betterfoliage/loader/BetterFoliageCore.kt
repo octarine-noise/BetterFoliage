@@ -1,8 +1,8 @@
 package mods.betterfoliage.loader
 
-import mods.octarinecore.metaprog.ASMPlugin
-import mods.octarinecore.metaprog.Transformer
-import mods.octarinecore.metaprog.allAvailable
+import mods.octarinelib.metaprog.ASMPlugin
+import mods.octarinelib.metaprog.Transformer
+import mods.octarinelib.metaprog.allAvailable
 import net.minecraftforge.fml.relauncher.FMLLaunchHandler
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin
 import org.objectweb.asm.Opcodes
@@ -10,9 +10,9 @@ import org.objectweb.asm.Opcodes.*
 
 @IFMLLoadingPlugin.TransformerExclusions(
     "mods.betterfoliage.loader",
-    "mods.octarinecore.metaprog",
+    "mods.octarinelib.metaprog",
     "kotlin",
-    "mods.octarinecore.kotlin"
+    "mods.octarinelib.kotlin"
 )
 class BetterFoliageLoader : ASMPlugin(BetterFoliageTransformer::class.java)
 

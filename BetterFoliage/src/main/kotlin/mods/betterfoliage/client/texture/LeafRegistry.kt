@@ -3,11 +3,11 @@ package mods.betterfoliage.client.texture
 import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.Config
 import mods.betterfoliage.client.integration.OptifineCTM
-import mods.octarinecore.client.render.BlockContext
-import mods.octarinecore.client.resource.BlockTextureInspector
-import mods.octarinecore.client.resource.IconSet
-import mods.octarinecore.client.resource.averageColor
-import mods.octarinecore.common.Int3
+import mods.octarinelib.client.render.BlockContext
+import mods.octarinelib.client.resource.BlockTextureInspector
+import mods.octarinelib.client.resource.IconSet
+import mods.octarinelib.client.resource.averageColor
+import mods.octarinelib.common.Int3
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.client.renderer.texture.TextureMap

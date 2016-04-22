@@ -8,9 +8,9 @@ import mods.betterfoliage.client.render.EntityFallingLeavesFX
 import mods.betterfoliage.client.render.EntityRisingSoulFX
 import mods.betterfoliage.client.render.down1
 import mods.betterfoliage.client.render.up1
-import mods.octarinecore.client.render.blockContext
-import mods.octarinecore.client.resource.LoadModelDataEvent
-import mods.octarinecore.common.plus
+import mods.octarinelib.client.render.blockContext
+import mods.octarinelib.client.resource.LoadModelDataEvent
+import mods.octarinelib.common.plus
 import net.minecraft.block.Block
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.renderer.BlockRendererDispatcher

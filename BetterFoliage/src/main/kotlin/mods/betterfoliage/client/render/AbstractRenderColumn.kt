@@ -1,14 +1,14 @@
 package mods.betterfoliage.client.render
 
-import mods.octarinecore.common.config.BlockMatcher
+import mods.octarinelib.common.config.BlockMatcher
 import mods.betterfoliage.client.render.AbstractRenderColumn.BlockType.*
 import mods.betterfoliage.client.render.AbstractRenderColumn.QuadrantType.*
-import mods.octarinecore.client.render.*
-import mods.octarinecore.client.resource.BlockTextureInspector
-import mods.octarinecore.common.Int3
-import mods.octarinecore.common.Rotation
-import mods.octarinecore.common.face
-import mods.octarinecore.common.rot
+import mods.octarinelib.client.render.*
+import mods.octarinelib.client.resource.BlockTextureInspector
+import mods.octarinelib.common.Int3
+import mods.octarinelib.common.Rotation
+import mods.octarinelib.common.face
+import mods.octarinelib.common.rot
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.renderer.BlockRendererDispatcher
 import net.minecraft.client.renderer.VertexBuffer

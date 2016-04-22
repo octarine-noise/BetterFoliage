@@ -1,12 +1,12 @@
 @file:JvmName("Utils")
 package mods.betterfoliage.client.render
 
-import mods.octarinecore.PI2
-import mods.octarinecore.client.render.*
-import mods.octarinecore.common.Double3
-import mods.octarinecore.common.Int3
-import mods.octarinecore.common.Rotation
-import mods.octarinecore.common.times
+import mods.octarinelib.PI2
+import mods.octarinelib.client.render.*
+import mods.octarinelib.common.Double3
+import mods.octarinelib.common.Int3
+import mods.octarinelib.common.Rotation
+import mods.octarinelib.common.times
 import net.minecraft.block.Block
 import net.minecraft.block.material.Material
 import net.minecraft.block.state.IBlockState

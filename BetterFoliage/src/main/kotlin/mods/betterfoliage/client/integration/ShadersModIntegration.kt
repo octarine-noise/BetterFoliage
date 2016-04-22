@@ -3,7 +3,7 @@ package mods.betterfoliage.client.integration
 import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.Config
 import mods.betterfoliage.loader.Refs
-import mods.octarinecore.metaprog.allAvailable
+import mods.octarinelib.metaprog.allAvailable
 import net.minecraft.block.Block
 import net.minecraft.block.BlockTallGrass
 import net.minecraft.block.state.IBlockState

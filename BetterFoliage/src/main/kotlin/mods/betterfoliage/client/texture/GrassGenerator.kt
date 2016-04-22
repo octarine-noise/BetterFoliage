@@ -1,6 +1,6 @@
 package mods.betterfoliage.client.texture
 
-import mods.octarinecore.client.resource.*
+import mods.octarinelib.client.resource.*
 import net.minecraft.util.ResourceLocation
 import java.awt.image.BufferedImage
 

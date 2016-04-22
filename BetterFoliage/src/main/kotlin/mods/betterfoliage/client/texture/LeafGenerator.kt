@@ -1,8 +1,8 @@
 package mods.betterfoliage.client.texture
 
 import mods.betterfoliage.BetterFoliageMod
-import mods.octarinecore.client.resource.*
-import mods.octarinecore.stripStart
+import mods.octarinelib.client.resource.*
+import mods.octarinelib.stripStart
 import net.minecraft.util.ResourceLocation
 import java.awt.image.BufferedImage
 

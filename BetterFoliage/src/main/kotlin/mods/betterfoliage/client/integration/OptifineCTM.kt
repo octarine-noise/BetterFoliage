@@ -2,9 +2,9 @@ package mods.betterfoliage.client.integration
 
 import mods.betterfoliage.client.Client
 import mods.betterfoliage.loader.Refs
-import mods.octarinecore.ThreadLocalDelegate
-import mods.octarinecore.client.render.BlockContext
-import mods.octarinecore.metaprog.allAvailable
+import mods.octarinelib.ThreadLocalDelegate
+import mods.octarinelib.client.render.BlockContext
+import mods.octarinelib.metaprog.allAvailable
 import net.minecraft.block.state.BlockStateBase
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.renderer.texture.TextureAtlasSprite

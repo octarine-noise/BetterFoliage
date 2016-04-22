@@ -1,9 +1,9 @@
 package mods.betterfoliage.client.texture
 
-import mods.octarinecore.client.resource.resourceManager
-import mods.octarinecore.client.resource.get
-import mods.octarinecore.client.resource.getLines
-import mods.octarinecore.stripStart
+import mods.octarinelib.client.resource.resourceManager
+import mods.octarinelib.client.resource.get
+import mods.octarinelib.client.resource.getLines
+import mods.octarinelib.stripStart
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.util.ResourceLocation
 
