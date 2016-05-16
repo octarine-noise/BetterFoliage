@@ -64,6 +64,8 @@ object Refs {
     val model_WPW = FieldRef(WeightedPartWrapper, "model", IModel)
     val WeightedRandomModel = ClassRef("net.minecraftforge.client.model.ModelLoader\$WeightedRandomModel")
     val models_WRM = FieldRef(WeightedRandomModel, "models", List)
+    val MultiModel = ClassRef("net.minecraftforge.client.model.MultiModel")
+    val base_MM = FieldRef(MultiModel, "base", IModel)
 
     // Better Foliage
     val BetterFoliageHooks = ClassRef("mods.betterfoliage.client.Hooks")
