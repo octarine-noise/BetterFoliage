@@ -13,9 +13,9 @@ import net.minecraftforge.fml.relauncher.SideOnly
 private fun featureEnable() = boolean(true).lang("enabled")
 private fun distanceLimit() = int(min=1, max=1000, default=1000).lang("distance")
 fun biomeList(defaults: (BiomeGenBase) -> Boolean) = intList {
-    BiomeGenBase.biomeRegistry
+    BiomeGenBase.REGISTRY
         .filter { it != null && defaults(it) }
-        .map { BiomeGenBase.biomeRegistry.getIDForObject(it) }
+        .map { BiomeGenBase.REGISTRY.getIDForObject(it) }
         .toTypedArray()
 }.apply { guiClass = BiomeListConfigEntry::class.java }
 

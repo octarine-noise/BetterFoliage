@@ -20,11 +20,11 @@ import org.apache.logging.log4j.Level.INFO
 object ShadersModIntegration {
 
     @JvmStatic var isPresent = false
-    @JvmStatic val tallGrassEntityData = entityDataFor(Blocks.tallgrass.defaultState.withProperty(BlockTallGrass.TYPE, BlockTallGrass.EnumType.GRASS))
-    @JvmStatic val leavesEntityData = entityDataFor(Blocks.leaves.defaultState)
+    @JvmStatic val tallGrassEntityData = entityDataFor(Blocks.TALLGRASS.defaultState.withProperty(BlockTallGrass.TYPE, BlockTallGrass.EnumType.GRASS))
+    @JvmStatic val leavesEntityData = entityDataFor(Blocks.LEAVES.defaultState)
 
     fun entityDataFor(blockState: IBlockState) =
-        (Block.blockRegistry.getIDForObject(blockState.block).toLong() and 65535) or
+        (Block.REGISTRY.getIDForObject(blockState.block).toLong() and 65535) or
         ((blockState.renderType.ordinal.toLong() and 65535) shl 16) or
         (blockState.block.getMetaFromState(blockState).toLong() shl 32)
 

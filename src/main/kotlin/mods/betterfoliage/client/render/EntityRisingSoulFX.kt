@@ -23,7 +23,7 @@ AbstractEntityFX(world, pos.x.toDouble() + 0.5, pos.y.toDouble() + 1.0, pos.z.to
     val initialPhase = rand.nextInt(64)
 
     init {
-        ySpeed = 0.1
+        motionY = 0.1
         particleGravity = 0.0f
         particleTexture = RisingSoulTextures.headIcons[rand.nextInt(256)]
         particleMaxAge = MathHelper.floor_double((0.6 + 0.4 * rand.nextDouble()) * Config.risingSoul.lifetime * 20.0)

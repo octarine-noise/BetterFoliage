@@ -25,10 +25,10 @@ abstract class AbstractEntityFX(world: World, x: Double, y: Double, z: Double) :
         super.onUpdate()
         currentPos.setTo(posX, posY, posZ)
         prevPos.setTo(prevPosX, prevPosY, prevPosZ)
-        velocity.setTo(xSpeed, ySpeed, zSpeed)
+        velocity.setTo(motionX, motionY, motionZ)
         update()
         posX = currentPos.x; posY = currentPos.y; posZ = currentPos.z;
-        xSpeed = velocity.x; ySpeed = velocity.y; zSpeed = velocity.z;
+        motionX = velocity.x; motionY = velocity.y; motionZ = velocity.z;
     }
 
     /** Render the particle. */

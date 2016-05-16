@@ -38,7 +38,7 @@ AbstractEntityFX(world, pos.x.toDouble() + 0.5, pos.y.toDouble(), pos.z.toDouble
 
     init {
         particleMaxAge = MathHelper.floor_double(random(0.6, 1.0) * Config.fallingLeaves.lifetime * 20.0)
-        ySpeed = -Config.fallingLeaves.speed
+        motionY = -Config.fallingLeaves.speed
         particleScale = Config.fallingLeaves.size.toFloat() * 0.1f
 
         val state = world.getBlockState(pos)

@@ -117,7 +117,7 @@ class SimplexNoise() : IWorldLoadListener {
     var noise = NoiseGeneratorSimplex()
     override fun onWorldLoad(world: World) { noise = NoiseGeneratorSimplex(Random(world.worldInfo.seed))
     }
-    operator fun get(x: Int, z: Int) = MathHelper.floor_double((noise.func_151605_a(x.toDouble(), z.toDouble()) + 1.0) * 32.0)
+    operator fun get(x: Int, z: Int) = MathHelper.floor_double((noise.getValue(x.toDouble(), z.toDouble()) + 1.0) * 32.0)
     operator fun get(pos: Int3) = get(pos.x, pos.z)
     operator fun get(pos: BlockPos) = get(pos.x, pos.z)
 }

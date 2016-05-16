@@ -33,7 +33,7 @@ abstract class ModelDataInspector {
     @Suppress("UNCHECKED_CAST")
     @SubscribeEvent
     fun handleLoadModelData(event: LoadModelDataEvent) {
-        val stateMappings = Block.blockRegistry.flatMap { block ->
+        val stateMappings = Block.REGISTRY.flatMap { block ->
             ((event.loader.blockModelShapes.blockStateMapper.blockStateMap[block] as? IStateMapper ?: DefaultStateMapper())
                 .putStateModelLocations(block as Block) as Map<IBlockState, ModelResourceLocation>).entries
         }

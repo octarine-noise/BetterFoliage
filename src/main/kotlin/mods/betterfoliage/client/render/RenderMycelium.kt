@@ -26,7 +26,7 @@ class RenderMycelium : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
 
     override fun isEligible(ctx: BlockContext): Boolean {
         if (!Config.enabled || !Config.shortGrass.myceliumEnabled) return false
-        return ctx.block == Blocks.mycelium &&
+        return ctx.block == Blocks.MYCELIUM &&
         ctx.cameraDistance < Config.shortGrass.distance
     }
 

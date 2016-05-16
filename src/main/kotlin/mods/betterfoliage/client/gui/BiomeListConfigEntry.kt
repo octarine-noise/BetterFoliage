@@ -13,7 +13,7 @@ class BiomeListConfigEntry(
     configElement: IConfigElement)
 : IdListConfigEntry<BiomeGenBase>(owningScreen, owningEntryList, configElement) {
 
-    override val baseSet: List<BiomeGenBase> get() = BiomeGenBase.biomeRegistry.filterNotNull()
-    override val BiomeGenBase.itemId: Int get() = BiomeGenBase.biomeRegistry.getIDForObject(this)
+    override val baseSet: List<BiomeGenBase> get() = BiomeGenBase.REGISTRY.filterNotNull()
+    override val BiomeGenBase.itemId: Int get() = BiomeGenBase.REGISTRY.getIDForObject(this)
     override val BiomeGenBase.itemName: String get() = this.biomeName
 }

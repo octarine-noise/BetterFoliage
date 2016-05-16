@@ -49,7 +49,7 @@ fun getUseNeighborBrightnessOverride(original: Boolean, state: IBlockState): Boo
 fun onRandomDisplayTick(world: World, state: IBlockState, pos: BlockPos) {
     if (Config.enabled &&
         Config.risingSoul.enabled &&
-        state.block == Blocks.soul_sand &&
+        state.block == Blocks.SOUL_SAND &&
         world.isAirBlock(pos + up1) &&
         Math.random() < Config.risingSoul.chance) {
             EntityRisingSoulFX(world, pos).addIfValid()

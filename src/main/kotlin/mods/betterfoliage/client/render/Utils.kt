@@ -24,7 +24,7 @@ val denseLeavesRot = arrayOf(Rotation.identity, Rotation.rot90[EAST.ordinal], Ro
 val whitewash: RenderVertex.(ShadingContext, Int, Quad, Int, Vertex)->Unit = { ctx, qi, q, vi, v -> setGrey(1.4f) }
 val greywash: RenderVertex.(ShadingContext, Int, Quad, Int, Vertex)->Unit = { ctx, qi, q, vi, v -> setGrey(1.0f) }
 
-val IBlockState.isSnow: Boolean get() = material.let { it == Material.snow || it == Material.craftedSnow }
+val IBlockState.isSnow: Boolean get() = material.let { it == Material.SNOW || it == Material.CRAFTED_SNOW }
 
 fun Quad.toCross(rotAxis: EnumFacing, trans: (Quad)->Quad) =
     (0..3).map { rotIdx ->

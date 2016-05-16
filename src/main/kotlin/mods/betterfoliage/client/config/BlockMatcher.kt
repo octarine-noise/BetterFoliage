@@ -34,7 +34,7 @@ class BlockMatcher(val domain: String, val path: String) : ConfigPropertyBase() 
         whiteList.forEach { if (it.isAssignableFrom(blockClass)) return true }
         return false
     }
-    fun matchesID(block: Block) = blockIDs.contains(Block.blockRegistry.getIDForObject(block))
+    fun matchesID(block: Block) = blockIDs.contains(Block.REGISTRY.getIDForObject(block))
     fun matchesID(blockId: Int) = blockIDs.contains(blockId)
 
     override fun attach(target: Configuration, langPrefix: String, categoryName: String, propertyName: String) {
@@ -59,8 +59,8 @@ class BlockMatcher(val domain: String, val path: String) : ConfigPropertyBase() 
 
     fun updateIDs() {
         blockIDs.clear()
-        Block.blockRegistry.forEach {
-            if (matchesClass(it as Block)) blockIDs.add(Block.blockRegistry.getIDForObject(it))
+        Block.REGISTRY.forEach {
+            if (matchesClass(it as Block)) blockIDs.add(Block.REGISTRY.getIDForObject(it))
         }
     }
 
