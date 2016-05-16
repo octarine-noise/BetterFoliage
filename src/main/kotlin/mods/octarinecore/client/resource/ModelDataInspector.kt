@@ -110,6 +110,9 @@ val IModel.modelBlockAndLoc: Pair<ModelBlock, ResourceLocation>? get() {
             it.modelBlockAndLoc.let { if (it != null) return it }
         }
     }
+    else if (Refs.MultiModel.isInstance(this)) Refs.base_MM.get(this)?.let {
+        return (it as IModel).modelBlockAndLoc
+    }
     return null
 }
 
