@@ -3,6 +3,7 @@ package mods.betterfoliage.loader
 import mods.octarinecore.metaprog.ClassRef
 import mods.octarinecore.metaprog.FieldRef
 import mods.octarinecore.metaprog.MethodRef
+import mods.octarinecore.metaprog.array
 import net.minecraftforge.fml.relauncher.FMLInjectionData
 
 /** Singleton object holding references to foreign code elements. */
@@ -90,8 +91,11 @@ object Refs {
     val CTtileProperties = FieldRef(ConnectedTextures, "tileProperties", null)
 
     val ConnectedProperties = ClassRef("ConnectedProperties")
+    val MatchBlock = ClassRef("MatchBlock")
     val CPtileIcons = FieldRef(ConnectedProperties, "tileIcons", null)
-    val CPmatchesBlock = MethodRef(ConnectedProperties, "matchesBlock", ClassRef.boolean, BlockStateBase)
+    val CPMatchBlocks = FieldRef(ConnectedProperties, "matchBlocks", MatchBlock.array())
+    val Matches = ClassRef("Matches")
+    val matchesBlock = MethodRef(Matches, "block", ClassRef.boolean, BlockStateBase, MatchBlock.array())
     val CPmatchesIcon = MethodRef(ConnectedProperties, "matchesIcon", ClassRef.boolean, TextureAtlasSprite)
 
     // ShadersMod

@@ -89,6 +89,14 @@ class ClassRefPrimitive(name: String, val clazz: Class<*>?) : ClassRef(name) {
     override fun resolve() = clazz
 }
 
+class ClassRefArray(mcpName: String, obfName: String) : ClassRef(mcpName, obfName) {
+    constructor(mcpName: String) : this(mcpName, mcpName)
+    override fun asmDescriptor(namespace: Namespace) = "[" + super.asmDescriptor(namespace)
+    override fun resolve() = listOf(mcpName, obfName).map { getJavaClass("[L$it;") }.filterNotNull().firstOrNull()
+}
+
+fun ClassRef.array() = ClassRefArray(mcpName, obfName)
+
 /**
  * Reference to a method.
  *
