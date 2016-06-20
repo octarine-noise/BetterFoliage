@@ -1,7 +1,7 @@
 package mods.betterfoliage.client.gui
 
 import mods.octarinecore.client.gui.IdListConfigEntry
-import net.minecraft.world.biome.BiomeGenBase
+import net.minecraft.world.biome.Biome
 import net.minecraftforge.fml.client.config.GuiConfig
 import net.minecraftforge.fml.client.config.GuiConfigEntries
 import net.minecraftforge.fml.client.config.IConfigElement
@@ -11,9 +11,9 @@ class BiomeListConfigEntry(
     owningScreen: GuiConfig,
     owningEntryList: GuiConfigEntries,
     configElement: IConfigElement)
-: IdListConfigEntry<BiomeGenBase>(owningScreen, owningEntryList, configElement) {
+: IdListConfigEntry<Biome>(owningScreen, owningEntryList, configElement) {
 
-    override val baseSet: List<BiomeGenBase> get() = BiomeGenBase.REGISTRY.filterNotNull()
-    override val BiomeGenBase.itemId: Int get() = BiomeGenBase.REGISTRY.getIDForObject(this)
-    override val BiomeGenBase.itemName: String get() = this.biomeName
+    override val baseSet: List<Biome> get() = Biome.REGISTRY.filterNotNull()
+    override val Biome.itemId: Int get() = Biome.REGISTRY.getIDForObject(this)
+    override val Biome.itemName: String get() = this.biomeName
 }

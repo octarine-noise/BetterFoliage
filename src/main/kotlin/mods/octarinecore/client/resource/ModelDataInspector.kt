@@ -119,7 +119,7 @@ val IModel.modelBlockAndLoc: Pair<ModelBlock, ResourceLocation>? get() {
 fun Pair<ModelBlock, ResourceLocation>.derivesFrom(targetLocation: String): Boolean {
     if (second.stripStart("models/") == ResourceLocation(targetLocation)) return true
     if (first.parent != null && first.parentLocation != null)
-        return Pair(first.parent, first.parentLocation).derivesFrom(targetLocation)
+        return Pair(first.parent, first.parentLocation!!).derivesFrom(targetLocation)
     return false
 }
 

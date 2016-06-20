@@ -3,7 +3,8 @@ package mods.octarinecore.client.resource
 import mods.octarinecore.metaprog.reflectField
 import net.minecraft.client.resources.IResourcePack
 import net.minecraft.client.resources.data.IMetadataSection
-import net.minecraft.client.resources.data.IMetadataSerializer
+import net.minecraft.client.resources.data.IMetadataSectionSerializer
+import net.minecraft.client.resources.data.MetadataSerializer
 import net.minecraft.client.resources.data.PackMetadataSection
 import net.minecraft.util.ResourceLocation
 import net.minecraft.util.text.TextComponentString
@@ -27,8 +28,8 @@ class GeneratorPack(val name: String, vararg val generators: GeneratorBase) : IR
     override fun getPackName() = name
     override fun getPackImage() = null
     override fun getResourceDomains() = HashSet(generators.map { it.domain })
-    override fun <T: IMetadataSection> getPackMetadata(serializer: IMetadataSerializer?, type: String?) =
-        if (type == "pack") PackMetadataSection(TextComponentString("Generated resources"), 1) as? T else null
+    override fun <T : IMetadataSection?> getPackMetadata(serializer: MetadataSerializer?, sectionName: String?) =
+        if (sectionName == "pack") PackMetadataSection(TextComponentString("Generated resources"), 1) as? T else null
 
     override fun resourceExists(location: ResourceLocation?): Boolean =
             if (location == null) false

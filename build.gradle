@@ -2,8 +2,8 @@ apply plugin: "net.minecraftforge.gradle.forge"
 apply plugin: 'kotlin'
 
 group = 'com.github.octarine-noise'
-version = "2.0.11"
-archivesBaseName = rootProject.name + '-MC1.9'
+version = "2.0.12b"
+archivesBaseName = rootProject.name + '-MC1.9.4'
 
 buildscript {
     ext.kotlin_version = '1.0.0'
@@ -19,7 +19,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath "net.minecraftforge.gradle:ForgeGradle:2.1-SNAPSHOT"
+        classpath "net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
@@ -32,8 +32,8 @@ dependencies {
 
 }
 minecraft {
-    version = '1.9-12.16.1.1894'
-    mappings = 'snapshot_20160509'
+    version = '1.9.4-12.17.0.1968'
+    mappings = 'snapshot_20160619'
     runDir = 'run'
 }
 

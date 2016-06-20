@@ -4,7 +4,7 @@ import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.gui.BiomeListConfigEntry
 import mods.octarinecore.common.config.*
 import net.minecraft.client.Minecraft
-import net.minecraft.world.biome.BiomeGenBase
+import net.minecraft.world.biome.Biome
 import net.minecraftforge.fml.client.event.ConfigChangedEvent
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
@@ -12,17 +12,17 @@ import net.minecraftforge.fml.relauncher.SideOnly
 // BetterFoliage-specific property delegates
 private fun featureEnable() = boolean(true).lang("enabled")
 private fun distanceLimit() = int(min=1, max=1000, default=1000).lang("distance")
-fun biomeList(defaults: (BiomeGenBase) -> Boolean) = intList {
-    BiomeGenBase.REGISTRY
+fun biomeList(defaults: (Biome) -> Boolean) = intList {
+    Biome.REGISTRY
         .filter { it != null && defaults(it) }
-        .map { BiomeGenBase.REGISTRY.getIDForObject(it) }
+        .map { Biome.REGISTRY.getIDForObject(it) }
         .toTypedArray()
 }.apply { guiClass = BiomeListConfigEntry::class.java }
 
 // Biome filter methods
-private fun BiomeGenBase.filterTemp(min: Float?, max: Float?) = (min == null || min <= temperature) && (max == null || max >= temperature)
-private fun BiomeGenBase.filterRain(min: Float?, max: Float?) = (min == null || min <= rainfall) && (max == null || max >= rainfall)
-private fun BiomeGenBase.filterClass(vararg name: String) = name.any { it in this.javaClass.name.toLowerCase() }
+private fun Biome.filterTemp(min: Float?, max: Float?) = (min == null || min <= temperature) && (max == null || max >= temperature)
+private fun Biome.filterRain(min: Float?, max: Float?) = (min == null || min <= rainfall) && (max == null || max >= rainfall)
+private fun Biome.filterClass(vararg name: String) = name.any { it in this.javaClass.name.toLowerCase() }
 
 // Config singleton
 @SideOnly(Side.CLIENT)

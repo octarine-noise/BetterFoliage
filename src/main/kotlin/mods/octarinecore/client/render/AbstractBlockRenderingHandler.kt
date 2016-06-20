@@ -17,7 +17,7 @@ import net.minecraft.util.BlockRenderLayer
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.MathHelper
 import net.minecraft.world.IBlockAccess
-import net.minecraft.world.biome.BiomeGenBase
+import net.minecraft.world.biome.Biome
 
 /**
  * [ThreadLocal] instance of [BlockContext] representing the block being rendered.
@@ -83,7 +83,7 @@ class BlockContext() {
     }
 
     /** Get the biome ID at the block position. */
-    val biomeId: Int get() = BiomeGenBase.getIdForBiome(world!!.getBiomeGenForCoords(pos))
+    val biomeId: Int get() = Biome.getIdForBiome(world!!.getBiome(pos))
 
     /** Get the centerpoint of the block being rendered. */
     val blockCenter: Double3 get() = Double3(pos.x + 0.5, pos.y + 0.5, pos.z + 0.5)

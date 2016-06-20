@@ -3,13 +3,13 @@ package mods.octarinecore.client.render
 import mods.octarinecore.PI2
 import mods.octarinecore.common.Double3
 import net.minecraft.client.Minecraft
-import net.minecraft.client.particle.EntityFX
+import net.minecraft.client.particle.Particle
 import net.minecraft.client.renderer.VertexBuffer
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.entity.Entity
 import net.minecraft.world.World
 
-abstract class AbstractEntityFX(world: World, x: Double, y: Double, z: Double) : EntityFX(world, x, y, z) {
+abstract class AbstractEntityFX(world: World, x: Double, y: Double, z: Double) : Particle(world, x, y, z) {
 
     companion object {
         @JvmStatic val sin = Array(64) { idx -> Math.sin(PI2 / 64.0 * idx) }
