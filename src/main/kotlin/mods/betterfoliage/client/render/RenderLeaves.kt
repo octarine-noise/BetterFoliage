@@ -57,7 +57,7 @@ class RenderLeaves : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
                     postProcess = noPost
                 )
             }
-            if (isSnowed) modelRenderer.render(
+            if (isSnowed && Config.leaves.snowEnabled) modelRenderer.render(
                 leavesModel.model,
                 Rotation.identity,
                 ctx.blockCenter + perturbs[rand[0]],
