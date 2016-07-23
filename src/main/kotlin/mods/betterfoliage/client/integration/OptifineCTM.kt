@@ -22,8 +22,12 @@ import org.apache.logging.log4j.Level.INFO
 @SideOnly(Side.CLIENT)
 object OptifineCTM {
 
-    val isAvailable = allAvailable(Refs.ConnectedTextures, Refs.ConnectedProperties, Refs.getConnectedTexture,
-        Refs.CTblockProperties, Refs.CTtileProperties, Refs.CPtileIcons, Refs.CPmatchesBlock, Refs.CPmatchesIcon)
+    val isAvailable = allAvailable(
+        Refs.ConnectedTextures, Refs.ConnectedProperties,
+        Refs.getConnectedTexture,
+        Refs.CTblockProperties, Refs.CTtileProperties,
+        Refs.CPtileIcons, Refs.CPmatchesIcon
+    )
 
     init {
         Client.log(INFO, "Optifine CTM support is ${if (isAvailable) "enabled" else "disabled" }")
@@ -45,7 +49,7 @@ object OptifineCTM {
     /** Get all the CTM [TextureAtlasSprite]s that could possibly be used for this block. */
     fun getAllCTM(state: IBlockState, icon: TextureAtlasSprite): Collection<TextureAtlasSprite> {
         val result = hashSetOf<TextureAtlasSprite>()
-        if (state !is BlockStateBase) return result
+        if (state !is BlockStateBase || !isAvailable) return result
 
         connectedProperties.forEach { cp ->
             if (Refs.CPmatchesBlock.invoke(cp, Refs.getBlockId.invoke(state), Refs.getMetadata.invoke(state)) as Boolean &&
