@@ -1,14 +1,12 @@
 package mods.betterfoliage.client.render
 
 import mods.betterfoliage.client.config.BlockMatcher
+import mods.betterfoliage.client.integration.OptifineCTM
 import mods.betterfoliage.client.render.AbstractRenderColumn.BlockType.*
 import mods.betterfoliage.client.render.AbstractRenderColumn.QuadrantType.*
 import mods.octarinecore.client.render.*
 import mods.octarinecore.client.resource.BlockTextureInspector
-import mods.octarinecore.common.Int3
-import mods.octarinecore.common.Rotation
-import mods.octarinecore.common.face
-import mods.octarinecore.common.rot
+import mods.octarinecore.common.*
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.renderer.BlockRendererDispatcher
 import net.minecraft.client.renderer.WorldRenderer
@@ -18,18 +16,34 @@ import net.minecraft.util.EnumFacing
 import net.minecraft.util.EnumFacing.*
 import net.minecraft.util.EnumWorldBlockLayer
 
-data class ColumnInfo(val topTexture: TextureAtlasSprite,
-                      val bottomTexture: TextureAtlasSprite,
-                      val sideTexture: TextureAtlasSprite)
+interface ColumnTextureResolver {
+    val top: (ShadingContext, Int, Quad)->TextureAtlasSprite?
+    val bottom: (ShadingContext, Int, Quad)->TextureAtlasSprite?
+    val side: (ShadingContext, Int, Quad)->TextureAtlasSprite?
+}
 
-open class ColumnTextures(val matcher: BlockMatcher) : BlockTextureInspector<ColumnInfo>() {
+data class StaticColumnInfo(val topTexture: TextureAtlasSprite,
+                            val bottomTexture: TextureAtlasSprite,
+                            val sideTexture: TextureAtlasSprite) : ColumnTextureResolver {
+    override val top = { ctx: ShadingContext, idx: Int, quad: Quad ->
+        OptifineCTM.override(topTexture, blockContext, UP.rotate(ctx.rotation))
+    }
+    override val bottom = { ctx: ShadingContext, idx: Int, quad: Quad ->
+        OptifineCTM.override(bottomTexture, blockContext, DOWN.rotate(ctx.rotation))
+    }
+    override val side = { ctx: ShadingContext, idx: Int, quad: Quad ->
+        OptifineCTM.override(sideTexture, blockContext, (if ((idx and 1) == 0) SOUTH else EAST).rotate(ctx.rotation))
+    }
+}
+
+open class ColumnTextures(val matcher: BlockMatcher) : BlockTextureInspector<StaticColumnInfo>() {
     init {
         matchClassAndModel(matcher, "block/column_side", listOf("end", "end", "side"))
         matchClassAndModel(matcher, "block/cube_column", listOf("end", "end", "side"))
         matchClassAndModel(matcher, "block/cube_all", listOf("all", "all", "all"))
     }
     override fun processTextures(state: IBlockState, textures: List<TextureAtlasSprite>, atlas: TextureMap) =
-        ColumnInfo(textures[0], textures[1], textures[2])
+        StaticColumnInfo(textures[0], textures[1], textures[2])
 }
 
 /** Index of SOUTH-EAST quadrant. */
@@ -120,13 +134,13 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
     abstract val axisFunc: (IBlockState)->EnumFacing.Axis?
     abstract val blockPredicate: (IBlockState)->Boolean
 
-    abstract val sideTexture: (ShadingContext, Int, Quad)->TextureAtlasSprite?
-    abstract val upTexture: (ShadingContext, Int, Quad)->TextureAtlasSprite?
-    abstract val downTexture: (ShadingContext, Int, Quad)->TextureAtlasSprite?
+    abstract fun resolver(ctx: BlockContext): ColumnTextureResolver?
 
     @Suppress("NON_EXHAUSTIVE_WHEN")
     override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: WorldRenderer, layer: EnumWorldBlockLayer): Boolean {
         if (ctx.isSurroundedBy(surroundPredicate) ) return false
+
+        val columnTextures = resolver(ctx) ?: return false
 
         // get AO data
         modelRenderer.updateShading(Int3.zero, allFaces)
@@ -170,7 +184,7 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
                 sideModel,
                 rotation,
                 blockContext.blockCenter,
-                icon = sideTexture,
+                icon = columnTextures.side,
                 rotateUV = { 0 },
                 postProcess = noPost
             )
@@ -178,8 +192,8 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
             // render top and bottom end of current quadrant
             var upModel: Model? = null
             var downModel: Model? = null
-            var upIcon = upTexture
-            var downIcon = downTexture
+            var upIcon = columnTextures.top
+            var downIcon = columnTextures.bottom
             var shouldRotateUp = true
             var shouldRotateDown = true
 
@@ -189,7 +203,7 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
                     if (!connectPerpendicular) {
                         upModel = flatTop(quadrants[idx])
                     } else {
-                        upIcon = sideTexture
+                        upIcon = columnTextures.side
                         upModel = extendTop(quadrants[idx])
                         shouldRotateUp = false
                     }
@@ -208,7 +222,7 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
                     if (!connectPerpendicular) {
                         downModel = flatBottom(quadrants[idx])
                     } else {
-                        downIcon = sideTexture
+                        downIcon = columnTextures.side
                         downModel = extendBottom(quadrants[idx])
                         shouldRotateDown = false
                     }
