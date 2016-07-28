@@ -67,7 +67,7 @@ class RenderLeaves : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
                     }
                 )
             }
-            if (isSnowed) modelRenderer.render(
+            if (isSnowed && Config.leaves.snowEnabled) modelRenderer.render(
                 renderer,
                 leavesModel.model,
                 Rotation.identity,

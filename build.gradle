@@ -2,11 +2,11 @@ apply plugin: "net.minecraftforge.gradle.forge"
 apply plugin: 'kotlin'
 
 group = 'com.github.octarine-noise'
-version = "2.0.13"
+version = "2.0.14"
 archivesBaseName = rootProject.name + '-MC1.10'
 
 buildscript {
-    ext.kotlin_version = '1.0.0'
+    ext.kotlin_version = '1.0.2'
     repositories {
         mavenCentral()
         maven {
@@ -29,7 +29,7 @@ configurations {
 }
 dependencies {
     shade "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-
+    shade "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 }
 minecraft {
     version = '1.10-12.18.0.2000-1.10.0'
@@ -65,12 +65,6 @@ jar {
         }
     }
     exclude "optifine"
-}
-
-reobf {
-    jar {
-        extraLines "PK: kotlin mods/octarinecore/kotlin"
-    }
 }
 
 repositories {

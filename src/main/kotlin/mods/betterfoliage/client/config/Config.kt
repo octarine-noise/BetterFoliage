@@ -43,6 +43,7 @@ object Config : DelegatingConfig(BetterFoliageMod.MOD_ID, BetterFoliageMod.DOMAI
 
     object leaves {
         val enabled by featureEnable()
+        val snowEnabled by boolean(true)
         val distance by distanceLimit()
         val hOffset by double(max=0.4, default=0.2).lang("hOffset")
         val vOffset by double(max=0.4, default=0.1).lang("vOffset")

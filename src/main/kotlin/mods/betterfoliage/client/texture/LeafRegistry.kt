@@ -48,6 +48,7 @@ object LeafRegistry : BlockTextureInspector<TextureAtlasSprite>() {
     init {
         matchClassAndModel(Config.blocks.leaves, "minecraft:block/leaves", listOf("all"))
         matchClassAndModel(Config.blocks.leaves, "minecraft:block/cube_all", listOf("all"))
+        matchClassAndModel(Config.blocks.leaves, "biomesoplenty:block/leaves_overlay", listOf("under"))
     }
 
     operator fun get(state: IBlockState, world: IBlockAccess, pos: BlockPos, face: EnumFacing): LeafInfo? {

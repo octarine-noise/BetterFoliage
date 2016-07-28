@@ -42,6 +42,8 @@ class RenderLog : AbstractRenderColumn(BetterFoliageMod.MOD_ID) {
         }
     }
 
+    override fun resolver(ctx: BlockContext): ColumnTextureResolver? = columnTextures[ctx.blockState(Int3.zero)]
+
     override val blockPredicate = { state: IBlockState -> Config.blocks.logs.matchesID(state.block) }
     override val surroundPredicate = { state: IBlockState -> state.isOpaqueCube && !Config.blocks.logs.matchesID(state.block) }
 
@@ -51,21 +53,4 @@ class RenderLog : AbstractRenderColumn(BetterFoliageMod.MOD_ID) {
     override val radiusLarge: Double get() = Config.roundLogs.radiusLarge
     override val radiusSmall: Double get() = Config.roundLogs.radiusSmall
 
-    override val downTexture = { ctx: ShadingContext, idx: Int, quad: Quad ->
-        columnTextures[ctx.blockData(Int3.zero).state]?.bottomTexture?.let { base ->
-            OptifineCTM.override(base, blockContext, DOWN.rotate(ctx.rotation))
-        }
-    }
-
-    override val sideTexture = { ctx: ShadingContext, idx: Int, quad: Quad ->
-        columnTextures[ctx.blockData(Int3.zero).state]?.sideTexture?.let { base ->
-            OptifineCTM.override(base, blockContext, (if ((idx and 1) == 0) SOUTH else EAST).rotate(ctx.rotation))
-        }
-    }
-
-    override val upTexture = { ctx: ShadingContext, idx: Int, quad: Quad ->
-        columnTextures[ctx.blockData(Int3.zero).state]?.topTexture?.let { base ->
-            OptifineCTM.override(base, blockContext, UP.rotate(ctx.rotation))
-        }
-    }
 }

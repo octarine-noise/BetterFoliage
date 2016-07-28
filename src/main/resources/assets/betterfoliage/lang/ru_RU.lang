@@ -210,4 +210,4 @@ betterfoliage.roundLogs.radiusLarge.tooltip=Радиус среза внешне
 betterfoliage.roundLogs.dimming=Затемнение
 betterfoliage.roundLogs.dimming.tooltip=Затемнить неясные длинные грани.
 betterfoliage.roundLogs.zProtection=Z-Защита
-betterfoliage.roundLogs.zProtection.tooltip=Для масштабирования параллельных битов соединения журнала, чтобы остановить Z-бой (мерцание). Попробуйте установить его как можно выше, для устранения мерцания.
+betterfoliage.roundLogs.zProtection.tooltip=Для масштабирования параллельных битов соединения бревен, чтобы остановить Z-бой (мерцание). Попробуйте установить его как можно выше, для устранения мерцания.
