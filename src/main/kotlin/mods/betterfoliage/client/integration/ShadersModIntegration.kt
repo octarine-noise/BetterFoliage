@@ -46,11 +46,11 @@ object ShadersModIntegration {
         }
     }
 
-    /** Quads rendered inside this block will behave as tallgrass blocks in shader programs. */
-    inline fun grass(renderer: VertexBuffer, enabled: Boolean = true, func: ()->Unit) {
+    /** Quads rendered inside this block will use the given block entity data in shader programs. */
+    inline fun renderAs(blockEntityData: Long, renderer: VertexBuffer, enabled: Boolean = true, func: ()->Unit) {
         if ((isPresent && enabled)) {
             val vertexBuilder = Refs.sVertexBuilder.get(renderer)!!
-            Refs.pushEntity_num.invoke(vertexBuilder, tallGrassEntityData)
+            Refs.pushEntity_num.invoke(vertexBuilder, blockEntityData)
             func()
             Refs.popEntity.invoke(vertexBuilder)
         } else {
@@ -58,15 +58,15 @@ object ShadersModIntegration {
         }
     }
 
+    /** Quads rendered inside this block will use the given block entity data in shader programs. */
+    inline fun renderAs(state: IBlockState, renderer: VertexBuffer, enabled: Boolean = true, func: ()->Unit) =
+        renderAs(entityDataFor(state), renderer, enabled, func)
+
+    /** Quads rendered inside this block will behave as tallgrass blocks in shader programs. */
+    inline fun grass(renderer: VertexBuffer, enabled: Boolean = true, func: ()->Unit) =
+        renderAs(tallGrassEntityData, renderer, enabled, func)
+
     /** Quads rendered inside this block will behave as leaf blocks in shader programs. */
-    inline fun leaves(renderer: VertexBuffer, enabled: Boolean = true, func: ()->Unit) {
-        if ((isPresent && enabled)) {
-            val vertexBuilder = Refs.sVertexBuilder.get(renderer)!!
-            Refs.pushEntity_num.invoke(vertexBuilder, leavesEntityData.toLong())
-            func()
-            Refs.popEntity.invoke(vertexBuilder)
-        } else {
-            func()
-        }
-    }
+    inline fun leaves(renderer: VertexBuffer, enabled: Boolean = true, func: ()->Unit) =
+        renderAs(leavesEntityData, renderer, enabled, func)
 }

@@ -64,18 +64,21 @@ class RenderGrass : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
             modelRenderer.updateShading(Int3.zero, allFaces)
 
             // render full grass block
-            modelRenderer.render(
-                renderer,
-                fullCube,
-                Rotation.identity,
-                ctx.blockCenter,
-                icon =  { ctx, qi, q -> grassTopTexture },
-                postProcess = { ctx, qi, q, vi, v ->
-                    rotateUV(2)
-                    if (isSnowed) { if(!ctx.aoEnabled) setGrey(1.4f) }
-                    else if (ctx.aoEnabled) multiplyColor(blockColor)
-                }
-            )
+            ShadersModIntegration.renderAs(ctx.blockState(Int3.zero), renderer) {
+                modelRenderer.render(
+                    renderer,
+                    fullCube,
+                    Rotation.identity,
+                    ctx.blockCenter,
+                    icon = { ctx, qi, q -> grassTopTexture },
+                    postProcess = { ctx, qi, q, vi, v ->
+                        rotateUV(2)
+                        if (isSnowed) {
+                            if (!ctx.aoEnabled) setGrey(1.4f)
+                        } else if (ctx.aoEnabled) multiplyColor(blockColor)
+                    }
+                )
+            }
         } else {
             renderWorldBlockBase(ctx, dispatcher, renderer, null)
 

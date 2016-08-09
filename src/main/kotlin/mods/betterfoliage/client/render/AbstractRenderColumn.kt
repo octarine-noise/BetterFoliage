@@ -2,6 +2,7 @@ package mods.betterfoliage.client.render
 
 import mods.betterfoliage.client.config.BlockMatcher
 import mods.betterfoliage.client.integration.OptifineCTM
+import mods.betterfoliage.client.integration.ShadersModIntegration
 import mods.betterfoliage.client.render.AbstractRenderColumn.BlockType.*
 import mods.betterfoliage.client.render.AbstractRenderColumn.QuadrantType.*
 import mods.octarinecore.client.render.*
@@ -158,110 +159,111 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
         val quadrantsBottom = Array(4) { SMALL_RADIUS }
         if (downType == PARALLEL) quadrantsBottom.checkNeighbors(ctx, baseRotation, logAxis, -1)
 
-        quadrantRotations.forEachIndexed { idx, quadrantRotation ->
-            // set rotation for the current quadrant
-            val rotation = baseRotation + quadrantRotation
+        ShadersModIntegration.renderAs(ctx.blockState(Int3.zero), renderer) {
+            quadrantRotations.forEachIndexed { idx, quadrantRotation ->
+                // set rotation for the current quadrant
+                val rotation = baseRotation + quadrantRotation
 
-            // disallow sharp discontinuities in the chamfer radius, or tapering-in where inappropriate
-            if (quadrants[idx] == LARGE_RADIUS &&
-                upType == PARALLEL && quadrantsTop[idx] != LARGE_RADIUS &&
-                downType == PARALLEL && quadrantsBottom[idx] != LARGE_RADIUS) {
-                quadrants[idx] = SMALL_RADIUS
-            }
+                // disallow sharp discontinuities in the chamfer radius, or tapering-in where inappropriate
+                if (quadrants[idx] == LARGE_RADIUS &&
+                    upType == PARALLEL && quadrantsTop[idx] != LARGE_RADIUS &&
+                    downType == PARALLEL && quadrantsBottom[idx] != LARGE_RADIUS) {
+                    quadrants[idx] = SMALL_RADIUS
+                }
 
-            // render side of current quadrant
-            val sideModel = when (quadrants[idx]) {
-                SMALL_RADIUS -> sideRoundSmall.model
-                LARGE_RADIUS -> if (upType == PARALLEL && quadrantsTop[idx] == SMALL_RADIUS) transitionTop.model
+                // render side of current quadrant
+                val sideModel = when (quadrants[idx]) {
+                    SMALL_RADIUS -> sideRoundSmall.model
+                    LARGE_RADIUS -> if (upType == PARALLEL && quadrantsTop[idx] == SMALL_RADIUS) transitionTop.model
                     else if (downType == PARALLEL && quadrantsBottom[idx] == SMALL_RADIUS) transitionBottom.model
                     else sideRoundLarge.model
-                SQUARE -> sideSquare.model
-                else -> null
-            }
-
-            if (sideModel != null) modelRenderer.render(
-                renderer,
-                sideModel,
-                rotation,
-                blockContext.blockCenter,
-                icon = columnTextures.side,
-                postProcess = noPost
-            )
-
-            // render top and bottom end of current quadrant
-            var upModel: Model? = null
-            var downModel: Model? = null
-            var upIcon = columnTextures.top
-            var downIcon = columnTextures.bottom
-            var isLidUp = true
-            var isLidDown = true
-
-            when (upType) {
-                NONSOLID -> upModel = flatTop(quadrants[idx])
-                PERPENDICULAR -> {
-                    if (!connectPerpendicular) {
-                        upModel = flatTop(quadrants[idx])
-                    } else {
-                        upIcon = columnTextures.side
-                        upModel = extendTop(quadrants[idx])
-                        isLidUp = false
-                    }
+                    SQUARE -> sideSquare.model
+                    else -> null
                 }
-                PARALLEL -> {
-                    if (!continous(quadrants[idx], quadrantsTop[idx])) {
-                        if (quadrants[idx] == SQUARE || quadrants[idx] == INVISIBLE) {
-                            upModel = topSquare.model
+
+                if (sideModel != null) modelRenderer.render(
+                    renderer,
+                    sideModel,
+                    rotation,
+                    blockContext.blockCenter,
+                    icon = columnTextures.side,
+                    postProcess = noPost
+                )
+
+                // render top and bottom end of current quadrant
+                var upModel: Model? = null
+                var downModel: Model? = null
+                var upIcon = columnTextures.top
+                var downIcon = columnTextures.bottom
+                var isLidUp = true
+                var isLidDown = true
+
+                when (upType) {
+                    NONSOLID -> upModel = flatTop(quadrants[idx])
+                    PERPENDICULAR -> {
+                        if (!connectPerpendicular) {
+                            upModel = flatTop(quadrants[idx])
+                        } else {
+                            upIcon = columnTextures.side
+                            upModel = extendTop(quadrants[idx])
+                            isLidUp = false
+                        }
+                    }
+                    PARALLEL -> {
+                        if (!continous(quadrants[idx], quadrantsTop[idx])) {
+                            if (quadrants[idx] == SQUARE || quadrants[idx] == INVISIBLE) {
+                                upModel = topSquare.model
+                            }
                         }
                     }
                 }
-            }
-            when (downType) {
-                NONSOLID -> downModel = flatBottom(quadrants[idx])
-                PERPENDICULAR -> {
-                    if (!connectPerpendicular) {
-                        downModel = flatBottom(quadrants[idx])
-                    } else {
-                        downIcon = columnTextures.side
-                        downModel = extendBottom(quadrants[idx])
-                        isLidDown = false
+                when (downType) {
+                    NONSOLID -> downModel = flatBottom(quadrants[idx])
+                    PERPENDICULAR -> {
+                        if (!connectPerpendicular) {
+                            downModel = flatBottom(quadrants[idx])
+                        } else {
+                            downIcon = columnTextures.side
+                            downModel = extendBottom(quadrants[idx])
+                            isLidDown = false
+                        }
+                    }
+                    PARALLEL -> {
+                        if (!continous(quadrants[idx], quadrantsBottom[idx]) &&
+                            (quadrants[idx] == SQUARE || quadrants[idx] == INVISIBLE)) {
+                            downModel = bottomSquare.model
+                        }
                     }
                 }
-                PARALLEL -> {
-                    if (!continous(quadrants[idx], quadrantsBottom[idx]) &&
-                        (quadrants[idx] == SQUARE || quadrants[idx] == INVISIBLE)) {
-                        downModel = bottomSquare.model
-                    }
-                }
-            }
 
-            if (upModel != null) modelRenderer.render(
-                renderer,
-                upModel,
-                rotation,
-                blockContext.blockCenter,
-                icon = upIcon,
-                postProcess = { ctx, qi, q, vi, v ->
-                    if (isLidUp) {
-                        rotateUV(idx + if (logAxis == Axis.X) 1 else 0)
-                        if (logAxis == Axis.X) mirrorUV(true, true)
+                if (upModel != null) modelRenderer.render(
+                    renderer,
+                    upModel,
+                    rotation,
+                    blockContext.blockCenter,
+                    icon = upIcon,
+                    postProcess = { ctx, qi, q, vi, v ->
+                        if (isLidUp) {
+                            rotateUV(idx + if (logAxis == Axis.X) 1 else 0)
+                            if (logAxis == Axis.X) mirrorUV(true, true)
+                        }
                     }
-                }
-            )
-            if (downModel != null) modelRenderer.render(
-                renderer,
-                downModel,
-                rotation,
-                blockContext.blockCenter,
-                icon = downIcon,
-                postProcess = { ctx, qi, q, vi, v ->
-                    if (isLidDown) {
-                        rotateUV((if (logAxis == Axis.X) 0 else 3) - idx)
-                        if (logAxis != Axis.Y) mirrorUV(true, true)
+                )
+                if (downModel != null) modelRenderer.render(
+                    renderer,
+                    downModel,
+                    rotation,
+                    blockContext.blockCenter,
+                    icon = downIcon,
+                    postProcess = { ctx, qi, q, vi, v ->
+                        if (isLidDown) {
+                            rotateUV((if (logAxis == Axis.X) 0 else 3) - idx)
+                            if (logAxis != Axis.Y) mirrorUV(true, true)
+                        }
                     }
-                }
-            )
+                )
+            }
         }
-
         return true
     }
 
