@@ -2,6 +2,7 @@ package mods.betterfoliage.client.render
 
 import mods.betterfoliage.client.config.Config
 import mods.betterfoliage.client.texture.LeafRegistry
+import mods.betterfoliage.client.texture.defaultLeafColor
 import mods.octarinecore.PI2
 import mods.octarinecore.client.render.AbstractEntityFX
 import mods.octarinecore.client.render.HSB
@@ -42,9 +43,14 @@ AbstractEntityFX(world, pos.x.toDouble() + 0.5, pos.y.toDouble(), pos.z.toDouble
         particleScale = Config.fallingLeaves.size.toFloat() * 0.1f
 
         val state = world.getBlockState(pos)
-        LeafRegistry[state, world, pos, DOWN]?.let {
-            particleTexture = it.particleTextures[rand.nextInt(1024)]
-            calculateParticleColor(it.averageColor, Minecraft.getMinecraft().blockColors.colorMultiplier(state, world, pos, 0))
+        val blockColor = Minecraft.getMinecraft().blockColors.colorMultiplier(state, world, pos, 0)
+        val leafInfo = LeafRegistry.get(state, world, pos, DOWN)
+        if (leafInfo != null) {
+            particleTexture = leafInfo.particleTextures?.get(rand.nextInt(1024))
+            calculateParticleColor(leafInfo.averageColor, blockColor)
+        } else {
+            particleTexture = LeafRegistry.particles["default"]?.get(rand.nextInt(1024))
+            setColor(blockColor)
         }
     }
 

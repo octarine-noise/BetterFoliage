@@ -41,14 +41,14 @@ class RenderLeaves : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
         Config.enabled &&
         Config.leaves.enabled &&
         ctx.cameraDistance < Config.leaves.distance &&
-        Config.blocks.leaves.matchesID(ctx.block)
+        LeafRegistry[ctx, DOWN] != null
 
     override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: VertexBuffer, layer: BlockRenderLayer): Boolean {
         val isSnowed = ctx.blockState(up1).material.let {
             it == Material.SNOW || it == Material.CRAFTED_SNOW
         }
         renderWorldBlockBase(ctx, dispatcher, renderer, null)
-        val leafInfo = LeafRegistry[ctx, DOWN] ?: return false
+        val leafInfo = LeafRegistry[ctx, DOWN]!!
         val blockColor = ctx.blockData(Int3.zero).color
 
         modelRenderer.updateShading(Int3.zero, allFaces)

@@ -5,10 +5,7 @@ import mods.betterfoliage.client.gui.ConfigGuiFactory
 import mods.betterfoliage.client.integration.OptifineCTM
 import mods.betterfoliage.client.integration.ShadersModIntegration
 import mods.betterfoliage.client.render.*
-import mods.betterfoliage.client.texture.GrassGenerator
-import mods.betterfoliage.client.texture.GrassRegistry
-import mods.betterfoliage.client.texture.LeafGenerator
-import mods.betterfoliage.client.texture.LeafRegistry
+import mods.betterfoliage.client.texture.*
 import mods.octarinecore.client.KeyHandler
 import mods.octarinecore.client.resource.CenteringTextureGenerator
 import mods.octarinecore.client.resource.GeneratorPack
@@ -63,14 +60,21 @@ object Client {
     )
 
     val singletons = listOf(
-        LeafRegistry,
-        GrassRegistry,
+        StandardLeafSupport,
+        StandardGrassSupport,
         LeafWindTracker,
         RisingSoulTextures,
         ShadersModIntegration,
         OptifineCTM
     )
 
-    fun log(level: Level, msg: String) = BetterFoliageMod.log.log(level, msg)
+    fun log(level: Level, msg: String) {
+        BetterFoliageMod.log.log(level, msg)
+        BetterFoliageMod.logDetail.log(level, msg)
+    }
+
+    fun logDetail(msg: String) {
+        BetterFoliageMod.logDetail.log(Level.DEBUG, msg)
+    }
 }
 

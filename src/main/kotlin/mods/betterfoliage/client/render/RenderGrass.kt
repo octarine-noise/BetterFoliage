@@ -3,7 +3,6 @@ package mods.betterfoliage.client.render
 import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.Config
-import mods.betterfoliage.client.integration.OptifineCTM
 import mods.betterfoliage.client.integration.ShadersModIntegration
 import mods.betterfoliage.client.texture.GrassRegistry
 import mods.octarinecore.client.render.*
@@ -47,16 +46,17 @@ class RenderGrass : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
         Config.enabled &&
         ctx.cameraDistance < Config.shortGrass.distance &&
         (Config.shortGrass.grassEnabled || Config.connectedGrass.enabled) &&
-        Config.blocks.grass.matchesID(ctx.block)
+        GrassRegistry[ctx, UP] != null
 
     override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: VertexBuffer, layer: BlockRenderLayer): Boolean {
-        val isConnected = ctx.block(down1).let { Config.blocks.dirt.matchesID(it) || Config.blocks.grass.matchesID(it) }
+        val isConnected = ctx.block(down1).let {
+            Config.blocks.dirt.matchesClass(it) ||
+            Config.blocks.grassClasses.matchesClass(it)
+        }
         val isSnowed = ctx.blockState(up1).isSnow
         val connectedGrass = isConnected && Config.connectedGrass.enabled && (!isSnowed || Config.connectedGrass.snowEnabled)
 
-        val grassInfo = GrassRegistry[ctx.blockState(Int3.zero)] ?: return renderWorldBlockBase(ctx, dispatcher, renderer, layer)
-        val grassTopTexture = OptifineCTM.override(grassInfo.grassTopTexture, ctx, UP)
-
+        val grassInfo = GrassRegistry[ctx, UP]!!
         val blockColor = ctx.blockData(Int3.zero).color
 
         if (connectedGrass) {
@@ -70,7 +70,7 @@ class RenderGrass : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
                     fullCube,
                     Rotation.identity,
                     ctx.blockCenter,
-                    icon = { ctx, qi, q -> grassTopTexture },
+                    icon = { ctx, qi, q -> grassInfo.grassTopTexture },
                     postProcess = { ctx, qi, q, vi, v ->
                         rotateUV(2)
                         if (isSnowed) {

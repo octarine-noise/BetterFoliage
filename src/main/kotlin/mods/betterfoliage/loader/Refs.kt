@@ -61,12 +61,15 @@ object Refs {
     val VanillaModelWrapper = ClassRef("net.minecraftforge.client.model.ModelLoader\$VanillaModelWrapper")
     val model_VMW = FieldRef(VanillaModelWrapper, "model", ModelBlock)
     val location_VMW = FieldRef(VanillaModelWrapper, "location", ModelBlock)
-    val WeightedPartWrapper = ClassRef("net.minecraftforge.client.model.ModelLoader\$WeightedPartWrapper")
-    val model_WPW = FieldRef(WeightedPartWrapper, "model", IModel)
+//    val WeightedPartWrapper = ClassRef("net.minecraftforge.client.model.ModelLoader\$WeightedPartWrapper")
+//    val model_WPW = FieldRef(WeightedPartWrapper, "model", IModel)
     val WeightedRandomModel = ClassRef("net.minecraftforge.client.model.ModelLoader\$WeightedRandomModel")
     val models_WRM = FieldRef(WeightedRandomModel, "models", List)
     val MultiModel = ClassRef("net.minecraftforge.client.model.MultiModel")
     val base_MM = FieldRef(MultiModel, "base", IModel)
+    val WeightedBakedModel = ClassRef("net.minecraft.client.renderer.block.model.WeightedBakedModel")
+    val models_WBM = FieldRef(WeightedBakedModel, "models", List)
+
 
     // Better Foliage
     val BetterFoliageHooks = ClassRef("mods.betterfoliage.client.Hooks")
@@ -76,6 +79,7 @@ object Refs {
     val isOpaqueCubeOverride = MethodRef(BetterFoliageHooks, "isOpaqueCubeOverride", ClassRef.boolean, ClassRef.boolean, IBlockState)
     val onRandomDisplayTick = MethodRef(BetterFoliageHooks, "onRandomDisplayTick", ClassRef.void, World, IBlockState, BlockPos)
     val onAfterLoadModelDefinitions = MethodRef(BetterFoliageHooks, "onAfterLoadModelDefinitions", ClassRef.void, ModelLoader)
+    val onAfterBakeModels = MethodRef(BetterFoliageHooks, "onAfterBakeModels", ClassRef.void, Map)
     val renderWorldBlock = MethodRef(BetterFoliageHooks, "renderWorldBlock", ClassRef.boolean, BlockRendererDispatcher, IBlockState, BlockPos, IBlockAccess, VertexBuffer, BlockRenderLayer)
     val canRenderBlockInLayer = MethodRef(BetterFoliageHooks, "canRenderBlockInLayer", ClassRef.boolean, Block, IBlockState, BlockRenderLayer)
 

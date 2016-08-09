@@ -13,8 +13,8 @@ import net.minecraft.util.BlockRenderLayer
 class RenderConnectedGrass : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
     override fun isEligible(ctx: BlockContext) =
         Config.enabled && Config.connectedGrass.enabled &&
-        Config.blocks.dirt.matchesID(ctx.block) &&
-        Config.blocks.grass.matchesID(ctx.block(up1)) &&
+        Config.blocks.dirt.matchesClass(ctx.block) &&
+        Config.blocks.grassClasses.matchesClass(ctx.block(up1)) &&
         (Config.connectedGrass.snowEnabled || !ctx.blockState(up2).isSnow)
 
     override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: VertexBuffer, layer: BlockRenderLayer): Boolean {

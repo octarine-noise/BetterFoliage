@@ -15,35 +15,38 @@ import net.minecraft.block.Block
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.renderer.BlockRendererDispatcher
 import net.minecraft.client.renderer.VertexBuffer
+import net.minecraft.client.renderer.block.model.IBakedModel
 import net.minecraft.init.Blocks
 import net.minecraft.util.BlockRenderLayer
-import net.minecraft.util.BlockRenderLayer.*
+import net.minecraft.util.BlockRenderLayer.CUTOUT
+import net.minecraft.util.BlockRenderLayer.CUTOUT_MIPPED
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.IBlockAccess
 import net.minecraft.world.World
+import net.minecraftforge.client.model.IModel
 import net.minecraftforge.client.model.ModelLoader
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
 
 fun doesSideBlockRenderingOverride(original: Boolean, blockAccess: IBlockAccess, pos: BlockPos, side: EnumFacing): Boolean {
-    return original && !(Config.enabled && Config.roundLogs.enabled && Config.blocks.logs.matchesID(blockAccess.getBlockState(pos).block));
+    return original && !(Config.enabled && Config.roundLogs.enabled && Config.blocks.logs.matchesClass(blockAccess.getBlockState(pos).block));
 }
 
 fun isOpaqueCubeOverride(original: Boolean, state: IBlockState): Boolean {
     // caution: blocks are initialized and the method called during startup
     if (!BetterFoliageMod.isAfterPostInit) return original
-    return original && !(Config.enabled && Config.roundLogs.enabled && Config.blocks.logs.matchesID(state.block))
+    return original && !(Config.enabled && Config.roundLogs.enabled && Config.blocks.logs.matchesClass(state.block))
 }
 
 fun getAmbientOcclusionLightValueOverride(original: Float, state: IBlockState): Float {
-    if (Config.enabled && Config.roundLogs.enabled && Config.blocks.logs.matchesID(state.block)) return Config.roundLogs.dimming;
+    if (Config.enabled && Config.roundLogs.enabled && Config.blocks.logs.matchesClass(state.block)) return Config.roundLogs.dimming;
     return original;
 }
 
 fun getUseNeighborBrightnessOverride(original: Boolean, state: IBlockState): Boolean {
-    return original || (Config.enabled && Config.roundLogs.enabled && Config.blocks.logs.matchesID(state.block));
+    return original || (Config.enabled && Config.roundLogs.enabled && Config.blocks.logs.matchesClass(state.block));
 }
 
 fun onRandomDisplayTick(world: World, state: IBlockState, pos: BlockPos) {
@@ -57,7 +60,7 @@ fun onRandomDisplayTick(world: World, state: IBlockState, pos: BlockPos) {
 
     if (Config.enabled &&
         Config.fallingLeaves.enabled &&
-        Config.blocks.leaves.matchesID(state.block) &&
+        Config.blocks.leavesClasses.matchesClass(state.block) &&
         world.isAirBlock(pos + down1) &&
         Math.random() < Config.fallingLeaves.chance) {
             EntityFallingLeavesFX(world, pos).addIfValid()

@@ -33,9 +33,9 @@ object ShadersModIntegration {
      * Called from transformed ShadersMod code.
      * @see mods.betterfoliage.loader.BetterFoliageTransformer
      */
-        @JvmStatic fun getBlockIdOverride(original: Long, blockState: IBlockState): Long {
-        if (Config.blocks.leaves.matchesID(blockState.block)) return leavesEntityData
-        if (Config.blocks.crops.matchesID(blockState.block)) return tallGrassEntityData
+    @JvmStatic fun getBlockIdOverride(original: Long, blockState: IBlockState): Long {
+        if (Config.blocks.leavesClasses.matchesClass(blockState.block)) return leavesEntityData
+        if (Config.blocks.crops.matchesClass(blockState.block)) return tallGrassEntityData
         return original
     }
 

@@ -31,9 +31,11 @@ object Config : DelegatingConfig(BetterFoliageMod.MOD_ID, BetterFoliageMod.DOMAI
     var enabled by boolean(true)
 
     object blocks {
+        val leavesClasses = BlockMatcher(BetterFoliageMod.DOMAIN, "LeavesBlocksDefault.cfg")
+        val leavesModels = ModelTextureListConfigOption(BetterFoliageMod.DOMAIN, "LeavesModelsDefault.cfg", 1)
+        val grassClasses = BlockMatcher(BetterFoliageMod.DOMAIN, "GrassBlocksDefault.cfg")
+        val grassModels = ModelTextureListConfigOption(BetterFoliageMod.DOMAIN, "GrassModelsDefault.cfg", 1)
         val dirt = BlockMatcher(BetterFoliageMod.DOMAIN, "DirtDefault.cfg")
-        val grass = BlockMatcher(BetterFoliageMod.DOMAIN, "GrassDefault.cfg")
-        val leaves = BlockMatcher(BetterFoliageMod.DOMAIN, "LeavesDefault.cfg")
         val crops = BlockMatcher(BetterFoliageMod.DOMAIN, "CropDefault.cfg")
         val logs = BlockMatcher(BetterFoliageMod.DOMAIN, "LogDefault.cfg")
         val sand = BlockMatcher(BetterFoliageMod.DOMAIN, "SandDefault.cfg")
@@ -177,9 +179,17 @@ object Config : DelegatingConfig(BetterFoliageMod.MOD_ID, BetterFoliageMod.DOMAI
         val trailDensity by int(min=1, max=16, default=3)
     }
 
+    val forceReloadOptions = listOf(
+        blocks.leavesClasses,
+        blocks.leavesModels,
+        blocks.grassClasses,
+        blocks.grassModels,
+        shortGrass["saturationThreshold"]
+    )
+
     override fun onChange(event: ConfigChangedEvent.OnConfigChangedEvent) {
         super.onChange(event)
-        if (hasChanged(blocks, shortGrass["saturationThreshold"]))
+        if (hasChanged(forceReloadOptions))
             Minecraft.getMinecraft().refreshResources()
         else
             Minecraft.getMinecraft().renderGlobal.loadRenderers()

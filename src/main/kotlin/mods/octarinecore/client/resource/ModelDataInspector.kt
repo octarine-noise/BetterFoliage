@@ -1,11 +1,9 @@
 package mods.octarinecore.client.resource
 
-import mods.betterfoliage.client.config.BlockMatcher
 import mods.betterfoliage.loader.Refs
-import mods.octarinecore.stripStart
+import mods.octarinecore.common.config.BlockMatcher
 import net.minecraft.block.Block
 import net.minecraft.block.state.IBlockState
-import net.minecraft.client.renderer.block.model.ModelBlock
 import net.minecraft.client.renderer.block.model.ModelResourceLocation
 import net.minecraft.client.renderer.block.statemap.DefaultStateMapper
 import net.minecraft.client.renderer.block.statemap.IStateMapper
@@ -34,8 +32,8 @@ abstract class ModelDataInspector {
     @SubscribeEvent
     fun handleLoadModelData(event: LoadModelDataEvent) {
         val stateMappings = Block.REGISTRY.flatMap { block ->
-            ((event.loader.blockModelShapes.blockStateMapper.blockStateMap[block] as? IStateMapper ?: DefaultStateMapper())
-                .putStateModelLocations(block as Block) as Map<IBlockState, ModelResourceLocation>).entries
+            val mapper = event.loader.blockModelShapes.blockStateMapper.blockStateMap[block] as? IStateMapper ?: DefaultStateMapper()
+            (mapper.putStateModelLocations(block as Block) as Map<IBlockState, ModelResourceLocation>).entries
         }
         val stateModels = Refs.stateModels.get(event.loader) as Map<ModelResourceLocation, IModel>
 
@@ -97,30 +95,3 @@ abstract class BlockTextureInspector<T> : ModelDataInspector() {
 
     abstract fun processTextures(state: IBlockState, textures: List<TextureAtlasSprite>, atlas: TextureMap): T
 }
-
-@Suppress("UNCHECKED_CAST")
-val IModel.modelBlockAndLoc: Pair<ModelBlock, ResourceLocation>? get() {
-    if (Refs.VanillaModelWrapper.isInstance(this))
-        return Pair(Refs.model_VMW.get(this) as ModelBlock, Refs.location_VMW.get(this) as ResourceLocation)
-    else if (Refs.WeightedPartWrapper.isInstance(this)) Refs.model_WPW.get(this)?.let {
-        return (it as IModel).modelBlockAndLoc
-    }
-    else if (Refs.WeightedRandomModel.isInstance(this)) Refs.models_WRM.get(this)?.let {
-        (it as List<IModel>).forEach {
-            it.modelBlockAndLoc.let { if (it != null) return it }
-        }
-    }
-    else if (Refs.MultiModel.isInstance(this)) Refs.base_MM.get(this)?.let {
-        return (it as IModel).modelBlockAndLoc
-    }
-    return null
-}
-
-fun Pair<ModelBlock, ResourceLocation>.derivesFrom(targetLocation: String): Boolean {
-    if (second.stripStart("models/") == ResourceLocation(targetLocation)) return true
-    if (first.parent != null && first.parentLocation != null)
-        return Pair(first.parent, first.parentLocation!!).derivesFrom(targetLocation)
-    return false
-}
-
-fun IModel.derivesFromModel(modelLocation: String) = modelBlockAndLoc?.derivesFrom(modelLocation) ?: false

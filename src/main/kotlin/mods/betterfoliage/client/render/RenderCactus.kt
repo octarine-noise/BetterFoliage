@@ -60,7 +60,7 @@ class RenderCactus : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
     override fun isEligible(ctx: BlockContext): Boolean =
         Config.enabled && Config.cactus.enabled &&
         ctx.cameraDistance < Config.cactus.distance &&
-        Config.blocks.cactus.matchesID(ctx.block)
+        Config.blocks.cactus.matchesClass(ctx.block)
 
     override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: VertexBuffer, layer: BlockRenderLayer): Boolean {
         // get AO data

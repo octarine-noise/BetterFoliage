@@ -2,17 +2,12 @@ package mods.betterfoliage.client.render
 
 import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.config.Config
-import mods.betterfoliage.client.integration.OptifineCTM
 import mods.octarinecore.client.render.BlockContext
-import mods.octarinecore.client.render.Quad
-import mods.octarinecore.client.render.ShadingContext
-import mods.octarinecore.client.render.blockContext
 import mods.octarinecore.common.Int3
-import mods.octarinecore.common.rotate
 import mods.octarinecore.tryDefault
 import net.minecraft.block.BlockLog
 import net.minecraft.block.state.IBlockState
-import net.minecraft.util.EnumFacing.*
+import net.minecraft.util.EnumFacing.Axis
 
 class RenderLog : AbstractRenderColumn(BetterFoliageMod.MOD_ID) {
 
@@ -21,7 +16,7 @@ class RenderLog : AbstractRenderColumn(BetterFoliageMod.MOD_ID) {
     override fun isEligible(ctx: BlockContext) =
         Config.enabled && Config.roundLogs.enabled &&
         ctx.cameraDistance < Config.roundLogs.distance &&
-        Config.blocks.logs.matchesID(ctx.block)
+        Config.blocks.logs.matchesClass(ctx.block)
 
     override var axisFunc = { state: IBlockState ->
         val axis = tryDefault(null) { state.getValue(BlockLog.LOG_AXIS).toString() } ?:
@@ -44,8 +39,8 @@ class RenderLog : AbstractRenderColumn(BetterFoliageMod.MOD_ID) {
 
     override fun resolver(ctx: BlockContext): ColumnTextureResolver? = columnTextures[ctx.blockState(Int3.zero)]
 
-    override val blockPredicate = { state: IBlockState -> Config.blocks.logs.matchesID(state.block) }
-    override val surroundPredicate = { state: IBlockState -> state.isOpaqueCube && !Config.blocks.logs.matchesID(state.block) }
+    override val blockPredicate = { state: IBlockState -> Config.blocks.logs.matchesClass(state.block) }
+    override val surroundPredicate = { state: IBlockState -> state.isOpaqueCube && !Config.blocks.logs.matchesClass(state.block) }
 
     override val connectPerpendicular: Boolean get() = Config.roundLogs.connectPerpendicular
     override val connectSolids: Boolean get() = Config.roundLogs.connectSolids

@@ -46,7 +46,7 @@ class RenderReeds : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
         ctx.cameraDistance < Config.reed.distance &&
         ctx.blockState(up2).material == Material.AIR &&
         ctx.blockState(up1).material == Material.WATER &&
-        Config.blocks.dirt.matchesID(ctx.block) &&
+        Config.blocks.dirt.matchesClass(ctx.block) &&
         ctx.biomeId in Config.reed.biomes &&
         noise[ctx.pos] < Config.reed.population
 

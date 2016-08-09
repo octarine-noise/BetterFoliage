@@ -1,15 +1,20 @@
 @file:JvmName("Utils")
 package mods.octarinecore.client.resource
 
+import mods.betterfoliage.loader.Refs
 import mods.octarinecore.PI2
 import mods.octarinecore.client.render.HSB
+import mods.octarinecore.stripStart
 import mods.octarinecore.tryDefault
 import net.minecraft.client.Minecraft
+import net.minecraft.client.renderer.block.model.ModelBlock
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
+import net.minecraft.client.renderer.texture.TextureMap
 import net.minecraft.client.resources.IResource
 import net.minecraft.client.resources.IResourceManager
 import net.minecraft.client.resources.SimpleReloadableResourceManager
 import net.minecraft.util.ResourceLocation
+import net.minecraftforge.client.model.IModel
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -28,6 +33,9 @@ operator fun ResourceLocation.plus(str: String) = ResourceLocation(resourceDomai
 operator fun IResourceManager.get(domain: String, path: String): IResource? = get(ResourceLocation(domain, path))
 /** Index operator to get a resource. */
 operator fun IResourceManager.get(location: ResourceLocation): IResource? = tryDefault(null) { getResource(location) }
+
+/** Index operator to get a texture sprite. */
+operator fun TextureMap.get(name: String): TextureAtlasSprite? = getTextureExtry(name)
 
 /** Load an image resource. */
 fun IResource.loadImage() = ImageIO.read(this.inputStream)
@@ -90,3 +98,28 @@ fun textureLocation(iconName: String) = ResourceLocation(iconName).let {
     if (it.resourcePath.startsWith("mcpatcher")) it
     else ResourceLocation(it.resourceDomain, "textures/${it.resourcePath}")
 }
+
+@Suppress("UNCHECKED_CAST")
+val IModel.modelBlockAndLoc: Pair<ModelBlock, ResourceLocation>? get() {
+    if (Refs.VanillaModelWrapper.isInstance(this))
+        return Pair(Refs.model_VMW.get(this) as ModelBlock, Refs.location_VMW.get(this) as ResourceLocation)
+    else if (Refs.WeightedRandomModel.isInstance(this)) Refs.models_WRM.get(this)?.let {
+        (it as List<IModel>).forEach {
+            it.modelBlockAndLoc.let { if (it != null) return it }
+        }
+    }
+    else if (Refs.MultiModel.isInstance(this)) Refs.base_MM.get(this)?.let {
+        return (it as IModel).modelBlockAndLoc
+    }
+    // TODO support net.minecraftforge.client.model.ModelLoader.MultipartModel
+    return null
+}
+
+fun Pair<ModelBlock, ResourceLocation>.derivesFrom(targetLocation: ResourceLocation): Boolean {
+    if (second.stripStart("models/") == targetLocation) return true
+    if (first.parent != null && first.parentLocation != null)
+        return Pair(first.parent, first.parentLocation!!).derivesFrom(targetLocation)
+    return false
+}
+
+fun IModel.derivesFromModel(modelLoc: String) = modelBlockAndLoc?.derivesFrom(ResourceLocation(modelLoc)) ?: false

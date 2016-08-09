@@ -33,6 +33,14 @@ inline fun <T1, T2> forEachNested(list1: Iterable<T1>, list2: Iterable<T2>, func
         }
     }
 
+@Suppress("UNCHECKED_CAST")
+inline fun <K, V> Map<K, V?>.filterValuesNotNull() = filterValues { it != null } as Map<K, V>
+
+inline fun <reified T, R> Iterable<T>.findFirst(func: (T)->R?): R? {
+    forEach { func(it)?.let { return it } }
+    return null
+}
+
 /**
  * Property-level delegate backed by a [ThreadLocal].
  *

@@ -61,6 +61,9 @@ object OptifineCTM {
         return result
     }
 
+    fun getAllCTM(states: List<IBlockState>, icon: TextureAtlasSprite): Collection<TextureAtlasSprite> =
+        states.flatMap { getAllCTM(it, icon) }.toSet()
+
     fun override(texture: TextureAtlasSprite, ctx: BlockContext, face: EnumFacing) =
         override(texture, ctx.world!!, ctx.pos, face)
 

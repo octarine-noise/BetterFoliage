@@ -30,15 +30,19 @@ betterfoliage.blocks.dirtBlacklist=Dirt Blacklist
 betterfoliage.blocks.dirtWhitelist.arrayEntry=%d entries
 betterfoliage.blocks.dirtBlacklist.arrayEntry=%d entries
 
-betterfoliage.blocks.grassWhitelist=Grass Whitelist
-betterfoliage.blocks.grassBlacklist=Grass Blacklist
-betterfoliage.blocks.grassWhitelist.arrayEntry=%d entries
-betterfoliage.blocks.grassBlacklist.arrayEntry=%d entries
+betterfoliage.blocks.grassClassesWhitelist=Grass Whitelist
+betterfoliage.blocks.grassClassesBlacklist=Grass Blacklist
+betterfoliage.blocks.grassClassesWhitelist.arrayEntry=%d entries
+betterfoliage.blocks.grassClassesBlacklist.arrayEntry=%d entries
+betterfoliage.blocks.grassModels=Grass Models
+betterfoliage.blocks.grassModels.arrayEntry=%d entries
 
-betterfoliage.blocks.leavesWhitelist=Leaves Whitelist
-betterfoliage.blocks.leavesBlacklist=Leaves Blacklist
-betterfoliage.blocks.leavesWhitelist.arrayEntry=%d entries
-betterfoliage.blocks.leavesBlacklist.arrayEntry=%d entries
+betterfoliage.blocks.leavesClassesWhitelist=Leaves Whitelist
+betterfoliage.blocks.leavesClassesBlacklist=Leaves Blacklist
+betterfoliage.blocks.leavesClassesWhitelist.arrayEntry=%d entries
+betterfoliage.blocks.leavesClassesBlacklist.arrayEntry=%d entries
+betterfoliage.blocks.leavesModels=Leaves Models
+betterfoliage.blocks.leavesModels.arrayEntry=%d entries
 
 betterfoliage.blocks.cropsWhitelist=Crop Whitelist
 betterfoliage.blocks.cropsBlacklist=Crop Blacklist

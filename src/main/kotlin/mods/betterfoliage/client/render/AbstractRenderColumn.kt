@@ -1,6 +1,5 @@
 package mods.betterfoliage.client.render
 
-import mods.betterfoliage.client.config.BlockMatcher
 import mods.betterfoliage.client.integration.OptifineCTM
 import mods.betterfoliage.client.integration.ShadersModIntegration
 import mods.betterfoliage.client.render.AbstractRenderColumn.BlockType.*
@@ -8,6 +7,7 @@ import mods.betterfoliage.client.render.AbstractRenderColumn.QuadrantType.*
 import mods.octarinecore.client.render.*
 import mods.octarinecore.client.resource.BlockTextureInspector
 import mods.octarinecore.common.*
+import mods.octarinecore.common.config.BlockMatcher
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.renderer.BlockRendererDispatcher
 import net.minecraft.client.renderer.VertexBuffer

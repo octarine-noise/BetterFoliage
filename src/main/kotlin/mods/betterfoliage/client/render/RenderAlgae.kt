@@ -29,7 +29,7 @@ class RenderAlgae : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
         ctx.cameraDistance < Config.algae.distance &&
         ctx.blockState(up2).material == Material.WATER &&
         ctx.blockState(up1).material == Material.WATER &&
-        Config.blocks.dirt.matchesID(ctx.block) &&
+        Config.blocks.dirt.matchesClass(ctx.block) &&
         ctx.biomeId in Config.algae.biomes &&
         noise[ctx.pos] < Config.algae.population
 

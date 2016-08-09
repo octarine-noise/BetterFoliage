@@ -5,7 +5,6 @@ import mods.octarinecore.metaprog.Transformer
 import mods.octarinecore.metaprog.allAvailable
 import net.minecraftforge.fml.relauncher.FMLLaunchHandler
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin
-import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Opcodes.*
 
 @IFMLLoadingPlugin.TransformerExclusions(

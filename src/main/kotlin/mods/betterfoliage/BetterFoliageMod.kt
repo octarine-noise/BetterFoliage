@@ -9,8 +9,15 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent
 import net.minecraftforge.fml.common.network.NetworkCheckHandler
 import net.minecraftforge.fml.relauncher.Side
+import org.apache.logging.log4j.Level.DEBUG
 import org.apache.logging.log4j.Level.INFO
 import org.apache.logging.log4j.Logger
+import org.apache.logging.log4j.simple.SimpleLogger
+import org.apache.logging.log4j.simple.SimpleLoggerContext
+import org.apache.logging.log4j.util.PropertiesUtil
+import java.io.File
+import java.io.PrintStream
+import java.util.*
 
 @Mod(
     modid = BetterFoliageMod.MOD_ID,
@@ -28,6 +35,8 @@ object BetterFoliageMod {
     const val GUI_FACTORY = "mods.betterfoliage.client.gui.ConfigGuiFactory"
 
     lateinit var log: Logger
+    lateinit var logDetail: Logger
+
     var config: Configuration? = null
     var isAfterPostInit = false
 
@@ -39,8 +48,16 @@ object BetterFoliageMod {
     @Mod.EventHandler
     fun preInit(event: FMLPreInitializationEvent) {
         log = event.modLog
+        logDetail = SimpleLogger(
+            "BetterFoliage",
+            DEBUG,
+            false, false, true, false,
+            "yyyy-MM-dd HH:mm:ss",
+            null,
+            PropertiesUtil(Properties()),
+            PrintStream(File(event.modConfigurationDirectory.parentFile, "logs/betterfoliage.log"))
+        )
         config = Configuration(event.suggestedConfigurationFile, null, false)
-
     }
 
     @Mod.EventHandler

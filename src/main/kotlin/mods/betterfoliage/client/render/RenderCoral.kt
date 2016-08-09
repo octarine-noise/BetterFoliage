@@ -47,7 +47,7 @@ class RenderCoral : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
         ctx.cameraDistance < Config.coral.distance &&
         (ctx.blockState(up2).material == Material.WATER || Config.coral.shallowWater) &&
         ctx.blockState(up1).material == Material.WATER &&
-        Config.blocks.sand.matchesID(ctx.block) &&
+        Config.blocks.sand.matchesClass(ctx.block) &&
         ctx.biomeId in Config.coral.biomes &&
         noise[ctx.pos] < Config.coral.population
 
