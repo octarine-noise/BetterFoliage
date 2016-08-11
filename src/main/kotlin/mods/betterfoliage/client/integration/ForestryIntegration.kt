@@ -58,6 +58,7 @@ object ForestryLeavesSupport : ILeafRegistry {
         textureToValue.clear()
         val allLeaves = ForestryIntegration.TeLleafTextures.getStatic() as Map<*, *>
         allLeaves.entries.forEach {
+            Client.logDetail("ForestryLeavesSupport: base leaf type ${it.key.toString()}")
             listOf(
                 ForestryIntegration.TeLplain.get(it.value) as ResourceLocation,
                 ForestryIntegration.TeLfancy.get(it.value) as ResourceLocation,
@@ -72,6 +73,8 @@ object ForestryLeavesSupport : ILeafRegistry {
     fun registerLeaf(textureLocation: ResourceLocation, atlas: TextureMap) {
         val texture = atlas[textureLocation.toString()] ?: return
         var leafType = LeafRegistry.typeMappings.getType(texture) ?: "default"
+        Client.logDetail("ForestryLeavesSupport:        texture ${texture.iconName}")
+        Client.logDetail("ForestryLeavesSupport:        particle $leafType")
         val generated = atlas.registerSprite(
             Client.genLeaves.generatedResource(texture.iconName, "type" to leafType)
         )

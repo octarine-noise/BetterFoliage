@@ -14,6 +14,7 @@ import net.minecraft.block.state.IBlockState
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.client.renderer.texture.TextureMap
 import net.minecraft.util.EnumFacing
+import net.minecraft.util.ResourceLocation
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.IBlockAccess
 import net.minecraftforge.client.event.TextureStitchEvent
@@ -58,6 +59,7 @@ object LeafRegistry : ILeafRegistry {
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun handlePreStitch(event: TextureStitchEvent.Pre) {
         particles.clear()
+        typeMappings.loadMappings(ResourceLocation(BetterFoliageMod.DOMAIN, "leafTextureMappings.cfg"))
     }
 
     override fun get(state: IBlockState, world: IBlockAccess, pos: BlockPos, face: EnumFacing) =
@@ -114,14 +116,18 @@ object StandardLeafSupport :
     override fun processStitch(state: IBlockState, key: List<String>, atlas: TextureMap) = atlas[key[0]]
 
     override fun processTexture(states: List<IBlockState>, texture: TextureAtlasSprite, atlas: TextureMap) {
+        logger?.log(Level.DEBUG, "$logName: leaf texture ${texture.iconName}")
+        logger?.log(Level.DEBUG, "$logName:      #states ${states.size}")
         registerLeaf(texture, atlas)
         OptifineCTM.getAllCTM(states, texture).forEach {
+            logger?.log(Level.DEBUG, "$logName:        CTM ${texture.iconName}")
             registerLeaf(it, atlas)
         }
     }
 
     fun registerLeaf(texture: TextureAtlasSprite, atlas: TextureMap) {
         var leafType = LeafRegistry.typeMappings.getType(texture) ?: "default"
+        logger?.log(Level.DEBUG, "$logName:      particle $leafType")
         val generated = atlas.registerSprite(
             Client.genLeaves.generatedResource(texture.iconName, "type" to leafType)
         )
