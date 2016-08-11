@@ -57,6 +57,7 @@ object Refs {
 
     val IModel = ClassRef("net.minecraftforge.client.model.IModel")
     val ModelBlock = ClassRef("net.minecraft.client.renderer.block.model.ModelBlock", "bpd")
+    val ResourceLocation = ClassRef("net.minecraft.util.ResourceLocation", "kn")
     val ModelResourceLocation = ClassRef("net.minecraft.client.renderer.block.model.ModelResourceLocation", "byq")
     val VanillaModelWrapper = ClassRef("net.minecraftforge.client.model.ModelLoader\$VanillaModelWrapper")
     val model_VMW = FieldRef(VanillaModelWrapper, "model", ModelBlock)
