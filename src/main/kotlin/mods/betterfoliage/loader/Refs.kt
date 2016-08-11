@@ -70,6 +70,7 @@ object Refs {
     val WeightedBakedModel = ClassRef("net.minecraft.client.renderer.block.model.WeightedBakedModel")
     val models_WBM = FieldRef(WeightedBakedModel, "models", List)
 
+    val resetChangedState = MethodRef(ClassRef("net.minecraftforge.common.config.Configuration"), "resetChangedState", ClassRef.void)
 
     // Better Foliage
     val BetterFoliageHooks = ClassRef("mods.betterfoliage.client.Hooks")

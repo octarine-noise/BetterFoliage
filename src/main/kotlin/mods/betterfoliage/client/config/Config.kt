@@ -187,8 +187,7 @@ object Config : DelegatingConfig(BetterFoliageMod.MOD_ID, BetterFoliageMod.DOMAI
         shortGrass["saturationThreshold"]
     )
 
-    override fun onChange(event: ConfigChangedEvent.OnConfigChangedEvent) {
-        super.onChange(event)
+    override fun onChange(event: ConfigChangedEvent.PostConfigChangedEvent) {
         if (hasChanged(forceReloadOptions))
             Minecraft.getMinecraft().refreshResources()
         else

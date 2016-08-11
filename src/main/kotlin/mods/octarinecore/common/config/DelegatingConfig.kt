@@ -1,6 +1,7 @@
 package mods.octarinecore.common.config
 
 import com.google.common.collect.LinkedListMultimap
+import mods.betterfoliage.loader.Refs
 import mods.octarinecore.metaprog.reflectField
 import mods.octarinecore.metaprog.reflectFieldsOfType
 import mods.octarinecore.metaprog.reflectNestedObjects
@@ -86,7 +87,7 @@ abstract class DelegatingConfig(val modId: String, val langPrefix: String) {
      * Returns true if any of the given configuration elements have changed.
      * Supports both categories and
      */
-    fun hasChanged(vararg elements: Any?): Boolean {
+    fun hasChanged(elements: List<*>): Boolean {
         reflectNestedObjects.forEach { category ->
             if (category.second in elements && config?.getCategory(category.first)?.hasChanged() ?: false) return true
         }
@@ -97,13 +98,22 @@ abstract class DelegatingConfig(val modId: String, val langPrefix: String) {
     }
 
     /** Called when the configuration for the mod changes. */
-    open fun onChange(event: ConfigChangedEvent.OnConfigChangedEvent) {
-        save()
-        forEachProperty { c, n, prop -> prop.read() }
-    }
+    abstract fun onChange(event: ConfigChangedEvent.PostConfigChangedEvent)
 
     @SubscribeEvent
-    fun handleConfigChange(event: ConfigChangedEvent.OnConfigChangedEvent) { if (event.modID == modId) onChange(event) }
+    fun handleConfigChange(event: ConfigChangedEvent.PostConfigChangedEvent) {
+        if (event.modID == modId) {
+            // refresh values
+            forEachProperty { c, n, prop -> prop.read() }
+
+            // call mod-specific handler
+            onChange(event)
+
+            // save to file
+            save()
+            Refs.resetChangedState.invoke(config!!)
+        }
+    }
 
     /** Extension to get the underlying delegate of a field */
     operator fun Any.get(name: String) = this.reflectField<ConfigPropertyBase>("$name\$delegate")
