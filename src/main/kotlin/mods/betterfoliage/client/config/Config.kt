@@ -10,6 +10,7 @@ import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
 
 // BetterFoliage-specific property delegates
+private val OBSOLETE = ObsoleteConfigProperty()
 private fun featureEnable() = boolean(true).lang("enabled")
 private fun distanceLimit() = int(min=1, max=1000, default=1000).lang("distance")
 fun biomeList(defaults: (Biome) -> Boolean) = intList {
@@ -42,6 +43,13 @@ object Config : DelegatingConfig(BetterFoliageMod.MOD_ID, BetterFoliageMod.DOMAI
         val sand = ConfigurableBlockMatcher(BetterFoliageMod.DOMAIN, "SandDefault.cfg")
         val lilypad = ConfigurableBlockMatcher(BetterFoliageMod.DOMAIN, "LilypadDefault.cfg")
         val cactus = ConfigurableBlockMatcher(BetterFoliageMod.DOMAIN, "CactusDefault.cfg")
+
+        val leavesWhitelist = OBSOLETE
+        val leavesBlacklist = OBSOLETE
+        val grassWhitelist = OBSOLETE
+        val grassBlacklist = OBSOLETE
+        val logsWhitelist = OBSOLETE
+        val logsBlacklist = OBSOLETE
     }
 
     object leaves {

@@ -144,6 +144,14 @@ abstract class ConfigPropertyBase {
     open fun read() {}
 }
 
+class ObsoleteConfigProperty : ConfigPropertyBase() {
+    override fun attach(target: Configuration, langPrefix: String, categoryName: String, propertyName: String) {
+        target.getCategory(categoryName)?.remove(propertyName)
+    }
+    override val guiProperties = emptyList<Property>()
+    override val hasChanged: Boolean get() = false
+}
+
 /** Delegate for a property backed by a single [Property] instance. */
 abstract class ConfigPropertyDelegate<T>() : ConfigPropertyBase() {
     /** Cached value of the property. */
