@@ -31,16 +31,17 @@ object Config : DelegatingConfig(BetterFoliageMod.MOD_ID, BetterFoliageMod.DOMAI
     var enabled by boolean(true)
 
     object blocks {
-        val leavesClasses = BlockMatcher(BetterFoliageMod.DOMAIN, "LeavesBlocksDefault.cfg")
+        val leavesClasses = ConfigurableBlockMatcher(BetterFoliageMod.DOMAIN, "LeavesBlocksDefault.cfg")
         val leavesModels = ModelTextureListConfigOption(BetterFoliageMod.DOMAIN, "LeavesModelsDefault.cfg", 1)
-        val grassClasses = BlockMatcher(BetterFoliageMod.DOMAIN, "GrassBlocksDefault.cfg")
+        val grassClasses = ConfigurableBlockMatcher(BetterFoliageMod.DOMAIN, "GrassBlocksDefault.cfg")
         val grassModels = ModelTextureListConfigOption(BetterFoliageMod.DOMAIN, "GrassModelsDefault.cfg", 1)
-        val dirt = BlockMatcher(BetterFoliageMod.DOMAIN, "DirtDefault.cfg")
-        val crops = BlockMatcher(BetterFoliageMod.DOMAIN, "CropDefault.cfg")
-        val logs = BlockMatcher(BetterFoliageMod.DOMAIN, "LogDefault.cfg")
-        val sand = BlockMatcher(BetterFoliageMod.DOMAIN, "SandDefault.cfg")
-        val lilypad = BlockMatcher(BetterFoliageMod.DOMAIN, "LilypadDefault.cfg")
-        val cactus = BlockMatcher(BetterFoliageMod.DOMAIN, "CactusDefault.cfg")
+        val dirt = ConfigurableBlockMatcher(BetterFoliageMod.DOMAIN, "DirtDefault.cfg")
+        val crops = ConfigurableBlockMatcher(BetterFoliageMod.DOMAIN, "CropDefault.cfg")
+        val logClasses = ConfigurableBlockMatcher(BetterFoliageMod.DOMAIN, "LogBlocksDefault.cfg")
+        val logModels = ModelTextureListConfigOption(BetterFoliageMod.DOMAIN, "LogModelsDefault.cfg", 3)
+        val sand = ConfigurableBlockMatcher(BetterFoliageMod.DOMAIN, "SandDefault.cfg")
+        val lilypad = ConfigurableBlockMatcher(BetterFoliageMod.DOMAIN, "LilypadDefault.cfg")
+        val cactus = ConfigurableBlockMatcher(BetterFoliageMod.DOMAIN, "CactusDefault.cfg")
     }
 
     object leaves {

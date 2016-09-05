@@ -31,22 +31,22 @@ import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
 
 fun doesSideBlockRenderingOverride(original: Boolean, blockAccess: IBlockAccess, pos: BlockPos, side: EnumFacing): Boolean {
-    return original && !(Config.enabled && Config.roundLogs.enabled && Config.blocks.logs.matchesClass(blockAccess.getBlockState(pos).block));
+    return original && !(Config.enabled && Config.roundLogs.enabled && Config.blocks.logClasses.matchesClass(blockAccess.getBlockState(pos).block));
 }
 
 fun isOpaqueCubeOverride(original: Boolean, state: IBlockState): Boolean {
     // caution: blocks are initialized and the method called during startup
     if (!BetterFoliageMod.isAfterPostInit) return original
-    return original && !(Config.enabled && Config.roundLogs.enabled && Config.blocks.logs.matchesClass(state.block))
+    return original && !(Config.enabled && Config.roundLogs.enabled && Config.blocks.logClasses.matchesClass(state.block))
 }
 
 fun getAmbientOcclusionLightValueOverride(original: Float, state: IBlockState): Float {
-    if (Config.enabled && Config.roundLogs.enabled && Config.blocks.logs.matchesClass(state.block)) return Config.roundLogs.dimming;
+    if (Config.enabled && Config.roundLogs.enabled && Config.blocks.logClasses.matchesClass(state.block)) return Config.roundLogs.dimming;
     return original;
 }
 
 fun getUseNeighborBrightnessOverride(original: Boolean, state: IBlockState): Boolean {
-    return original || (Config.enabled && Config.roundLogs.enabled && Config.blocks.logs.matchesClass(state.block));
+    return original || (Config.enabled && Config.roundLogs.enabled && Config.blocks.logClasses.matchesClass(state.block));
 }
 
 fun onRandomDisplayTick(world: World, state: IBlockState, pos: BlockPos) {

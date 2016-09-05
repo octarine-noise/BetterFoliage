@@ -7,7 +7,7 @@ import mods.betterfoliage.client.integration.OptifineCTM
 import mods.octarinecore.client.render.BlockContext
 import mods.octarinecore.client.resource.*
 import mods.octarinecore.common.Int3
-import mods.octarinecore.common.config.BlockMatcher
+import mods.octarinecore.common.config.ConfigurableBlockMatcher
 import mods.octarinecore.common.config.ModelTextureList
 import mods.octarinecore.findFirst
 import net.minecraft.block.state.IBlockState
@@ -96,7 +96,7 @@ object StandardLeafSupport :
     init { MinecraftForge.EVENT_BUS.register(this) }
 
     override val logName = "StandardLeafSupport"
-    override val matchClasses: BlockMatcher get() = Config.blocks.leavesClasses
+    override val matchClasses: ConfigurableBlockMatcher get() = Config.blocks.leavesClasses
     override val modelTextures: List<ModelTextureList> get() = Config.blocks.leavesModels.list
     override val logger: Logger? get() = BetterFoliageMod.logDetail
 

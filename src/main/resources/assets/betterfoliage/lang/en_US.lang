@@ -29,6 +29,8 @@ betterfoliage.blocks.dirtWhitelist=Dirt Whitelist
 betterfoliage.blocks.dirtBlacklist=Dirt Blacklist
 betterfoliage.blocks.dirtWhitelist.arrayEntry=%d entries
 betterfoliage.blocks.dirtBlacklist.arrayEntry=%d entries
+betterfoliage.blocks.dirtWhitelist.tooltip=Blocks recognized as Dirt. Has an impact on Reeds, Algae, Connected Grass
+betterfoliage.blocks.dirtBlacklist.tooltip=Blocks never accepted as Dirt. Has an impact on Reeds, Algae, Connected Grass
 
 betterfoliage.blocks.grassClassesWhitelist=Grass Whitelist
 betterfoliage.blocks.grassClassesBlacklist=Grass Blacklist
@@ -36,6 +38,9 @@ betterfoliage.blocks.grassClassesWhitelist.arrayEntry=%d entries
 betterfoliage.blocks.grassClassesBlacklist.arrayEntry=%d entries
 betterfoliage.blocks.grassModels=Grass Models
 betterfoliage.blocks.grassModels.arrayEntry=%d entries
+betterfoliage.blocks.grassWhitelist.tooltip=Blocks recognized as Grass. Has an impact on Short Grass, Connected Grass
+betterfoliage.blocks.grassBlacklist.tooltip=Blocks never accepted as Grass. Has an impact on Short Grass, Connected Grass
+betterfoliage.blocks.grassModels.tooltip=Models and textures recognized for grass blocks
 
 betterfoliage.blocks.leavesClassesWhitelist=Leaves Whitelist
 betterfoliage.blocks.leavesClassesBlacklist=Leaves Blacklist
@@ -43,49 +48,48 @@ betterfoliage.blocks.leavesClassesWhitelist.arrayEntry=%d entries
 betterfoliage.blocks.leavesClassesBlacklist.arrayEntry=%d entries
 betterfoliage.blocks.leavesModels=Leaves Models
 betterfoliage.blocks.leavesModels.arrayEntry=%d entries
+betterfoliage.blocks.leavesClassesWhitelist.tooltip=Blocks recognized as Leaves. Has an impact on Extra Leaves, Falling Leaves. Leaves will render with leaves block ID in shader programs
+betterfoliage.blocks.leavesClassesBlacklist.tooltip=Blocks never accepted as Leaves. Has an impact on Extra Leaves, Falling Leaves. Leaves will render with leaves block ID in shader programs
+betterfoliage.blocks.leavesModels.tooltip=Models and textures recognized for leaves blocks
 
 betterfoliage.blocks.cropsWhitelist=Crop Whitelist
 betterfoliage.blocks.cropsBlacklist=Crop Blacklist
 betterfoliage.blocks.cropsWhitelist.arrayEntry=%d entries
 betterfoliage.blocks.cropsBlacklist.arrayEntry=%d entries
+betterfoliage.blocks.cropsWhitelist.tooltip=Blocks recognized as crops. Crops will render with tallgrass block ID in shader programs
+betterfoliage.blocks.cropsBlacklist.tooltip=Blocks never accepted as crops. Crops will render with tallgrass block ID in shader programs
 
-betterfoliage.blocks.logsWhitelist=Wood Log Whitelist
-betterfoliage.blocks.logsBlacklist=Wood Log Blacklist
-betterfoliage.blocks.logsWhitelist.arrayEntry=%d entries
-betterfoliage.blocks.logsBlacklist.arrayEntry=%d entries
+betterfoliage.blocks.logClassesWhitelist=Wood Log Whitelist
+betterfoliage.blocks.logClassesBlacklist=Wood Log Blacklist
+betterfoliage.blocks.logClassesWhitelist.arrayEntry=%d entries
+betterfoliage.blocks.logClassesBlacklist.arrayEntry=%d entries
+betterfoliage.blocks.logModels=Wood Log Models
+betterfoliage.blocks.logModels.arrayEntry=%d entries
+betterfoliage.blocks.logClassesWhitelist.tooltip=Blocks recognized as wooden logs. Has an impact on Rounded Logs
+betterfoliage.blocks.logClassesBlacklist.tooltip=Blocks never accepted as wooden logs. Has an impact on Rounded Logs
+betterfoliage.blocks.logModels.tooltip=Models and textures recognized for wood log blocks
 
 betterfoliage.blocks.sandWhitelist=Sand Whitelist
 betterfoliage.blocks.sandBlacklist=Sand Blacklist
 betterfoliage.blocks.sandWhitelist.arrayEntry=%d entries
 betterfoliage.blocks.sandBlacklist.arrayEntry=%d entries
+betterfoliage.blocks.sandWhitelist.tooltip=Blocks recognized as Sand. Has an impact on Coral
+betterfoliage.blocks.sandBlacklist.tooltip=Blocks never accepted Sand. Has an impact on Coral
 
 betterfoliage.blocks.lilypadWhitelist=Lilypad Whitelist
 betterfoliage.blocks.lilypadBlacklist=Lilypad Blacklist
 betterfoliage.blocks.lilypadWhitelist.arrayEntry=%d entries
 betterfoliage.blocks.lilypadBlacklist.arrayEntry=%d entries
+betterfoliage.blocks.lilypadWhitelist.tooltip=Blocks recognized as Lilypad. Has an impact on Better Lilypad
+betterfoliage.blocks.lilypadBlacklist.tooltip=Blocks never accepted Lilypad. Has an impact on Better Lilypad
 
 betterfoliage.blocks.cactusWhitelist=Cactus Whitelist
 betterfoliage.blocks.cactusBlacklist=Cactus Blacklist
 betterfoliage.blocks.cactusWhitelist.arrayEntry=%d entries
 betterfoliage.blocks.cactusBlacklist.arrayEntry=%d entries
-
-
-betterfoliage.blocks.dirtWhitelist.tooltip=Blocks recognized as Dirt. Has an impact on Reeds, Algae, Connected Grass
-betterfoliage.blocks.dirtBlacklist.tooltip=Blocks never accepted as Dirt. Has an impact on Reeds, Algae, Connected Grass
-betterfoliage.blocks.grassWhitelist.tooltip=Blocks recognized as Grass. Has an impact on Short Grass, Connected Grass
-betterfoliage.blocks.grassBlacklist.tooltip=Blocks never accepted as Grass. Has an impact on Short Grass, Connected Grass
-betterfoliage.blocks.leavesWhitelist.tooltip=Blocks recognized as Leaves. Has an impact on Extra Leaves, Falling Leaves. Leaves will render with leaves block ID in shader programs
-betterfoliage.blocks.leavesBlacklist.tooltip=Blocks never accepted as Leaves. Has an impact on Extra Leaves, Falling Leaves. Leaves will render with leaves block ID in shader programs
-betterfoliage.blocks.cropsWhitelist.tooltip=Blocks recognized as crops. Crops will render with tallgrass block ID in shader programs
-betterfoliage.blocks.cropsBlacklist.tooltip=Blocks never accepted as crops. Crops will render with tallgrass block ID in shader programs
-betterfoliage.blocks.logsWhitelist.tooltip=Blocks recognized as wooden logs. Has an impact on Rounded Logs
-betterfoliage.blocks.logsBlacklist.tooltip=Blocks never accepted as wooden logs. Has an impact on Rounded Logs
-betterfoliage.blocks.sandWhitelist.tooltip=Blocks recognized as Sand. Has an impact on Coral
-betterfoliage.blocks.sandBlacklist.tooltip=Blocks never accepted Sand. Has an impact on Coral
-betterfoliage.blocks.lilypadWhitelist.tooltip=Blocks recognized as Lilypad. Has an impact on Better Lilypad
-betterfoliage.blocks.lilypadBlacklist.tooltip=Blocks never accepted Lilypad. Has an impact on Better Lilypad
 betterfoliage.blocks.cactusWhitelist.tooltip=Blocks recognized as Cactus. Has an impact on Better Cactus
 betterfoliage.blocks.cactusBlacklist.tooltip=Blocks never accepted Cactus. Has an impact on Better Cactus
+
 
 betterfoliage.leaves=Extra Leaves
 betterfoliage.leaves.tooltip=Extra round leaves on leaf blocks

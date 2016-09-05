@@ -35,7 +35,7 @@ operator fun IResourceManager.get(domain: String, path: String): IResource? = ge
 operator fun IResourceManager.get(location: ResourceLocation): IResource? = tryDefault(null) { getResource(location) }
 
 /** Index operator to get a texture sprite. */
-operator fun TextureMap.get(name: String): TextureAtlasSprite? = getTextureExtry(name)
+operator fun TextureMap.get(name: String): TextureAtlasSprite? = getTextureExtry(ResourceLocation(name).toString())
 
 /** Load an image resource. */
 fun IResource.loadImage() = ImageIO.read(this.inputStream)

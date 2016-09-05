@@ -10,7 +10,7 @@ import mods.octarinecore.client.resource.TextureMediatedRegistry
 import mods.octarinecore.client.resource.averageColor
 import mods.octarinecore.client.resource.get
 import mods.octarinecore.common.Int3
-import mods.octarinecore.common.config.BlockMatcher
+import mods.octarinecore.common.config.ConfigurableBlockMatcher
 import mods.octarinecore.common.config.ModelTextureList
 import mods.octarinecore.findFirst
 import net.minecraft.block.state.IBlockState
@@ -47,7 +47,7 @@ interface IGrassRegistry {
 /** Collects and manages rendering-related information for grass blocks. */
 @SideOnly(Side.CLIENT)
 object GrassRegistry : IGrassRegistry {
-    val subRegistries = mutableListOf(StandardGrassSupport)
+    val subRegistries: MutableList<IGrassRegistry> = mutableListOf(StandardGrassSupport)
 
     override fun get(state: IBlockState, world: IBlockAccess, pos: BlockPos, face: EnumFacing) =
         subRegistries.findFirst { it.get(state, world, pos, face) }
@@ -70,7 +70,7 @@ object StandardGrassSupport :
 
     override val logger = BetterFoliageMod.logDetail
     override val logName = "StandardGrassSupport"
-    override val matchClasses: BlockMatcher get() = Config.blocks.grassClasses
+    override val matchClasses: ConfigurableBlockMatcher get() = Config.blocks.grassClasses
     override val modelTextures: List<ModelTextureList> get() = Config.blocks.grassModels.list
 
     override fun get(state: IBlockState, world: IBlockAccess, pos: BlockPos, face: EnumFacing): GrassInfo? {

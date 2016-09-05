@@ -2,12 +2,24 @@ package mods.betterfoliage.client.render
 
 import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.config.Config
+import mods.betterfoliage.client.texture.GrassRegistry
+import mods.betterfoliage.client.texture.IGrassRegistry
+import mods.betterfoliage.client.texture.StandardGrassSupport
 import mods.octarinecore.client.render.BlockContext
+import mods.octarinecore.client.resource.TextureListModelProcessor
+import mods.octarinecore.client.resource.get
 import mods.octarinecore.common.Int3
+import mods.octarinecore.common.config.ConfigurableBlockMatcher
+import mods.octarinecore.common.config.ModelTextureList
+import mods.octarinecore.findFirst
 import mods.octarinecore.tryDefault
 import net.minecraft.block.BlockLog
 import net.minecraft.block.state.IBlockState
+import net.minecraft.client.renderer.texture.TextureAtlasSprite
+import net.minecraft.client.renderer.texture.TextureMap
 import net.minecraft.util.EnumFacing.Axis
+import net.minecraftforge.common.MinecraftForge
+import org.apache.logging.log4j.Logger
 
 class RenderLog : AbstractRenderColumn(BetterFoliageMod.MOD_ID) {
 
@@ -16,7 +28,7 @@ class RenderLog : AbstractRenderColumn(BetterFoliageMod.MOD_ID) {
     override fun isEligible(ctx: BlockContext) =
         Config.enabled && Config.roundLogs.enabled &&
         ctx.cameraDistance < Config.roundLogs.distance &&
-        Config.blocks.logs.matchesClass(ctx.block)
+        Config.blocks.logClasses.matchesClass(ctx.block)
 
     override var axisFunc = { state: IBlockState ->
         val axis = tryDefault(null) { state.getValue(BlockLog.LOG_AXIS).toString() } ?:
@@ -29,18 +41,10 @@ class RenderLog : AbstractRenderColumn(BetterFoliageMod.MOD_ID) {
         }
     }
 
-    val columnTextures = object : ColumnTextures(Config.blocks.logs) {
-        init {
-            matchClassAndModel(matcher, "plantmegapack:block/_cube_column", listOf("end", "end", "side"))
-            matchClassAndModel(matcher, "plantmegapack:block/_column_side", listOf("end", "end", "side"))
-            matchClassAndModel(matcher, "cookingplus:block/palmlog", listOf("top", "top", "texture"))
-        }
-    }
+    override val registry: IColumnRegistry get() = LogRegistry
 
-    override fun resolver(ctx: BlockContext): ColumnTextureResolver? = columnTextures[ctx.blockState(Int3.zero)]
-
-    override val blockPredicate = { state: IBlockState -> Config.blocks.logs.matchesClass(state.block) }
-    override val surroundPredicate = { state: IBlockState -> state.isOpaqueCube && !Config.blocks.logs.matchesClass(state.block) }
+    override val blockPredicate = { state: IBlockState -> Config.blocks.logClasses.matchesClass(state.block) }
+    override val surroundPredicate = { state: IBlockState -> state.isOpaqueCube && !Config.blocks.logClasses.matchesClass(state.block) }
 
     override val connectPerpendicular: Boolean get() = Config.roundLogs.connectPerpendicular
     override val connectSolids: Boolean get() = Config.roundLogs.connectSolids
@@ -48,4 +52,31 @@ class RenderLog : AbstractRenderColumn(BetterFoliageMod.MOD_ID) {
     override val radiusLarge: Double get() = Config.roundLogs.radiusLarge
     override val radiusSmall: Double get() = Config.roundLogs.radiusSmall
 
+}
+
+object LogRegistry : IColumnRegistry {
+    val subRegistries: MutableList<IColumnRegistry> = mutableListOf(StandardLogSupport)
+    override fun get(state: IBlockState) = subRegistries.findFirst { it[state] }
+}
+
+object StandardLogSupport : TextureListModelProcessor<IColumnTextureResolver>, IColumnRegistry {
+
+    init { MinecraftForge.EVENT_BUS.register(this) }
+
+    override var stateToKey = mutableMapOf<IBlockState, List<String>>()
+    override var stateToValue = mapOf<IBlockState, IColumnTextureResolver>()
+
+    override val logger = BetterFoliageMod.logDetail
+    override val logName = "StandardLogSupport"
+    override val matchClasses: ConfigurableBlockMatcher get() = Config.blocks.logClasses
+    override val modelTextures: List<ModelTextureList> get() = Config.blocks.logModels.list
+
+    override fun processStitch(state: IBlockState, key: List<String>, atlas: TextureMap): IColumnTextureResolver? {
+        val topTex = atlas[key[0]]
+        val bottomTex = atlas[key[1]]
+        val sideTex = atlas[key[2]]
+        return if (topTex != null && bottomTex != null && sideTex != null) StaticColumnInfo(topTex, bottomTex, sideTex) else null
+    }
+
+    override fun get(state: IBlockState) = stateToValue[state]
 }

@@ -5,27 +5,28 @@ import mods.betterfoliage.client.integration.ShadersModIntegration
 import mods.betterfoliage.client.render.AbstractRenderColumn.BlockType.*
 import mods.betterfoliage.client.render.AbstractRenderColumn.QuadrantType.*
 import mods.octarinecore.client.render.*
-import mods.octarinecore.client.resource.BlockTextureInspector
 import mods.octarinecore.common.*
-import mods.octarinecore.common.config.BlockMatcher
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.renderer.BlockRendererDispatcher
 import net.minecraft.client.renderer.VertexBuffer
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
-import net.minecraft.client.renderer.texture.TextureMap
 import net.minecraft.util.BlockRenderLayer
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.EnumFacing.*
 
-interface ColumnTextureResolver {
+interface IColumnTextureResolver {
     val top: (ShadingContext, Int, Quad)->TextureAtlasSprite?
     val bottom: (ShadingContext, Int, Quad)->TextureAtlasSprite?
     val side: (ShadingContext, Int, Quad)->TextureAtlasSprite?
 }
 
+interface IColumnRegistry {
+    operator fun get(state: IBlockState): IColumnTextureResolver?
+}
+
 data class StaticColumnInfo(val topTexture: TextureAtlasSprite,
                             val bottomTexture: TextureAtlasSprite,
-                            val sideTexture: TextureAtlasSprite) : ColumnTextureResolver {
+                            val sideTexture: TextureAtlasSprite) : IColumnTextureResolver {
     override val top = { ctx: ShadingContext, idx: Int, quad: Quad ->
         OptifineCTM.override(topTexture, blockContext, UP.rotate(ctx.rotation))
     }
@@ -35,16 +36,6 @@ data class StaticColumnInfo(val topTexture: TextureAtlasSprite,
     override val side = { ctx: ShadingContext, idx: Int, quad: Quad ->
         OptifineCTM.override(sideTexture, blockContext, (if ((idx and 1) == 0) SOUTH else EAST).rotate(ctx.rotation))
     }
-}
-
-open class ColumnTextures(val matcher: BlockMatcher) : BlockTextureInspector<StaticColumnInfo>() {
-    init {
-        matchClassAndModel(matcher, "block/column_side", listOf("end", "end", "side"))
-        matchClassAndModel(matcher, "block/cube_column", listOf("end", "end", "side"))
-        matchClassAndModel(matcher, "block/cube_all", listOf("all", "all", "all"))
-    }
-    override fun processTextures(state: IBlockState, textures: List<TextureAtlasSprite>, atlas: TextureMap) =
-        StaticColumnInfo(textures[0], textures[1], textures[2])
 }
 
 /** Index of SOUTH-EAST quadrant. */
@@ -135,13 +126,13 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
     abstract val axisFunc: (IBlockState)->EnumFacing.Axis?
     abstract val blockPredicate: (IBlockState)->Boolean
 
-    abstract fun resolver(ctx: BlockContext): ColumnTextureResolver?
+    abstract val registry: IColumnRegistry
 
     @Suppress("NON_EXHAUSTIVE_WHEN")
     override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: VertexBuffer, layer: BlockRenderLayer): Boolean {
         if (ctx.isSurroundedBy(surroundPredicate) ) return false
 
-        val columnTextures = resolver(ctx) ?: return false
+        val columnTextures = registry[ctx.blockState(Int3.zero)] ?: return false
 
         // get AO data
         modelRenderer.updateShading(Int3.zero, allFaces)

@@ -10,6 +10,7 @@ object Refs {
     val mcVersion = FMLInjectionData.data()[4].toString()
 
     // Java
+    val String = ClassRef("java.lang.String")
     val Map = ClassRef("java.util.Map")
     val List = ClassRef("java.util.List")
     val Random = ClassRef("java.util.Random")

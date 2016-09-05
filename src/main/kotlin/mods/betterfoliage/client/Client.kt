@@ -61,8 +61,9 @@ object Client {
     )
 
     val singletons = listOf(
-        StandardLeafSupport,
-        StandardGrassSupport,
+        LeafRegistry,
+        GrassRegistry,
+        LogRegistry,
         LeafWindTracker,
         RisingSoulTextures,
         ShadersModIntegration,

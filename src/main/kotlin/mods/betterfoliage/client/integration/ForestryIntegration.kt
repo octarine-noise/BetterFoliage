@@ -1,11 +1,18 @@
 package mods.betterfoliage.client.integration
 
+import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.Client
+import mods.betterfoliage.client.config.Config
+import mods.betterfoliage.client.render.IColumnRegistry
+import mods.betterfoliage.client.render.IColumnTextureResolver
+import mods.betterfoliage.client.render.LogRegistry
+import mods.betterfoliage.client.render.StaticColumnInfo
 import mods.betterfoliage.client.texture.ILeafRegistry
 import mods.betterfoliage.client.texture.LeafInfo
 import mods.betterfoliage.client.texture.LeafRegistry
 import mods.betterfoliage.client.texture.StandardLeafSupport
 import mods.betterfoliage.loader.Refs
+import mods.octarinecore.client.resource.ModelProcessor
 import mods.octarinecore.client.resource.get
 import mods.octarinecore.metaprog.ClassRef
 import mods.octarinecore.metaprog.FieldRef
@@ -13,6 +20,7 @@ import mods.octarinecore.metaprog.MethodRef
 import mods.octarinecore.metaprog.allAvailable
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
+import net.minecraft.client.renderer.block.model.ModelResourceLocation
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.client.renderer.texture.TextureMap
 import net.minecraft.util.EnumFacing
@@ -20,6 +28,7 @@ import net.minecraft.util.ResourceLocation
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.IBlockAccess
 import net.minecraftforge.client.event.TextureStitchEvent
+import net.minecraftforge.client.model.IModel
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.Loader
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -39,10 +48,16 @@ object ForestryIntegration {
     val TileLeaves = ClassRef("forestry.arboriculture.tiles.TileLeaves")
     val TiLgetLeaveSprite = MethodRef(TileLeaves, "getLeaveSprite", Refs.ResourceLocation, ClassRef.boolean)
 
+    val PropertyWoodType = ClassRef("forestry.arboriculture.blocks.property.PropertyWoodType")
+    val IWoodType = ClassRef("forestry.api.arboriculture.IWoodType")
+    val barkTex = MethodRef(IWoodType, "getBarkTexture", Refs.String)
+    val heartTex = MethodRef(IWoodType, "getHeartTexture", Refs.String)
+
     init {
-        if (Loader.isModLoaded("forestry") && allAvailable(TextureLeaves, TileLeaves)) {
+        if (Loader.isModLoaded("forestry") && allAvailable(TextureLeaves, TileLeaves, PropertyWoodType, IWoodType)) {
             Client.log(Level.INFO, "Forestry support initialized")
             LeafRegistry.subRegistries.add(ForestryLeavesSupport)
+            LogRegistry.subRegistries.add(ForestryLogSupport)
         }
     }
 }
@@ -89,4 +104,42 @@ object ForestryLeavesSupport : ILeafRegistry {
         val textureLoc = ForestryIntegration.TiLgetLeaveSprite.invoke(tile, Minecraft.isFancyGraphicsEnabled()) ?: return null
         return textureToValue[textureLoc]
     }
+}
+
+object ForestryLogSupport : ModelProcessor<List<String>, IColumnTextureResolver>, IColumnRegistry {
+
+    override var stateToKey = mutableMapOf<IBlockState, List<String>>()
+    override var stateToValue = mapOf<IBlockState, IColumnTextureResolver>()
+
+    override val logger = BetterFoliageMod.logDetail
+
+    init { MinecraftForge.EVENT_BUS.register(this) }
+
+    override fun processModelLoad(state: IBlockState, modelLoc: ModelResourceLocation, model: IModel): List<String>? {
+        // respect class list to avoid triggering on fences, stairs, etc.
+        if (!Config.blocks.logClasses.matchesClass(state.block)) return null
+
+        // find wood type property
+        val woodType = state.properties.entries.find {
+            ForestryIntegration.PropertyWoodType.isInstance(it.key) && ForestryIntegration.IWoodType.isInstance(it.value)
+        } ?: return null
+
+        logger.log(Level.DEBUG, "ForestryLogSupport: block state ${state.toString()}")
+        logger.log(Level.DEBUG, "ForestryLogSupport:     variant ${woodType.value.toString()}")
+
+        // get texture names for wood type
+        val bark = ForestryIntegration.barkTex.invoke(woodType.value) as String?
+        val heart = ForestryIntegration.heartTex.invoke(woodType.value) as String?
+
+        logger.log(Level.DEBUG, "ForestryLogSupport:    textures [heart=$heart, bark=$bark]")
+        return if (bark != null && heart != null) listOf(heart, bark) else null
+    }
+
+    override fun processStitch(state: IBlockState, key: List<String>, atlas: TextureMap): IColumnTextureResolver? {
+        val heart = atlas[key[0]] ?: return null
+        val bark = atlas[key[1]] ?: return null
+        return StaticColumnInfo(heart, heart, bark)
+    }
+
+    override fun get(state: IBlockState) = stateToValue[state]
 }

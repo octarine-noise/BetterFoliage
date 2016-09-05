@@ -2,7 +2,8 @@ package mods.octarinecore.client.resource
 
 import com.google.common.base.Joiner
 import mods.betterfoliage.loader.Refs
-import mods.octarinecore.common.config.BlockMatcher
+import mods.octarinecore.common.config.ConfigurableBlockMatcher
+import mods.octarinecore.common.config.IBlockMatcher
 import mods.octarinecore.common.config.ModelTextureList
 import mods.octarinecore.filterValuesNotNull
 import net.minecraft.block.Block
@@ -14,10 +15,14 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.client.renderer.texture.TextureMap
 import net.minecraftforge.client.event.TextureStitchEvent
 import net.minecraftforge.client.model.IModel
+import net.minecraftforge.client.model.ModelLoader
+import net.minecraftforge.fml.common.eventhandler.Event
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.Logger
+
+class LoadModelDataEvent(val loader: ModelLoader) : Event()
 
 interface ModelProcessor<T1, T2> {
     val logger: Logger?
@@ -58,7 +63,7 @@ interface ModelProcessor<T1, T2> {
 
 interface TextureListModelProcessor<T2> : ModelProcessor<List<String>, T2> {
     val logName: String
-    val matchClasses: BlockMatcher
+    val matchClasses: IBlockMatcher
     val modelTextures: List<ModelTextureList>
 
     override fun processModelLoad(state: IBlockState, modelLoc: ModelResourceLocation, model: IModel): List<String>? {
