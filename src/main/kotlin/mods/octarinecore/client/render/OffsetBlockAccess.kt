@@ -18,7 +18,6 @@ class OffsetBlockAccess(val original: IBlockAccess, val modded: BlockPos, val ta
     inline fun actualPos(pos: BlockPos?) =
         if (pos != null && pos.x == modded.x && pos.y == modded.y && pos.z == modded.z) target else pos
 
-    override fun extendedLevelsInChunkCache() = original.extendedLevelsInChunkCache()
     override fun getBiome(pos: BlockPos?) = original.getBiome(actualPos(pos))
     override fun getBlockState(pos: BlockPos?) = original.getBlockState(actualPos(pos))
     override fun getCombinedLight(pos: BlockPos?, lightValue: Int) = original.getCombinedLight(actualPos(pos), lightValue)
