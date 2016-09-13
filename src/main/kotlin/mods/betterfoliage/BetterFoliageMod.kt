@@ -38,7 +38,7 @@ object BetterFoliageMod {
     @Mod.EventHandler
     fun preInit(event: FMLPreInitializationEvent) {
         log = event.modLog
-        config = Configuration(event.suggestedConfigurationFile, null, false)
+        config = Configuration(event.suggestedConfigurationFile, null, true)
 
     }
 

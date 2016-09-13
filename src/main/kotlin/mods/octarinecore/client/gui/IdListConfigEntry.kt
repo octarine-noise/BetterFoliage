@@ -57,6 +57,6 @@ abstract class IdListConfigEntry<T>(
         }
 
         override fun getComment() = I18n.format("${configElement.languageKey}.tooltip.element", "${GOLD}${item.itemName}${YELLOW}")
-        val booleanValue: Boolean get() = value as Boolean
+        val booleanValue: Boolean get() = defaultValue as Boolean
     }
 }
