@@ -57,7 +57,7 @@ object BetterFoliageMod {
             PropertiesUtil(Properties()),
             PrintStream(File(event.modConfigurationDirectory.parentFile, "logs/betterfoliage.log"))
         )
-        config = Configuration(event.suggestedConfigurationFile, null, false)
+        config = Configuration(event.suggestedConfigurationFile, null, true)
     }
 
     @Mod.EventHandler

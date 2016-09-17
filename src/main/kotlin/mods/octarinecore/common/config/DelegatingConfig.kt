@@ -63,6 +63,11 @@ abstract class DelegatingConfig(val modId: String, val langPrefix: String) {
             rootGuiElements.add(ConfigElement(configCategory))
         }
         save()
+
+        // hide all categories not in the config singleton
+        config.categoryNames.forEach {
+            config.getCategory(it).setShowInGui(it in subProperties.keySet())
+        }
     }
 
     /**
