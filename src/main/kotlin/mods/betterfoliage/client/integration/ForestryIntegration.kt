@@ -53,8 +53,16 @@ object ForestryIntegration {
     val barkTex = MethodRef(IWoodType, "getBarkTexture", Refs.String)
     val heartTex = MethodRef(IWoodType, "getHeartTexture", Refs.String)
 
+    val PropertyTreeType = ClassRef("forestry.arboriculture.blocks.property.PropertyTreeType")
+    val TreeDefinition = ClassRef("forestry.arboriculture.genetics.TreeDefinition")
+    val IAlleleTreeSpecies = ClassRef("forestry.api.arboriculture.IAlleleTreeSpecies")
+    val ILeafSpriteProvider = ClassRef("forestry.api.arboriculture.ILeafSpriteProvider")
+    val TdSpecies = FieldRef(TreeDefinition, "species", IAlleleTreeSpecies)
+    val getLeafSpriteProvider = MethodRef(IAlleleTreeSpecies, "getLeafSpriteProvider", ILeafSpriteProvider)
+    val getSprite = MethodRef(ILeafSpriteProvider, "getSprite", Refs.ResourceLocation, ClassRef.boolean, ClassRef.boolean)
+
     init {
-        if (Loader.isModLoaded("forestry") && allAvailable(TextureLeaves, TileLeaves, PropertyWoodType, IWoodType)) {
+        if (Loader.isModLoaded("forestry") && allAvailable(TiLgetLeaveSprite, getLeafSpriteProvider, getSprite)) {
             Client.log(Level.INFO, "Forestry support initialized")
             LeafRegistry.subRegistries.add(ForestryLeavesSupport)
             LogRegistry.subRegistries.add(ForestryLogSupport)
@@ -99,6 +107,17 @@ object ForestryLeavesSupport : ILeafRegistry {
     override fun get(state: IBlockState) = null
 
     override fun get(state: IBlockState, world: IBlockAccess, pos: BlockPos, face: EnumFacing): LeafInfo? {
+        // check variant property (used in decorative leaves)
+        state.properties.entries.find {
+            ForestryIntegration.PropertyTreeType.isInstance(it.key) && ForestryIntegration.TreeDefinition.isInstance(it.value)
+        } ?.let {
+            val species = ForestryIntegration.TdSpecies.get(it.value)
+            val spriteProvider = ForestryIntegration.getLeafSpriteProvider.invoke(species!!)
+            val textureLoc = ForestryIntegration.getSprite.invoke(spriteProvider!!, false, Minecraft.isFancyGraphicsEnabled())
+            return textureToValue[textureLoc]
+        }
+
+        // extract leaf texture information from TileEntity
         val tile = world.getTileEntity(pos) ?: return null
         if (!ForestryIntegration.TileLeaves.isInstance(tile)) return null
         val textureLoc = ForestryIntegration.TiLgetLeaveSprite.invoke(tile, Minecraft.isFancyGraphicsEnabled()) ?: return null
