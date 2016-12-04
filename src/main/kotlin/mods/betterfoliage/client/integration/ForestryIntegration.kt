@@ -18,6 +18,7 @@ import mods.octarinecore.metaprog.ClassRef
 import mods.octarinecore.metaprog.FieldRef
 import mods.octarinecore.metaprog.MethodRef
 import mods.octarinecore.metaprog.allAvailable
+import mods.octarinecore.tryDefault
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.block.model.ModelResourceLocation
@@ -118,7 +119,7 @@ object ForestryLeavesSupport : ILeafRegistry {
         }
 
         // extract leaf texture information from TileEntity
-        val tile = world.getTileEntity(pos) ?: return null
+        val tile = tryDefault(null) { world.getTileEntity(pos) } ?: return null
         if (!ForestryIntegration.TileLeaves.isInstance(tile)) return null
         val textureLoc = ForestryIntegration.TiLgetLeaveSprite.invoke(tile, Minecraft.isFancyGraphicsEnabled()) ?: return null
         return textureToValue[textureLoc]
