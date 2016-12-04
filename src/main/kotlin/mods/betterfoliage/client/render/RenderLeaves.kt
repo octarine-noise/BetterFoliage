@@ -47,9 +47,10 @@ class RenderLeaves : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
         val isSnowed = ctx.blockState(up1).material.let {
             it == Material.SNOW || it == Material.CRAFTED_SNOW
         }
-        renderWorldBlockBase(ctx, dispatcher, renderer, null)
-        val leafInfo = LeafRegistry[ctx, DOWN]!!
+        val leafInfo = LeafRegistry[ctx, DOWN] ?: return false
         val blockColor = ctx.blockData(Int3.zero).color
+
+        renderWorldBlockBase(ctx, dispatcher, renderer, null)
 
         modelRenderer.updateShading(Int3.zero, allFaces)
         ShadersModIntegration.leaves(renderer) {
