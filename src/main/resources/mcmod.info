@@ -1,9 +1,8 @@
 [{
-  "modid": "BetterFoliage",
+  "modid": "betterfoliage",
   "name": "Better Foliage",
   "version": "$version",
   "mcversion": "$mcversion",
   "description": "Leafier leaves and grassier grass",
-  "authorList" : ["octarine-noise (code)", "Meringue (textures)"],
-  "modLanguageAdapter": ""
+  "authorList" : ["octarine-noise (code)", "Meringue (textures)"]
 }]
