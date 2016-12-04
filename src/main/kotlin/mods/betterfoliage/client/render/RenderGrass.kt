@@ -75,7 +75,7 @@ class RenderGrass : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
                         rotateUV(2)
                         if (isSnowed) {
                             if (!ctx.aoEnabled) setGrey(1.4f)
-                        } else if (ctx.aoEnabled) multiplyColor(blockColor)
+                        } else if (ctx.aoEnabled && grassInfo.overrideColor == null) multiplyColor(blockColor)
                     }
                 )
             }
