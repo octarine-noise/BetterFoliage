@@ -48,6 +48,9 @@ object BetterFoliageMod {
     @Mod.EventHandler
     fun preInit(event: FMLPreInitializationEvent) {
         log = event.modLog
+        val logDetailFile = File(event.modConfigurationDirectory.parentFile, "logs/betterfoliage.log").apply {
+            if (!exists()) createNewFile()
+        }
         logDetail = SimpleLogger(
             "BetterFoliage",
             DEBUG,
@@ -55,7 +58,7 @@ object BetterFoliageMod {
             "yyyy-MM-dd HH:mm:ss",
             null,
             PropertiesUtil(Properties()),
-            PrintStream(File(event.modConfigurationDirectory.parentFile, "logs/betterfoliage.log"))
+            PrintStream(logDetailFile)
         )
         config = Configuration(event.suggestedConfigurationFile, null, true)
     }
