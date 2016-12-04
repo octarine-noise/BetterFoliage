@@ -13,7 +13,6 @@ import org.apache.logging.log4j.Level.DEBUG
 import org.apache.logging.log4j.Level.INFO
 import org.apache.logging.log4j.Logger
 import org.apache.logging.log4j.simple.SimpleLogger
-import org.apache.logging.log4j.simple.SimpleLoggerContext
 import org.apache.logging.log4j.util.PropertiesUtil
 import java.io.File
 import java.io.PrintStream
@@ -27,11 +26,11 @@ import java.util.*
 )
 object BetterFoliageMod {
 
-    const val MOD_ID = "BetterFoliage"
+    const val MOD_ID = "betterfoliage"
     const val MOD_NAME = "Better Foliage"
     const val DOMAIN = "betterfoliage"
     const val LEGACY_DOMAIN = "bettergrassandleaves"
-    const val MC_VERSIONS = "[1.9.4]"
+    const val MC_VERSIONS = "[1.10.2]"
     const val GUI_FACTORY = "mods.betterfoliage.client.gui.ConfigGuiFactory"
 
     lateinit var log: Logger
