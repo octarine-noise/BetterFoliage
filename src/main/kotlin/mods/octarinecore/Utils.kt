@@ -8,7 +8,10 @@ import java.lang.Math.*
 
 const val PI2 = 2.0 * PI
 
+/** Strip the given prefix off the start of the string, if present */
 inline fun String.stripStart(str: String) = if (startsWith(str)) substring(str.length) else this
+
+/** Strip the given prefix off the start of the resource path, if present */
 inline fun ResourceLocation.stripStart(str: String) = ResourceLocation(resourceDomain, resourcePath.stripStart(str))
 
 /** Mutating version of _map_. Replace each element of the list with the result of the given transformation. */

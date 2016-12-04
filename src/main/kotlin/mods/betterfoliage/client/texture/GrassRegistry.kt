@@ -22,6 +22,7 @@ import net.minecraft.world.IBlockAccess
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
+import org.apache.logging.log4j.Level
 
 const val defaultGrassColor = 0
 
@@ -92,8 +93,16 @@ object StandardGrassSupport :
     }
 
     fun registerGrass(texture: TextureAtlasSprite, atlas: TextureMap) {
+        logger.log(Level.DEBUG, "$logName: texture ${texture.iconName}")
         val hsb = HSB.fromColor(texture.averageColor ?: defaultGrassColor)
-        val overrideColor = if (hsb.saturation > Config.shortGrass.saturationThreshold) hsb.copy(brightness = 0.8f).asColor else null
+        val overrideColor = if (hsb.saturation >= Config.shortGrass.saturationThreshold) {
+            logger.log(Level.DEBUG, "$logName:         saturation ${hsb.saturation} >= ${Config.shortGrass.saturationThreshold}, using texture color")
+            hsb.copy(brightness = 0.9f).asColor
+        } else {
+            logger.log(Level.DEBUG, "$logName:         saturation ${hsb.saturation} < ${Config.shortGrass.saturationThreshold}, using block color")
+            null
+        }
+
         textureToValue[texture] =  GrassInfo(texture, overrideColor)
     }
 }

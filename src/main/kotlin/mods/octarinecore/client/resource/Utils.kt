@@ -63,7 +63,7 @@ val BufferedImage.asStream: InputStream get() =
  * and the result transformed back to the RGB color space.
  */
 val TextureAtlasSprite.averageColor: Int? get() {
-    val locationNoDirs = ResourceLocation(iconName)
+    val locationNoDirs = ResourceLocation(iconName).stripStart("blocks/")
     val locationWithDirs = ResourceLocation(locationNoDirs.resourceDomain, "textures/blocks/%s.png".format(locationNoDirs.resourcePath))
     val image = resourceManager[locationWithDirs]?.loadImage() ?: return null
 
