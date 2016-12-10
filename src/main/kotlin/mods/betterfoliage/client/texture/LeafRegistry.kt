@@ -59,7 +59,7 @@ object LeafRegistry : ILeafRegistry {
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun handlePreStitch(event: TextureStitchEvent.Pre) {
         particles.clear()
-        typeMappings.loadMappings(ResourceLocation(BetterFoliageMod.DOMAIN, "leafTextureMappings.cfg"))
+        typeMappings.loadMappings(ResourceLocation(BetterFoliageMod.DOMAIN, "leaf_texture_mappings.cfg"))
     }
 
     override fun get(state: IBlockState, world: IBlockAccess, pos: BlockPos, face: EnumFacing) =
@@ -113,7 +113,7 @@ object StandardLeafSupport :
         if (it == null) null else textureToValue[it]
     }
 
-    override fun processStitch(state: IBlockState, key: List<String>, atlas: TextureMap) = atlas[key[0]]
+    override fun processStitch(state: IBlockState, key: List<String>, atlas: TextureMap) = atlas.registerSprite(key[0])
 
     override fun processTexture(states: List<IBlockState>, texture: TextureAtlasSprite, atlas: TextureMap) {
         logger?.log(Level.DEBUG, "$logName: leaf texture ${texture.iconName}")

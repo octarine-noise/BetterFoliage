@@ -5,10 +5,7 @@ import mods.betterfoliage.client.config.Config
 import mods.betterfoliage.client.integration.OptifineCTM
 import mods.octarinecore.client.render.BlockContext
 import mods.octarinecore.client.render.HSB
-import mods.octarinecore.client.resource.TextureListModelProcessor
-import mods.octarinecore.client.resource.TextureMediatedRegistry
-import mods.octarinecore.client.resource.averageColor
-import mods.octarinecore.client.resource.get
+import mods.octarinecore.client.resource.*
 import mods.octarinecore.common.Int3
 import mods.octarinecore.common.config.ConfigurableBlockMatcher
 import mods.octarinecore.common.config.ModelTextureList
@@ -83,7 +80,7 @@ object StandardGrassSupport :
         if (it == null) null else textureToValue[it]
     }
 
-    override fun processStitch(state: IBlockState, key: List<String>, atlas: TextureMap) = atlas[key[0]]
+    override fun processStitch(state: IBlockState, key: List<String>, atlas: TextureMap) = atlas.registerSprite(key[0])
 
     override fun processTexture(states: List<IBlockState>, texture: TextureAtlasSprite, atlas: TextureMap) {
         registerGrass(texture, atlas)

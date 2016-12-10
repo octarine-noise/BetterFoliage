@@ -37,8 +37,10 @@ operator fun IResourceManager.get(location: ResourceLocation): IResource? = tryD
 /** Index operator to get a texture sprite. */
 operator fun TextureMap.get(name: String): TextureAtlasSprite? = getTextureExtry(ResourceLocation(name).toString())
 
+fun TextureMap.registerSprite(name: String): TextureAtlasSprite = registerSprite(ResourceLocation(name))!!
+
 /** Load an image resource. */
-fun IResource.loadImage() = ImageIO.read(this.inputStream)
+fun IResource.loadImage(): BufferedImage? = ImageIO.read(this.inputStream)
 
 /** Get the lines of a text resource. */
 fun IResource.getLines(): List<String> {

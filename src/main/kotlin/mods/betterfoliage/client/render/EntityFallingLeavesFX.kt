@@ -38,7 +38,7 @@ AbstractEntityFX(world, pos.x.toDouble() + 0.5, pos.y.toDouble(), pos.z.toDouble
     var wasCollided = false
 
     init {
-        particleMaxAge = MathHelper.floor_double(random(0.6, 1.0) * Config.fallingLeaves.lifetime * 20.0)
+        particleMaxAge = MathHelper.floor(random(0.6, 1.0) * Config.fallingLeaves.lifetime * 20.0)
         motionY = -Config.fallingLeaves.speed
         particleScale = Config.fallingLeaves.size.toFloat() * 0.1f
 
@@ -60,7 +60,7 @@ AbstractEntityFX(world, pos.x.toDouble() + 0.5, pos.y.toDouble(), pos.z.toDouble
         if (rand.nextFloat() > 0.95f) rotPositive = !rotPositive
         if (particleAge > particleMaxAge - 20) particleAlpha = 0.05f * (particleMaxAge - particleAge)
 
-        if (isCollided || wasCollided) {
+        if (onGround || wasCollided) {
             velocity.setTo(0.0, 0.0, 0.0)
             if (!wasCollided) {
                 particleAge = Math.max(particleAge, particleMaxAge - 20)
@@ -117,7 +117,7 @@ object LeafWindTracker {
 
     @SubscribeEvent
     fun handleWorldTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase == TickEvent.Phase.START) Minecraft.getMinecraft().theWorld?.let { world ->
+        if (event.phase == TickEvent.Phase.START) Minecraft.getMinecraft().world?.let { world ->
             // change target wind speed
             if (world.worldInfo.worldTime >= nextChange) changeWind(world)
 

@@ -48,9 +48,9 @@ abstract class AbstractBlockRenderingHandler(modId: String) : ResourceHandler(mo
      * Render the block in the current [BlockContext]
      */
     fun renderWorldBlockBase(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: VertexBuffer, layer: BlockRenderLayer?): Boolean {
-        ctx.blockState(Int3.zero).let {
-            if (layer == null || it.block.canRenderInLayer(layer))
-                return dispatcher.renderBlock(it, ctx.pos, ctx.world, renderer)
+        ctx.blockState(Int3.zero).let { state ->
+            if (layer == null || state.block.canRenderInLayer(state, layer))
+                return dispatcher.renderBlock(state, ctx.pos, ctx.world, renderer)
         }
         return false
     }
@@ -111,8 +111,8 @@ class BlockContext() {
     /** Get the distance of the block from the camera (player). */
     val cameraDistance: Int get() {
         val camera = Minecraft.getMinecraft().renderViewEntity ?: return 0
-        return Math.abs(pos.x - MathHelper.floor_double(camera.posX)) +
-               Math.abs(pos.y - MathHelper.floor_double(camera.posY)) +
-               Math.abs(pos.z - MathHelper.floor_double(camera.posZ))
+        return Math.abs(pos.x - MathHelper.floor(camera.posX)) +
+               Math.abs(pos.y - MathHelper.floor(camera.posY)) +
+               Math.abs(pos.z - MathHelper.floor(camera.posZ))
     }
 }

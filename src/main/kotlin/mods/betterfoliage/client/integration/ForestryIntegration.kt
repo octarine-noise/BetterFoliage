@@ -14,6 +14,7 @@ import mods.betterfoliage.client.texture.StandardLeafSupport
 import mods.betterfoliage.loader.Refs
 import mods.octarinecore.client.resource.ModelProcessor
 import mods.octarinecore.client.resource.get
+import mods.octarinecore.client.resource.registerSprite
 import mods.octarinecore.metaprog.ClassRef
 import mods.octarinecore.metaprog.FieldRef
 import mods.octarinecore.metaprog.MethodRef
@@ -95,8 +96,8 @@ object ForestryLeavesSupport : ILeafRegistry {
     }
 
     fun registerLeaf(textureLocation: ResourceLocation, atlas: TextureMap) {
-        val texture = atlas[textureLocation.toString()] ?: return
-        var leafType = LeafRegistry.typeMappings.getType(texture) ?: "default"
+        val texture = atlas.registerSprite(textureLocation)
+        val leafType = LeafRegistry.typeMappings.getType(texture) ?: "default"
         Client.logDetail("ForestryLeavesSupport:        texture ${texture.iconName}")
         Client.logDetail("ForestryLeavesSupport:        particle $leafType")
         val generated = atlas.registerSprite(
@@ -156,8 +157,8 @@ object ForestryLogSupport : ModelProcessor<List<String>, IColumnTextureResolver>
     }
 
     override fun processStitch(state: IBlockState, key: List<String>, atlas: TextureMap): IColumnTextureResolver? {
-        val heart = atlas[key[0]] ?: return null
-        val bark = atlas[key[1]] ?: return null
+        val heart = atlas.registerSprite(key[0])
+        val bark = atlas.registerSprite(key[1])
         return StaticColumnInfo(heart, heart, bark)
     }
 

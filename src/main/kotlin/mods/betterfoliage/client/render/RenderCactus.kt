@@ -6,6 +6,7 @@ import mods.betterfoliage.client.config.Config
 import mods.octarinecore.client.render.*
 import mods.octarinecore.client.resource.TextureListModelProcessor
 import mods.octarinecore.client.resource.get
+import mods.octarinecore.client.resource.registerSprite
 import mods.octarinecore.common.Int3
 import mods.octarinecore.common.Rotation
 import mods.octarinecore.common.config.ConfigurableBlockMatcher
@@ -45,10 +46,10 @@ class RenderCactus : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
         )
 
         override fun processStitch(state: IBlockState, key: List<String>, atlas: TextureMap): IColumnTextureResolver? {
-            val topTex = atlas[key[0]]
-            val bottomTex = atlas[key[1]]
-            val sideTex = atlas[key[2]]
-            return if (topTex != null && bottomTex != null && sideTex != null) StaticColumnInfo(topTex, bottomTex, sideTex) else null
+            val topTex = atlas.registerSprite(key[0])
+            val bottomTex = atlas.registerSprite(key[1])
+            val sideTex = atlas.registerSprite(key[2])
+            return StaticColumnInfo(topTex, bottomTex, sideTex)
         }
 
         override fun get(state: IBlockState) = stateToValue[state]

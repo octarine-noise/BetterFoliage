@@ -30,7 +30,7 @@ object BetterFoliageMod {
     const val MOD_NAME = "Better Foliage"
     const val DOMAIN = "betterfoliage"
     const val LEGACY_DOMAIN = "bettergrassandleaves"
-    const val MC_VERSIONS = "[1.10.2]"
+    const val MC_VERSIONS = "[1.11]"
     const val GUI_FACTORY = "mods.betterfoliage.client.gui.ConfigGuiFactory"
 
     lateinit var log: Logger
