@@ -30,12 +30,12 @@ class BetterFoliageTransformer : Transformer() {
         // why: allows us to catch random display ticks, without touching block code
         transformMethod(Refs.showBarrierParticles) {
             find(invokeRef(Refs.randomDisplayTick))?.insertAfter {
-                log.info("Applying random display tick call hook")
+                log.info("[BetterFoliageLoader] Applying random display tick call hook")
                 varinsn(ALOAD, 0)
                 varinsn(ALOAD, 11)
                 varinsn(ALOAD, 7)
                 invokeStatic(Refs.onRandomDisplayTick)
-            } ?: log.warn("Failed to apply random display tick call hook!")
+            } ?: log.warn("[BetterFoliageLoader] Failed to apply random display tick call hook!")
         }
 
         // where: BlockStateContainer$StateImplementation.getAmbientOcclusionLightValue()
@@ -43,10 +43,10 @@ class BetterFoliageTransformer : Transformer() {
         // why: allows us to have light behave properly on non-solid log blocks
         transformMethod(Refs.getAmbientOcclusionLightValue) {
             find(FRETURN)?.insertBefore {
-                log.info("Applying getAmbientOcclusionLightValue() override")
+                log.info("[BetterFoliageLoader] Applying getAmbientOcclusionLightValue() override")
                 varinsn(ALOAD, 0)
                 invokeStatic(Refs.getAmbientOcclusionLightValueOverride)
-            } ?: log.warn("Failed to apply getAmbientOcclusionLightValue() override!")
+            } ?: log.warn("[BetterFoliageLoader] Failed to apply getAmbientOcclusionLightValue() override!")
         }
 
         // where: BlockStateContainer$StateImplementation.useNeighborBrightness()
@@ -54,10 +54,10 @@ class BetterFoliageTransformer : Transformer() {
         // why: allows us to have light behave properly on non-solid log blocks
         transformMethod(Refs.useNeighborBrightness) {
             find(IRETURN)?.insertBefore {
-                log.info("Applying useNeighborBrightness() override")
+                log.info("[BetterFoliageLoader] Applying useNeighborBrightness() override")
                 varinsn(ALOAD, 0)
                 invokeStatic(Refs.useNeighborBrightnessOverride)
-            } ?: log.warn("Failed to apply useNeighborBrightness() override!")
+            } ?: log.warn("[BetterFoliageLoader] Failed to apply useNeighborBrightness() override!")
         }
 
         // where: BlockStateContainer$StateImplementation.doesSideBlockRendering()
@@ -65,12 +65,12 @@ class BetterFoliageTransformer : Transformer() {
         // why: allows us to make log blocks non-solid
         transformMethod(Refs.doesSideBlockRendering) {
             find(IRETURN)?.insertBefore {
-                log.info("Applying doesSideBlockRendering() override")
+                log.info("[BetterFoliageLoader] Applying doesSideBlockRendering() override")
                 varinsn(ALOAD, 1)
                 varinsn(ALOAD, 2)
                 varinsn(ALOAD, 3)
                 invokeStatic(Refs.doesSideBlockRenderingOverride)
-            } ?: log.warn("Failed to apply doesSideBlockRendering() override!")
+            } ?: log.warn("[BetterFoliageLoader] Failed to apply doesSideBlockRendering() override!")
         }
 
         // where: BlockStateContainer$StateImplementation.isOpaqueCube()
@@ -78,10 +78,10 @@ class BetterFoliageTransformer : Transformer() {
         // why: allows us to make log blocks non-solid
         transformMethod(Refs.isOpaqueCube) {
             find(IRETURN)?.insertBefore {
-                log.info("Applying isOpaqueCube() override")
+                log.info("[BetterFoliageLoader] Applying isOpaqueCube() override")
                 varinsn(ALOAD, 0)
                 invokeStatic(Refs.isOpaqueCubeOverride)
-            } ?: log.warn("Failed to apply isOpaqueCube() override!")
+            } ?: log.warn("[BetterFoliageLoader] Failed to apply isOpaqueCube() override!")
         }
 
         // where: ModelLoader.setupModelRegistry(), right before the textures are loaded
@@ -89,10 +89,10 @@ class BetterFoliageTransformer : Transformer() {
         // why: allows us to iterate the unbaked models in ModelLoader in time to register textures
         transformMethod(Refs.setupModelRegistry) {
             find(invokeName("addAll"))?.insertAfter {
-                log.info("Applying ModelLoader lifecycle callback")
+                log.info("[BetterFoliageLoader] Applying ModelLoader lifecycle callback")
                 varinsn(ALOAD, 0)
                 invokeStatic(Refs.onAfterLoadModelDefinitions)
-            } ?: log.warn("Failed to apply ModelLoader lifecycle callback!")
+            } ?: log.warn("[BetterFoliageLoader] Failed to apply ModelLoader lifecycle callback!")
         }
 
         // where: RenderChunk.rebuildChunk()
@@ -102,13 +102,13 @@ class BetterFoliageTransformer : Transformer() {
         // why: allows us to render transparent quads for blocks which are only on the SOLID layer
         transformMethod(Refs.rebuildChunk) {
             find(invokeRef(Refs.renderBlock))?.replace {
-                log.info("Applying RenderChunk block render override")
+                log.info("[BetterFoliageLoader] Applying RenderChunk block render override")
                 varinsn(ALOAD, if (isOptifinePresent) 22 else 20)
                 invokeStatic(Refs.renderWorldBlock)
             }
             if (isOptifinePresent) {
                 find(varinsn(ISTORE, 23))?.insertAfter {
-                    log.info("Applying RenderChunk block layer override")
+                    log.info("[BetterFoliageLoader] Applying RenderChunk block layer override")
                     varinsn(ALOAD, 19)
                     varinsn(ALOAD, 18)
                     varinsn(ALOAD, 22)
@@ -117,7 +117,7 @@ class BetterFoliageTransformer : Transformer() {
                 }
             } else {
                 find(invokeRef(Refs.canRenderInLayer))?.replace {
-                    log.info("Applying RenderChunk block layer override")
+                    log.info("[BetterFoliageLoader] Applying RenderChunk block layer override")
                     invokeStatic(Refs.canRenderBlockInLayer)
                 }
             }
@@ -127,7 +127,7 @@ class BetterFoliageTransformer : Transformer() {
         // what: make constructor public
         // why: use vanilla AO calculation at will without duplicating code
         transformMethod(Refs.AOF_constructor) {
-            log.info("Setting AmbientOcclusionFace constructor public")
+            log.info("[BetterFoliageLoader] Setting AmbientOcclusionFace constructor public")
             makePublic()
         }
 
@@ -136,10 +136,10 @@ class BetterFoliageTransformer : Transformer() {
         // why: allows us to change the block ID seen by shader programs
         transformMethod(Refs.pushEntity_state) {
             find(invokeRef(Refs.pushEntity_num))?.insertBefore {
-                log.info("Applying SVertexBuilder.pushEntity() block ID override")
+                log.info("[BetterFoliageLoader] Applying SVertexBuilder.pushEntity() block ID override")
                 varinsn(ALOAD, 0)
                 invokeStatic(Refs.getBlockIdOverride)
-            } ?: log.warn("Failed to apply SVertexBuilder.pushEntity() block ID override!")
+            } ?: log.warn("[BetterFoliageLoader] Failed to apply SVertexBuilder.pushEntity() block ID override!")
         }
     }
 }

@@ -72,7 +72,7 @@ object Client {
     )
 
     fun log(level: Level, msg: String) {
-        BetterFoliageMod.log.log(level, msg)
+        BetterFoliageMod.log.log(level, "[BetterFoliage] $msg")
         BetterFoliageMod.logDetail.log(level, msg)
     }
 
