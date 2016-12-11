@@ -48,6 +48,7 @@ object BetterFoliageMod {
     fun preInit(event: FMLPreInitializationEvent) {
         log = event.modLog
         val logDetailFile = File(event.modConfigurationDirectory.parentFile, "logs/betterfoliage.log").apply {
+            parentFile.mkdirs()
             if (!exists()) createNewFile()
         }
         logDetail = SimpleLogger(
