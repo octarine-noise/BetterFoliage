@@ -76,7 +76,7 @@ object LeafRegistry : ILeafRegistry {
             particleSet.onStitch(atlas)
             if (particleSet.num == 0) {
                 Client.log(Level.WARN, "Leaf particle textures not found for leaf type: $leafType")
-                leafType == "default"
+                leafType = "default"
             } else {
                 particles.put(leafType, particleSet)
             }
