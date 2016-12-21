@@ -78,6 +78,7 @@ object OptifineCTM {
     }
 }
 
+@SideOnly(Side.CLIENT)
 class OptifineRenderEnv {
     val wrapped: Any = Refs.RenderEnv.element!!.getDeclaredConstructor(
         Refs.IBlockAccess.element, Refs.IBlockState.element, Refs.BlockPos.element

@@ -19,9 +19,12 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.client.renderer.texture.TextureMap
 import net.minecraft.util.EnumFacing.Axis
 import net.minecraftforge.common.MinecraftForge
+import net.minecraftforge.fml.relauncher.Side
+import net.minecraftforge.fml.relauncher.SideOnly
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.Logger
 
+@SideOnly(Side.CLIENT)
 class RenderLog : AbstractRenderColumn(BetterFoliageMod.MOD_ID) {
 
     override val moveToCutout: Boolean get() = false
@@ -44,11 +47,13 @@ class RenderLog : AbstractRenderColumn(BetterFoliageMod.MOD_ID) {
 
 }
 
+@SideOnly(Side.CLIENT)
 object LogRegistry : IColumnRegistry {
     val subRegistries: MutableList<IColumnRegistry> = mutableListOf(StandardLogSupport)
     override fun get(state: IBlockState) = subRegistries.findFirst { it[state] }
 }
 
+@SideOnly(Side.CLIENT)
 object StandardLogSupport : TextureListModelProcessor<IColumnTextureInfo>, IColumnRegistry {
 
     init { MinecraftForge.EVENT_BUS.register(this) }

@@ -38,7 +38,7 @@ class AoData() {
     }
 
     companion object {
-        val black = AoData();
+        val black = AoData()
     }
 }
 

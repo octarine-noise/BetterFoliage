@@ -12,8 +12,11 @@ import net.minecraft.client.renderer.VertexBuffer
 import net.minecraft.init.Blocks
 import net.minecraft.util.BlockRenderLayer
 import net.minecraft.util.EnumFacing.*
+import net.minecraftforge.fml.relauncher.Side
+import net.minecraftforge.fml.relauncher.SideOnly
 import org.apache.logging.log4j.Level.INFO
 
+@SideOnly(Side.CLIENT)
 class RenderNetherrack : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
 
     val netherrackIcon = iconSet(BetterFoliageMod.LEGACY_DOMAIN, "blocks/better_netherrack_%d")

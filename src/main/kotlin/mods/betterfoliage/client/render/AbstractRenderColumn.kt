@@ -14,7 +14,10 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.util.BlockRenderLayer
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.EnumFacing.*
+import net.minecraftforge.fml.relauncher.Side
+import net.minecraftforge.fml.relauncher.SideOnly
 
+@SideOnly(Side.CLIENT)
 interface IColumnTextureInfo {
     val axis: Axis?
     val top: (ShadingContext, Int, Quad)->TextureAtlasSprite?
@@ -22,10 +25,12 @@ interface IColumnTextureInfo {
     val side: (ShadingContext, Int, Quad)->TextureAtlasSprite?
 }
 
+@SideOnly(Side.CLIENT)
 interface IColumnRegistry {
     operator fun get(state: IBlockState): IColumnTextureInfo?
 }
 
+@SideOnly(Side.CLIENT)
 data class StaticColumnInfo(override val axis: Axis?,
                             val topTexture: TextureAtlasSprite,
                             val bottomTexture: TextureAtlasSprite,
@@ -50,6 +55,7 @@ const val NW = 2
 /** Index of SOUTH-WEST quadrant. */
 const val SW = 3
 
+@SideOnly(Side.CLIENT)
 @Suppress("NOTHING_TO_INLINE")
 abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandler(modId) {
 

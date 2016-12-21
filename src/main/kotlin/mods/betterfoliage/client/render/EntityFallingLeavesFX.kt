@@ -25,6 +25,7 @@ import org.lwjgl.opengl.GL11
 import java.lang.Math.*
 import java.util.*
 
+@SideOnly(Side.CLIENT)
 class EntityFallingLeavesFX(world: World, pos: BlockPos) :
 AbstractEntityFX(world, pos.x.toDouble() + 0.5, pos.y.toDouble(), pos.z.toDouble() + 0.5) {
 

@@ -68,6 +68,7 @@ object ForestryIntegration {
     }
 }
 
+@SideOnly(Side.CLIENT)
 object ForestryLeavesSupport : ILeafRegistry {
 
     val textureToValue = mutableMapOf<ResourceLocation, LeafInfo>()
@@ -123,6 +124,7 @@ object ForestryLeavesSupport : ILeafRegistry {
     }
 }
 
+@SideOnly(Side.CLIENT)
 object ForestryLogSupport : ModelProcessor<List<String>, IColumnTextureInfo>, IColumnRegistry {
 
     override var stateToKey = mutableMapOf<IBlockState, List<String>>()

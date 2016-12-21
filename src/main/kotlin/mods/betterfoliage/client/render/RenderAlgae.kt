@@ -11,8 +11,11 @@ import net.minecraft.block.material.Material
 import net.minecraft.client.renderer.BlockRendererDispatcher
 import net.minecraft.client.renderer.VertexBuffer
 import net.minecraft.util.BlockRenderLayer
+import net.minecraftforge.fml.relauncher.Side
+import net.minecraftforge.fml.relauncher.SideOnly
 import org.apache.logging.log4j.Level.INFO
 
+@SideOnly(Side.CLIENT)
 class RenderAlgae : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
 
     val noise = simplexNoise()

@@ -20,8 +20,11 @@ import net.minecraft.client.renderer.texture.TextureMap
 import net.minecraft.util.BlockRenderLayer
 import net.minecraft.util.EnumFacing.*
 import net.minecraftforge.common.MinecraftForge
+import net.minecraftforge.fml.relauncher.Side
+import net.minecraftforge.fml.relauncher.SideOnly
 import org.apache.logging.log4j.Level
 
+@SideOnly(Side.CLIENT)
 class RenderCactus : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
 
     val cactusStemRadius = 0.4375
