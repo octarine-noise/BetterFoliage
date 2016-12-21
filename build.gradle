@@ -32,7 +32,7 @@ dependencies {
     shade "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 }
 minecraft {
-    version = '1.10.2-12.18.1.2075'
+    version = '1.10.2-12.18.2.2121'
     mappings = 'snapshot_20160905'
     runDir = 'run'
 }

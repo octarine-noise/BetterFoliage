@@ -35,9 +35,13 @@ interface ModelProcessor<T1, T2> {
     fun processModelLoad(state: IBlockState, modelLoc: ModelResourceLocation, model: IModel): T1?
     fun processStitch(state: IBlockState, key: T1, atlas: TextureMap): T2?
 
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    fun clearBeforeLoadModelData(event: LoadModelDataEvent) {
+        stateToKey.clear()
+    }
+
     @SubscribeEvent
     fun handleLoadModelData(event: LoadModelDataEvent) {
-        stateToKey.clear()
         onPostLoad()
 
         val stateMappings = Block.REGISTRY.flatMap { block ->
@@ -96,7 +100,6 @@ interface TextureMediatedRegistry<T1, T3> : ModelProcessor<T1, TextureAtlasSprit
     var textureToValue: MutableMap<TextureAtlasSprite, T3>
 
     @Suppress("UNCHECKED_CAST")
-    //    @SubscribeEvent(priority = EventPriority.LOW)
     override fun handlePreStitch(event: TextureStitchEvent.Pre) {
         textureToValue.clear()
         super.handlePreStitch(event)
