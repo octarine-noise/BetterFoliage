@@ -30,12 +30,12 @@ class RenderCactus : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
     val iconCross = iconStatic(BetterFoliageMod.LEGACY_DOMAIN, "blocks/better_cactus")
     val iconArm = iconSet(BetterFoliageMod.LEGACY_DOMAIN, "blocks/better_cactus_arm_%d")
 
-    val cactusTextures: IColumnRegistry = object : TextureListModelProcessor<IColumnTextureResolver>, IColumnRegistry {
+    val cactusTextures: IColumnRegistry = object : TextureListModelProcessor<IColumnTextureInfo>, IColumnRegistry {
 
         init { MinecraftForge.EVENT_BUS.register(this) }
 
         override var stateToKey = mutableMapOf<IBlockState, List<String>>()
-        override var stateToValue = mapOf<IBlockState, IColumnTextureResolver>()
+        override var stateToValue = mapOf<IBlockState, IColumnTextureInfo>()
 
         override val logger = BetterFoliageMod.logDetail
         override val logName = "CactusTextures"
@@ -44,11 +44,11 @@ class RenderCactus : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
             modelTextures("block/cactus", "top", "bottom", "side")
         )
 
-        override fun processStitch(state: IBlockState, key: List<String>, atlas: TextureMap): IColumnTextureResolver? {
-            val topTex = atlas[key[0]]
-            val bottomTex = atlas[key[1]]
-            val sideTex = atlas[key[2]]
-            return if (topTex != null && bottomTex != null && sideTex != null) StaticColumnInfo(topTex, bottomTex, sideTex) else null
+        override fun processStitch(state: IBlockState, key: List<String>, atlas: TextureMap): IColumnTextureInfo? {
+            val topTex = atlas[key[0]] ?: return null
+            val bottomTex = atlas[key[1]] ?: return null
+            val sideTex = atlas[key[2]] ?: return null
+            return StaticColumnInfo(Axis.Y, topTex, bottomTex, sideTex)
         }
 
         override fun get(state: IBlockState) = stateToValue[state]

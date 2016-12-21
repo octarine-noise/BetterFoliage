@@ -3,10 +3,7 @@ package mods.betterfoliage.client.integration
 import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.Config
-import mods.betterfoliage.client.render.IColumnRegistry
-import mods.betterfoliage.client.render.IColumnTextureResolver
-import mods.betterfoliage.client.render.LogRegistry
-import mods.betterfoliage.client.render.StaticColumnInfo
+import mods.betterfoliage.client.render.*
 import mods.betterfoliage.client.texture.ILeafRegistry
 import mods.betterfoliage.client.texture.LeafInfo
 import mods.betterfoliage.client.texture.LeafRegistry
@@ -126,10 +123,10 @@ object ForestryLeavesSupport : ILeafRegistry {
     }
 }
 
-object ForestryLogSupport : ModelProcessor<List<String>, IColumnTextureResolver>, IColumnRegistry {
+object ForestryLogSupport : ModelProcessor<List<String>, IColumnTextureInfo>, IColumnRegistry {
 
     override var stateToKey = mutableMapOf<IBlockState, List<String>>()
-    override var stateToValue = mapOf<IBlockState, IColumnTextureResolver>()
+    override var stateToValue = mapOf<IBlockState, IColumnTextureInfo>()
 
     override val logger = BetterFoliageMod.logDetail
 
@@ -155,10 +152,10 @@ object ForestryLogSupport : ModelProcessor<List<String>, IColumnTextureResolver>
         return if (bark != null && heart != null) listOf(heart, bark) else null
     }
 
-    override fun processStitch(state: IBlockState, key: List<String>, atlas: TextureMap): IColumnTextureResolver? {
+    override fun processStitch(state: IBlockState, key: List<String>, atlas: TextureMap): IColumnTextureInfo? {
         val heart = atlas[key[0]] ?: return null
         val bark = atlas[key[1]] ?: return null
-        return StaticColumnInfo(heart, heart, bark)
+        return StaticColumnInfo(StandardLogSupport.getAxis(state), heart, heart, bark)
     }
 
     override fun get(state: IBlockState) = stateToValue[state]

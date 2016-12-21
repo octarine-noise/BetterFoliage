@@ -19,6 +19,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.client.renderer.texture.TextureMap
 import net.minecraft.util.EnumFacing.Axis
 import net.minecraftforge.common.MinecraftForge
+import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.Logger
 
 class RenderLog : AbstractRenderColumn(BetterFoliageMod.MOD_ID) {
@@ -29,17 +30,6 @@ class RenderLog : AbstractRenderColumn(BetterFoliageMod.MOD_ID) {
         Config.enabled && Config.roundLogs.enabled &&
         ctx.cameraDistance < Config.roundLogs.distance &&
         Config.blocks.logClasses.matchesClass(ctx.block)
-
-    override var axisFunc = { state: IBlockState ->
-        val axis = tryDefault(null) { state.getValue(BlockLog.LOG_AXIS).toString() } ?:
-            state.properties.entries.find { it.key.getName().toLowerCase() == "axis" }?.let { it.value.toString() }
-        when (axis) {
-            "x" -> Axis.X
-            "y" -> Axis.Y
-            "z" -> Axis.Z
-            else -> if (Config.roundLogs.defaultY) Axis.Y else null
-        }
-    }
 
     override val registry: IColumnRegistry get() = LogRegistry
 
@@ -59,24 +49,35 @@ object LogRegistry : IColumnRegistry {
     override fun get(state: IBlockState) = subRegistries.findFirst { it[state] }
 }
 
-object StandardLogSupport : TextureListModelProcessor<IColumnTextureResolver>, IColumnRegistry {
+object StandardLogSupport : TextureListModelProcessor<IColumnTextureInfo>, IColumnRegistry {
 
     init { MinecraftForge.EVENT_BUS.register(this) }
 
     override var stateToKey = mutableMapOf<IBlockState, List<String>>()
-    override var stateToValue = mapOf<IBlockState, IColumnTextureResolver>()
+    override var stateToValue = mapOf<IBlockState, IColumnTextureInfo>()
 
     override val logger = BetterFoliageMod.logDetail
     override val logName = "StandardLogSupport"
     override val matchClasses: ConfigurableBlockMatcher get() = Config.blocks.logClasses
     override val modelTextures: List<ModelTextureList> get() = Config.blocks.logModels.list
 
-    override fun processStitch(state: IBlockState, key: List<String>, atlas: TextureMap): IColumnTextureResolver? {
-        val topTex = atlas[key[0]]
-        val bottomTex = atlas[key[1]]
-        val sideTex = atlas[key[2]]
-        return if (topTex != null && bottomTex != null && sideTex != null) StaticColumnInfo(topTex, bottomTex, sideTex) else null
+    override fun processStitch(state: IBlockState, key: List<String>, atlas: TextureMap): IColumnTextureInfo? {
+        val topTex = atlas[key[0]] ?: return null
+        val bottomTex = atlas[key[1]] ?: return null
+        val sideTex = atlas[key[2]] ?: return null
+        return StaticColumnInfo(getAxis(state), topTex, bottomTex, sideTex)
     }
 
     override fun get(state: IBlockState) = stateToValue[state]
+
+    fun getAxis(state: IBlockState): Axis? {
+        val axis = tryDefault(null) { state.getValue(BlockLog.LOG_AXIS).toString() } ?:
+            state.properties.entries.find { it.key.getName().toLowerCase() == "axis" }?.let { it.value.toString() }
+        return when (axis) {
+            "x" -> Axis.X
+            "y" -> Axis.Y
+            "z" -> Axis.Z
+            else -> null
+        }
+    }
 }
