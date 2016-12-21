@@ -14,8 +14,11 @@ import net.minecraft.client.renderer.VertexBuffer
 import net.minecraft.util.BlockRenderLayer
 import net.minecraft.util.EnumFacing.Axis
 import net.minecraft.util.EnumFacing.UP
+import net.minecraftforge.fml.relauncher.Side
+import net.minecraftforge.fml.relauncher.SideOnly
 import org.apache.logging.log4j.Level.INFO
 
+@SideOnly(Side.CLIENT)
 class RenderCoral : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
 
     val noise = simplexNoise()

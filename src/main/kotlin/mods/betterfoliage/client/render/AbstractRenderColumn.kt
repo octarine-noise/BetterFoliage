@@ -1,5 +1,6 @@
 package mods.betterfoliage.client.render
 
+import mods.betterfoliage.client.config.Config
 import mods.betterfoliage.client.integration.OptifineCTM
 import mods.betterfoliage.client.integration.ShadersModIntegration
 import mods.betterfoliage.client.render.AbstractRenderColumn.BlockType.*
@@ -13,20 +14,27 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.util.BlockRenderLayer
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.EnumFacing.*
+import net.minecraftforge.fml.relauncher.Side
+import net.minecraftforge.fml.relauncher.SideOnly
 
-interface IColumnTextureResolver {
+@SideOnly(Side.CLIENT)
+interface IColumnTextureInfo {
+    val axis: Axis?
     val top: (ShadingContext, Int, Quad)->TextureAtlasSprite?
     val bottom: (ShadingContext, Int, Quad)->TextureAtlasSprite?
     val side: (ShadingContext, Int, Quad)->TextureAtlasSprite?
 }
 
+@SideOnly(Side.CLIENT)
 interface IColumnRegistry {
-    operator fun get(state: IBlockState): IColumnTextureResolver?
+    operator fun get(state: IBlockState): IColumnTextureInfo?
 }
 
-data class StaticColumnInfo(val topTexture: TextureAtlasSprite,
+@SideOnly(Side.CLIENT)
+data class StaticColumnInfo(override val axis: Axis?,
+                            val topTexture: TextureAtlasSprite,
                             val bottomTexture: TextureAtlasSprite,
-                            val sideTexture: TextureAtlasSprite) : IColumnTextureResolver {
+                            val sideTexture: TextureAtlasSprite) : IColumnTextureInfo {
     override val top = { ctx: ShadingContext, idx: Int, quad: Quad ->
         OptifineCTM.override(topTexture, blockContext, UP.rotate(ctx.rotation))
     }
@@ -47,6 +55,7 @@ const val NW = 2
 /** Index of SOUTH-WEST quadrant. */
 const val SW = 3
 
+@SideOnly(Side.CLIENT)
 @Suppress("NOTHING_TO_INLINE")
 abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandler(modId) {
 
@@ -123,7 +132,6 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
     inline fun continous(q1: QuadrantType, q2: QuadrantType) =
         q1 == q2 || ((q1 == SQUARE || q1 == INVISIBLE) && (q2 == SQUARE || q2 == INVISIBLE))
 
-    abstract val axisFunc: (IBlockState)->EnumFacing.Axis?
     abstract val blockPredicate: (IBlockState)->Boolean
 
     abstract val registry: IColumnRegistry
@@ -138,7 +146,8 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
         modelRenderer.updateShading(Int3.zero, allFaces)
 
         // check log neighborhood
-        val logAxis = ctx.blockAxis ?: return renderWorldBlockBase(ctx, dispatcher, renderer, null)
+        // if log axis is not defined and "Default to vertical" config option is not set, render normally
+        val logAxis = columnTextures.axis ?: if (Config.roundLogs.defaultY) Axis.Y else return renderWorldBlockBase(ctx, dispatcher, renderer, null)
         val baseRotation = rotationFromUp[(logAxis to AxisDirection.POSITIVE).face.ordinal]
 
         val upType = ctx.blockType(baseRotation, logAxis, Int3(0, 1, 0))
@@ -328,9 +337,6 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
         return this
     }
 
-    /** Get the axis of the block */
-    val BlockContext.blockAxis: Axis? get() = axisFunc(blockState(Int3.zero))
-
     /**
      * Get the type of the block at the given offset in a rotated reference frame.
      */
@@ -340,7 +346,9 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
         return if (!blockPredicate(state)) {
             if (state.isOpaqueCube) SOLID else NONSOLID
         } else {
-            axisFunc(state)?.let { if (it == axis) PARALLEL else PERPENDICULAR } ?: SOLID
+            (registry[state]?.axis ?: if (Config.roundLogs.defaultY) Axis.Y else null)?.let {
+                if (it == axis) PARALLEL else PERPENDICULAR
+            } ?: SOLID
         }
     }
 }

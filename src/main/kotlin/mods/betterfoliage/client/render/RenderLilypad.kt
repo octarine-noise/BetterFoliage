@@ -12,8 +12,11 @@ import net.minecraft.client.renderer.VertexBuffer
 import net.minecraft.util.BlockRenderLayer
 import net.minecraft.util.EnumFacing.DOWN
 import net.minecraft.util.EnumFacing.UP
+import net.minecraftforge.fml.relauncher.Side
+import net.minecraftforge.fml.relauncher.SideOnly
 import org.apache.logging.log4j.Level
 
+@SideOnly(Side.CLIENT)
 class RenderLilypad : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
 
     val rootModel = model {

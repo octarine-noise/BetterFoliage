@@ -13,8 +13,11 @@ import net.minecraft.client.renderer.BlockRendererDispatcher
 import net.minecraft.client.renderer.VertexBuffer
 import net.minecraft.util.BlockRenderLayer
 import net.minecraft.util.EnumFacing.UP
+import net.minecraftforge.fml.relauncher.Side
+import net.minecraftforge.fml.relauncher.SideOnly
 import org.apache.logging.log4j.Level
 
+@SideOnly(Side.CLIENT)
 class RenderReeds : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
 
     val noise = simplexNoise()

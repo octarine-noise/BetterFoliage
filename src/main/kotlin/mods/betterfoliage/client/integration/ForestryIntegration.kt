@@ -3,10 +3,7 @@ package mods.betterfoliage.client.integration
 import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.Config
-import mods.betterfoliage.client.render.IColumnRegistry
-import mods.betterfoliage.client.render.IColumnTextureResolver
-import mods.betterfoliage.client.render.LogRegistry
-import mods.betterfoliage.client.render.StaticColumnInfo
+import mods.betterfoliage.client.render.*
 import mods.betterfoliage.client.texture.ILeafRegistry
 import mods.betterfoliage.client.texture.LeafInfo
 import mods.betterfoliage.client.texture.LeafRegistry
@@ -72,6 +69,7 @@ object ForestryIntegration {
     }
 }
 
+@SideOnly(Side.CLIENT)
 object ForestryLeavesSupport : ILeafRegistry {
 
     val textureToValue = mutableMapOf<ResourceLocation, LeafInfo>()
@@ -127,10 +125,11 @@ object ForestryLeavesSupport : ILeafRegistry {
     }
 }
 
-object ForestryLogSupport : ModelProcessor<List<String>, IColumnTextureResolver>, IColumnRegistry {
+@SideOnly(Side.CLIENT)
+object ForestryLogSupport : ModelProcessor<List<String>, IColumnTextureInfo>, IColumnRegistry {
 
     override var stateToKey = mutableMapOf<IBlockState, List<String>>()
-    override var stateToValue = mapOf<IBlockState, IColumnTextureResolver>()
+    override var stateToValue = mapOf<IBlockState, IColumnTextureInfo>()
 
     override val logger = BetterFoliageMod.logDetail
 
@@ -156,10 +155,10 @@ object ForestryLogSupport : ModelProcessor<List<String>, IColumnTextureResolver>
         return if (bark != null && heart != null) listOf(heart, bark) else null
     }
 
-    override fun processStitch(state: IBlockState, key: List<String>, atlas: TextureMap): IColumnTextureResolver? {
+    override fun processStitch(state: IBlockState, key: List<String>, atlas: TextureMap): IColumnTextureInfo? {
         val heart = atlas.registerSprite(key[0])
         val bark = atlas.registerSprite(key[1])
-        return StaticColumnInfo(heart, heart, bark)
+        return StaticColumnInfo(StandardLogSupport.getAxis(state), heart, heart, bark)
     }
 
     override fun get(state: IBlockState) = stateToValue[state]

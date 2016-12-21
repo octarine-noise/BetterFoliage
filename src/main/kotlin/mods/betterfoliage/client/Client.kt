@@ -2,9 +2,7 @@ package mods.betterfoliage.client
 
 import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.gui.ConfigGuiFactory
-import mods.betterfoliage.client.integration.ForestryIntegration
-import mods.betterfoliage.client.integration.OptifineCTM
-import mods.betterfoliage.client.integration.ShadersModIntegration
+import mods.betterfoliage.client.integration.*
 import mods.betterfoliage.client.render.*
 import mods.betterfoliage.client.texture.*
 import mods.octarinecore.client.KeyHandler
@@ -63,12 +61,14 @@ object Client {
     val singletons = listOf(
         LeafRegistry,
         GrassRegistry,
-        LogRegistry,
         LeafWindTracker,
         RisingSoulTextures,
         ShadersModIntegration,
         OptifineCTM,
-        ForestryIntegration
+        ForestryIntegration,
+        IC2Integration,
+        TechRebornIntegration,
+        StandardLogSupport          // add _after_ all other log registries
     )
 
     fun log(level: Level, msg: String) {
