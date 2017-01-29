@@ -13,7 +13,7 @@ import org.objectweb.asm.Opcodes.*
     "kotlin",
     "mods.octarinecore.kotlin"
 )
-@IFMLLoadingPlugin.MCVersion("1.11")
+@IFMLLoadingPlugin.MCVersion("1.11.2")
 class BetterFoliageLoader : ASMPlugin(BetterFoliageTransformer::class.java)
 
 class BetterFoliageTransformer : Transformer() {
