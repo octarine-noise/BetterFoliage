@@ -47,12 +47,12 @@ object ForestryIntegration {
     val TileLeaves = ClassRef("forestry.arboriculture.tiles.TileLeaves")
     val TiLgetLeaveSprite = MethodRef(TileLeaves, "getLeaveSprite", Refs.ResourceLocation, ClassRef.boolean)
 
-    val PropertyWoodType = ClassRef("forestry.arboriculture.blocks.property.PropertyWoodType")
+    val PropertyWoodType = ClassRef("forestry.arboriculture.blocks.PropertyWoodType")
     val IWoodType = ClassRef("forestry.api.arboriculture.IWoodType")
     val barkTex = MethodRef(IWoodType, "getBarkTexture", Refs.String)
     val heartTex = MethodRef(IWoodType, "getHeartTexture", Refs.String)
 
-    val PropertyTreeType = ClassRef("forestry.arboriculture.blocks.property.PropertyTreeType")
+    val PropertyTreeType = ClassRef("forestry.arboriculture.blocks.PropertyTreeType")
     val TreeDefinition = ClassRef("forestry.arboriculture.genetics.TreeDefinition")
     val IAlleleTreeSpecies = ClassRef("forestry.api.arboriculture.IAlleleTreeSpecies")
     val ILeafSpriteProvider = ClassRef("forestry.api.arboriculture.ILeafSpriteProvider")
