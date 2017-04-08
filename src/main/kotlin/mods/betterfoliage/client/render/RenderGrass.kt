@@ -58,24 +58,27 @@ class RenderGrass : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
             return true
         }
         val cubeTexture = if (isSnowed) ctx.icon(UP, up1) else null ?: grassInfo.grassTopTexture
-        val blockColor = ctx.blockColor(Int3.zero)
+        val blockColor = ctx.blockColor
 
         if (connectedGrass) {
             // get AO data
             if (renderWorldBlockBase(parent, face = neverRender)) return true
 
             // render full grass block
-            modelRenderer.render(
-                fullCube,
-                Rotation.identity,
-                ctx.blockCenter,
-                icon =  { ctx, qi, q -> cubeTexture },
-                rotateUV = { 2 },
-                postProcess = { ctx, qi, q, vi, v ->
-                    if (isSnowed) { if(!ctx.aoEnabled) setGrey(1.4f) }
-                    else if (qi != UP.ordinal && ctx.aoEnabled) multiplyColor(blockColor)
-                }
-            )
+            ShadersModIntegration.renderAs(ctx.block) {
+                modelRenderer.render(
+                    fullCube,
+                    Rotation.identity,
+                    ctx.blockCenter,
+                    icon = { _, _, _ -> cubeTexture },
+                    rotateUV = { 2 },
+                    postProcess = { ctx, qi, _, _, _ ->
+                        if (isSnowed) {
+                            if (!ctx.aoEnabled) setGrey(1.4f)
+                        } else if (qi != UP.ordinal && ctx.aoEnabled) multiplyColor(blockColor)
+                    }
+                )
+            }
         } else {
             // render normally
             if (renderWorldBlockBase(parent, face = alwaysRender)) return true

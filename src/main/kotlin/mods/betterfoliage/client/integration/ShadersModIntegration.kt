@@ -17,8 +17,12 @@ import org.apache.logging.log4j.Level.*
 object ShadersModIntegration {
 
     @JvmStatic var isPresent = false
-    @JvmStatic val tallGrassEntityData = Block.blockRegistry.getIDForObject(Blocks.tallgrass) and 65535 or (Blocks.tallgrass.renderType shl 16)
-    @JvmStatic val leavesEntityData = Block.blockRegistry.getIDForObject(Blocks.leaves) and 65535 or (Blocks.leaves.renderType shl 16)
+    @JvmStatic val tallGrassEntityData = entityDataFor(Blocks.tallgrass)
+    @JvmStatic val leavesEntityData = entityDataFor(Blocks.leaves)
+
+    fun entityDataFor(block: Block) =
+        (Block.blockRegistry.getIDForObject(block) and 65535) or
+        ((block.renderType and 65535) shl 16)
 
     /**
      * Called from transformed ShadersMod code.
@@ -37,17 +41,20 @@ object ShadersModIntegration {
         }
     }
 
-    /** Quads rendered inside this block will behave as tallgrass blocks in shader programs. */
-    inline fun grass(enabled: Boolean = true, func: ()->Unit) {
-        if (isPresent && enabled) Refs.pushEntity_I.invokeStatic(tallGrassEntityData)
+    /** Quads rendered inside this block will use the given block entity data in shader programs. */
+    inline fun renderAs(blockEntityData: Int, enabled: Boolean = true, func: ()->Unit) {
+        if (isPresent && enabled) Refs.pushEntity_I.invokeStatic(blockEntityData)
         func()
         if (isPresent && enabled) Refs.popEntity.invokeStatic()
     }
 
+    /** Quads rendered inside this block will use the given block entity data in shader programs. */
+    inline fun renderAs(block: Block, enabled: Boolean = true, func: ()->Unit) =
+        renderAs(entityDataFor(block), enabled, func)
+
+    /** Quads rendered inside this block will behave as tallgrass blocks in shader programs. */
+    inline fun grass(enabled: Boolean = true, func: ()->Unit) = renderAs(tallGrassEntityData, enabled, func)
+
     /** Quads rendered inside this block will behave as leaf blocks in shader programs. */
-    inline fun leaves(enabled: Boolean = true, func: ()->Unit) {
-        if (isPresent && enabled) Refs.pushEntity_I.invokeStatic(leavesEntityData)
-        func()
-        if (isPresent && enabled) Refs.popEntity.invokeStatic()
-    }
+    inline fun leaves(enabled: Boolean = true, func: ()->Unit) = renderAs(leavesEntityData, enabled, func)
 }
