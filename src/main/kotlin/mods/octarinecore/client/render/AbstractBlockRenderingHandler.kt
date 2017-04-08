@@ -49,7 +49,7 @@ abstract class AbstractBlockRenderingHandler(modId: String) : ResourceHandler(mo
      */
     fun renderWorldBlockBase(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: VertexBuffer, layer: BlockRenderLayer?): Boolean {
         ctx.blockState(Int3.zero).let {
-            if (layer == null || it.block.canRenderInLayer(layer))
+            if (layer == null || it.block.canRenderInLayer(it, layer))
                 return dispatcher.renderBlock(it, ctx.pos, ctx.world, renderer)
         }
         return false

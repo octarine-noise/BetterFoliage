@@ -6,6 +6,8 @@ import mods.octarinecore.client.render.AbstractBlockRenderingHandler
 import mods.octarinecore.client.render.BlockContext
 import mods.octarinecore.client.render.withOffset
 import mods.octarinecore.common.Int3
+import mods.octarinecore.common.forgeDirsHorizontal
+import mods.octarinecore.common.offset
 import net.minecraft.client.renderer.BlockRendererDispatcher
 import net.minecraft.client.renderer.VertexBuffer
 import net.minecraft.util.BlockRenderLayer
@@ -21,6 +23,10 @@ class RenderConnectedGrass : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_
         (Config.connectedGrass.snowEnabled || !ctx.blockState(up2).isSnow)
 
     override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: VertexBuffer, layer: BlockRenderLayer): Boolean {
+        // if the block sides are not visible anyway, render normally
+        if (forgeDirsHorizontal.all { ctx.blockState(it.offset).isOpaqueCube }) return renderWorldBlockBase(ctx, dispatcher, renderer, null)
+
+        if (ctx.isSurroundedBy { it.isOpaqueCube } ) return false
         return ctx.withOffset(Int3.zero, up1) {
             ctx.withOffset(up1, up2) {
                 renderWorldBlockBase(ctx, dispatcher, renderer, null)

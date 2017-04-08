@@ -34,6 +34,7 @@ class ModelRenderer : ShadingContext() {
         rot: Rotation = Rotation.identity,
         trans: Double3 = blockContext.blockCenter,
         forceFlat: Boolean = false,
+        quadFilter: (Int, Quad) -> Boolean = { _, _ -> true },
         icon: QuadIconResolver,
         postProcess: PostProcessLambda
     ) {
@@ -44,21 +45,23 @@ class ModelRenderer : ShadingContext() {
         worldRenderer.ensureSpaceForQuads(model.quads.size + 1)
 
         model.quads.forEachIndexed { quadIdx, quad ->
-            val drawIcon = icon(this, quadIdx, quad)
-            if (drawIcon != null) {
-                quad.verts.forEachIndexed { vertIdx, vert ->
-                    temp.init(vert).rotate(rotation).translate(trans)
-                    val shader = if (aoEnabled && !forceFlat) vert.aoShader else vert.flatShader
-                    shader.shade(this, temp)
-                    temp.postProcess(this, quadIdx, quad, vertIdx, vert)
-                    temp.setIcon(drawIcon)
+            if (quadFilter(quadIdx, quad)) {
+                val drawIcon = icon(this, quadIdx, quad)
+                if (drawIcon != null) {
+                    quad.verts.forEachIndexed { vertIdx, vert ->
+                        temp.init(vert).rotate(rotation).translate(trans)
+                        val shader = if (aoEnabled && !forceFlat) vert.aoShader else vert.flatShader
+                        shader.shade(this, temp)
+                        temp.postProcess(this, quadIdx, quad, vertIdx, vert)
+                        temp.setIcon(drawIcon)
 
-                    worldRenderer
-                        .pos(temp.x, temp.y, temp.z)
-                        .color(temp.red, temp.green, temp.blue, 1.0f)
-                        .tex(temp.u, temp.v)
-                        .lightmap(temp.brightness shr 16 and 65535, temp.brightness and 65535)
-                        .endVertex()
+                        worldRenderer
+                            .pos(temp.x, temp.y, temp.z)
+                            .color(temp.red, temp.green, temp.blue, 1.0f)
+                            .tex(temp.u, temp.v)
+                            .lightmap(temp.brightness shr 16 and 65535, temp.brightness and 65535)
+                            .endVertex()
+                    }
                 }
             }
         }
