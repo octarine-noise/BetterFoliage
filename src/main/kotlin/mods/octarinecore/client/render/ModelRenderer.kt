@@ -32,6 +32,7 @@ class ModelRenderer() : ShadingContext() {
         rot: Rotation = Rotation.identity,
         trans: Double3 = blockContext.blockCenter,
         forceFlat: Boolean = false,
+        quadFilter: (Int, Quad) -> Boolean = { qi, q -> true },
         icon: QuadIconResolver,
         rotateUV: (Quad) -> Int,
         postProcess: PostProcessLambda
@@ -40,18 +41,20 @@ class ModelRenderer() : ShadingContext() {
         aoEnabled = Minecraft.isAmbientOcclusionEnabled()
 
         model.quads.forEachIndexed { quadIdx, quad ->
-            val drawIcon = icon(this, quadIdx, quad)
-            val uvRot = rotateUV(quad)
-            quad.verts.forEachIndexed { vertIdx, vert ->
-                temp.init(vert)
-                temp.rotate(rotation).translate(trans).rotateUV(uvRot).setIcon(drawIcon)
-                val shader = if (aoEnabled && !forceFlat) vert.aoShader else vert.flatShader
-                shader.shade(this, temp)
-                temp.postProcess(this, quadIdx, quad, vertIdx, vert)
-                Tessellator.instance.apply {
-                    setBrightness(temp.brightness)
-                    setColorOpaque_F(temp.red, temp.green, temp.blue)
-                    addVertexWithUV(temp.x, temp.y, temp.z, temp.u, temp.v)
+            if (quadFilter(quadIdx, quad)) {
+                val drawIcon = icon(this, quadIdx, quad)
+                val uvRot = rotateUV(quad)
+                quad.verts.forEachIndexed { vertIdx, vert ->
+                    temp.init(vert)
+                    temp.rotate(rotation).translate(trans).rotateUV(uvRot).setIcon(drawIcon)
+                    val shader = if (aoEnabled && !forceFlat) vert.aoShader else vert.flatShader
+                    shader.shade(this, temp)
+                    temp.postProcess(this, quadIdx, quad, vertIdx, vert)
+                    Tessellator.instance.apply {
+                        setBrightness(temp.brightness)
+                        setColorOpaque_F(temp.red, temp.green, temp.blue)
+                        addVertexWithUV(temp.x, temp.y, temp.z, temp.u, temp.v)
+                    }
                 }
             }
         }
