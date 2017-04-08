@@ -80,7 +80,7 @@ object StandardLogSupport : TextureListModelProcessor<IColumnTextureInfo>, IColu
 
     fun getAxis(state: IBlockState): Axis? {
         val axis = tryDefault(null) { state.getValue(BlockLog.LOG_AXIS).toString() } ?:
-            state.properties.entries.find { it.key.getName().toLowerCase() == "axis" }?.let { it.value.toString() }
+            state.properties.entries.find { it.key.getName().toLowerCase() == "axis" }?.value?.toString()
         return when (axis) {
             "x" -> Axis.X
             "y" -> Axis.Y

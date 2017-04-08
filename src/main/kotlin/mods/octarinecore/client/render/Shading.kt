@@ -10,6 +10,10 @@ import net.minecraft.util.EnumFacing.*
 import java.lang.Math.min
 import java.util.*
 
+typealias EdgeShaderFactory = (EnumFacing, EnumFacing) -> Shader
+typealias CornerShaderFactory = (EnumFacing, EnumFacing, EnumFacing) -> Shader
+typealias ShaderFactory = (Quad, Vertex) -> Shader
+
 /** Holds shading values for block corners as calculated by vanilla Minecraft rendering. */
 class AoData() {
     var valid = false
@@ -140,8 +144,8 @@ interface Shader {
  * @param[edge] shader instantiation lambda for edge midpoint vertices
  */
 fun faceOrientedAuto(overrideFace: EnumFacing? = null,
-                     corner: ((EnumFacing, EnumFacing, EnumFacing)->Shader)? = null,
-                     edge: ((EnumFacing, EnumFacing)->Shader)? = null) =
+                     corner: CornerShaderFactory? = null,
+                     edge: EdgeShaderFactory? = null) =
     fun(quad: Quad, vertex: Vertex): Shader {
         val quadFace = overrideFace ?: quad.normal.nearestCardinal
         val nearestCorner = nearestPosition(vertex.xyz, faceCorners[quadFace.ordinal].asList) {
@@ -167,7 +171,7 @@ fun faceOrientedAuto(overrideFace: EnumFacing? = null,
  * @param[corner] shader instantiation lambda
  */
 fun edgeOrientedAuto(overrideEdge: Pair<EnumFacing, EnumFacing>? = null,
-                     corner: (EnumFacing, EnumFacing, EnumFacing)->Shader) =
+                     corner: CornerShaderFactory) =
     fun(quad: Quad, vertex: Vertex): Shader {
         val edgeDir = overrideEdge ?: nearestAngle(quad.normal, boxEdges) { it.first.vec + it.second.vec }.first
         val nearestFace = nearestPosition(vertex.xyz, edgeDir.toList()) { it.vec }.first

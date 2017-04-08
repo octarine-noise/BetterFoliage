@@ -7,7 +7,10 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.EnumFacing.*
 
-class ModelRenderer() : ShadingContext() {
+typealias QuadIconResolver = (ShadingContext, Int, Quad) -> TextureAtlasSprite?
+typealias PostProcessLambda = RenderVertex.(ShadingContext, Int, Quad, Int, Vertex) -> Unit
+
+class ModelRenderer : ShadingContext() {
 
     /** Holds final vertex data before it goes to the [Tessellator]. */
     val temp = RenderVertex()
@@ -25,14 +28,14 @@ class ModelRenderer() : ShadingContext() {
      * @param[rotateUV] lambda to get amount of UV rotation for each quad
      * @param[postProcess] lambda to perform arbitrary modifications on the [RenderVertex] just before it goes to the [Tessellator]
      */
-    inline fun render(
+    fun render(
         worldRenderer: VertexBuffer,
         model: Model,
-        rot: Rotation,
+        rot: Rotation = Rotation.identity,
         trans: Double3 = blockContext.blockCenter,
         forceFlat: Boolean = false,
-        icon: (ShadingContext, Int, Quad) -> TextureAtlasSprite?,
-        postProcess: RenderVertex.(ShadingContext, Int, Quad, Int, Vertex) -> Unit
+        icon: QuadIconResolver,
+        postProcess: PostProcessLambda
     ) {
         rotation = rot
         aoEnabled = Minecraft.isAmbientOcclusionEnabled()
@@ -167,4 +170,4 @@ val allFaces: (EnumFacing) -> Boolean = { true }
 val topOnly: (EnumFacing) -> Boolean = { it == UP }
 
 /** Perform no post-processing */
-val noPost: RenderVertex.(ShadingContext, Int, Quad, Int, Vertex) -> Unit = { ctx, qi, q, vi, v -> }
+val noPost: PostProcessLambda = { _, _, _, _, _ -> }

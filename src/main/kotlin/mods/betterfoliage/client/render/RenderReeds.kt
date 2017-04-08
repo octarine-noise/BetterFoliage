@@ -64,7 +64,7 @@ class RenderReeds : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
                 reedModels[ctx.random(0)],
                 Rotation.identity,
                 forceFlat = true,
-                icon = { ctx, qi, q -> reedIcons[iconVar]!! },
+                icon = { _, _, _ -> reedIcons[iconVar]!! },
                 postProcess = noPost
             )
         }

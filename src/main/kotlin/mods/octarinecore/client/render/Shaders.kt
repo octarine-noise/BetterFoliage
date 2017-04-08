@@ -10,7 +10,7 @@ const val defaultEdgeDimming = 0.8f
 // ================================
 // Shader instantiation lambdas
 // ================================
-fun cornerAo(fallbackAxis: EnumFacing.Axis): (EnumFacing, EnumFacing, EnumFacing)->Shader = { face, dir1, dir2 ->
+fun cornerAo(fallbackAxis: EnumFacing.Axis): CornerShaderFactory = { face, dir1, dir2 ->
     val fallbackDir = listOf(face, dir1, dir2).find { it.axis == fallbackAxis }!!
     CornerSingleFallback(face, dir1, dir2, fallbackDir)
 }
@@ -20,7 +20,7 @@ fun cornerAoTri(func: (AoData, AoData)-> AoData) = { face: EnumFacing, dir1: Enu
 }
 val cornerAoMaxGreen = cornerAoTri { s1, s2 -> if (s1.green > s2.green) s1 else s2 }
 
-fun cornerInterpolate(edgeAxis: EnumFacing.Axis, weight: Float, dimming: Float): (EnumFacing, EnumFacing, EnumFacing)->Shader = { dir1, dir2, dir3 ->
+fun cornerInterpolate(edgeAxis: EnumFacing.Axis, weight: Float, dimming: Float): CornerShaderFactory = { dir1, dir2, dir3 ->
     val edgeDir = listOf(dir1, dir2, dir3).find { it.axis == edgeAxis }!!
     val faceDirs = listOf(dir1, dir2, dir3).filter { it.axis != edgeAxis }
     CornerInterpolateDimming(faceDirs[0], faceDirs[1], edgeDir, weight, dimming)
