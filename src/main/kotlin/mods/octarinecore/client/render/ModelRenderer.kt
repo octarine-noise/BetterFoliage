@@ -6,6 +6,9 @@ import net.minecraft.util.IIcon
 import net.minecraftforge.common.util.ForgeDirection
 import net.minecraftforge.common.util.ForgeDirection.*
 
+typealias QuadIconResolver = (ShadingContext, Int, Quad) -> IIcon
+typealias PostProcessLambda = RenderVertex.(ShadingContext, Int, Quad, Int, Vertex) -> Unit
+
 class ModelRenderer() : ShadingContext() {
 
     /** Holds final vertex data before it goes to the [Tessellator]. */
@@ -24,14 +27,14 @@ class ModelRenderer() : ShadingContext() {
      * @param[rotateUV] lambda to get amount of UV rotation for each quad
      * @param[postProcess] lambda to perform arbitrary modifications on the [RenderVertex] just before it goes to the [Tessellator]
      */
-    inline fun render(
+    fun render(
         model: Model,
-        rot: Rotation,
+        rot: Rotation = Rotation.identity,
         trans: Double3 = blockContext.blockCenter,
         forceFlat: Boolean = false,
-        icon: (ShadingContext, Int, Quad) -> IIcon,
+        icon: QuadIconResolver,
         rotateUV: (Quad) -> Int,
-        postProcess: RenderVertex.(ShadingContext, Int, Quad, Int, Vertex) -> Unit
+        postProcess: PostProcessLambda
     ) {
         rotation = rot
         aoEnabled = Minecraft.isAmbientOcclusionEnabled()

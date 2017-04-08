@@ -68,13 +68,13 @@ data class Quad(val v1: Vertex, val v2: Vertex, val v3: Vertex, val v4: Vertex) 
     fun clampUV(minU: Double = -0.5, maxU: Double = 0.5, minV: Double = -0.5, maxV: Double = 0.5) =
         transformV { it.copy(uv = it.uv.clamp(minU, maxU, minV, maxV)) }
     fun mirrorUV(mirrorU: Boolean, mirrorV: Boolean) = transformV { it.copy(uv = it.uv.mirror(mirrorU, mirrorV)) }
-    fun setAoShader(resolver: (Quad, Vertex)->Shader, predicate: (Vertex, Int)->Boolean = { v, vi -> true }) =
+    fun setAoShader(factory: ShaderFactory, predicate: (Vertex, Int)->Boolean = { v, vi -> true }) =
         transformVI { vertex, idx ->
-            if (!predicate(vertex, idx)) vertex else vertex.copy(aoShader = resolver(this@Quad, vertex))
+            if (!predicate(vertex, idx)) vertex else vertex.copy(aoShader = factory(this@Quad, vertex))
         }
-    fun setFlatShader(resolver: (Quad, Vertex)->Shader, predicate: (Vertex, Int)->Boolean = { v, vi -> true }) =
+    fun setFlatShader(factory: ShaderFactory, predicate: (Vertex, Int)->Boolean = { v, vi -> true }) =
         transformVI { vertex, idx ->
-            if (!predicate(vertex, idx)) vertex else vertex.copy(flatShader = resolver(this@Quad, vertex))
+            if (!predicate(vertex, idx)) vertex else vertex.copy(flatShader = factory(this@Quad, vertex))
         }
     fun setFlatShader(shader: Shader) = transformVI { vertex, idx -> vertex.copy(flatShader = shader) }
     val flipped: Quad get() = Quad(v4, v3, v2, v1)

@@ -52,8 +52,8 @@ class RenderLeaves : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
                     leavesModel.model,
                     rotation,
                     ctx.blockCenter + perturbs[rand[0]],
-                    icon = { ctx, qi, q -> leafInfo.roundLeafTexture },
-                    rotateUV = { q -> rand[1] },
+                    icon = { _, _, _ -> leafInfo.roundLeafTexture },
+                    rotateUV = { rand[1] },
                     postProcess = noPost
                 )
             }
@@ -61,7 +61,7 @@ class RenderLeaves : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
                 leavesModel.model,
                 Rotation.identity,
                 ctx.blockCenter + perturbs[rand[0]],
-                icon = { ctx, qi, q -> snowedIcon[rand[1]]!! },
+                icon = { _, _, _ -> snowedIcon[rand[1]]!! },
                 rotateUV = { 0 },
                 postProcess = whitewash
             )

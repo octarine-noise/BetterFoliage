@@ -54,7 +54,7 @@ class RenderLilypad : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
             Rotation.identity,
             ctx.blockCenter.add(perturbs[rand[4]]),
             forceFlat = true,
-            icon = { ctx, qi, q -> flowerIcon[rand[0]]!! },
+            icon = { _, _, _ -> flowerIcon[rand[0]]!! },
             rotateUV = { 0 },
             postProcess = noPost
         )

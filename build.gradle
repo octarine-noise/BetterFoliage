@@ -6,7 +6,7 @@ version = "2.0.14"
 archivesBaseName = rootProject.name + '-MC1.7.10'
 
 buildscript {
-    ext.kotlin_version = '1.0.0'
+    ext.kotlin_version = '1.1.1'
     repositories {
         mavenCentral()
         maven {

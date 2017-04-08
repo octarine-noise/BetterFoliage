@@ -38,7 +38,7 @@ class RenderMycelium : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
             myceliumModel[rand[0]],
             Rotation.identity,
             ctx.blockCenter + (if (isSnowed) snowOffset else Double3.zero),
-            icon = { ctx, qi, q -> myceliumIcon[rand[qi and 1]]!! },
+            icon = { _, qi, _ -> myceliumIcon[rand[qi and 1]]!! },
             rotateUV = { 0 },
             postProcess = if (isSnowed) whitewash else noPost
         )

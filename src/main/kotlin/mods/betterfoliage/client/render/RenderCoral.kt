@@ -53,7 +53,7 @@ class RenderCoral : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
                 modelRenderer.render(
                     coralModels[variation++],
                     rotationFromUp[idx],
-                    icon = { ctx, qi, q -> if (qi == 4) crustIcons[variation]!! else coralIcons[variation + (qi and 1)]!!},
+                    icon = { _, qi, _ -> if (qi == 4) crustIcons[variation]!! else coralIcons[variation + (qi and 1)]!!},
                     rotateUV = { 0 },
                     postProcess = noPost
                 )

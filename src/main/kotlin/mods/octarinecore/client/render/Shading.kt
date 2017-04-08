@@ -3,6 +3,10 @@ package mods.octarinecore.client.render
 import net.minecraftforge.common.util.ForgeDirection
 import java.lang.Math.*
 
+typealias EdgeShaderFactory = (ForgeDirection, ForgeDirection) -> Shader
+typealias CornerShaderFactory = (ForgeDirection, ForgeDirection, ForgeDirection) -> Shader
+typealias ShaderFactory = (Quad, Vertex) -> Shader
+
 /** Holds shading values for block corners as calculated by vanilla Minecraft rendering. */
 class AoData() {
     var valid = false
@@ -70,7 +74,7 @@ interface Shader {
 }
 
 /**
- * Returns a shader resolver for quads that point towards one of the 6 block faces.
+ * Returns a shader factory for quads that point towards one of the 6 block faces.
  * The resolver works the following way:
  *   - determines which face the _quad_ normal points towards (if not overridden)
  *   - determines the distance of the _vertex_ to the corners and edge midpoints on that block face
@@ -82,8 +86,8 @@ interface Shader {
  * @param[edge] shader instantiation lambda for edge midpoint vertices
  */
 fun faceOrientedAuto(overrideFace: ForgeDirection? = null,
-                     corner: ((ForgeDirection, ForgeDirection, ForgeDirection)->Shader)? = null,
-                     edge: ((ForgeDirection, ForgeDirection)->Shader)? = null) =
+                     corner: CornerShaderFactory? = null,
+                     edge: EdgeShaderFactory? = null) =
     fun(quad: Quad, vertex: Vertex): Shader {
         val quadFace = overrideFace ?: quad.normal.nearestCardinal
         val nearestCorner = nearestPosition(vertex.xyz, faceCorners[quadFace.ordinal].asList) {
@@ -98,7 +102,7 @@ fun faceOrientedAuto(overrideFace: ForgeDirection? = null,
     }
 
 /**
- * Returns a shader resolver for quads that point towards one of the 12 block edges.
+ * Returns a shader factory for quads that point towards one of the 12 block edges.
  * The resolver works the following way:
  *   - determines which edge the _quad_ normal points towards (if not overridden)
  *   - determines which face midpoint the _vertex_ is closest to, of the 2 block faces that share this edge
@@ -109,7 +113,7 @@ fun faceOrientedAuto(overrideFace: ForgeDirection? = null,
  * @param[corner] shader instantiation lambda
  */
 fun edgeOrientedAuto(overrideEdge: Pair<ForgeDirection, ForgeDirection>? = null,
-                     corner: (ForgeDirection, ForgeDirection, ForgeDirection)->Shader) =
+                     corner: CornerShaderFactory) =
     fun(quad: Quad, vertex: Vertex): Shader {
         val edgeDir = overrideEdge ?: nearestAngle(quad.normal, boxEdges) { it.first.vec + it.second.vec }.first
         val nearestFace = nearestPosition(vertex.xyz, edgeDir.toList()) { it.vec }.first

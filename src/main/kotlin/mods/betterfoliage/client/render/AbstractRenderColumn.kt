@@ -1,7 +1,9 @@
 package mods.betterfoliage.client.render
 
+import mods.betterfoliage.client.integration.ShadersModIntegration
 import mods.betterfoliage.client.render.AbstractRenderColumn.BlockType.*
 import mods.betterfoliage.client.render.AbstractRenderColumn.QuadrantType.*
+import mods.betterfoliage.loader.Refs
 import mods.octarinecore.client.render.*
 import net.minecraft.block.Block
 import net.minecraft.client.renderer.RenderBlocks
@@ -89,11 +91,11 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
     val transitionTop = model { mix(sideRoundLarge.model, sideRoundSmall.model) { it > 1 } }
     val transitionBottom = model { mix(sideRoundSmall.model, sideRoundLarge.model) { it > 1 } }
 
-    val sideTexture = { ctx: ShadingContext, qi: Int, q: Quad -> if ((qi and 1) == 0) ctx.icon(SOUTH) else ctx.icon(EAST) }
-    val upTexture = { ctx: ShadingContext, qi: Int, q: Quad -> ctx.icon(UP) }
-    val downTexture = { ctx: ShadingContext, qi: Int, q: Quad -> ctx.icon(DOWN) }
+    val sideTexture: QuadIconResolver = { ctx, qi, _ -> if ((qi and 1) == 0) ctx.icon(SOUTH) else ctx.icon(EAST) }
+    val upTexture: QuadIconResolver = { ctx, _, _ -> ctx.icon(UP) }
+    val downTexture: QuadIconResolver = { ctx, _, _ -> ctx.icon(DOWN) }
 
-    inline fun continous(q1: QuadrantType, q2: QuadrantType) =
+    inline fun continuous(q1: QuadrantType, q2: QuadrantType) =
         q1 == q2 || ((q1 == SQUARE || q1 == INVISIBLE) && (q2 == SQUARE || q2 == INVISIBLE))
 
     abstract val axisFunc: (Block, Int)->Axis
@@ -119,98 +121,100 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
         val quadrantsBottom = Array(4) { SMALL_RADIUS }
         if (downType == PARALLEL) quadrantsBottom.checkNeighbors(ctx, baseRotation, logAxis, -1)
 
-        quadrantRotations.forEachIndexed { idx, quadrantRotation ->
-            // set rotation for the current quadrant
-            val rotation = baseRotation + quadrantRotation
+        ShadersModIntegration.renderAs(ctx.block) {
+            quadrantRotations.forEachIndexed { idx, quadrantRotation ->
+                // set rotation for the current quadrant
+                val rotation = baseRotation + quadrantRotation
 
-            // disallow sharp discontinuities in the chamfer radius, or tapering-in where inappropriate
-            if (quadrants[idx] == LARGE_RADIUS &&
-                upType == PARALLEL && quadrantsTop[idx] != LARGE_RADIUS &&
-                downType == PARALLEL && quadrantsBottom[idx] != LARGE_RADIUS) {
-                quadrants[idx] = SMALL_RADIUS
-            }
-
-            // render side of current quadrant
-            val sideModel = when (quadrants[idx]) {
-                SMALL_RADIUS -> sideRoundSmall.model
-                LARGE_RADIUS -> if (upType == PARALLEL && quadrantsTop[idx] == SMALL_RADIUS) transitionTop.model
-                else if (downType == PARALLEL && quadrantsBottom[idx] == SMALL_RADIUS) transitionBottom.model
-                else sideRoundLarge.model
-                SQUARE -> sideSquare.model
-                else -> null
-            }
-
-            if (sideModel != null) modelRenderer.render(
-                sideModel,
-                rotation,
-                blockContext.blockCenter,
-                icon = sideTexture,
-                rotateUV = { 0 },
-                postProcess = noPost
-            )
-
-            // render top and bottom end of current quadrant
-            var upModel: Model? = null
-            var downModel: Model? = null
-            var upIcon = upTexture
-            var downIcon = downTexture
-            var shouldRotateUp = true
-            var shouldRotateDown = true
-
-            when (upType) {
-                NONSOLID -> upModel = flatTop(quadrants[idx])
-                PERPENDICULAR -> {
-                    if (!connectPerpendicular) {
-                        upModel = flatTop(quadrants[idx])
-                    } else {
-                        upIcon = sideTexture
-                        upModel = extendTop(quadrants[idx])
-                        shouldRotateUp = false
-                    }
+                // disallow sharp discontinuities in the chamfer radius, or tapering-in where inappropriate
+                if (quadrants[idx] == LARGE_RADIUS &&
+                    upType == PARALLEL && quadrantsTop[idx] != LARGE_RADIUS &&
+                    downType == PARALLEL && quadrantsBottom[idx] != LARGE_RADIUS) {
+                    quadrants[idx] = SMALL_RADIUS
                 }
-                PARALLEL -> {
-                    if (!continous(quadrants[idx], quadrantsTop[idx])) {
-                        if (quadrants[idx] == SQUARE || quadrants[idx] == INVISIBLE) {
-                            upModel = topSquare.model
+
+                // render side of current quadrant
+                val sideModel = when (quadrants[idx]) {
+                    SMALL_RADIUS -> sideRoundSmall.model
+                    LARGE_RADIUS -> if (upType == PARALLEL && quadrantsTop[idx] == SMALL_RADIUS) transitionTop.model
+                    else if (downType == PARALLEL && quadrantsBottom[idx] == SMALL_RADIUS) transitionBottom.model
+                    else sideRoundLarge.model
+                    SQUARE -> sideSquare.model
+                    else -> null
+                }
+
+                if (sideModel != null) modelRenderer.render(
+                    sideModel,
+                    rotation,
+                    blockContext.blockCenter,
+                    icon = sideTexture,
+                    rotateUV = { 0 },
+                    postProcess = noPost
+                )
+
+                // render top and bottom end of current quadrant
+                var upModel: Model? = null
+                var downModel: Model? = null
+                var upIcon = upTexture
+                var downIcon = downTexture
+                var shouldRotateUp = true
+                var shouldRotateDown = true
+
+                when (upType) {
+                    NONSOLID -> upModel = flatTop(quadrants[idx])
+                    PERPENDICULAR -> {
+                        if (!connectPerpendicular) {
+                            upModel = flatTop(quadrants[idx])
+                        } else {
+                            upIcon = sideTexture
+                            upModel = extendTop(quadrants[idx])
+                            shouldRotateUp = false
+                        }
+                    }
+                    PARALLEL -> {
+                        if (!continuous(quadrants[idx], quadrantsTop[idx])) {
+                            if (quadrants[idx] == SQUARE || quadrants[idx] == INVISIBLE) {
+                                upModel = topSquare.model
+                            }
                         }
                     }
                 }
-            }
-            when (downType) {
-                NONSOLID -> downModel = flatBottom(quadrants[idx])
-                PERPENDICULAR -> {
-                    if (!connectPerpendicular) {
-                        downModel = flatBottom(quadrants[idx])
-                    } else {
-                        downIcon = sideTexture
-                        downModel = extendBottom(quadrants[idx])
-                        shouldRotateDown = false
+                when (downType) {
+                    NONSOLID -> downModel = flatBottom(quadrants[idx])
+                    PERPENDICULAR -> {
+                        if (!connectPerpendicular) {
+                            downModel = flatBottom(quadrants[idx])
+                        } else {
+                            downIcon = sideTexture
+                            downModel = extendBottom(quadrants[idx])
+                            shouldRotateDown = false
+                        }
+                    }
+                    PARALLEL -> {
+                        if (!continuous(quadrants[idx], quadrantsBottom[idx]) &&
+                            (quadrants[idx] == SQUARE || quadrants[idx] == INVISIBLE)) {
+                            downModel = bottomSquare.model
+                        }
                     }
                 }
-                PARALLEL -> {
-                    if (!continous(quadrants[idx], quadrantsBottom[idx]) &&
-                        (quadrants[idx] == SQUARE || quadrants[idx] == INVISIBLE)) {
-                        downModel = bottomSquare.model
-                    }
-                }
-            }
 
-            if (upModel != null) modelRenderer.render(
-                upModel,
-                rotation,
-                blockContext.blockCenter,
-                icon = upIcon,
-                rotateUV = { if (shouldRotateUp) idx else 0 },
-                postProcess = noPost
-            )
-            if (downModel != null) modelRenderer.render(
-                downModel,
-                rotation,
-                blockContext.blockCenter,
-                icon = downIcon,
-                rotateUV = { if (shouldRotateDown) 3 - idx else 0 },
-                postProcess = noPost
-            )
+                if (upModel != null) modelRenderer.render(
+                    upModel,
+                    rotation,
+                    blockContext.blockCenter,
+                    icon = upIcon,
+                    rotateUV = { if (shouldRotateUp) idx else 0 },
+                    postProcess = noPost
+                )
+                if (downModel != null) modelRenderer.render(
+                    downModel,
+                    rotation,
+                    blockContext.blockCenter,
+                    icon = downIcon,
+                    rotateUV = { if (shouldRotateDown) 3 - idx else 0 },
+                    postProcess = noPost
+                )
+            }
         }
 
         return true

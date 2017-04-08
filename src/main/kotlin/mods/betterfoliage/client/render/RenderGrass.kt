@@ -101,8 +101,8 @@ class RenderGrass : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
                     { ctx: ShadingContext, qi: Int, q: Quad -> iconset[rand[qi and 1]]!! },
                 rotateUV = { 0 },
                 postProcess = if (isSnowed) whitewash
-                    else if (grassInfo.overrideColor != null)  { ctx, qi, q, vi, v -> multiplyColor(grassInfo.overrideColor) }
-                    else if (TFCIntegration.grass.matchesID(ctx.block)) { ctx, qi, q, vi, v -> multiplyColor(blockColor) }
+                    else if (grassInfo.overrideColor != null)  { _, _, _, _, _ -> multiplyColor(grassInfo.overrideColor) }
+                    else if (TFCIntegration.grass.matchesID(ctx.block)) { _, _, _, _, _ -> multiplyColor(blockColor) }
                     else noPost
             )
         }
