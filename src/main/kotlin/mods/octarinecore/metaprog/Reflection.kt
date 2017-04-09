@@ -43,7 +43,7 @@ fun Any.reflectFieldsOfType(vararg types: Class<*>) = this.javaClass.declaredFie
     .map { field -> field.name to field.let { it.isAccessible = true; it.get(this) } }
     .filterNotNull()
 
-enum class Namespace { OBF, SRG, MCP }
+enum class Namespace { MCP, SRG }
 
 abstract class Resolvable<T> {
     abstract fun resolve(): T?
@@ -56,11 +56,9 @@ fun allAvailable(vararg codeElement: Resolvable<*>) = codeElement.all { it.eleme
 /**
  * Reference to a class.
  *
- * @param[mcpName] MCP name of the class
- * @param[obfName] obfuscated name of the class
+ * @param[name] MCP name of the class
  */
-open class ClassRef(val mcpName: String, val obfName: String) : Resolvable<Class<*>>() {
-    constructor(mcpName: String) : this(mcpName, mcpName)
+open class ClassRef(val name: String) : Resolvable<Class<*>>() {
 
     companion object {
         val int = ClassRefPrimitive("I", Int::class.java)
@@ -70,10 +68,9 @@ open class ClassRef(val mcpName: String, val obfName: String) : Resolvable<Class
         val void = ClassRefPrimitive("V", null)
     }
 
-    fun name(namespace: Namespace) = if (namespace == Namespace.OBF) obfName else mcpName
-    open fun asmDescriptor(namespace: Namespace) = "L${name(namespace).replace(".", "/")};"
+    open fun asmDescriptor(namespace: Namespace) = "L${name.replace(".", "/")};"
 
-    override fun resolve() = listOf(mcpName, obfName).map { getJavaClass(it) }.filterNotNull().firstOrNull()
+    override fun resolve() = getJavaClass(name)
 
     fun isInstance(obj: Any) = element?.isInstance(obj) ?: false
 }
@@ -85,17 +82,16 @@ open class ClassRef(val mcpName: String, val obfName: String) : Resolvable<Class
  * @param[clazz] class of this primitive type
  */
 class ClassRefPrimitive(name: String, val clazz: Class<*>?) : ClassRef(name) {
-    override fun asmDescriptor(namespace: Namespace) = mcpName
+    override fun asmDescriptor(namespace: Namespace) = name
     override fun resolve() = clazz
 }
 
-class ClassRefArray(mcpName: String, obfName: String) : ClassRef(mcpName, obfName) {
-    constructor(mcpName: String) : this(mcpName, mcpName)
+class ClassRefArray(name: String) : ClassRef(name) {
     override fun asmDescriptor(namespace: Namespace) = "[" + super.asmDescriptor(namespace)
-    override fun resolve() = listOf(mcpName, obfName).map { getJavaClass("[L$it;") }.filterNotNull().firstOrNull()
+    override fun resolve() = getJavaClass("[L$name;")
 }
 
-fun ClassRef.array() = ClassRefArray(mcpName, obfName)
+fun ClassRef.array() = ClassRefArray(name)
 
 /**
  * Reference to a method.
@@ -103,30 +99,26 @@ fun ClassRef.array() = ClassRefArray(mcpName, obfName)
  * @param[parentClass] reference to the class containing the method
  * @param[mcpName] MCP name of the method
  * @param[srgName] SRG name of the method
- * @param[obfName] obfuscated name of the method
  * @param[returnType] reference to the return type
  * @param[returnType] references to the argument types
  */
 class MethodRef(val parentClass: ClassRef,
                 val mcpName: String,
-                val srgName: String?,
-                val obfName: String?,
+                val srgName: String,
                 val returnType: ClassRef,
-                vararg argTypes: ClassRef
+                vararg val argTypes: ClassRef
 ) : Resolvable<Method>() {
     constructor(parentClass: ClassRef, mcpName: String, returnType: ClassRef, vararg argTypes: ClassRef) :
-    this(parentClass, mcpName, mcpName, mcpName, returnType, *argTypes)
+    this(parentClass, mcpName, mcpName, returnType, *argTypes)
 
-    val argTypes = argTypes
-
-    fun name(namespace: Namespace) = when(namespace) { OBF -> obfName!!; SRG -> srgName!!; MCP -> mcpName }
+    fun name(namespace: Namespace) = when(namespace) { SRG -> srgName; MCP -> mcpName }
     fun asmDescriptor(namespace: Namespace) = "(${argTypes.map { it.asmDescriptor(namespace) }.fold(""){ s1, s2 -> s1 + s2 } })${returnType.asmDescriptor(namespace)}"
 
     override fun resolve(): Method? =
         if (parentClass.element == null || argTypes.any { it.element == null }) null
         else {
             val args = argTypes.map { it.element!! }.toTypedArray()
-            listOf(srgName!!, mcpName).map { tryDefault(null) {
+            listOf(srgName, mcpName).map { tryDefault(null) {
                 parentClass.element!!.getDeclaredMethod(it, *args)
             }}.filterNotNull().firstOrNull()
             ?.apply { isAccessible = true }
@@ -146,24 +138,22 @@ class MethodRef(val parentClass: ClassRef,
  * @param[parentClass] reference to the class containing the field
  * @param[mcpName] MCP name of the field
  * @param[srgName] SRG name of the field
- * @param[obfName] obfuscated name of the field
  * @param[type] reference to the field type
  */
 class FieldRef(val parentClass: ClassRef,
                val mcpName: String,
-               val srgName: String?,
-               val obfName: String?,
+               val srgName: String,
                val type: ClassRef?
 ) : Resolvable<Field>() {
-    constructor(parentClass: ClassRef, mcpName: String, type: ClassRef?) : this(parentClass, mcpName, mcpName, mcpName, type)
+    constructor(parentClass: ClassRef, mcpName: String, type: ClassRef?) : this(parentClass, mcpName, mcpName, type)
 
-    fun name(namespace: Namespace) = when(namespace) { OBF -> obfName!!; SRG -> srgName!!; MCP -> mcpName }
+    fun name(namespace: Namespace) = when(namespace) { SRG -> srgName; MCP -> mcpName }
     fun asmDescriptor(namespace: Namespace) = type!!.asmDescriptor(namespace)
 
     override fun resolve(): Field? =
         if (parentClass.element == null) null
         else {
-            listOf(srgName!!, mcpName).map { tryDefault(null) {
+            listOf(srgName, mcpName).map { tryDefault(null) {
                 parentClass.element!!.getDeclaredField(it)
             }}.filterNotNull().firstOrNull()
             ?.apply{ isAccessible = true }

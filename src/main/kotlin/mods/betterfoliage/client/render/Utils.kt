@@ -21,8 +21,8 @@ val snowOffset = UP * 0.0625
 val normalLeavesRot = arrayOf(Rotation.identity)
 val denseLeavesRot = arrayOf(Rotation.identity, Rotation.rot90[EAST.ordinal], Rotation.rot90[SOUTH.ordinal])
 
-val whitewash: RenderVertex.(ShadingContext, Int, Quad, Int, Vertex)->Unit = { ctx, qi, q, vi, v -> setGrey(1.4f) }
-val greywash: RenderVertex.(ShadingContext, Int, Quad, Int, Vertex)->Unit = { ctx, qi, q, vi, v -> setGrey(1.0f) }
+val whitewash: PostProcessLambda = { _, _, _, _, _ -> setGrey(1.4f) }
+val greywash: PostProcessLambda = { _, _, _, _, _ -> setGrey(1.0f) }
 
 val IBlockState.isSnow: Boolean get() = material.let { it == Material.SNOW || it == Material.CRAFTED_SNOW }
 

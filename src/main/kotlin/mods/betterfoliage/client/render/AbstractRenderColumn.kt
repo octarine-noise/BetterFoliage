@@ -20,9 +20,9 @@ import net.minecraftforge.fml.relauncher.SideOnly
 @SideOnly(Side.CLIENT)
 interface IColumnTextureInfo {
     val axis: Axis?
-    val top: (ShadingContext, Int, Quad)->TextureAtlasSprite?
-    val bottom: (ShadingContext, Int, Quad)->TextureAtlasSprite?
-    val side: (ShadingContext, Int, Quad)->TextureAtlasSprite?
+    val top: QuadIconResolver
+    val bottom: QuadIconResolver
+    val side: QuadIconResolver
 }
 
 @SideOnly(Side.CLIENT)
@@ -35,13 +35,13 @@ data class StaticColumnInfo(override val axis: Axis?,
                             val topTexture: TextureAtlasSprite,
                             val bottomTexture: TextureAtlasSprite,
                             val sideTexture: TextureAtlasSprite) : IColumnTextureInfo {
-    override val top = { ctx: ShadingContext, idx: Int, quad: Quad ->
+    override val top: QuadIconResolver = { ctx, _, _ ->
         OptifineCTM.override(topTexture, blockContext, UP.rotate(ctx.rotation))
     }
-    override val bottom = { ctx: ShadingContext, idx: Int, quad: Quad ->
+    override val bottom: QuadIconResolver = { ctx, _, _ ->
         OptifineCTM.override(bottomTexture, blockContext, DOWN.rotate(ctx.rotation))
     }
-    override val side = { ctx: ShadingContext, idx: Int, quad: Quad ->
+    override val side: QuadIconResolver = { ctx, idx, _ ->
         OptifineCTM.override(sideTexture, blockContext, (if ((idx and 1) == 0) SOUTH else EAST).rotate(ctx.rotation))
     }
 }
@@ -129,7 +129,7 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
     val transitionTop = model { mix(sideRoundLarge.model, sideRoundSmall.model) { it > 1 } }
     val transitionBottom = model { mix(sideRoundSmall.model, sideRoundLarge.model) { it > 1 } }
 
-    inline fun continous(q1: QuadrantType, q2: QuadrantType) =
+    inline fun continuous(q1: QuadrantType, q2: QuadrantType) =
         q1 == q2 || ((q1 == SQUARE || q1 == INVISIBLE) && (q2 == SQUARE || q2 == INVISIBLE))
 
     abstract val blockPredicate: (IBlockState)->Boolean
@@ -185,7 +185,6 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
                     renderer,
                     sideModel,
                     rotation,
-                    blockContext.blockCenter,
                     icon = columnTextures.side,
                     postProcess = noPost
                 )
@@ -210,7 +209,7 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
                         }
                     }
                     PARALLEL -> {
-                        if (!continous(quadrants[idx], quadrantsTop[idx])) {
+                        if (!continuous(quadrants[idx], quadrantsTop[idx])) {
                             if (quadrants[idx] == SQUARE || quadrants[idx] == INVISIBLE) {
                                 upModel = topSquare.model
                             }
@@ -229,7 +228,7 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
                         }
                     }
                     PARALLEL -> {
-                        if (!continous(quadrants[idx], quadrantsBottom[idx]) &&
+                        if (!continuous(quadrants[idx], quadrantsBottom[idx]) &&
                             (quadrants[idx] == SQUARE || quadrants[idx] == INVISIBLE)) {
                             downModel = bottomSquare.model
                         }
@@ -240,9 +239,8 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
                     renderer,
                     upModel,
                     rotation,
-                    blockContext.blockCenter,
                     icon = upIcon,
-                    postProcess = { ctx, qi, q, vi, v ->
+                    postProcess = { _, _, _, _, _ ->
                         if (isLidUp) {
                             rotateUV(idx + if (logAxis == Axis.X) 1 else 0)
                             if (logAxis == Axis.X) mirrorUV(true, true)
@@ -253,9 +251,8 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
                     renderer,
                     downModel,
                     rotation,
-                    blockContext.blockCenter,
                     icon = downIcon,
-                    postProcess = { ctx, qi, q, vi, v ->
+                    postProcess = { _, _, _, _, _ ->
                         if (isLidDown) {
                             rotateUV((if (logAxis == Axis.X) 0 else 3) - idx)
                             if (logAxis != Axis.Y) mirrorUV(true, true)

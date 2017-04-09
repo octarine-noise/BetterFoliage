@@ -7,7 +7,10 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.EnumFacing.*
 
-class ModelRenderer() : ShadingContext() {
+typealias QuadIconResolver = (ShadingContext, Int, Quad) -> TextureAtlasSprite?
+typealias PostProcessLambda = RenderVertex.(ShadingContext, Int, Quad, Int, Vertex) -> Unit
+
+class ModelRenderer : ShadingContext() {
 
     /** Holds final vertex data before it goes to the [Tessellator]. */
     val temp = RenderVertex()
@@ -25,14 +28,15 @@ class ModelRenderer() : ShadingContext() {
      * @param[rotateUV] lambda to get amount of UV rotation for each quad
      * @param[postProcess] lambda to perform arbitrary modifications on the [RenderVertex] just before it goes to the [Tessellator]
      */
-    inline fun render(
+    fun render(
         worldRenderer: VertexBuffer,
         model: Model,
-        rot: Rotation,
+        rot: Rotation = Rotation.identity,
         trans: Double3 = blockContext.blockCenter,
         forceFlat: Boolean = false,
-        icon: (ShadingContext, Int, Quad) -> TextureAtlasSprite?,
-        postProcess: RenderVertex.(ShadingContext, Int, Quad, Int, Vertex) -> Unit
+        quadFilter: (Int, Quad) -> Boolean = { _, _ -> true },
+        icon: QuadIconResolver,
+        postProcess: PostProcessLambda
     ) {
         rotation = rot
         aoEnabled = Minecraft.isAmbientOcclusionEnabled()
@@ -41,21 +45,23 @@ class ModelRenderer() : ShadingContext() {
         worldRenderer.ensureSpaceForQuads(model.quads.size + 1)
 
         model.quads.forEachIndexed { quadIdx, quad ->
-            val drawIcon = icon(this, quadIdx, quad)
-            if (drawIcon != null) {
-                quad.verts.forEachIndexed { vertIdx, vert ->
-                    temp.init(vert).rotate(rotation).translate(trans)
-                    val shader = if (aoEnabled && !forceFlat) vert.aoShader else vert.flatShader
-                    shader.shade(this, temp)
-                    temp.postProcess(this, quadIdx, quad, vertIdx, vert)
-                    temp.setIcon(drawIcon)
+            if (quadFilter(quadIdx, quad)) {
+                val drawIcon = icon(this, quadIdx, quad)
+                if (drawIcon != null) {
+                    quad.verts.forEachIndexed { vertIdx, vert ->
+                        temp.init(vert).rotate(rotation).translate(trans)
+                        val shader = if (aoEnabled && !forceFlat) vert.aoShader else vert.flatShader
+                        shader.shade(this, temp)
+                        temp.postProcess(this, quadIdx, quad, vertIdx, vert)
+                        temp.setIcon(drawIcon)
 
-                    worldRenderer
-                        .pos(temp.x, temp.y, temp.z)
-                        .color(temp.red, temp.green, temp.blue, 1.0f)
-                        .tex(temp.u, temp.v)
-                        .lightmap(temp.brightness shr 16 and 65535, temp.brightness and 65535)
-                        .endVertex()
+                        worldRenderer
+                            .pos(temp.x, temp.y, temp.z)
+                            .color(temp.red, temp.green, temp.blue, 1.0f)
+                            .tex(temp.u, temp.v)
+                            .lightmap(temp.brightness shr 16 and 65535, temp.brightness and 65535)
+                            .endVertex()
+                    }
                 }
             }
         }
@@ -167,4 +173,4 @@ val allFaces: (EnumFacing) -> Boolean = { true }
 val topOnly: (EnumFacing) -> Boolean = { it == UP }
 
 /** Perform no post-processing */
-val noPost: RenderVertex.(ShadingContext, Int, Quad, Int, Vertex) -> Unit = { ctx, qi, q, vi, v -> }
+val noPost: PostProcessLambda = { _, _, _, _, _ -> }

@@ -16,6 +16,7 @@ val axisDirs = listOf(POSITIVE, NEGATIVE)
 val EnumFacing.dir: AxisDirection get() = axisDirection
 val AxisDirection.sign: String get() = when(this) { POSITIVE -> "+"; NEGATIVE -> "-" }
 val forgeDirs = EnumFacing.values()
+val forgeDirsHorizontal = listOf(NORTH, SOUTH, EAST, WEST)
 val forgeDirOffsets = forgeDirs.map { Int3(it) }
 val Pair<Axis, AxisDirection>.face: EnumFacing get() = when(this) {
     X to POSITIVE -> EAST; X to NEGATIVE -> WEST;

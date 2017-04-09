@@ -110,14 +110,14 @@ class RenderCactus : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
             renderer,
             modelCross[ctx.random(0)],
             Rotation.identity,
-            icon = { ctx, qi, q -> iconCross.icon!!},
+            icon = { _, _, _ -> iconCross.icon!!},
             postProcess = noPost
         )
         modelRenderer.render(
             renderer,
             modelArm[ctx.random(1)],
             cactusArmRotation[ctx.random(2) % 4],
-            icon = { ctx2, qi, q -> iconArm[ctx.random(3)]!!},
+            icon = { _, _, _ -> iconArm[ctx.random(3)]!!},
             postProcess = noPost
         )
         return true

@@ -6,9 +6,7 @@ import mods.betterfoliage.client.config.Config
 import mods.betterfoliage.client.integration.ShadersModIntegration
 import mods.betterfoliage.client.texture.GrassRegistry
 import mods.octarinecore.client.render.*
-import mods.octarinecore.common.Double3
-import mods.octarinecore.common.Int3
-import mods.octarinecore.common.Rotation
+import mods.octarinecore.common.*
 import mods.octarinecore.random
 import net.minecraft.client.renderer.BlockRendererDispatcher
 import net.minecraft.client.renderer.VertexBuffer
@@ -66,15 +64,17 @@ class RenderGrass : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
             // get full AO data
             modelRenderer.updateShading(Int3.zero, allFaces)
 
+            // check occlusion
+            val isHidden = forgeDirs.map { ctx.blockState(it.offset).isOpaqueCube }
+
             // render full grass block
             ShadersModIntegration.renderAs(ctx.blockState(Int3.zero), renderer) {
                 modelRenderer.render(
                     renderer,
                     fullCube,
-                    Rotation.identity,
-                    ctx.blockCenter,
-                    icon = { ctx, qi, q -> grassInfo.grassTopTexture },
-                    postProcess = { ctx, qi, q, vi, v ->
+                    quadFilter = { qi, _ -> !isHidden[qi] },
+                    icon = { _, _, _ -> grassInfo.grassTopTexture },
+                    postProcess = { ctx, _, _, _, _ ->
                         rotateUV(2)
                         if (isSnowed) {
                             if (!ctx.aoEnabled) setGrey(1.4f)
@@ -104,10 +104,8 @@ class RenderGrass : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
                 grassModels[rand[0]],
                 Rotation.identity,
                 ctx.blockCenter + (if (isSnowed) snowOffset else Double3.zero),
-                icon = { ctx: ShadingContext, qi: Int, q: Quad ->
-                    if (Config.shortGrass.useGenerated) iconGen.icon!! else iconset[rand[qi and 1]]!!
-                },
-                postProcess = { ctx, qi, q, vi, v -> if (isSnowed) setGrey(1.0f) else multiplyColor(grassInfo.overrideColor ?: blockColor) }
+                icon = { _, qi, _ -> if (Config.shortGrass.useGenerated) iconGen.icon!! else iconset[rand[qi and 1]]!! },
+                postProcess = { _, _, _, _, _ -> if (isSnowed) setGrey(1.0f) else multiplyColor(grassInfo.overrideColor ?: blockColor) }
             )
         }
 

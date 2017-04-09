@@ -1,7 +1,6 @@
 package mods.octarinecore.metaprog
 
-import mods.octarinecore.metaprog.Namespace.MCP
-import mods.octarinecore.metaprog.Namespace.OBF
+import mods.octarinecore.metaprog.Namespace.*
 import net.minecraft.launchwrapper.IClassTransformer
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin
 import org.apache.logging.log4j.LogManager
@@ -29,9 +28,6 @@ open class Transformer : IClassTransformer {
 
     val log = LogManager.getLogger(this)
 
-    /** The type of environment we are in. Assume MCP until proven otherwise. */
-    var environment: Namespace = MCP
-
     /** The list of transformers and targets. */
     var methodTransformers: MutableList<Pair<MethodRef, MethodTransformContext.()->Unit>> = arrayListOf()
 
@@ -44,36 +40,28 @@ open class Transformer : IClassTransformer {
 
     override fun transform(name: String?, transformedName: String?, classData: ByteArray?): ByteArray? {
         if (classData == null) return null
-        if (name != transformedName) environment = OBF
-
         val classNode = ClassNode().apply { val reader = ClassReader(classData); reader.accept(this, 0) }
         var workDone = false
 
-        val transformations: List<Pair<MethodTransformContext.()->Unit, MethodNode?>> = methodTransformers.map { transformer ->
-            if (transformedName != transformer.first.parentClass.mcpName) return@map transformer.second to null
-            log.debug("Found class: $name -> $transformedName")
-            log.debug("  searching: ${transformer.first.name(OBF)} ${transformer.first.asmDescriptor(OBF)} -> ${transformer.first.name(MCP)} ${transformer.first.asmDescriptor(MCP)}")
-            transformer.second to classNode.methods.find {
-                log.debug("             ${it.name} ${it.desc}")
+        synchronized(this) {
+            methodTransformers.forEach { (targetMethod, transform) ->
+                if (transformedName != targetMethod.parentClass.name) return@forEach
 
-                it.name == transformer.first.name(MCP) && it.desc == transformer.first.asmDescriptor(MCP) ||
-                it.name == transformer.first.name(OBF) && it.desc == transformer.first.asmDescriptor(OBF)
-            }
-        }
-
-        transformations.filter { it.second != null }.forEach {
-            synchronized(it.second!!) {
-                try {
-                    val trans = it.first
-                    MethodTransformContext(it.second!!, environment).trans()
+                for (method in classNode.methods) {
+                    val namespace = Namespace.values().find {
+                        method.name == targetMethod.name(it) && method.desc == targetMethod.asmDescriptor(it)
+                    } ?: continue
+                    when (namespace) {
+                        MCP -> log.info("Found method ${targetMethod.parentClass.name}.${targetMethod.name(MCP)} ${targetMethod.asmDescriptor(MCP)}")
+                        SRG -> log.info("Found method ${targetMethod.parentClass.name}.${targetMethod.name(namespace)} ${targetMethod.asmDescriptor(namespace)} (matching ${targetMethod.name(MCP)})")
+                    }
+                    MethodTransformContext(method, namespace).transform()
                     workDone = true
-                } catch (e: Throwable) {
-                    log.warn("Error transforming method ${it.second!!.name} ${it.second!!.desc}")
                 }
             }
         }
 
-        return if (!workDone) classData else ClassWriter(3).apply { classNode.accept(this) }.toByteArray()
+        return if (!workDone) classData else ClassWriter(0).apply { classNode.accept(this) }.toByteArray()
     }
 }
 
@@ -169,7 +157,7 @@ class MethodTransformContext(val method: MethodNode, val environment: Namespace)
 
     fun invokeRef(ref: MethodRef): (AbstractInsnNode)->Boolean = { insn ->
         (insn as? MethodInsnNode)?.let {
-            it.name == ref.name(environment) && it.owner == ref.parentClass.name(environment).replace(".", "/")
+            it.name == ref.name(environment) && it.owner == ref.parentClass.name.replace(".", "/")
         } ?: false
     }
 }
@@ -202,7 +190,7 @@ class InstructionList(val environment: Namespace) {
      */
     fun invokeStatic(target: MethodRef, isInterface: Boolean = false) = list.add(MethodInsnNode(
             Opcodes.INVOKESTATIC,
-            target.parentClass.name(environment).replace(".", "/"),
+            target.parentClass.name.replace(".", "/"),
             target.name(environment),
             target.asmDescriptor(environment),
             isInterface
@@ -215,7 +203,7 @@ class InstructionList(val environment: Namespace) {
      */
     fun getField(target: FieldRef) = list.add(FieldInsnNode(
             Opcodes.GETFIELD,
-            target.parentClass.name(environment).replace(".", "/"),
+            target.parentClass.name.replace(".", "/"),
             target.name(environment),
             target.asmDescriptor(environment)
     ))
