@@ -1,6 +1,6 @@
 package mods.octarinecore.metaprog
 
-import mods.octarinecore.metaprog.Namespace.MCP
+import mods.octarinecore.metaprog.Namespace.*
 import net.minecraft.launchwrapper.IClassTransformer
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin
 import org.apache.logging.log4j.LogManager
@@ -45,19 +45,15 @@ open class Transformer : IClassTransformer {
 
         synchronized(this) {
             methodTransformers.forEach { (targetMethod, transform) ->
-                if (transformedName != targetMethod.parentClass.name(MCP)) return@forEach
-                if (name == transformedName)
-                    log.debug("Found class $name")
-                else
-                    log.debug("Found class $name matching $transformedName")
+                if (transformedName != targetMethod.parentClass.name) return@forEach
 
                 for (method in classNode.methods) {
-                    val namespace = Namespace.values().reversed().find {
+                    val namespace = Namespace.values().find {
                         method.name == targetMethod.name(it) && method.desc == targetMethod.asmDescriptor(it)
                     } ?: continue
                     when (namespace) {
-                        MCP -> log.debug("Found method ${targetMethod.parentClass.name(MCP)}.${targetMethod.name(MCP)} ${targetMethod.asmDescriptor(MCP)}")
-                        else -> log.debug("Found method ${targetMethod.parentClass.name(namespace)}.${targetMethod.name(namespace)} ${targetMethod.asmDescriptor(namespace)} matching ${targetMethod.parentClass.name(MCP)}.${targetMethod.name(MCP)} ${targetMethod.asmDescriptor(MCP)} in namespace $namespace")
+                        MCP -> log.info("Found method ${targetMethod.parentClass.name}.${targetMethod.name(MCP)} ${targetMethod.asmDescriptor(MCP)}")
+                        SRG -> log.info("Found method ${targetMethod.parentClass.name}.${targetMethod.name(namespace)} ${targetMethod.asmDescriptor(namespace)} (matching ${targetMethod.name(MCP)})")
                     }
                     MethodTransformContext(method, namespace).transform()
                     workDone = true
@@ -161,7 +157,7 @@ class MethodTransformContext(val method: MethodNode, val environment: Namespace)
 
     fun invokeRef(ref: MethodRef): (AbstractInsnNode)->Boolean = { insn ->
         (insn as? MethodInsnNode)?.let {
-            it.name == ref.name(environment) && it.owner == ref.parentClass.name(environment).replace(".", "/")
+            it.name == ref.name(environment) && it.owner == ref.parentClass.name.replace(".", "/")
         } ?: false
     }
 }
@@ -194,7 +190,7 @@ class InstructionList(val environment: Namespace) {
      */
     fun invokeStatic(target: MethodRef, isInterface: Boolean = false) = list.add(MethodInsnNode(
             Opcodes.INVOKESTATIC,
-            target.parentClass.name(environment).replace(".", "/"),
+            target.parentClass.name.replace(".", "/"),
             target.name(environment),
             target.asmDescriptor(environment),
             isInterface
@@ -207,7 +203,7 @@ class InstructionList(val environment: Namespace) {
      */
     fun getField(target: FieldRef) = list.add(FieldInsnNode(
             Opcodes.GETFIELD,
-            target.parentClass.name(environment).replace(".", "/"),
+            target.parentClass.name.replace(".", "/"),
             target.name(environment),
             target.asmDescriptor(environment)
     ))
