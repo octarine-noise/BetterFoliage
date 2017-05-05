@@ -23,6 +23,7 @@ import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
 import org.apache.logging.log4j.Level
+import java.lang.Math.min
 
 const val defaultGrassColor = 0
 
@@ -96,8 +97,9 @@ object StandardGrassSupport :
         logger.log(Level.DEBUG, "$logName: texture ${texture.iconName}")
         val hsb = HSB.fromColor(texture.averageColor ?: defaultGrassColor)
         val overrideColor = if (hsb.saturation >= Config.shortGrass.saturationThreshold) {
+            logger.log(Level.DEBUG, "$logName:         brightness ${hsb.brightness}")
             logger.log(Level.DEBUG, "$logName:         saturation ${hsb.saturation} >= ${Config.shortGrass.saturationThreshold}, using texture color")
-            hsb.copy(brightness = 0.9f).asColor
+            hsb.copy(brightness = min(0.9f, hsb.brightness * 2.0f)).asColor
         } else {
             logger.log(Level.DEBUG, "$logName:         saturation ${hsb.saturation} < ${Config.shortGrass.saturationThreshold}, using block color")
             null
