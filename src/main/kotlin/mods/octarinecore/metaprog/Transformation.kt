@@ -8,6 +8,8 @@ import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.*
+import java.io.File
+import java.io.FileOutputStream
 
 @IFMLLoadingPlugin.TransformerExclusions(
     "mods.octarinecore.metaprog",
@@ -55,6 +57,15 @@ open class Transformer : IClassTransformer {
                         MCP -> log.info("Found method ${targetMethod.parentClass.name}.${targetMethod.name(MCP)} ${targetMethod.asmDescriptor(MCP)}")
                         SRG -> log.info("Found method ${targetMethod.parentClass.name}.${targetMethod.name(namespace)} ${targetMethod.asmDescriptor(namespace)} (matching ${targetMethod.name(MCP)})")
                     }
+
+                    // write input bytecode for debugging - definitely not in production...
+                    //File("BF_debug").mkdir()
+                    //FileOutputStream(File("BF_debug/$transformedName.class")).apply {
+                    //    write(classData)
+                    //    close()
+                    //}
+
+                    // transform
                     MethodTransformContext(method, namespace).transform()
                     workDone = true
                 }
