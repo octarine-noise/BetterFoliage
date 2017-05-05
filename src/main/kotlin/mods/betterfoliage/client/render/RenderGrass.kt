@@ -31,6 +31,8 @@ class RenderGrass : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
         }
     }
 
+    val noise = simplexNoise()
+
     val normalIcons = iconSet(BetterFoliageMod.LEGACY_DOMAIN, "blocks/better_grass_long_%d")
     val snowedIcons = iconSet(BetterFoliageMod.LEGACY_DOMAIN, "blocks/better_grass_snowed_%d")
     val normalGenIcon = iconStatic(Client.genGrass.generatedResource("minecraft:blocks/tallgrass", "snowed" to false))
@@ -97,6 +99,7 @@ class RenderGrass : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
         if (!Config.shortGrass.grassEnabled) return true
         if (isSnowed && !Config.shortGrass.snowEnabled) return true
         if (ctx.blockState(up1).isOpaqueCube) return true
+        if (Config.shortGrass.population < 64 && noise[ctx.pos] >= Config.shortGrass.population) return true
 
         // render grass quads
         val iconset = if (isSnowed) snowedIcons else normalIcons
