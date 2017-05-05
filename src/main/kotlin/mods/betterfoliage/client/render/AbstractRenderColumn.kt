@@ -1,5 +1,6 @@
 package mods.betterfoliage.client.render
 
+import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.Config
 import mods.betterfoliage.client.integration.OptifineCTM
 import mods.betterfoliage.client.integration.ShadersModIntegration
@@ -140,7 +141,11 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
     override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: VertexBuffer, layer: BlockRenderLayer): Boolean {
         if (ctx.isSurroundedBy(surroundPredicate) ) return false
 
-        val columnTextures = registry[ctx.blockState(Int3.zero)] ?: return false
+        val columnTextures = registry[ctx.blockState(Int3.zero)]
+        if (columnTextures == null) {
+            Client.logRenderError(ctx.blockState(Int3.zero), ctx.pos)
+            return renderWorldBlockBase(ctx, dispatcher, renderer, null)
+        }
 
         // get AO data
         modelRenderer.updateShading(Int3.zero, allFaces)

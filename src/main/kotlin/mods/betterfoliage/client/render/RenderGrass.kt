@@ -57,7 +57,12 @@ class RenderGrass : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
         val isSnowed = ctx.blockState(up1).isSnow
         val connectedGrass = isConnected && Config.connectedGrass.enabled && (!isSnowed || Config.connectedGrass.snowEnabled)
 
-        val grassInfo = GrassRegistry[ctx, UP]!!
+        val grassInfo = GrassRegistry[ctx, UP]
+        if (grassInfo == null) {
+            // shouldn't happen
+            Client.logRenderError(ctx.blockState(Int3.zero), ctx.pos)
+            return renderWorldBlockBase(ctx, dispatcher, renderer, null)
+        }
         val blockColor = ctx.blockData(Int3.zero).color
 
         if (connectedGrass) {

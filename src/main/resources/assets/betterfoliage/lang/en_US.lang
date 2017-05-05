@@ -20,7 +20,9 @@ betterfoliage.population.tooltip=Chance (N in 64) that an eligible block will ha
 betterfoliage.shaderWind=Shader wind effects
 betterfoliage.shaderWind.tooltip=Apply wind effects from ShaderMod shaders to this element?
 betterfoliage.distance=Distance limit
-betterfoliage.distance.tooltip=Maximum distance from player at which to render this feature 
+betterfoliage.distance.tooltip=Maximum distance from player at which to render this feature
+
+betterfoliage.rendererror=§a[BetterFoliage]§f Error rendering block %s at position %s
 
 betterfoliage.blocks=Block Types
 betterfoliage.blocks.tooltip=Configure lists of block classes that will have specific features applied to them
