@@ -63,14 +63,12 @@ object Refs {
     val VanillaModelWrapper = ClassRef("net.minecraftforge.client.model.ModelLoader\$VanillaModelWrapper")
     val model_VMW = FieldRef(VanillaModelWrapper, "model", ModelBlock)
     val location_VMW = FieldRef(VanillaModelWrapper, "location", ModelBlock)
-//    val WeightedPartWrapper = ClassRef("net.minecraftforge.client.model.ModelLoader\$WeightedPartWrapper")
-//    val model_WPW = FieldRef(WeightedPartWrapper, "model", IModel)
     val WeightedRandomModel = ClassRef("net.minecraftforge.client.model.ModelLoader\$WeightedRandomModel")
     val models_WRM = FieldRef(WeightedRandomModel, "models", List)
     val MultiModel = ClassRef("net.minecraftforge.client.model.MultiModel")
     val base_MM = FieldRef(MultiModel, "base", IModel)
-    val WeightedBakedModel = ClassRef("net.minecraft.client.renderer.block.model.WeightedBakedModel")
-    val models_WBM = FieldRef(WeightedBakedModel, "models", List)
+    val MultipartModel = ClassRef("net.minecraftforge.client.model.ModelLoader\$MultipartModel")
+    val partModels_MPM = FieldRef(MultipartModel, "partModels", List)
 
     val resetChangedState = MethodRef(ClassRef("net.minecraftforge.common.config.Configuration"), "resetChangedState", ClassRef.void)
 

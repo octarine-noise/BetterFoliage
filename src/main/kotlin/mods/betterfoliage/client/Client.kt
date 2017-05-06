@@ -6,9 +6,16 @@ import mods.betterfoliage.client.integration.*
 import mods.betterfoliage.client.render.*
 import mods.betterfoliage.client.texture.*
 import mods.octarinecore.client.KeyHandler
+import mods.octarinecore.client.gui.textComponent
 import mods.octarinecore.client.resource.CenteringTextureGenerator
 import mods.octarinecore.client.resource.GeneratorPack
+import net.minecraft.block.Block
+import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
+import net.minecraft.util.math.BlockPos
+import net.minecraft.util.text.TextComponentString
+import net.minecraft.util.text.TextComponentTranslation
+import net.minecraft.util.text.TextFormatting
 import net.minecraftforge.fml.client.FMLClientHandler
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
@@ -71,6 +78,8 @@ object Client {
         StandardLogSupport          // add _after_ all other log registries
     )
 
+    val suppressRenderErrors = mutableSetOf<IBlockState>()
+
     fun log(level: Level, msg: String) {
         BetterFoliageMod.log.log(level, "[BetterFoliage] $msg")
         BetterFoliageMod.logDetail.log(level, msg)
@@ -78,6 +87,20 @@ object Client {
 
     fun logDetail(msg: String) {
         BetterFoliageMod.logDetail.log(Level.DEBUG, msg)
+    }
+
+    fun logRenderError(state: IBlockState, location: BlockPos) {
+        if (state in suppressRenderErrors) return
+        suppressRenderErrors.add(state)
+
+        val blockName = Block.REGISTRY.getNameForObject(state.block).toString()
+        val blockLoc = "${location.x},${location.y},${location.z}"
+        Minecraft.getMinecraft().thePlayer.addChatMessage(TextComponentTranslation(
+            "betterfoliage.rendererror",
+            textComponent(blockName, TextFormatting.GOLD),
+            textComponent(blockLoc, TextFormatting.GOLD)
+        ))
+        logDetail("Error rendering block $state at $blockLoc")
     }
 }
 

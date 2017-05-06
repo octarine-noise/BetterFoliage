@@ -75,23 +75,24 @@ interface TextureListModelProcessor<T2> : ModelProcessor<List<String>, T2> {
         logger?.log(Level.DEBUG, "$logName: block state ${state.toString()}")
         logger?.log(Level.DEBUG, "$logName:       class ${state.block.javaClass.name} matches ${matchClass.name}")
 
-        val blockLoc = model.modelBlockAndLoc
-        if (blockLoc == null) {
+        val allModels = model.modelBlockAndLoc
+        if (allModels.isEmpty()) {
             logger?.log(Level.DEBUG, "$logName:       no models found")
             return null
         }
-        val modelMatch = modelTextures.firstOrNull { blockLoc.derivesFrom(it.modelLocation) }
-        if (modelMatch == null) {
-            logger?.log(Level.DEBUG, "$logName:       no matching models found")
-            return null
+        allModels.forEach { blockLoc ->
+            modelTextures.firstOrNull { blockLoc.derivesFrom(it.modelLocation) }?.let{ modelMatch ->
+                logger?.log(Level.DEBUG, "$logName:       model ${blockLoc.second} matches ${modelMatch.modelLocation.toString()}")
+
+                val textures = modelMatch.textureNames.map { it to blockLoc.first.resolveTextureName(it) }
+                val texMapString = Joiner.on(", ").join(textures.map { "${it.first}=${it.second}" })
+                logger?.log(Level.DEBUG, "$logName:       textures [$texMapString]")
+
+                return if (textures.all { it.second != "missingno" }) textures.map { it.second } else null
+            }
         }
-        logger?.log(Level.DEBUG, "$logName:       model ${blockLoc.second} matches ${modelMatch.modelLocation.toString()}")
-
-        val textures = modelMatch.textureNames.map { it to blockLoc.first.resolveTextureName(it) }
-        val texMapString = Joiner.on(", ").join(textures.map { "${it.first}=${it.second}" })
-        logger?.log(Level.DEBUG, "$logName:       textures [$texMapString]")
-
-        return if (textures.all { it.second != "missingno" }) textures.map { it.second } else null
+        logger?.log(Level.DEBUG, "$logName:       no matching models found")
+        return null
     }
 }
 

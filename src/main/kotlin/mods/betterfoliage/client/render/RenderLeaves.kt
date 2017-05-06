@@ -1,6 +1,7 @@
 package mods.betterfoliage.client.render
 
 import mods.betterfoliage.BetterFoliageMod
+import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.Config
 import mods.betterfoliage.client.integration.ShadersModIntegration
 import mods.betterfoliage.client.texture.LeafRegistry
@@ -50,7 +51,12 @@ class RenderLeaves : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
         val isSnowed = ctx.blockState(up1).material.let {
             it == Material.SNOW || it == Material.CRAFTED_SNOW
         }
-        val leafInfo = LeafRegistry[ctx, DOWN] ?: return false
+        val leafInfo = LeafRegistry[ctx, DOWN]
+        if (leafInfo == null) {
+            // shouldn't happen
+            Client.logRenderError(ctx.blockState(Int3.zero), ctx.pos)
+            return renderWorldBlockBase(ctx, dispatcher, renderer, null)
+        }
         val blockColor = ctx.blockData(Int3.zero).color
 
         renderWorldBlockBase(ctx, dispatcher, renderer, null)
