@@ -100,19 +100,19 @@ fun textureLocation(iconName: String) = ResourceLocation(iconName).let {
 }
 
 @Suppress("UNCHECKED_CAST")
-val IModel.modelBlockAndLoc: Pair<ModelBlock, ResourceLocation>? get() {
+val IModel.modelBlockAndLoc: List<Pair<ModelBlock, ResourceLocation>> get() {
     if (Refs.VanillaModelWrapper.isInstance(this))
-        return Pair(Refs.model_VMW.get(this) as ModelBlock, Refs.location_VMW.get(this) as ResourceLocation)
+        return listOf(Pair(Refs.model_VMW.get(this) as ModelBlock, Refs.location_VMW.get(this) as ResourceLocation))
     else if (Refs.WeightedRandomModel.isInstance(this)) Refs.models_WRM.get(this)?.let {
-        (it as List<IModel>).forEach {
-            it.modelBlockAndLoc.let { if (it != null) return it }
-        }
+        return (it as List<IModel>).flatMap(IModel::modelBlockAndLoc)
     }
     else if (Refs.MultiModel.isInstance(this)) Refs.base_MM.get(this)?.let {
         return (it as IModel).modelBlockAndLoc
     }
-    // TODO support net.minecraftforge.client.model.ModelLoader.MultipartModel
-    return null
+    else if (Refs.MultipartModel.isInstance(this)) Refs.partModels_MPM.get(this)?.let {
+        return (it as Map<Any, IModel>).flatMap { it.value.modelBlockAndLoc }
+    }
+    return listOf()
 }
 
 fun Pair<ModelBlock, ResourceLocation>.derivesFrom(targetLocation: ResourceLocation): Boolean {
@@ -121,5 +121,3 @@ fun Pair<ModelBlock, ResourceLocation>.derivesFrom(targetLocation: ResourceLocat
         return Pair(first.parent, first.parentLocation!!).derivesFrom(targetLocation)
     return false
 }
-
-fun IModel.derivesFromModel(modelLoc: String) = modelBlockAndLoc?.derivesFrom(ResourceLocation(modelLoc)) ?: false

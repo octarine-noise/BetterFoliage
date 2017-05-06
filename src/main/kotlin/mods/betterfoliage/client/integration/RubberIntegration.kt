@@ -21,6 +21,7 @@ import mods.octarinecore.common.rotate
 import mods.octarinecore.metaprog.ClassRef
 import mods.octarinecore.metaprog.MethodRef
 import mods.octarinecore.metaprog.allAvailable
+import mods.octarinecore.tryDefault
 import net.minecraft.block.properties.PropertyDirection
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.renderer.block.model.ModelResourceLocation
@@ -133,7 +134,7 @@ object IC2LogSupport : RubberLogSupportBase() {
     override fun processModelLoad(state: IBlockState, modelLoc: ModelResourceLocation, model: IModel): RubberLogModelInfo? {
         // check for proper block class, existence of ModelBlock, and "state" blockstate property
         if (!IC2Integration.BlockRubWood.isInstance(state.block)) return null
-        val blockLoc = model.modelBlockAndLoc ?: return null
+        val blockLoc = model.modelBlockAndLoc.firstOrNull() ?: return null
         val type = state.properties.entries.find { it.key.getName() == "state" }?.value?.toString() ?: return null
 
         // logs with no rubber spot
