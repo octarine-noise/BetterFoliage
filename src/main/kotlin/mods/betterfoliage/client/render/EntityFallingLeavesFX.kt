@@ -2,7 +2,6 @@ package mods.betterfoliage.client.render
 
 import mods.betterfoliage.client.config.Config
 import mods.betterfoliage.client.texture.LeafRegistry
-import mods.betterfoliage.client.texture.defaultLeafColor
 import mods.octarinecore.PI2
 import mods.octarinecore.client.render.AbstractEntityFX
 import mods.octarinecore.client.render.HSB
@@ -10,7 +9,7 @@ import mods.octarinecore.common.Double3
 import mods.octarinecore.minmax
 import mods.octarinecore.random
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.VertexBuffer
+import net.minecraft.client.renderer.BufferBuilder
 import net.minecraft.util.EnumFacing.DOWN
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.MathHelper
@@ -74,7 +73,7 @@ AbstractEntityFX(world, pos.x.toDouble() + 0.5, pos.y.toDouble(), pos.z.toDouble
         }
     }
 
-    override fun render(worldRenderer: VertexBuffer, partialTickTime: Float) {
+    override fun render(worldRenderer: BufferBuilder, partialTickTime: Float) {
         if (Config.fallingLeaves.opacityHack) GL11.glDepthMask(true)
         renderParticleQuad(worldRenderer, partialTickTime, rotation = particleRot, isMirrored = isMirrored)
     }

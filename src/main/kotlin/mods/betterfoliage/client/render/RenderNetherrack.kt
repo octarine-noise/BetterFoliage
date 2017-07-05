@@ -8,7 +8,7 @@ import mods.octarinecore.common.Int3
 import mods.octarinecore.common.Rotation
 import mods.octarinecore.random
 import net.minecraft.client.renderer.BlockRendererDispatcher
-import net.minecraft.client.renderer.VertexBuffer
+import net.minecraft.client.renderer.BufferBuilder
 import net.minecraft.init.Blocks
 import net.minecraft.util.BlockRenderLayer
 import net.minecraft.util.EnumFacing.*
@@ -39,7 +39,7 @@ class RenderNetherrack : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) 
         ctx.cameraDistance < Config.netherrack.distance
     }
 
-    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: VertexBuffer, layer: BlockRenderLayer): Boolean {
+    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: BufferBuilder, layer: BlockRenderLayer): Boolean {
         val baseRender = renderWorldBlockBase(ctx, dispatcher, renderer, layer)
         if (!layer.isCutout) return baseRender
 

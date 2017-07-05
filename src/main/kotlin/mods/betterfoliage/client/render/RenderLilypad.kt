@@ -8,7 +8,7 @@ import mods.octarinecore.client.render.*
 import mods.octarinecore.common.Int3
 import mods.octarinecore.common.Rotation
 import net.minecraft.client.renderer.BlockRendererDispatcher
-import net.minecraft.client.renderer.VertexBuffer
+import net.minecraft.client.renderer.BufferBuilder
 import net.minecraft.util.BlockRenderLayer
 import net.minecraft.util.EnumFacing.DOWN
 import net.minecraft.util.EnumFacing.UP
@@ -44,7 +44,7 @@ class RenderLilypad : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
         ctx.cameraDistance < Config.lilypad.distance &&
         Config.blocks.lilypad.matchesClass(ctx.block)
 
-    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: VertexBuffer, layer: BlockRenderLayer): Boolean {
+    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: BufferBuilder, layer: BlockRenderLayer): Boolean {
         // render the whole block on the cutout layer
         if (!layer.isCutout) return false
 

@@ -11,7 +11,7 @@ import net.minecraft.block.Block
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.BlockRendererDispatcher
-import net.minecraft.client.renderer.VertexBuffer
+import net.minecraft.client.renderer.BufferBuilder
 import net.minecraft.client.renderer.color.BlockColors
 import net.minecraft.util.BlockRenderLayer
 import net.minecraft.util.math.BlockPos
@@ -39,7 +39,7 @@ abstract class AbstractBlockRenderingHandler(modId: String) : ResourceHandler(mo
     // Custom rendering
     // ============================
     abstract fun isEligible(ctx: BlockContext): Boolean
-    abstract fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: VertexBuffer, layer: BlockRenderLayer): Boolean
+    abstract fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: BufferBuilder, layer: BlockRenderLayer): Boolean
 
     // ============================
     // Vanilla rendering wrapper
@@ -47,7 +47,7 @@ abstract class AbstractBlockRenderingHandler(modId: String) : ResourceHandler(mo
     /**
      * Render the block in the current [BlockContext]
      */
-    fun renderWorldBlockBase(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: VertexBuffer, layer: BlockRenderLayer?): Boolean {
+    fun renderWorldBlockBase(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: BufferBuilder, layer: BlockRenderLayer?): Boolean {
         ctx.blockState(Int3.zero).let { state ->
             if (layer == null || state.block.canRenderInLayer(state, layer))
                 return dispatcher.renderBlock(state, ctx.pos, ctx.world, renderer)

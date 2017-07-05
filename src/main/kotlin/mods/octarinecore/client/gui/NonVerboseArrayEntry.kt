@@ -15,7 +15,7 @@ class NonVerboseArrayEntry(
     init {
         stripTooltipDefaultText(toolTip as MutableList<String>)
         val shortDefaults = I18n.format("${configElement.languageKey}.arrayEntry", configElement.defaults.size)
-        toolTip.addAll(mc.fontRendererObj.listFormattedStringToWidth("$AQUA${I18n.format("fml.configgui.tooltip.default", shortDefaults)}", 300))
+        toolTip.addAll(mc.fontRenderer.listFormattedStringToWidth("$AQUA${I18n.format("fml.configgui.tooltip.default", shortDefaults)}", 300))
     }
 
     override fun updateValueButtonText() {

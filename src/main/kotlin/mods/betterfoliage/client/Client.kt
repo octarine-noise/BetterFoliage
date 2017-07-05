@@ -7,6 +7,7 @@ import mods.betterfoliage.client.render.*
 import mods.betterfoliage.client.texture.*
 import mods.octarinecore.client.KeyHandler
 import mods.octarinecore.client.gui.textComponent
+import mods.octarinecore.client.render.AbstractBlockRenderingHandler
 import mods.octarinecore.client.resource.CenteringTextureGenerator
 import mods.octarinecore.client.resource.GeneratorPack
 import net.minecraft.block.Block
@@ -31,12 +32,10 @@ import org.apache.logging.log4j.Level
 @SideOnly(Side.CLIENT)
 object Client {
 
-    val configKey = KeyHandler(BetterFoliageMod.MOD_NAME, 66, "key.betterfoliage.gui") {
-        FMLClientHandler.instance().showGuiScreen(
-            ConfigGuiFactory.ConfigGuiBetterFoliage(Minecraft.getMinecraft().currentScreen)
-        )
-    }
+    lateinit var renderers: List<AbstractBlockRenderingHandler>
+    val suppressRenderErrors = mutableSetOf<IBlockState>()
 
+    // texture generation stuff
     val genGrass = GrassGenerator("bf_gen_grass")
     val genLeaves = LeafGenerator("bf_gen_leaves")
     val genReeds = CenteringTextureGenerator("bf_gen_reeds", 1, 2)
@@ -48,37 +47,45 @@ object Client {
         genReeds
     )
 
-    val logRenderer = RenderLog()
+    fun init() {
+        // init renderers
+        renderers = listOf(
+            RenderGrass(),
+            RenderMycelium(),
+            RenderLeaves(),
+            RenderCactus(),
+            RenderLilypad(),
+            RenderReeds(),
+            RenderAlgae(),
+            RenderCoral(),
+            RenderLog(),
+            RenderNetherrack(),
+            RenderConnectedGrass(),
+            RenderConnectedGrassLog()
+        )
 
-    val renderers = listOf(
-        RenderGrass(),
-        RenderMycelium(),
-        RenderLeaves(),
-        RenderCactus(),
-        RenderLilypad(),
-        RenderReeds(),
-        RenderAlgae(),
-        RenderCoral(),
-        logRenderer,
-        RenderNetherrack(),
-        RenderConnectedGrass(),
-        RenderConnectedGrassLog()
-    )
+        // init singletons
+        val singletons = listOf(
+            LeafRegistry,
+            GrassRegistry,
+            LeafWindTracker,
+            RisingSoulTextures,
+            ShadersModIntegration,
+            OptifineCTM,
+            ForestryIntegration,
+            IC2Integration,
+            TechRebornIntegration,
+            StandardLogSupport          // add _after_ all other log registries
+        )
 
-    val singletons = listOf(
-        LeafRegistry,
-        GrassRegistry,
-        LeafWindTracker,
-        RisingSoulTextures,
-        ShadersModIntegration,
-        OptifineCTM,
-        ForestryIntegration,
-        IC2Integration,
-        TechRebornIntegration,
-        StandardLogSupport          // add _after_ all other log registries
-    )
+        // init config hotkey
+        val configKey = KeyHandler(BetterFoliageMod.MOD_NAME, 66, "key.betterfoliage.gui") {
+            FMLClientHandler.instance().showGuiScreen(
+                ConfigGuiFactory.createBFConfigGui(Minecraft.getMinecraft().currentScreen)
+            )
+        }
+    }
 
-    val suppressRenderErrors = mutableSetOf<IBlockState>()
 
     fun log(level: Level, msg: String) {
         BetterFoliageMod.log.log(level, "[BetterFoliage] $msg")

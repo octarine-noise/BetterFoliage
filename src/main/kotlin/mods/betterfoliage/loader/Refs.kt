@@ -40,14 +40,14 @@ object Refs {
     val BlockModelRenderer = ClassRef("net.minecraft.client.renderer.BlockModelRenderer")
     val AmbientOcclusionFace = ClassRef("net.minecraft.client.renderer.BlockModelRenderer\$AmbientOcclusionFace")
     val ChunkCompileTaskGenerator = ClassRef("net.minecraft.client.renderer.chunk.ChunkCompileTaskGenerator")
-    val VertexBuffer = ClassRef("net.minecraft.client.renderer.VertexBuffer")
+    val BufferBuilder = ClassRef("net.minecraft.client.renderer.BufferBuilder")
     val AOF_constructor = MethodRef(AmbientOcclusionFace, "<init>", ClassRef.void, BlockModelRenderer)
 
     val RenderChunk = ClassRef("net.minecraft.client.renderer.chunk.RenderChunk")
     val rebuildChunk = MethodRef(RenderChunk, "rebuildChunk", "func_178581_b", ClassRef.void, ClassRef.float, ClassRef.float, ClassRef.float, ChunkCompileTaskGenerator)
 
     val BlockRendererDispatcher = ClassRef("net.minecraft.client.renderer.BlockRendererDispatcher")
-    val renderBlock = MethodRef(BlockRendererDispatcher, "renderBlock", "func_175018_a", ClassRef.boolean, IBlockState, BlockPos, IBlockAccess, VertexBuffer)
+    val renderBlock = MethodRef(BlockRendererDispatcher, "renderBlock", "func_175018_a", ClassRef.boolean, IBlockState, BlockPos, IBlockAccess, BufferBuilder)
 
     val TextureAtlasSprite = ClassRef("net.minecraft.client.renderer.texture.TextureAtlasSprite")
 
@@ -81,7 +81,7 @@ object Refs {
     val onRandomDisplayTick = MethodRef(BetterFoliageHooks, "onRandomDisplayTick", ClassRef.void, World, IBlockState, BlockPos)
     val onAfterLoadModelDefinitions = MethodRef(BetterFoliageHooks, "onAfterLoadModelDefinitions", ClassRef.void, ModelLoader)
     val onAfterBakeModels = MethodRef(BetterFoliageHooks, "onAfterBakeModels", ClassRef.void, Map)
-    val renderWorldBlock = MethodRef(BetterFoliageHooks, "renderWorldBlock", ClassRef.boolean, BlockRendererDispatcher, IBlockState, BlockPos, IBlockAccess, VertexBuffer, BlockRenderLayer)
+    val renderWorldBlock = MethodRef(BetterFoliageHooks, "renderWorldBlock", ClassRef.boolean, BlockRendererDispatcher, IBlockState, BlockPos, IBlockAccess, BufferBuilder, BlockRenderLayer)
     val canRenderBlockInLayer = MethodRef(BetterFoliageHooks, "canRenderBlockInLayer", ClassRef.boolean, Block, IBlockState, BlockRenderLayer)
 
     // Optifine
@@ -104,8 +104,8 @@ object Refs {
 
     // ShadersMod
     val SVertexBuilder = ClassRef("shadersmod.client.SVertexBuilder")
-    val sVertexBuilder = FieldRef(VertexBuffer, "sVertexBuilder", SVertexBuilder)
-    val pushEntity_state = MethodRef(SVertexBuilder, "pushEntity", ClassRef.void, IBlockState, BlockPos, IBlockAccess, VertexBuffer)
+    val sVertexBuilder = FieldRef(BufferBuilder, "sVertexBuilder", SVertexBuilder)
+    val pushEntity_state = MethodRef(SVertexBuilder, "pushEntity", ClassRef.void, IBlockState, BlockPos, IBlockAccess, BufferBuilder)
     val pushEntity_num = MethodRef(SVertexBuilder, "pushEntity", ClassRef.void, ClassRef.long)
     val popEntity = MethodRef(SVertexBuilder, "popEntity", ClassRef.void)
 

@@ -11,7 +11,7 @@ import mods.octarinecore.common.plus
 import net.minecraft.block.Block
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.renderer.BlockRendererDispatcher
-import net.minecraft.client.renderer.VertexBuffer
+import net.minecraft.client.renderer.BufferBuilder
 import net.minecraft.init.Blocks
 import net.minecraft.util.BlockRenderLayer
 import net.minecraft.util.BlockRenderLayer.CUTOUT
@@ -25,13 +25,15 @@ import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
 
+var isAfterPostInit = false
+
 fun doesSideBlockRenderingOverride(original: Boolean, blockAccess: IBlockAccess, pos: BlockPos, side: EnumFacing): Boolean {
     return original && !(Config.enabled && Config.roundLogs.enabled && Config.blocks.logClasses.matchesClass(blockAccess.getBlockState(pos).block));
 }
 
 fun isOpaqueCubeOverride(original: Boolean, state: IBlockState): Boolean {
     // caution: blocks are initialized and the method called during startup
-    if (!BetterFoliageMod.isAfterPostInit) return original
+    if (!isAfterPostInit) return original
     return original && !(Config.enabled && Config.roundLogs.enabled && Config.blocks.logClasses.matchesClass(state.block))
 }
 
@@ -70,7 +72,7 @@ fun renderWorldBlock(dispatcher: BlockRendererDispatcher,
                      state: IBlockState,
                      pos: BlockPos,
                      blockAccess: IBlockAccess,
-                     worldRenderer: VertexBuffer,
+                     worldRenderer: BufferBuilder,
                      layer: BlockRenderLayer
 ): Boolean {
     blockContext.let { ctx ->

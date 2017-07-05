@@ -9,12 +9,14 @@ import net.minecraftforge.fml.client.config.GuiConfig
 
 class ConfigGuiFactory : IModGuiFactory {
 
-    override fun mainConfigGuiClass() = ConfigGuiBetterFoliage::class.java
-    override fun runtimeGuiCategories() = hashSetOf<IModGuiFactory.RuntimeOptionCategoryElement>()
-    override fun getHandlerFor(element: IModGuiFactory.RuntimeOptionCategoryElement?) = null
     override fun initialize(minecraftInstance: Minecraft?) { }
+    override fun hasConfigGui() = true
+    override fun runtimeGuiCategories() = hashSetOf<IModGuiFactory.RuntimeOptionCategoryElement>()
+    override fun createConfigGui(parentScreen: GuiScreen?) = createBFConfigGui(parentScreen)
 
-    class ConfigGuiBetterFoliage(parentScreen: GuiScreen?) : GuiConfig(
+    companion object {
+        @JvmStatic
+        fun createBFConfigGui(parentScreen: GuiScreen?) = GuiConfig(
             parentScreen,
             Config.rootGuiElements,
             BetterFoliageMod.MOD_ID,
@@ -22,5 +24,6 @@ class ConfigGuiFactory : IModGuiFactory {
             false,
             false,
             BetterFoliageMod.MOD_NAME
-    )
+        )
+    }
 }

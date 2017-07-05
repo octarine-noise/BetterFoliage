@@ -10,7 +10,7 @@ import mods.octarinecore.common.forgeDirs
 import mods.octarinecore.random
 import net.minecraft.block.material.Material
 import net.minecraft.client.renderer.BlockRendererDispatcher
-import net.minecraft.client.renderer.VertexBuffer
+import net.minecraft.client.renderer.BufferBuilder
 import net.minecraft.util.BlockRenderLayer
 import net.minecraft.util.EnumFacing.Axis
 import net.minecraft.util.EnumFacing.UP
@@ -54,7 +54,7 @@ class RenderCoral : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
         ctx.biomeId in Config.coral.biomes &&
         noise[ctx.pos] < Config.coral.population
 
-    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: VertexBuffer, layer: BlockRenderLayer): Boolean {
+    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: BufferBuilder, layer: BlockRenderLayer): Boolean {
         val baseRender = renderWorldBlockBase(ctx, dispatcher, renderer, layer)
         if (!layer.isCutout) return baseRender
 

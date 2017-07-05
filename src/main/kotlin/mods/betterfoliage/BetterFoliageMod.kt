@@ -2,6 +2,7 @@ package mods.betterfoliage
 
 import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.Config
+import mods.betterfoliage.client.isAfterPostInit
 import net.minecraftforge.common.config.Configuration
 import net.minecraftforge.fml.common.FMLCommonHandler
 import net.minecraftforge.fml.common.Mod
@@ -30,19 +31,23 @@ object BetterFoliageMod {
     const val MOD_NAME = "Better Foliage"
     const val DOMAIN = "betterfoliage"
     const val LEGACY_DOMAIN = "bettergrassandleaves"
-    const val MC_VERSIONS = "[1.11.2]"
+    const val MC_VERSIONS = "[1.12]"
     const val GUI_FACTORY = "mods.betterfoliage.client.gui.ConfigGuiFactory"
 
     lateinit var log: Logger
     lateinit var logDetail: Logger
 
     var config: Configuration? = null
-    var isAfterPostInit = false
 
     @JvmStatic
     @Mod.InstanceFactory
     // the fun never stops with the fun factory! :)
-    fun factory() = this
+    fun factory(): BetterFoliageMod {
+        // inject pack into default list at construction time to get domains enumerated
+        // there's no 2nd resource reload pass anymore
+        Client.generatorPack.inject()
+        return this
+    }
 
     @Mod.EventHandler
     fun preInit(event: FMLPreInitializationEvent) {
@@ -61,12 +66,10 @@ object BetterFoliageMod {
             PrintStream(logDetailFile)
         )
         config = Configuration(event.suggestedConfigurationFile, null, true)
-    }
 
-    @Mod.EventHandler
-    fun postInit(event: FMLPostInitializationEvent) {
         if (FMLCommonHandler.instance().effectiveSide == Side.CLIENT) {
             Config.attach(config!!)
+            Client.init()
             Client.log(INFO, "BetterFoliage initialized")
             isAfterPostInit = true
         }

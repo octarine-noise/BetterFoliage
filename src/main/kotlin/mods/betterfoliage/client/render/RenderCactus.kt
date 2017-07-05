@@ -13,7 +13,7 @@ import mods.octarinecore.common.config.modelTextures
 import net.minecraft.block.BlockCactus
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.renderer.BlockRendererDispatcher
-import net.minecraft.client.renderer.VertexBuffer
+import net.minecraft.client.renderer.BufferBuilder
 import net.minecraft.client.renderer.texture.TextureMap
 import net.minecraft.util.BlockRenderLayer
 import net.minecraft.util.EnumFacing.*
@@ -92,7 +92,7 @@ class RenderCactus : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
         ctx.cameraDistance < Config.cactus.distance &&
         Config.blocks.cactus.matchesClass(ctx.block)
 
-    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: VertexBuffer, layer: BlockRenderLayer): Boolean {
+    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: BufferBuilder, layer: BlockRenderLayer): Boolean {
         // render the whole block on the cutout layer
         if (!layer.isCutout) return false
 

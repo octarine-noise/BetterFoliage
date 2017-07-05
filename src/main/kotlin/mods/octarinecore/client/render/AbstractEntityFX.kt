@@ -4,7 +4,7 @@ import mods.octarinecore.PI2
 import mods.octarinecore.common.Double3
 import net.minecraft.client.Minecraft
 import net.minecraft.client.particle.Particle
-import net.minecraft.client.renderer.VertexBuffer
+import net.minecraft.client.renderer.BufferBuilder
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.entity.Entity
 import net.minecraft.world.World
@@ -32,7 +32,7 @@ abstract class AbstractEntityFX(world: World, x: Double, y: Double, z: Double) :
     }
 
     /** Render the particle. */
-    abstract fun render(worldRenderer: VertexBuffer, partialTickTime: Float)
+    abstract fun render(worldRenderer: BufferBuilder, partialTickTime: Float)
 
     /** Update particle on world tick. */
     abstract fun update()
@@ -43,7 +43,7 @@ abstract class AbstractEntityFX(world: World, x: Double, y: Double, z: Double) :
     /** Add the particle to the effect renderer if it is valid. */
     fun addIfValid() { if (isValid) Minecraft.getMinecraft().effectRenderer.addEffect(this) }
 
-    override fun renderParticle(worldRenderer: VertexBuffer, entity: Entity, partialTickTime: Float, rotX: Float, rotZ: Float, rotYZ: Float, rotXY: Float, rotXZ: Float) {
+    override fun renderParticle(worldRenderer: BufferBuilder, entity: Entity, partialTickTime: Float, rotX: Float, rotZ: Float, rotYZ: Float, rotXY: Float, rotXZ: Float) {
         billboardRot.first.setTo(rotX + rotXY, rotZ, rotYZ + rotXZ)
         billboardRot.second.setTo(rotX - rotXY, -rotZ, rotYZ - rotXZ)
         render(worldRenderer, partialTickTime)
@@ -61,7 +61,7 @@ abstract class AbstractEntityFX(world: World, x: Double, y: Double, z: Double) :
      * @param[isMirrored] mirror particle texture along V-axis
      * @param[alpha] aplha blending
      */
-    fun renderParticleQuad(worldRenderer: VertexBuffer,
+    fun renderParticleQuad(worldRenderer: BufferBuilder,
                            partialTickTime: Float,
                            currentPos: Double3 = this.currentPos,
                            prevPos: Double3 = this.prevPos,

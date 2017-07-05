@@ -21,7 +21,7 @@ import java.util.*
  */
 class GeneratorPack(val name: String, vararg val generators: GeneratorBase) : IResourcePack {
 
-    init {
+    fun inject() {
         FMLClientHandler.instance().reflectField<MutableList<IResourcePack>>("resourcePackList")!!.add(this)
     }
 

@@ -14,7 +14,7 @@ import mods.octarinecore.common.vec
 import mods.octarinecore.random
 import net.minecraft.block.material.Material
 import net.minecraft.client.renderer.BlockRendererDispatcher
-import net.minecraft.client.renderer.VertexBuffer
+import net.minecraft.client.renderer.BufferBuilder
 import net.minecraft.util.BlockRenderLayer
 import net.minecraft.util.EnumFacing.DOWN
 import net.minecraft.util.EnumFacing.UP
@@ -47,7 +47,7 @@ class RenderLeaves : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
         ctx.cameraDistance < Config.leaves.distance &&
         LeafRegistry[ctx, DOWN] != null
 
-    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: VertexBuffer, layer: BlockRenderLayer): Boolean {
+    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: BufferBuilder, layer: BlockRenderLayer): Boolean {
         val isSnowed = ctx.blockState(up1).material.let {
             it == Material.SNOW || it == Material.CRAFTED_SNOW
         }

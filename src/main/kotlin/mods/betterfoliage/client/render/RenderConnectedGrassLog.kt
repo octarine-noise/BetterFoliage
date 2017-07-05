@@ -8,7 +8,7 @@ import mods.octarinecore.client.render.withOffset
 import mods.octarinecore.common.Int3
 import mods.octarinecore.common.offset
 import net.minecraft.client.renderer.BlockRendererDispatcher
-import net.minecraft.client.renderer.VertexBuffer
+import net.minecraft.client.renderer.BufferBuilder
 import net.minecraft.util.BlockRenderLayer
 import net.minecraft.util.EnumFacing.*
 import net.minecraftforge.fml.relauncher.Side
@@ -24,7 +24,7 @@ class RenderConnectedGrassLog : AbstractBlockRenderingHandler(BetterFoliageMod.M
         Config.blocks.dirt.matchesClass(ctx.block) &&
         Config.blocks.logClasses.matchesClass(ctx.block(up1))
 
-    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: VertexBuffer, layer: BlockRenderLayer): Boolean {
+    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: BufferBuilder, layer: BlockRenderLayer): Boolean {
         val grassDir = grassCheckDirs.find {
             Config.blocks.grassClasses.matchesClass(ctx.block(it.offset))
         }

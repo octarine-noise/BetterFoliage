@@ -2,7 +2,7 @@ package mods.octarinecore.client.render
 
 import mods.octarinecore.common.*
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.VertexBuffer
+import net.minecraft.client.renderer.BufferBuilder
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.EnumFacing.*
@@ -29,7 +29,7 @@ class ModelRenderer : ShadingContext() {
      * @param[postProcess] lambda to perform arbitrary modifications on the [RenderVertex] just before it goes to the [Tessellator]
      */
     fun render(
-        worldRenderer: VertexBuffer,
+        worldRenderer: BufferBuilder,
         model: Model,
         rot: Rotation = Rotation.identity,
         trans: Double3 = blockContext.blockCenter,
@@ -164,7 +164,7 @@ class RenderVertex() {
 
 }
 
-fun VertexBuffer.ensureSpaceForQuads(num: Int) {
+fun BufferBuilder.ensureSpaceForQuads(num: Int) {
     rawIntBuffer.position(bufferSize)
     growBuffer(num * vertexFormat.nextOffset)
 }

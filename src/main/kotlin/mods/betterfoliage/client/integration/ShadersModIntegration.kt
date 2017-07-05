@@ -7,7 +7,7 @@ import mods.octarinecore.metaprog.allAvailable
 import net.minecraft.block.Block
 import net.minecraft.block.BlockTallGrass
 import net.minecraft.block.state.IBlockState
-import net.minecraft.client.renderer.VertexBuffer
+import net.minecraft.client.renderer.BufferBuilder
 import net.minecraft.init.Blocks
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
@@ -47,7 +47,7 @@ object ShadersModIntegration {
     }
 
     /** Quads rendered inside this block will use the given block entity data in shader programs. */
-    inline fun renderAs(blockEntityData: Long, renderer: VertexBuffer, enabled: Boolean = true, func: ()->Unit) {
+    inline fun renderAs(blockEntityData: Long, renderer: BufferBuilder, enabled: Boolean = true, func: ()->Unit) {
         if ((isPresent && enabled)) {
             val vertexBuilder = Refs.sVertexBuilder.get(renderer)!!
             Refs.pushEntity_num.invoke(vertexBuilder, blockEntityData)
@@ -59,14 +59,14 @@ object ShadersModIntegration {
     }
 
     /** Quads rendered inside this block will use the given block entity data in shader programs. */
-    inline fun renderAs(state: IBlockState, renderer: VertexBuffer, enabled: Boolean = true, func: ()->Unit) =
+    inline fun renderAs(state: IBlockState, renderer: BufferBuilder, enabled: Boolean = true, func: ()->Unit) =
         renderAs(entityDataFor(state), renderer, enabled, func)
 
     /** Quads rendered inside this block will behave as tallgrass blocks in shader programs. */
-    inline fun grass(renderer: VertexBuffer, enabled: Boolean = true, func: ()->Unit) =
+    inline fun grass(renderer: BufferBuilder, enabled: Boolean = true, func: ()->Unit) =
         renderAs(tallGrassEntityData, renderer, enabled, func)
 
     /** Quads rendered inside this block will behave as leaf blocks in shader programs. */
-    inline fun leaves(renderer: VertexBuffer, enabled: Boolean = true, func: ()->Unit) =
+    inline fun leaves(renderer: BufferBuilder, enabled: Boolean = true, func: ()->Unit) =
         renderAs(leavesEntityData, renderer, enabled, func)
 }

@@ -10,7 +10,7 @@ import mods.octarinecore.client.render.noPost
 import mods.octarinecore.common.Double3
 import mods.octarinecore.common.Rotation
 import net.minecraft.client.renderer.BlockRendererDispatcher
-import net.minecraft.client.renderer.VertexBuffer
+import net.minecraft.client.renderer.BufferBuilder
 import net.minecraft.init.Blocks
 import net.minecraft.util.BlockRenderLayer
 import net.minecraftforge.fml.relauncher.Side
@@ -33,7 +33,7 @@ class RenderMycelium : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
         ctx.cameraDistance < Config.shortGrass.distance
     }
 
-    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: VertexBuffer, layer: BlockRenderLayer): Boolean {
+    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: BufferBuilder, layer: BlockRenderLayer): Boolean {
         // render the whole block on the cutout layer
         if (!layer.isCutout) return false
 

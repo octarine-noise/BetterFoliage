@@ -9,7 +9,7 @@ import mods.octarinecore.common.Int3
 import mods.octarinecore.common.forgeDirsHorizontal
 import mods.octarinecore.common.offset
 import net.minecraft.client.renderer.BlockRendererDispatcher
-import net.minecraft.client.renderer.VertexBuffer
+import net.minecraft.client.renderer.BufferBuilder
 import net.minecraft.util.BlockRenderLayer
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
@@ -22,7 +22,7 @@ class RenderConnectedGrass : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_
         Config.blocks.grassClasses.matchesClass(ctx.block(up1)) &&
         (Config.connectedGrass.snowEnabled || !ctx.blockState(up2).isSnow)
 
-    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: VertexBuffer, layer: BlockRenderLayer): Boolean {
+    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: BufferBuilder, layer: BlockRenderLayer): Boolean {
         // if the block sides are not visible anyway, render normally
         if (forgeDirsHorizontal.all { ctx.blockState(it.offset).isOpaqueCube }) return renderWorldBlockBase(ctx, dispatcher, renderer, layer)
 

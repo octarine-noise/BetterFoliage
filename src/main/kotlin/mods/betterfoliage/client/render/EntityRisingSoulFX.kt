@@ -7,7 +7,7 @@ import mods.octarinecore.client.render.AbstractEntityFX
 import mods.octarinecore.client.resource.ResourceHandler
 import mods.octarinecore.common.Double3
 import mods.octarinecore.forEachPairIndexed
-import net.minecraft.client.renderer.VertexBuffer
+import net.minecraft.client.renderer.BufferBuilder
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.MathHelper
 import net.minecraft.world.World
@@ -42,7 +42,7 @@ AbstractEntityFX(world, pos.x.toDouble() + 0.5, pos.y.toDouble() + 1.0, pos.z.to
         if (!Config.enabled) setExpired()
     }
 
-    override fun render(worldRenderer: VertexBuffer, partialTickTime: Float) {
+    override fun render(worldRenderer: BufferBuilder, partialTickTime: Float) {
         var alpha = Config.risingSoul.opacity
         if (particleAge > particleMaxAge - 40) alpha *= (particleMaxAge - particleAge) / 40.0f
 
