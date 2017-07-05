@@ -10,6 +10,7 @@ import mods.octarinecore.common.times
 import net.minecraft.block.Block
 import net.minecraft.block.material.Material
 import net.minecraft.block.state.IBlockState
+import net.minecraft.util.BlockRenderLayer
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.EnumFacing.*
 
@@ -54,3 +55,7 @@ fun Model.mix(first: Model, second: Model, predicate: (Int)->Boolean) {
         ).add()
     }
 }
+
+val BlockRenderLayer.isCutout: Boolean get() = (this == BlockRenderLayer.CUTOUT) || (this == BlockRenderLayer.CUTOUT_MIPPED)
+
+fun IBlockState.canRenderInLayer(layer: BlockRenderLayer) = this.block.canRenderInLayer(this, layer)

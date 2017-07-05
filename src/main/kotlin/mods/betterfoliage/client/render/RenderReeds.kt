@@ -54,7 +54,9 @@ class RenderReeds : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
         noise[ctx.pos] < Config.reed.population
 
     override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: VertexBuffer, layer: BlockRenderLayer): Boolean {
-        renderWorldBlockBase(ctx, dispatcher, renderer, null)
+        val baseRender = renderWorldBlockBase(ctx, dispatcher, renderer, layer)
+        if (!layer.isCutout) return baseRender
+
         modelRenderer.updateShading(Int3.zero, allFaces)
 
         val iconVar = ctx.random(1)

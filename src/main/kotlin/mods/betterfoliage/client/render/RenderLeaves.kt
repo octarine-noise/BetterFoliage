@@ -55,11 +55,12 @@ class RenderLeaves : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
         if (leafInfo == null) {
             // shouldn't happen
             Client.logRenderError(ctx.blockState(Int3.zero), ctx.pos)
-            return renderWorldBlockBase(ctx, dispatcher, renderer, null)
+            return renderWorldBlockBase(ctx, dispatcher, renderer, layer)
         }
         val blockColor = ctx.blockData(Int3.zero).color
 
-        renderWorldBlockBase(ctx, dispatcher, renderer, null)
+        renderWorldBlockBase(ctx, dispatcher, renderer, layer)
+        if (!layer.isCutout) return true
 
         modelRenderer.updateShading(Int3.zero, allFaces)
         ShadersModIntegration.leaves(renderer) {
