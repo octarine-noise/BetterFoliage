@@ -64,7 +64,7 @@ class RenderGrass : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
             // get AO data
             if (renderWorldBlockBase(parent, face = neverRender)) return true
 
-            val isHidden = forgeDirs.map { ctx.block(it.offset).isOpaqueCube }
+            val isHidden = forgeDirs.map { !ctx.shouldRenderSide(it.offset, it.opposite) }
 
             // render full grass block
             ShadersModIntegration.renderAs(ctx.block) {
