@@ -45,6 +45,9 @@ class RenderLilypad : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
         Config.blocks.lilypad.matchesClass(ctx.block)
 
     override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: VertexBuffer, layer: BlockRenderLayer): Boolean {
+        // render the whole block on the cutout layer
+        if (!layer.isCutout) return false
+
         renderWorldBlockBase(ctx, dispatcher, renderer, null)
         modelRenderer.updateShading(Int3.zero, allFaces)
 

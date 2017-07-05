@@ -40,8 +40,11 @@ class RenderNetherrack : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) 
     }
 
     override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: VertexBuffer, layer: BlockRenderLayer): Boolean {
-        renderWorldBlockBase(ctx, dispatcher, renderer, null)
-        if (ctx.blockState(down1).isOpaqueCube) return true
+        val baseRender = renderWorldBlockBase(ctx, dispatcher, renderer, layer)
+        if (!layer.isCutout) return baseRender
+
+        if (ctx.blockState(down1).isOpaqueCube) return baseRender
+
         modelRenderer.updateShading(Int3.zero, allFaces)
 
         val rand = ctx.semiRandomArray(2)

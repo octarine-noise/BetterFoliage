@@ -20,7 +20,7 @@ import net.minecraftforge.fml.relauncher.SideOnly
 
 class RenderLog : AbstractRenderColumn(BetterFoliageMod.MOD_ID) {
 
-    override val moveToCutout: Boolean get() = false
+    override val addToCutout: Boolean get() = false
 
     override fun isEligible(ctx: BlockContext) =
         Config.enabled && Config.roundLogs.enabled &&

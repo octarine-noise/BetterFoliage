@@ -24,12 +24,12 @@ class RenderConnectedGrass : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_
 
     override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: VertexBuffer, layer: BlockRenderLayer): Boolean {
         // if the block sides are not visible anyway, render normally
-        if (forgeDirsHorizontal.all { ctx.blockState(it.offset).isOpaqueCube }) return renderWorldBlockBase(ctx, dispatcher, renderer, null)
+        if (forgeDirsHorizontal.all { ctx.blockState(it.offset).isOpaqueCube }) return renderWorldBlockBase(ctx, dispatcher, renderer, layer)
 
         if (ctx.isSurroundedBy { it.isOpaqueCube } ) return false
         return ctx.withOffset(Int3.zero, up1) {
             ctx.withOffset(up1, up2) {
-                renderWorldBlockBase(ctx, dispatcher, renderer, null)
+                renderWorldBlockBase(ctx, dispatcher, renderer, layer)
             }
         }
     }

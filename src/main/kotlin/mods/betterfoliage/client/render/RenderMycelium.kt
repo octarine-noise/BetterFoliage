@@ -34,6 +34,9 @@ class RenderMycelium : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
     }
 
     override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: VertexBuffer, layer: BlockRenderLayer): Boolean {
+        // render the whole block on the cutout layer
+        if (!layer.isCutout) return false
+
         val isSnowed = ctx.blockState(up1).isSnow
 
         renderWorldBlockBase(ctx, dispatcher, renderer, null)

@@ -4,10 +4,7 @@ package mods.betterfoliage.client
 
 import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.config.Config
-import mods.betterfoliage.client.render.EntityFallingLeavesFX
-import mods.betterfoliage.client.render.EntityRisingSoulFX
-import mods.betterfoliage.client.render.down1
-import mods.betterfoliage.client.render.up1
+import mods.betterfoliage.client.render.*
 import mods.octarinecore.client.render.blockContext
 import mods.octarinecore.client.resource.LoadModelDataEvent
 import mods.octarinecore.common.plus
@@ -76,23 +73,17 @@ fun renderWorldBlock(dispatcher: BlockRendererDispatcher,
                      worldRenderer: VertexBuffer,
                      layer: BlockRenderLayer
 ): Boolean {
-    val isCutout = layer == CUTOUT_MIPPED || layer == CUTOUT
-    val needsCutout = state.block.canRenderInLayer(state, CUTOUT_MIPPED) || state.block.canRenderInLayer(state, CUTOUT)
-    val canRender = (isCutout && needsCutout) || state.block.canRenderInLayer(state, layer)
-
     blockContext.let { ctx ->
         ctx.set(blockAccess, pos)
         Client.renderers.forEach { renderer ->
             if (renderer.isEligible(ctx)) {
-                return if (renderer.moveToCutout) {
-                    if (isCutout) renderer.render(ctx, dispatcher, worldRenderer, layer) else false
-                } else {
-                    renderer.render(ctx, dispatcher, worldRenderer, layer)
+                if (state.canRenderInLayer(layer) || (layer.isCutout && renderer.addToCutout)) {
+                    return renderer.render(ctx, dispatcher, worldRenderer, layer)
                 }
             }
         }
     }
-    return if (canRender) dispatcher.renderBlock(state, pos, blockAccess, worldRenderer) else false
+    return if (state.canRenderInLayer(layer)) dispatcher.renderBlock(state, pos, blockAccess, worldRenderer) else false
 }
 
 fun canRenderBlockInLayer(block: Block, state: IBlockState, layer: BlockRenderLayer): Boolean {

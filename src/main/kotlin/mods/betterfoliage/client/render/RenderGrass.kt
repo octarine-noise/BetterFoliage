@@ -52,6 +52,9 @@ class RenderGrass : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
         GrassRegistry[ctx, UP] != null
 
     override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: VertexBuffer, layer: BlockRenderLayer): Boolean {
+        // render the whole block on the cutout layer
+        if (!layer.isCutout) return false
+
         val isConnected = ctx.block(down1).let {
             Config.blocks.dirt.matchesClass(it) ||
             Config.blocks.grassClasses.matchesClass(it)

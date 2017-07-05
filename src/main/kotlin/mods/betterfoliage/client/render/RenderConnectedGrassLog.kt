@@ -31,10 +31,10 @@ class RenderConnectedGrassLog : AbstractBlockRenderingHandler(BetterFoliageMod.M
 
         return if (grassDir != null) {
             ctx.withOffset(Int3.zero, grassDir.offset) {
-                renderWorldBlockBase(ctx, dispatcher, renderer, null)
+                renderWorldBlockBase(ctx, dispatcher, renderer, layer)
             }
         } else {
-            renderWorldBlockBase(ctx, dispatcher, renderer, null)
+            renderWorldBlockBase(ctx, dispatcher, renderer, layer)
         }
     }
 }
