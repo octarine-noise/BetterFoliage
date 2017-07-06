@@ -13,10 +13,7 @@ import mods.betterfoliage.loader.Refs
 import mods.octarinecore.client.render.Quad
 import mods.octarinecore.client.render.ShadingContext
 import mods.octarinecore.client.render.blockContext
-import mods.octarinecore.client.resource.ModelProcessor
-import mods.octarinecore.client.resource.derivesFrom
-import mods.octarinecore.client.resource.get
-import mods.octarinecore.client.resource.modelBlockAndLoc
+import mods.octarinecore.client.resource.*
 import mods.octarinecore.common.rotate
 import mods.octarinecore.metaprog.ClassRef
 import mods.octarinecore.metaprog.MethodRef
@@ -114,13 +111,13 @@ abstract class RubberLogSupportBase : ModelProcessor<RubberLogModelInfo, IColumn
     init { MinecraftForge.EVENT_BUS.register(this) }
 
     override fun processStitch(state: IBlockState, key: RubberLogModelInfo, atlas: TextureMap): IColumnTextureInfo? {
-        val topTex = atlas[key.textures[0]] ?: return null
-        val bottomTex = atlas[key.textures[1]] ?: return null
-        val sideTex = atlas[key.textures[2]] ?: return null
+        val topTex = atlas.registerSprite(key.textures[0])
+        val bottomTex = atlas.registerSprite(key.textures[1])
+        val sideTex = atlas.registerSprite(key.textures[2])
         if (key.spotDir == null)
             return StaticColumnInfo(key.axis, topTex, bottomTex, sideTex)
         else {
-            val spotTex = atlas[key.textures[3]] ?: return null
+            val spotTex = atlas.registerSprite(key.textures[3])
             return RubberLogColumnInfo(key.axis, key.spotDir, topTex, bottomTex, sideTex, spotTex)
         }
     }
