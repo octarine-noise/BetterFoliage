@@ -40,7 +40,7 @@ object IC2Integration {
     val BlockRubWood = ClassRef("ic2.core.block.BlockRubWood")
 
     init {
-        if (Loader.isModLoaded("IC2") && allAvailable(BlockRubWood)) {
+        if (Loader.isModLoaded("ic2") && allAvailable(BlockRubWood)) {
             Client.log(Level.INFO, "IC2 support initialized")
             LogRegistry.subRegistries.add(IC2LogSupport)
         }
@@ -51,23 +51,11 @@ object IC2Integration {
 object TechRebornIntegration {
 
     val BlockRubberLog = ClassRef("techreborn.blocks.BlockRubberLog")
-    val ITexturedBlock = ClassRef("me.modmuss50.jsonDestroyer.api.ITexturedBlock")
-    val getTextureNameFromState = MethodRef(ITexturedBlock, "getTextureNameFromState", Refs.String, Refs.IBlockState, Refs.EnumFacing)
-
-    val rubberLogTextureNames = listOf(
-        "techreborn:blocks/rubber_log_top",
-        "techreborn:blocks/rubber_log_top",
-        "techreborn:blocks/rubber_log_side",
-        "techreborn:blocks/rubber_log_sap"
-    )
 
     init {
-        if (Loader.isModLoaded("techreborn") && allAvailable(BlockRubberLog, ITexturedBlock, getTextureNameFromState)) {
+        if (Loader.isModLoaded("techreborn") && allAvailable(BlockRubberLog)) {
             Client.log(Level.INFO, "TechReborn support initialized")
             LogRegistry.subRegistries.add(TechRebornLogSupport)
-
-            // initialize object but don't add to registry
-            TechRebornLeafSupport.toString()
         }
     }
 }
@@ -169,47 +157,20 @@ object TechRebornLogSupport : RubberLogSupportBase() {
     override fun processModelLoad(state: IBlockState, modelLoc: ModelResourceLocation, model: IModel): RubberLogModelInfo? {
         // check for proper block class, existence of ModelBlock
         if (!TechRebornIntegration.BlockRubberLog.isInstance(state.block)) return null
+        val blockLoc = model.modelBlockAndLoc.firstOrNull() ?: return null
 
         val hasSap = state.properties.entries.find { it.key.getName() == "hassap" }?.value as? Boolean ?: return null
         val sapSide = state.properties.entries.find { it.key.getName() == "sapside" }?.value as? EnumFacing ?: return null
 
+        val textureNames = listOf("end", "end", "side", "sapside").map { blockLoc.first.resolveTextureName(it) }
+
         logger.log(Level.DEBUG, "TechRebornLogSupport: block state ${state.toString()}")
         if (hasSap) {
-            val textureNames = listOf(EnumFacing.UP, EnumFacing.DOWN, sapSide.opposite, sapSide).map {
-                TechRebornIntegration.getTextureNameFromState.invoke(state.block, state, it) as String
-            }
-            logger.log(Level.DEBUG, "TechRebornLogSupport:             spotDir=$sapSide, up=${textureNames[0]}, down=${textureNames[1]}, side=${textureNames[2]}, spot=${textureNames[3]}")
+            logger.log(Level.DEBUG, "TechRebornLogSupport:             spotDir=$sapSide, end=${textureNames[0]}, side=${textureNames[2]}, spot=${textureNames[3]}")
             return if (textureNames.all { it != "missingno" }) RubberLogModelInfo(EnumFacing.Axis.Y, sapSide, textureNames) else null
         } else {
-            val textureNames = listOf(EnumFacing.UP, EnumFacing.DOWN, sapSide).map {
-                TechRebornIntegration.getTextureNameFromState.invoke(state.block, state, it) as String
-            }
-            logger.log(Level.DEBUG, "TechRebornLogSupport:             up=${textureNames[0]}, down=${textureNames[1]}, side=${textureNames[2]}")
+            logger.log(Level.DEBUG, "TechRebornLogSupport:             end=${textureNames[0]}, side=${textureNames[2]}")
             return if (textureNames.all { it != "missingno" }) RubberLogModelInfo(EnumFacing.Axis.Y, null, textureNames) else null
         }
     }
-}
-
-@SideOnly(Side.CLIENT)
-object TechRebornLeafSupport : ModelProcessor<Nothing, Nothing> {
-
-    init { MinecraftForge.EVENT_BUS.register(this) }
-
-    override var stateToKey = mutableMapOf<IBlockState, Nothing>()
-    override var stateToValue = mapOf<IBlockState, Nothing>()
-    override val logger: Logger get() = BetterFoliageMod.logDetail
-
-    override fun processModelLoad(state: IBlockState, modelLoc: ModelResourceLocation, model: IModel): Nothing? {
-        if (Config.blocks.leavesClasses.matchesClass(state.block) && TechRebornIntegration.ITexturedBlock.isInstance(state.block)) {
-            val textureName = TechRebornIntegration.getTextureNameFromState.invoke(state.block, state, EnumFacing.UP) as String
-            logger.log(Level.DEBUG, "TechRebornLeafSupport: block state ${state.toString()}")
-            logger.log(Level.DEBUG, "TechRebornLeafSupport:             texture=$textureName")
-            // register directly into StandardLeafSupport for the sake of simplicity
-            StandardLeafSupport.stateToKey[state] = listOf(textureName)
-        }
-        return null
-    }
-
-    // no-op
-    override fun processStitch(state: IBlockState, key: Nothing, atlas: TextureMap) = null
 }
