@@ -5,9 +5,11 @@ package mods.betterfoliage.client
 import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.config.Config
 import mods.betterfoliage.client.render.*
+import mods.betterfoliage.loader.Refs
 import mods.octarinecore.client.render.blockContext
 import mods.octarinecore.client.resource.LoadModelDataEvent
 import mods.octarinecore.common.plus
+import mods.octarinecore.metaprog.allAvailable
 import net.minecraft.block.Block
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.renderer.BlockRendererDispatcher
@@ -24,6 +26,8 @@ import net.minecraftforge.client.model.ModelLoader
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
+
+val isOptifinePresent = allAvailable(Refs.OptifineClassTransformer)
 
 fun doesSideBlockRenderingOverride(original: Boolean, blockAccess: IBlockAccess, pos: BlockPos, side: EnumFacing): Boolean {
     return original && !(Config.enabled && Config.roundLogs.enabled && Config.blocks.logClasses.matchesClass(blockAccess.getBlockState(pos).block));
@@ -77,13 +81,16 @@ fun renderWorldBlock(dispatcher: BlockRendererDispatcher,
         ctx.set(blockAccess, pos)
         Client.renderers.forEach { renderer ->
             if (renderer.isEligible(ctx)) {
+                // render on the block's default layer AND CUTOUT_MIPPED if the renderer requires it
                 if (state.canRenderInLayer(layer) || (layer.isCutout && renderer.addToCutout)) {
                     return renderer.render(ctx, dispatcher, worldRenderer, layer)
                 }
             }
         }
     }
-    return if (state.canRenderInLayer(layer)) dispatcher.renderBlock(state, pos, blockAccess, worldRenderer) else false
+    // stuff on the CUTOUT layer must be rendered on CUTOUT_MIPPED instead if OptiFine is present
+    val doBaseRender = state.canRenderInLayer(layer) || (isOptifinePresent && layer == CUTOUT_MIPPED && state.canRenderInLayer(CUTOUT))
+    return if (doBaseRender) dispatcher.renderBlock(state, pos, blockAccess, worldRenderer) else false
 }
 
 fun canRenderBlockInLayer(block: Block, state: IBlockState, layer: BlockRenderLayer): Boolean {
