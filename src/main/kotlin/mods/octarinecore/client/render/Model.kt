@@ -81,6 +81,12 @@ data class Quad(val v1: Vertex, val v2: Vertex, val v3: Vertex, val v4: Vertex) 
     fun setFlatShader(shader: Shader) = transformVI { vertex, idx -> vertex.copy(flatShader = shader) }
     val flipped: Quad get() = Quad(v4, v3, v2, v1)
 
+    fun cycleVertices(n: Int) = when(n % 4) {
+        1 -> Quad(v2, v3, v4, v1)
+        2 -> Quad(v3, v4, v1, v2)
+        3 -> Quad(v4, v1, v2, v3)
+        else -> this.copy()
+    }
 }
 
 /**
