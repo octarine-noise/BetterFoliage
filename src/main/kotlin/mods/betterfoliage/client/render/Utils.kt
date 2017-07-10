@@ -59,3 +59,4 @@ fun Model.mix(first: Model, second: Model, predicate: (Int)->Boolean) {
 val BlockRenderLayer.isCutout: Boolean get() = (this == BlockRenderLayer.CUTOUT) || (this == BlockRenderLayer.CUTOUT_MIPPED)
 
 fun IBlockState.canRenderInLayer(layer: BlockRenderLayer) = this.block.canRenderInLayer(this, layer)
+fun IBlockState.canRenderInCutout() = this.block.canRenderInLayer(this, BlockRenderLayer.CUTOUT) || this.block.canRenderInLayer(this, BlockRenderLayer.CUTOUT_MIPPED)

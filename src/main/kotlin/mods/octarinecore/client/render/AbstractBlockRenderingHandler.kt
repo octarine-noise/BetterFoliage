@@ -1,6 +1,9 @@
 @file:JvmName("RendererHolder")
 package mods.octarinecore.client.render
 
+import mods.betterfoliage.client.render.canRenderInCutout
+import mods.betterfoliage.client.render.canRenderInLayer
+import mods.betterfoliage.client.render.isCutout
 import mods.octarinecore.ThreadLocalDelegate
 import mods.octarinecore.client.resource.ResourceHandler
 import mods.octarinecore.common.Double3
@@ -49,8 +52,11 @@ abstract class AbstractBlockRenderingHandler(modId: String) : ResourceHandler(mo
      */
     fun renderWorldBlockBase(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: VertexBuffer, layer: BlockRenderLayer?): Boolean {
         ctx.blockState(Int3.zero).let {
-            if (layer == null || it.block.canRenderInLayer(it, layer))
+            if (layer == null ||
+                it.canRenderInLayer(layer) ||
+                (it.canRenderInCutout() && layer.isCutout)) {
                 return dispatcher.renderBlock(it, ctx.pos, ctx.world, renderer)
+            }
         }
         return false
     }
@@ -63,7 +69,7 @@ data class BlockData(val state: IBlockState, val color: Int, val brightness: Int
  * Represents the block being rendered. Has properties and methods to query the neighborhood of the block in
  * block-relative coordinates.
  */
-class BlockContext() {
+class BlockContext {
     var world: IBlockAccess? = null
     var pos = BlockPos.ORIGIN
 
