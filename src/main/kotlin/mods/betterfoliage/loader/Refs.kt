@@ -102,6 +102,8 @@ object Refs {
     val CPmatchesBlock = MethodRef(ConnectedProperties, "matchesBlock", ClassRef.boolean, ClassRef.int, ClassRef.int)
     val CPmatchesIcon = MethodRef(ConnectedProperties, "matchesIcon", ClassRef.boolean, TextureAtlasSprite)
 
+    val quadSprite = FieldRef(VertexBuffer, "quadSprite", TextureAtlasSprite)
+
     // ShadersMod
     val SVertexBuilder = ClassRef("shadersmod.client.SVertexBuilder")
     val sVertexBuilder = FieldRef(VertexBuffer, "sVertexBuilder", SVertexBuilder)
