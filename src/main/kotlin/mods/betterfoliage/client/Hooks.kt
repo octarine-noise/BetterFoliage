@@ -11,6 +11,7 @@ import mods.octarinecore.common.plus
 import mods.octarinecore.metaprog.allAvailable
 import net.minecraft.block.Block
 import net.minecraft.block.state.IBlockState
+import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.BlockRendererDispatcher
 import net.minecraft.client.renderer.BufferBuilder
 import net.minecraft.init.Blocks
@@ -77,26 +78,24 @@ fun renderWorldBlock(dispatcher: BlockRendererDispatcher,
                      worldRenderer: BufferBuilder,
                      layer: BlockRenderLayer
 ): Boolean {
+    val doBaseRender = state.canRenderInLayer(layer) || (layer == targetCutoutLayer && state.canRenderInLayer(otherCutoutLayer))
     blockContext.let { ctx ->
         ctx.set(blockAccess, pos)
         Client.renderers.forEach { renderer ->
             if (renderer.isEligible(ctx)) {
-                // render on the block's default layer AND CUTOUT_MIPPED if the renderer requires it
-                if (state.canRenderInLayer(layer) || (layer.isCutout && renderer.addToCutout)) {
+                // render on the block's default layer
+                // also render on the cutout layer if the renderer requires it
+                if (doBaseRender || (renderer.addToCutout && layer == targetCutoutLayer)) {
                     return renderer.render(ctx, dispatcher, worldRenderer, layer)
                 }
             }
         }
     }
-    // stuff on the CUTOUT layer must be rendered on CUTOUT_MIPPED instead if OptiFine is present
-    val doBaseRender = state.canRenderInLayer(layer) || (isOptifinePresent && layer == CUTOUT_MIPPED && state.canRenderInLayer(CUTOUT))
+
     return if (doBaseRender) dispatcher.renderBlock(state, pos, blockAccess, worldRenderer) else false
 }
 
-fun canRenderBlockInLayer(block: Block, state: IBlockState, layer: BlockRenderLayer): Boolean {
-    if (layer == CUTOUT_MIPPED && !block.canRenderInLayer(state, CUTOUT)) {
-        return true
-    }
-    return block.canRenderInLayer(state, layer)
+fun canRenderBlockInLayer(block: Block, state: IBlockState, layer: BlockRenderLayer) = block.canRenderInLayer(state, layer) || layer == targetCutoutLayer
 
-}
+val targetCutoutLayer: BlockRenderLayer get() = if (Minecraft.getMinecraft().gameSettings.mipmapLevels > 0) CUTOUT_MIPPED else CUTOUT
+val otherCutoutLayer: BlockRenderLayer get() = if (Minecraft.getMinecraft().gameSettings.mipmapLevels > 0) CUTOUT else CUTOUT_MIPPED

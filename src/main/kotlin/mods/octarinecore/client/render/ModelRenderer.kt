@@ -1,5 +1,6 @@
 package mods.octarinecore.client.render
 
+import mods.betterfoliage.loader.Refs
 import mods.octarinecore.common.*
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.BufferBuilder
@@ -48,6 +49,10 @@ class ModelRenderer : ShadingContext() {
             if (quadFilter(quadIdx, quad)) {
                 val drawIcon = icon(this, quadIdx, quad)
                 if (drawIcon != null) {
+                    // let OptiFine know the texture we're using, so it can
+                    // transform UV coordinates to quad-relative
+                    Refs.quadSprite.set(worldRenderer, drawIcon)
+
                     quad.verts.forEachIndexed { vertIdx, vert ->
                         temp.init(vert).rotate(rotation).translate(trans)
                         val shader = if (aoEnabled && !forceFlat) vert.aoShader else vert.flatShader
