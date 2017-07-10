@@ -164,4 +164,6 @@ class FieldRef(val parentClass: ClassRef,
 
     /** Get this static field using reflection. */
     fun getStatic() = get(null)
+
+    fun set(receiver: Any?, obj: Any?) { element?.set(receiver, obj) }
 }

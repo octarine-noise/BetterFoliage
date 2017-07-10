@@ -248,7 +248,6 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
                     postProcess = { _, _, _, _, _ ->
                         if (isLidUp) {
                             rotateUV(idx + if (logAxis == Axis.X) 1 else 0)
-                            if (logAxis == Axis.X) mirrorUV(true, true)
                         }
                     }
                 )
@@ -260,7 +259,6 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
                     postProcess = { _, _, _, _, _ ->
                         if (isLidDown) {
                             rotateUV((if (logAxis == Axis.X) 0 else 3) - idx)
-                            if (logAxis != Axis.Y) mirrorUV(true, true)
                         }
                     }
                 )

@@ -27,13 +27,9 @@ class RenderConnectedGrassLog : AbstractBlockRenderingHandler(BetterFoliageMod.M
     override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: VertexBuffer, layer: BlockRenderLayer): Boolean {
         val grassDir = grassCheckDirs.find {
             Config.blocks.grassClasses.matchesClass(ctx.block(it.offset))
-        }
+        } ?: return renderWorldBlockBase(ctx, dispatcher, renderer, layer)
 
-        return if (grassDir != null) {
-            ctx.withOffset(Int3.zero, grassDir.offset) {
-                renderWorldBlockBase(ctx, dispatcher, renderer, layer)
-            }
-        } else {
+        return ctx.withOffset(Int3.zero, grassDir.offset) {
             renderWorldBlockBase(ctx, dispatcher, renderer, layer)
         }
     }
