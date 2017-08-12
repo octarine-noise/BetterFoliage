@@ -33,7 +33,7 @@ object Client {
 
     val configKey = KeyHandler(BetterFoliageMod.MOD_NAME, 66, "key.betterfoliage.gui") {
         FMLClientHandler.instance().showGuiScreen(
-            ConfigGuiFactory.ConfigGuiBetterFoliage(Minecraft.getMinecraft().currentScreen)
+            ConfigGuiFactory.createBFConfigGui(Minecraft.getMinecraft().currentScreen)
         )
     }
 

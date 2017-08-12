@@ -32,8 +32,8 @@ dependencies {
     shade "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 }
 minecraft {
-    version = '1.11.2-13.20.0.2232'
-    mappings = 'snapshot_20161210'
+    version = '1.11.2-13.20.1.2386'
+    mappings = 'snapshot_20170612'
     runDir = 'run'
 }
 processResources {
