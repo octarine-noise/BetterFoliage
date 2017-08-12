@@ -70,7 +70,10 @@ object Refs {
     val MultipartModel = ClassRef("net.minecraftforge.client.model.ModelLoader\$MultipartModel")
     val partModels_MPM = FieldRef(MultipartModel, "partModels", List)
 
+    val BakedQuad = ClassRef("net.minecraft.client.renderer.block.model.BakedQuad")
+
     val resetChangedState = MethodRef(ClassRef("net.minecraftforge.common.config.Configuration"), "resetChangedState", ClassRef.void)
+
 
     // Better Foliage
     val BetterFoliageHooks = ClassRef("mods.betterfoliage.client.Hooks")
@@ -103,6 +106,10 @@ object Refs {
     val CPmatchesIcon = MethodRef(ConnectedProperties, "matchesIcon", ClassRef.boolean, TextureAtlasSprite)
 
     val quadSprite = FieldRef(VertexBuffer, "quadSprite", TextureAtlasSprite)
+
+    val CustomColors = ClassRef("CustomColors")
+    val getColorMultiplier = MethodRef(CustomColors, "getColorMultiplier", ClassRef.int, BakedQuad, IBlockState, IBlockAccess, BlockPos, RenderEnv)
+
 
     // ShadersMod
     val SVertexBuilder = ClassRef("shadersmod.client.SVertexBuilder")

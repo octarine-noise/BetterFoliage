@@ -73,6 +73,11 @@ fun <T> tryDefault(default: T, work: ()->T) = try { work() } catch (e: Throwable
 /** Return a random [Double] value between the given two limits (inclusive min, exclusive max). */
 fun random(min: Double, max: Double) = Math.random().let { min + (max - min) * it }
 
+fun semiRandom(x: Int, y: Int, z: Int, seed: Int): Int {
+    var value = (x * x + y * y + z * z + x * y + y * z + z * x + (seed * seed)) and 63
+    value = (3 * x * value + 5 * y * value + 7 * z * value + (11 * seed)) and 63
+    return value
+}
 /**
  * Return this [Double] value if it lies between the two limits. If outside, return the
  * minimum/maximum value correspondingly.

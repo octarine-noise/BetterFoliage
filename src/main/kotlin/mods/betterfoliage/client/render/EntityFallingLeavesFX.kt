@@ -9,6 +9,7 @@ import mods.octarinecore.client.render.HSB
 import mods.octarinecore.common.Double3
 import mods.octarinecore.minmax
 import mods.octarinecore.random
+import mods.octarinecore.semiRandom
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.VertexBuffer
 import net.minecraft.util.EnumFacing.DOWN
@@ -45,7 +46,7 @@ AbstractEntityFX(world, pos.x.toDouble() + 0.5, pos.y.toDouble(), pos.z.toDouble
 
         val state = world.getBlockState(pos)
         val blockColor = Minecraft.getMinecraft().blockColors.colorMultiplier(state, world, pos, 0)
-        val leafInfo = LeafRegistry.get(state, world, pos, DOWN)
+        val leafInfo = LeafRegistry.get(state, world, pos, DOWN, semiRandom(pos.x, pos.y, pos.z, 0))
         if (leafInfo != null) {
             particleTexture = leafInfo.particleTextures?.get(rand.nextInt(1024))
             calculateParticleColor(leafInfo.averageColor, blockColor)

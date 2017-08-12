@@ -3,6 +3,7 @@ package mods.betterfoliage.client.render
 import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.config.Config
 import mods.octarinecore.client.render.BlockContext
+import mods.octarinecore.client.resource.ModelVariant
 import mods.octarinecore.client.resource.TextureListModelProcessor
 import mods.octarinecore.client.resource.registerSprite
 import mods.octarinecore.common.config.ConfigurableBlockMatcher
@@ -43,7 +44,7 @@ class RenderLog : AbstractRenderColumn(BetterFoliageMod.MOD_ID) {
 @SideOnly(Side.CLIENT)
 object LogRegistry : IColumnRegistry {
     val subRegistries: MutableList<IColumnRegistry> = mutableListOf()
-    override fun get(state: IBlockState) = subRegistries.findFirst { it[state] }
+    override fun get(state: IBlockState, rand: Int) = subRegistries.findFirst { it[state, rand] }
 }
 
 @SideOnly(Side.CLIENT)
@@ -54,22 +55,27 @@ object StandardLogSupport : TextureListModelProcessor<IColumnTextureInfo>, IColu
         MinecraftForge.EVENT_BUS.register(this)
     }
 
-    override var stateToKey = mutableMapOf<IBlockState, List<String>>()
-    override var stateToValue = mapOf<IBlockState, IColumnTextureInfo>()
+    override var variants = mutableMapOf<IBlockState, MutableList<ModelVariant>>()
+    override var variantToKey = mutableMapOf<ModelVariant, List<String>>()
+    override var variantToValue = mapOf<ModelVariant, IColumnTextureInfo>()
 
     override val logger = BetterFoliageMod.logDetail
     override val logName = "StandardLogSupport"
     override val matchClasses: ConfigurableBlockMatcher get() = Config.blocks.logClasses
     override val modelTextures: List<ModelTextureList> get() = Config.blocks.logModels.list
 
-    override fun processStitch(state: IBlockState, key: List<String>, atlas: TextureMap): IColumnTextureInfo? {
+    override fun processStitch(variant: ModelVariant, key: List<String>, atlas: TextureMap): IColumnTextureInfo? {
         val topTex = atlas.registerSprite(key[0])
         val bottomTex = atlas.registerSprite(key[1])
-        val sideTex = atlas.registerSprite(key[2])
-        return StaticColumnInfo(getAxis(state), topTex, bottomTex, sideTex)
+        val sideTexList = key.drop(2).map { atlas.registerSprite(it) }
+        if (sideTexList.isEmpty()) return null
+        return StaticColumnInfo(getAxis(variant.state), topTex, bottomTex, sideTexList)
     }
 
-    override fun get(state: IBlockState) = stateToValue[state]
+    override fun get(state: IBlockState, rand: Int): IColumnTextureInfo? {
+        val variant = getVariant(state, rand) ?: return null
+        return variantToValue[variant]
+    }
 
     fun getAxis(state: IBlockState): Axis? {
         val axis = tryDefault(null) { state.getValue(BlockLog.LOG_AXIS).toString() } ?:

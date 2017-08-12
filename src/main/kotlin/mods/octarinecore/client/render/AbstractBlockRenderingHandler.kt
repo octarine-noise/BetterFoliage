@@ -10,6 +10,7 @@ import mods.octarinecore.common.Double3
 import mods.octarinecore.common.Int3
 import mods.octarinecore.common.forgeDirOffsets
 import mods.octarinecore.common.plus
+import mods.octarinecore.semiRandom
 import net.minecraft.block.Block
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
@@ -105,11 +106,7 @@ class BlockContext {
     fun isSurroundedBy(predicate: (IBlockState)->Boolean) = forgeDirOffsets.all { predicate(blockState(it)) }
 
     /** Get a semi-random value based on the block coordinate and the given seed. */
-    fun random(seed: Int): Int {
-        var value = (pos.x * pos.x + pos.y * pos.y + pos.z * pos.z + pos.x * pos.y + pos.y * pos.z + pos.z * pos.x + (seed * seed)) and 63
-        value = (3 * pos.x * value + 5 * pos.y * value + 7 * pos.z * value + (11 * seed)) and 63
-        return value
-    }
+    fun random(seed: Int) = semiRandom(pos.x, pos.y, pos.z, seed)
 
     /** Get an array of semi-random values based on the block coordinate. */
     fun semiRandomArray(num: Int): Array<Int> = Array(num) { random(it) }
