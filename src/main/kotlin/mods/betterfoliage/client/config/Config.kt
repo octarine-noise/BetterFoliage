@@ -8,6 +8,7 @@ import net.minecraft.world.biome.Biome
 import net.minecraftforge.fml.client.event.ConfigChangedEvent
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
+import org.lwjgl.opengl.GL11
 
 // BetterFoliage-specific property delegates
 private val OBSOLETE = ObsoleteConfigProperty()
@@ -30,6 +31,7 @@ private fun Biome.filterClass(vararg name: String) = name.any { it in this.javaC
 object Config : DelegatingConfig(BetterFoliageMod.MOD_ID, BetterFoliageMod.DOMAIN) {
 
     var enabled by boolean(true)
+    var nVidia by boolean(GL11.glGetString(GL11.GL_VENDOR).toLowerCase().contains("nvidia"))
 
     object blocks {
         val leavesClasses = ConfigurableBlockMatcher(BetterFoliageMod.DOMAIN, "LeavesBlocksDefault.cfg")

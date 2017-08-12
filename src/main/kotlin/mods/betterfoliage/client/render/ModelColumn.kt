@@ -14,9 +14,6 @@ const val chamferAffinity = 0.9f
 /** Amount to shrink column extension bits to stop Z-fighting. */
 val zProtectionScale: Double3 get() = Double3(Config.roundLogs.zProtection, 1.0, Config.roundLogs.zProtection)
 
-/** nVidia does it different... */
-val nVidia = GL11.glGetString(GL11.GL_VENDOR).toLowerCase().contains("nvidia")
-
 fun Model.columnSide(radius: Double, yBottom: Double, yTop: Double, transform: (Quad) -> Quad = { it }) {
     val halfRadius = radius * 0.5
     listOf(
@@ -96,14 +93,14 @@ fun Model.columnLid(radius: Double, transform: (Quad)->Quad = { it }) {
                  1 -> EdgeInterpolateFallback(UP, SOUTH, 0.0)
                  else -> vertex.aoShader
              })}
-             .cycleVertices(if (nVidia) 0 else 1)
+             .cycleVertices(if (Config.nVidia) 0 else 1)
     val q2 = Quad(v1, v4, v5, v6).setAoShader(faceOrientedAuto(overrideFace = UP, corner = cornerAo(Axis.Y)))
              .transformVI { vertex, idx -> vertex.copy(aoShader = when(idx) {
                  0 -> FaceCenter(UP)
                  3 -> EdgeInterpolateFallback(UP, EAST, 0.0)
                  else -> vertex.aoShader
              })}
-             .cycleVertices(if (nVidia) 0 else 1)
+             .cycleVertices(if (Config.nVidia) 0 else 1)
     listOf(q1, q2).forEach { transform(it.setFlatShader(FaceFlat(UP))).add() }
 }
 
