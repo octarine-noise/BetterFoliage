@@ -36,6 +36,7 @@ object Config : DelegatingConfig(BetterFoliageMod.MOD_ID, BetterFoliageMod.DOMAI
         val leavesModels = ModelTextureListConfigOption(BetterFoliageMod.DOMAIN, "LeavesModelsDefault.cfg", 1)
         val grassClasses = ConfigurableBlockMatcher(BetterFoliageMod.DOMAIN, "GrassBlocksDefault.cfg")
         val grassModels = ModelTextureListConfigOption(BetterFoliageMod.DOMAIN, "GrassModelsDefault.cfg", 1)
+        val mycelium = ConfigurableBlockMatcher(BetterFoliageMod.DOMAIN, "MyceliumBlocksDefault.cfg")
         val dirt = ConfigurableBlockMatcher(BetterFoliageMod.DOMAIN, "DirtDefault.cfg")
         val crops = ConfigurableBlockMatcher(BetterFoliageMod.DOMAIN, "CropDefault.cfg")
         val logClasses = ConfigurableBlockMatcher(BetterFoliageMod.DOMAIN, "LogBlocksDefault.cfg")
@@ -43,6 +44,7 @@ object Config : DelegatingConfig(BetterFoliageMod.MOD_ID, BetterFoliageMod.DOMAI
         val sand = ConfigurableBlockMatcher(BetterFoliageMod.DOMAIN, "SandDefault.cfg")
         val lilypad = ConfigurableBlockMatcher(BetterFoliageMod.DOMAIN, "LilypadDefault.cfg")
         val cactus = ConfigurableBlockMatcher(BetterFoliageMod.DOMAIN, "CactusDefault.cfg")
+        val netherrack = ConfigurableBlockMatcher(BetterFoliageMod.DOMAIN, "NetherrackBlocksDefault.cfg")
 
         val leavesWhitelist = OBSOLETE
         val leavesBlacklist = OBSOLETE
