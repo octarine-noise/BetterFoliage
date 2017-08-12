@@ -3,6 +3,7 @@ package mods.betterfoliage.client.render
 import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.Config
+import mods.betterfoliage.client.integration.OptifineCTM
 import mods.betterfoliage.client.integration.ShadersModIntegration
 import mods.betterfoliage.client.texture.LeafRegistry
 import mods.octarinecore.PI2
@@ -57,7 +58,7 @@ class RenderLeaves : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
             Client.logRenderError(ctx.blockState(Int3.zero), ctx.pos)
             return renderWorldBlockBase(ctx, dispatcher, renderer, layer)
         }
-        val blockColor = ctx.blockData(Int3.zero).color
+        val blockColor = OptifineCTM.getBlockColor(ctx)
 
         renderWorldBlockBase(ctx, dispatcher, renderer, layer)
         if (!layer.isCutout) return true

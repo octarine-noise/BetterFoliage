@@ -4,10 +4,15 @@ import mods.betterfoliage.client.Client
 import mods.betterfoliage.loader.Refs
 import mods.octarinecore.ThreadLocalDelegate
 import mods.octarinecore.client.render.BlockContext
+import mods.octarinecore.common.Int3
 import mods.octarinecore.metaprog.allAvailable
+import mods.octarinecore.metaprog.reflectField
 import net.minecraft.block.state.BlockStateBase
 import net.minecraft.block.state.IBlockState
+import net.minecraft.client.Minecraft
+import net.minecraft.client.renderer.block.model.BakedQuad
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.IBlockAccess
@@ -22,18 +27,24 @@ import org.apache.logging.log4j.Level.INFO
 @SideOnly(Side.CLIENT)
 object OptifineCTM {
 
-    val isAvailable = allAvailable(
+    val isCTMAvailable = allAvailable(
         Refs.ConnectedTextures, Refs.ConnectedProperties,
         Refs.getConnectedTexture,
         Refs.CTblockProperties, Refs.CTtileProperties,
         Refs.CPtileIcons, Refs.CPmatchesIcon
     )
+    val isColorAvailable = allAvailable(
+        Refs.CustomColors, Refs.getColorMultiplier
+    )
 
     init {
-        Client.log(INFO, "Optifine CTM support is ${if (isAvailable) "enabled" else "disabled" }")
+        Client.log(INFO, "Optifine CTM support is ${if (isCTMAvailable) "enabled" else "disabled" }")
+        Client.log(INFO, "Optifine custom color support is ${if (isColorAvailable) "enabled" else "disabled" }")
     }
 
     val renderEnv by ThreadLocalDelegate { OptifineRenderEnv() }
+    val fakeQuad = BakedQuad(IntArray(0), 1, EnumFacing.UP, null, true, DefaultVertexFormats.BLOCK)
+    val isCustomColors: Boolean get() = if (!isCTMAvailable) false else Minecraft.getMinecraft().gameSettings.reflectField<Boolean>("ofCustomColors") ?: false
 
     val connectedProperties: Iterable<Any> get() {
         val result = hashSetOf<Any>()
@@ -49,7 +60,7 @@ object OptifineCTM {
     /** Get all the CTM [TextureAtlasSprite]s that could possibly be used for this block. */
     fun getAllCTM(state: IBlockState, icon: TextureAtlasSprite): Collection<TextureAtlasSprite> {
         val result = hashSetOf<TextureAtlasSprite>()
-        if (state !is BlockStateBase || !isAvailable) return result
+        if (state !is BlockStateBase || !isCTMAvailable) return result
 
         connectedProperties.forEach { cp ->
             if (Refs.CPmatchesBlock.invoke(cp, Refs.getBlockId.invoke(state), Refs.getMetadata.invoke(state)) as Boolean &&
@@ -68,13 +79,21 @@ object OptifineCTM {
         override(texture, ctx.world!!, ctx.pos, face)
 
     fun override(texture: TextureAtlasSprite, world: IBlockAccess, pos: BlockPos, face: EnumFacing): TextureAtlasSprite {
-        if (!isAvailable) return texture
+        if (!isCTMAvailable) return texture
         val state = world.getBlockState(pos)
 
         return renderEnv.let {
             it.reset(world, state, pos)
             Refs.getConnectedTexture.invokeStatic(world, state, pos, face, texture, it.wrapped) as TextureAtlasSprite
         }
+    }
+
+    fun getBlockColor(ctx: BlockContext): Int {
+        val ofColor = if (isColorAvailable && Minecraft.getMinecraft().gameSettings.reflectField<Boolean>("ofCustomColors") == true) {
+            renderEnv.reset(ctx.world!!, ctx.blockState(Int3.zero), ctx.pos)
+            Refs.getColorMultiplier.invokeStatic(fakeQuad, ctx.blockState(Int3.zero), ctx.world!!, ctx.pos, renderEnv.wrapped) as? Int
+        } else null
+        return ofColor ?: ctx.blockData(Int3.zero).color
     }
 }
 
