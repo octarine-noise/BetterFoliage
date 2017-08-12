@@ -134,7 +134,7 @@ object ForestryLogSupport : ModelProcessor<List<String>, IColumnTextureInfo>, IC
 
     init { MinecraftForge.EVENT_BUS.register(this) }
 
-    override fun processModelLoad1(state: IBlockState, modelLoc: ModelResourceLocation, model: IModel) {
+    override fun processModelLoad(state: IBlockState, modelLoc: ModelResourceLocation, model: IModel) {
         // respect class list to avoid triggering on fences, stairs, etc.
         if (!Config.blocks.logClasses.matchesClass(state.block)) return
 

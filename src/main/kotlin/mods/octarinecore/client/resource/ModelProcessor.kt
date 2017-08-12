@@ -7,7 +7,6 @@ import mods.octarinecore.common.config.ModelTextureList
 import mods.octarinecore.filterValuesNotNull
 import net.minecraft.block.Block
 import net.minecraft.block.state.IBlockState
-import net.minecraft.client.renderer.block.model.ModelBlock
 import net.minecraft.client.renderer.block.model.ModelResourceLocation
 import net.minecraft.client.renderer.block.statemap.DefaultStateMapper
 import net.minecraft.client.renderer.block.statemap.IStateMapper
@@ -27,7 +26,6 @@ class LoadModelDataEvent(val loader: ModelLoader) : Event()
 
 data class ModelVariant(
     val state: IBlockState,
-    var modelBlock: ModelBlock?,
     val modelLocation: ResourceLocation?,
     val weight: Int
 )
@@ -41,7 +39,7 @@ interface ModelProcessor<T1, T2> {
     fun addVariant(state: IBlockState, variant: ModelVariant) { variants.getOrPut(state) { mutableListOf() }.add(variant) }
     fun getVariant(state: IBlockState, rand: Int) = variants[state]?.let { it[rand % it.size] }
     fun putKeySingle(state: IBlockState, key: T1) {
-        val variant = ModelVariant(state, null, null, 1)
+        val variant = ModelVariant(state, null, 1)
         variants[state] = mutableListOf(variant)
         variantToKey[variant] = key
     }
@@ -49,8 +47,7 @@ interface ModelProcessor<T1, T2> {
     fun onPostLoad() { }
     fun onPreStitch() { }
 
-    fun processModelLoad1(state: IBlockState, modelLoc: ModelResourceLocation, model: IModel)
-
+    fun processModelLoad(state: IBlockState, modelLoc: ModelResourceLocation, model: IModel)
     fun processStitch(variant: ModelVariant, key: T1, atlas: TextureMap): T2?
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -71,7 +68,7 @@ interface ModelProcessor<T1, T2> {
 
         stateMappings.forEach { mapping ->
             if (mapping.key.block != null) stateModels[mapping.value]?.let { model ->
-                processModelLoad1(mapping.key, mapping.value, model)
+                processModelLoad(mapping.key, mapping.value, model)
             }
         }
     }
@@ -89,7 +86,7 @@ interface TextureListModelProcessor<T2> : ModelProcessor<List<String>, T2> {
     val matchClasses: IBlockMatcher
     val modelTextures: List<ModelTextureList>
 
-    override fun processModelLoad1(state: IBlockState, modelLoc: ModelResourceLocation, model: IModel) {
+    override fun processModelLoad(state: IBlockState, modelLoc: ModelResourceLocation, model: IModel) {
         val matchClass = matchClasses.matchingClass(state.block) ?: return
         logger?.log(Level.DEBUG, "$logName: block state ${state.toString()}")
         logger?.log(Level.DEBUG, "$logName:       class ${state.block.javaClass.name} matches ${matchClass.name}")
@@ -111,7 +108,7 @@ interface TextureListModelProcessor<T2> : ModelProcessor<List<String>, T2> {
 
                 if (textures.all { it.second != "missingno" }) {
                     // found a valid variant (all required textures exist)
-                    val variant = ModelVariant(state, blockLoc.first, blockLoc.second, 1)
+                    val variant = ModelVariant(state, blockLoc.second, 1)
                     addVariant(state, variant)
                     variantToKey[variant] = textures.map { it.second }
                 }

@@ -129,7 +129,7 @@ abstract class RubberLogSupportBase : ModelProcessor<RubberLogModelInfo, IColumn
 @SideOnly(Side.CLIENT)
 object IC2LogSupport : RubberLogSupportBase() {
 
-    override fun processModelLoad1(state: IBlockState, modelLoc: ModelResourceLocation, model: IModel) {
+    override fun processModelLoad(state: IBlockState, modelLoc: ModelResourceLocation, model: IModel) {
         // check for proper block class, existence of ModelBlock, and "state" blockstate property
         if (!IC2Integration.BlockRubWood.isInstance(state.block)) return
         val blockLoc = model.modelBlockAndLoc.firstOrNull() ?: return
@@ -172,7 +172,7 @@ object IC2LogSupport : RubberLogSupportBase() {
 @SideOnly(Side.CLIENT)
 object TechRebornLogSupport : RubberLogSupportBase() {
 
-    override fun processModelLoad1(state: IBlockState, modelLoc: ModelResourceLocation, model: IModel) {
+    override fun processModelLoad(state: IBlockState, modelLoc: ModelResourceLocation, model: IModel) {
         // check for proper block class, existence of ModelBlock
         if (!TechRebornIntegration.BlockRubberLog.isInstance(state.block)) return
 
@@ -210,7 +210,7 @@ object TechRebornLeafSupport : ModelProcessor<Nothing, Nothing> {
     override var variantToValue = mapOf<ModelVariant, Nothing>()
     override val logger: Logger get() = BetterFoliageMod.logDetail
 
-    override fun processModelLoad1(state: IBlockState, modelLoc: ModelResourceLocation, model: IModel) {
+    override fun processModelLoad(state: IBlockState, modelLoc: ModelResourceLocation, model: IModel) {
         if (Config.blocks.leavesClasses.matchesClass(state.block) && TechRebornIntegration.ITexturedBlock.isInstance(state.block)) {
             val textureName = TechRebornIntegration.getTextureNameFromState.invoke(state.block, state, EnumFacing.UP) as String
             logger.log(Level.DEBUG, "TechRebornLeafSupport: block state ${state.toString()}")
