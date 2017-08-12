@@ -2,6 +2,8 @@ key.betterfoliage.gui=Open Settings
 
 betterfoliage.global.enabled=Enable Mod
 betterfoliage.global.enabled.tooltip=If set to false, BetterFoliage will not render anything
+betterfoliage.global.nVidia=nVidia GPU
+betterfoliage.global.nVidia.tooltip=Specify whether you have an nVidia GPU
 
 betterfoliage.enabled=Enable
 betterfoliage.enabled.tooltip=Is this feature enabled?
@@ -92,6 +94,19 @@ betterfoliage.blocks.cactusBlacklist.arrayEntry=%d entries
 betterfoliage.blocks.cactusWhitelist.tooltip=Blocks recognized as Cactus. Has an impact on Better Cactus
 betterfoliage.blocks.cactusBlacklist.tooltip=Blocks never accepted Cactus. Has an impact on Better Cactus
 
+betterfoliage.blocks.myceliumWhitelist=Mycelium Whitelist
+betterfoliage.blocks.myceliumBlacklist=Mycelium Blacklist
+betterfoliage.blocks.myceliumWhitelist.arrayEntry=%d entries
+betterfoliage.blocks.myceliumBlacklist.arrayEntry=%d entries
+betterfoliage.blocks.myceliumWhitelist.tooltip=Blocks recognized as Mycelium. Has an impact on Better Grass
+betterfoliage.blocks.myceliumBlacklist.tooltip=Blocks never accepted Mycelium. Has an impact on Better Grass
+
+betterfoliage.blocks.netherrackWhitelist=Netherrack Whitelist
+betterfoliage.blocks.netherrackBlacklist=Netherrack Blacklist
+betterfoliage.blocks.netherrackWhitelist.arrayEntry=%d entries
+betterfoliage.blocks.netherrackBlacklist.arrayEntry=%d entries
+betterfoliage.blocks.netherrackWhitelist.tooltip=Blocks recognized as Netherrack. Has an impact on Netherrack Vines
+betterfoliage.blocks.netherrackBlacklist.tooltip=Blocks never accepted Netherrack. Has an impact on Netherrack Vines
 
 betterfoliage.leaves=Extra Leaves
 betterfoliage.leaves.tooltip=Extra round leaves on leaf blocks
