@@ -4,6 +4,7 @@ import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.Config
 import mods.octarinecore.client.render.*
+import mods.octarinecore.client.resource.ModelVariant
 import mods.octarinecore.client.resource.TextureListModelProcessor
 import mods.octarinecore.client.resource.registerSprite
 import mods.octarinecore.common.Int3
@@ -35,8 +36,9 @@ class RenderCactus : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
 
         init { MinecraftForge.EVENT_BUS.register(this) }
 
-        override var stateToKey = mutableMapOf<IBlockState, List<String>>()
-        override var stateToValue = mapOf<IBlockState, IColumnTextureInfo>()
+        override var variants = mutableMapOf<IBlockState, MutableList<ModelVariant>>()
+        override var variantToKey = mutableMapOf<ModelVariant, List<String>>()
+        override var variantToValue = mapOf<ModelVariant, IColumnTextureInfo>()
 
         override val logger = BetterFoliageMod.logDetail
         override val logName = "CactusTextures"
@@ -45,14 +47,17 @@ class RenderCactus : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
             modelTextures("block/cactus", "top", "bottom", "side")
         )
 
-        override fun processStitch(state: IBlockState, key: List<String>, atlas: TextureMap): IColumnTextureInfo? {
+        override fun processStitch(variant: ModelVariant, key: List<String>, atlas: TextureMap): IColumnTextureInfo? {
             val topTex = atlas.registerSprite(key[0])
             val bottomTex = atlas.registerSprite(key[1])
             val sideTex = atlas.registerSprite(key[2])
-            return StaticColumnInfo(Axis.Y, topTex, bottomTex, sideTex)
+            return StaticColumnInfo(Axis.Y, topTex, bottomTex, listOf(sideTex))
         }
 
-        override fun get(state: IBlockState) = stateToValue[state]
+        override fun get(state: IBlockState, rand: Int): IColumnTextureInfo? {
+            val variant = getVariant(state, rand) ?: return null
+            return variantToValue[variant]
+        }
     }
 
     val modelStem = model {
@@ -98,7 +103,7 @@ class RenderCactus : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
 
         // get AO data
         modelRenderer.updateShading(Int3.zero, allFaces)
-        val icons = cactusTextures[ctx.blockState(Int3.zero)] ?: return renderWorldBlockBase(ctx, dispatcher, renderer, null)
+        val icons = cactusTextures[ctx.blockState(Int3.zero), ctx.random(0)] ?: return renderWorldBlockBase(ctx, dispatcher, renderer, null)
 
         modelRenderer.render(
             renderer,

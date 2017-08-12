@@ -9,7 +9,6 @@ import mods.octarinecore.common.Rotation
 import mods.octarinecore.random
 import net.minecraft.client.renderer.BlockRendererDispatcher
 import net.minecraft.client.renderer.BufferBuilder
-import net.minecraft.init.Blocks
 import net.minecraft.util.BlockRenderLayer
 import net.minecraft.util.EnumFacing.*
 import net.minecraftforge.fml.relauncher.Side
@@ -35,8 +34,8 @@ class RenderNetherrack : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) 
 
     override fun isEligible(ctx: BlockContext): Boolean {
         if (!Config.enabled || !Config.netherrack.enabled) return false
-        return ctx.block == Blocks.NETHERRACK &&
-        ctx.cameraDistance < Config.netherrack.distance
+        return Config.blocks.netherrack.matchesClass(ctx.block) &&
+            ctx.cameraDistance < Config.netherrack.distance
     }
 
     override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: BufferBuilder, layer: BlockRenderLayer): Boolean {

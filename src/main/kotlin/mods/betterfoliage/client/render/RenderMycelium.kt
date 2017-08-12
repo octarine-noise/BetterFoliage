@@ -11,7 +11,6 @@ import mods.octarinecore.common.Double3
 import mods.octarinecore.common.Rotation
 import net.minecraft.client.renderer.BlockRendererDispatcher
 import net.minecraft.client.renderer.BufferBuilder
-import net.minecraft.init.Blocks
 import net.minecraft.util.BlockRenderLayer
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
@@ -29,8 +28,8 @@ class RenderMycelium : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
 
     override fun isEligible(ctx: BlockContext): Boolean {
         if (!Config.enabled || !Config.shortGrass.myceliumEnabled) return false
-        return ctx.block == Blocks.MYCELIUM &&
-        ctx.cameraDistance < Config.shortGrass.distance
+        return Config.blocks.mycelium.matchesClass(ctx.block) &&
+            ctx.cameraDistance < Config.shortGrass.distance
     }
 
     override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: BufferBuilder, layer: BlockRenderLayer): Boolean {

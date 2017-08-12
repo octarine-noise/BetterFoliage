@@ -8,6 +8,7 @@ import net.minecraft.world.biome.Biome
 import net.minecraftforge.fml.client.event.ConfigChangedEvent
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
+import org.lwjgl.opengl.GL11
 
 // BetterFoliage-specific property delegates
 private val OBSOLETE = ObsoleteConfigProperty()
@@ -30,12 +31,14 @@ private fun Biome.filterClass(vararg name: String) = name.any { it in this.javaC
 object Config : DelegatingConfig(BetterFoliageMod.MOD_ID, BetterFoliageMod.DOMAIN) {
 
     var enabled by boolean(true)
+    var nVidia by boolean(GL11.glGetString(GL11.GL_VENDOR).toLowerCase().contains("nvidia"))
 
     object blocks {
         val leavesClasses = ConfigurableBlockMatcher(BetterFoliageMod.DOMAIN, "leaves_blocks_default.cfg")
         val leavesModels = ModelTextureListConfigOption(BetterFoliageMod.DOMAIN, "leaves_models_default.cfg", 1)
         val grassClasses = ConfigurableBlockMatcher(BetterFoliageMod.DOMAIN, "grass_blocks_default.cfg")
         val grassModels = ModelTextureListConfigOption(BetterFoliageMod.DOMAIN, "grass_models_default.cfg", 1)
+        val mycelium = ConfigurableBlockMatcher(BetterFoliageMod.DOMAIN, "mycelium_blocks_default.cfg")
         val dirt = ConfigurableBlockMatcher(BetterFoliageMod.DOMAIN, "dirt_default.cfg")
         val crops = ConfigurableBlockMatcher(BetterFoliageMod.DOMAIN, "crop_default.cfg")
         val logClasses = ConfigurableBlockMatcher(BetterFoliageMod.DOMAIN, "log_blocks_default.cfg")
@@ -43,6 +46,7 @@ object Config : DelegatingConfig(BetterFoliageMod.MOD_ID, BetterFoliageMod.DOMAI
         val sand = ConfigurableBlockMatcher(BetterFoliageMod.DOMAIN, "sand_default.cfg")
         val lilypad = ConfigurableBlockMatcher(BetterFoliageMod.DOMAIN, "lilypad_default.cfg")
         val cactus = ConfigurableBlockMatcher(BetterFoliageMod.DOMAIN, "cactus_default.cfg")
+        val netherrack = ConfigurableBlockMatcher(BetterFoliageMod.DOMAIN, "netherrack_blocks_default.cfg")
 
         val leavesWhitelist = OBSOLETE
         val leavesBlacklist = OBSOLETE
