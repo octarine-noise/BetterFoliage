@@ -5,10 +5,7 @@ import mods.betterfoliage.client.config.Config
 import mods.betterfoliage.client.integration.OptifineCTM
 import mods.octarinecore.client.render.BlockContext
 import mods.octarinecore.client.render.HSB
-import mods.octarinecore.client.resource.TextureListModelProcessor
-import mods.octarinecore.client.resource.TextureMediatedRegistry
-import mods.octarinecore.client.resource.averageColor
-import mods.octarinecore.client.resource.get
+import mods.octarinecore.client.resource.*
 import mods.octarinecore.common.Int3
 import mods.octarinecore.common.config.ConfigurableBlockMatcher
 import mods.octarinecore.common.config.ModelTextureList
@@ -42,8 +39,8 @@ class GrassInfo(
 )
 
 interface IGrassRegistry {
-    fun get(state: IBlockState): GrassInfo?
-    fun get(state: IBlockState, world: IBlockAccess, pos: BlockPos, face: EnumFacing): GrassInfo?
+    operator fun get(state: IBlockState, rand: Int): GrassInfo?
+    operator fun get(state: IBlockState, world: IBlockAccess, pos: BlockPos, face: EnumFacing, rand: Int): GrassInfo?
 }
 
 /** Collects and manages rendering-related information for grass blocks. */
@@ -51,12 +48,12 @@ interface IGrassRegistry {
 object GrassRegistry : IGrassRegistry {
     val subRegistries: MutableList<IGrassRegistry> = mutableListOf(StandardGrassSupport)
 
-    override fun get(state: IBlockState, world: IBlockAccess, pos: BlockPos, face: EnumFacing) =
-        subRegistries.findFirst { it.get(state, world, pos, face) }
+    override fun get(state: IBlockState, world: IBlockAccess, pos: BlockPos, face: EnumFacing, rand: Int) =
+        subRegistries.findFirst { it.get(state, world, pos, face, rand) }
 
-    operator fun get(ctx: BlockContext, face: EnumFacing) = get(ctx.blockState(Int3.zero), ctx.world!!, ctx.pos, face)
+    operator fun get(ctx: BlockContext, face: EnumFacing) = get(ctx.blockState(Int3.zero), ctx.world!!, ctx.pos, face, ctx.random(0))
 
-    override fun get(state: IBlockState) = subRegistries.findFirst { it.get(state) }
+    override fun get(state: IBlockState, rand: Int) = subRegistries.findFirst { it[state, rand] }
 }
 
 object StandardGrassSupport :
@@ -66,8 +63,9 @@ object StandardGrassSupport :
 {
     init { MinecraftForge.EVENT_BUS.register(this) }
 
-    override var stateToKey = mutableMapOf<IBlockState, List<String>>()
-    override var stateToValue = mapOf<IBlockState, TextureAtlasSprite>()
+    override var variants = mutableMapOf<IBlockState, MutableList<ModelVariant>>()
+    override var variantToKey = mutableMapOf<ModelVariant, List<String>>()
+    override var variantToValue = mapOf<ModelVariant, TextureAtlasSprite>()
     override var textureToValue = mutableMapOf<TextureAtlasSprite, GrassInfo>()
 
     override val logger = BetterFoliageMod.logDetail
@@ -75,20 +73,22 @@ object StandardGrassSupport :
     override val matchClasses: ConfigurableBlockMatcher get() = Config.blocks.grassClasses
     override val modelTextures: List<ModelTextureList> get() = Config.blocks.grassModels.list
 
-    override fun get(state: IBlockState, world: IBlockAccess, pos: BlockPos, face: EnumFacing): GrassInfo? {
-        val baseTexture = stateToValue[state] ?: return null
+    override fun get(state: IBlockState, world: IBlockAccess, pos: BlockPos, face: EnumFacing, rand: Int): GrassInfo? {
+        val variant = getVariant(state, rand) ?: return null
+        val baseTexture = variantToValue[variant] ?: return null
         return textureToValue[OptifineCTM.override(baseTexture, world, pos, face)] ?: textureToValue[baseTexture]
     }
 
-    override fun get(state: IBlockState) = StandardLeafSupport.stateToValue[state].let {
-        if (it == null) null else textureToValue[it]
+    override fun get(state: IBlockState, rand: Int): GrassInfo? {
+        val variant = getVariant(state, rand) ?: return null
+        return variantToValue[variant].let { if (it == null) null else textureToValue[it] }
     }
 
-    override fun processStitch(state: IBlockState, key: List<String>, atlas: TextureMap) = atlas[key[0]]
+    override fun processStitch(variant: ModelVariant, key: List<String>, atlas: TextureMap) = atlas[key[0]]
 
-    override fun processTexture(states: List<IBlockState>, texture: TextureAtlasSprite, atlas: TextureMap) {
+    override fun processTexture(variants: List<ModelVariant>, texture: TextureAtlasSprite, atlas: TextureMap) {
         registerGrass(texture, atlas)
-        OptifineCTM.getAllCTM(states, texture).forEach {
+        OptifineCTM.getAllCTM(variants.map { it.state }, texture).forEach {
             registerGrass(it, atlas)
         }
     }

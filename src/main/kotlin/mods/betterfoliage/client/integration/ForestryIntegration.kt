@@ -7,9 +7,9 @@ import mods.betterfoliage.client.render.*
 import mods.betterfoliage.client.texture.ILeafRegistry
 import mods.betterfoliage.client.texture.LeafInfo
 import mods.betterfoliage.client.texture.LeafRegistry
-import mods.betterfoliage.client.texture.StandardLeafSupport
 import mods.betterfoliage.loader.Refs
 import mods.octarinecore.client.resource.ModelProcessor
+import mods.octarinecore.client.resource.ModelVariant
 import mods.octarinecore.client.resource.get
 import mods.octarinecore.metaprog.ClassRef
 import mods.octarinecore.metaprog.FieldRef
@@ -19,7 +19,6 @@ import mods.octarinecore.tryDefault
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.block.model.ModelResourceLocation
-import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.client.renderer.texture.TextureMap
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.ResourceLocation
@@ -103,9 +102,9 @@ object ForestryLeavesSupport : ILeafRegistry {
         textureToValue[textureLocation] = LeafInfo(generated, LeafRegistry.getParticleType(texture, atlas))
     }
 
-    override fun get(state: IBlockState) = null
+    override fun get(state: IBlockState, rand: Int) = null
 
-    override fun get(state: IBlockState, world: IBlockAccess, pos: BlockPos, face: EnumFacing): LeafInfo? {
+    override fun get(state: IBlockState, world: IBlockAccess, pos: BlockPos, face: EnumFacing, rand: Int): LeafInfo? {
         // check variant property (used in decorative leaves)
         state.properties.entries.find {
             ForestryIntegration.PropertyTreeType.isInstance(it.key) && ForestryIntegration.TreeDefinition.isInstance(it.value)
@@ -127,21 +126,22 @@ object ForestryLeavesSupport : ILeafRegistry {
 @SideOnly(Side.CLIENT)
 object ForestryLogSupport : ModelProcessor<List<String>, IColumnTextureInfo>, IColumnRegistry {
 
-    override var stateToKey = mutableMapOf<IBlockState, List<String>>()
-    override var stateToValue = mapOf<IBlockState, IColumnTextureInfo>()
+    override var variants = mutableMapOf<IBlockState, MutableList<ModelVariant>>()
+    override var variantToKey = mutableMapOf<ModelVariant, List<String>>()
+    override var variantToValue = mapOf<ModelVariant, IColumnTextureInfo>()
 
     override val logger = BetterFoliageMod.logDetail
 
     init { MinecraftForge.EVENT_BUS.register(this) }
 
-    override fun processModelLoad(state: IBlockState, modelLoc: ModelResourceLocation, model: IModel): List<String>? {
+    override fun processModelLoad1(state: IBlockState, modelLoc: ModelResourceLocation, model: IModel) {
         // respect class list to avoid triggering on fences, stairs, etc.
-        if (!Config.blocks.logClasses.matchesClass(state.block)) return null
+        if (!Config.blocks.logClasses.matchesClass(state.block)) return
 
         // find wood type property
         val woodType = state.properties.entries.find {
             ForestryIntegration.PropertyWoodType.isInstance(it.key) && ForestryIntegration.IWoodType.isInstance(it.value)
-        } ?: return null
+        } ?: return
 
         logger.log(Level.DEBUG, "ForestryLogSupport: block state ${state.toString()}")
         logger.log(Level.DEBUG, "ForestryLogSupport:     variant ${woodType.value.toString()}")
@@ -151,14 +151,14 @@ object ForestryLogSupport : ModelProcessor<List<String>, IColumnTextureInfo>, IC
         val heart = ForestryIntegration.heartTex.invoke(woodType.value) as String?
 
         logger.log(Level.DEBUG, "ForestryLogSupport:    textures [heart=$heart, bark=$bark]")
-        return if (bark != null && heart != null) listOf(heart, bark) else null
+        if (bark != null && heart != null) putKeySingle(state, listOf(heart, bark))
     }
 
-    override fun processStitch(state: IBlockState, key: List<String>, atlas: TextureMap): IColumnTextureInfo? {
+    override fun processStitch(variant: ModelVariant, key: List<String>, atlas: TextureMap): IColumnTextureInfo? {
         val heart = atlas[key[0]] ?: return null
         val bark = atlas[key[1]] ?: return null
-        return StaticColumnInfo(StandardLogSupport.getAxis(state), heart, heart, bark)
+        return StaticColumnInfo(StandardLogSupport.getAxis(variant.state), heart, heart, listOf(bark))
     }
 
-    override fun get(state: IBlockState) = stateToValue[state]
+    override fun get(state: IBlockState, rand: Int) = variants[state]?.let { variantToValue[it[0]] }
 }

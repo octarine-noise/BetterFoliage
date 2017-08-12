@@ -44,8 +44,8 @@ class LeafInfo(
 }
 
 interface ILeafRegistry {
-    operator fun get(state: IBlockState): LeafInfo?
-    operator fun get(state: IBlockState, world: IBlockAccess, pos: BlockPos, face: EnumFacing): LeafInfo?
+    operator fun get(state: IBlockState, rand: Int): LeafInfo?
+    operator fun get(state: IBlockState, world: IBlockAccess, pos: BlockPos, face: EnumFacing, rand: Int): LeafInfo?
 }
 
 /** Collects and manages rendering-related information for grass blocks. */
@@ -62,12 +62,12 @@ object LeafRegistry : ILeafRegistry {
         typeMappings.loadMappings(ResourceLocation(BetterFoliageMod.DOMAIN, "leafTextureMappings.cfg"))
     }
 
-    override fun get(state: IBlockState, world: IBlockAccess, pos: BlockPos, face: EnumFacing) =
-        subRegistries.findFirst { it.get(state, world, pos, face) }
+    override fun get(state: IBlockState, world: IBlockAccess, pos: BlockPos, face: EnumFacing, rand: Int) =
+        subRegistries.findFirst { it.get(state, world, pos, face, rand) }
 
-    operator fun get(ctx: BlockContext, face: EnumFacing) = get(ctx.blockState(Int3.zero), ctx.world!!, ctx.pos, face)
+    operator fun get(ctx: BlockContext, face: EnumFacing) = get(ctx.blockState(Int3.zero), ctx.world!!, ctx.pos, face, ctx.random(0))
 
-    override fun get(state: IBlockState) = subRegistries.findFirst { it.get(state) }
+    override fun get(state: IBlockState, rand: Int) = subRegistries.findFirst { it[state, rand] }
 
     fun getParticleType(texture: TextureAtlasSprite, atlas: TextureMap): String {
         var leafType = typeMappings.getType(texture) ?: "default"
@@ -100,26 +100,30 @@ object StandardLeafSupport :
     override val modelTextures: List<ModelTextureList> get() = Config.blocks.leavesModels.list
     override val logger: Logger? get() = BetterFoliageMod.logDetail
 
-    override var stateToKey = mutableMapOf<IBlockState, List<String>>()
-    override var stateToValue = mapOf<IBlockState, TextureAtlasSprite>()
+    override var variants = mutableMapOf<IBlockState, MutableList<ModelVariant>>()
+    override var variantToKey = mutableMapOf<ModelVariant, List<String>>()
+    override var variantToValue = mapOf<ModelVariant, TextureAtlasSprite>()
     override var textureToValue = mutableMapOf<TextureAtlasSprite, LeafInfo>()
 
-    override fun get(state: IBlockState, world: IBlockAccess, pos: BlockPos, face: EnumFacing): LeafInfo? {
-        val baseTexture = stateToValue[state] ?: return null
+    override fun get(state: IBlockState, world: IBlockAccess, pos: BlockPos, face: EnumFacing, rand: Int): LeafInfo? {
+        val variant = getVariant(state, rand) ?: return null
+        val baseTexture = variantToValue[variant] ?: return null
         return textureToValue[OptifineCTM.override(baseTexture, world, pos, face)] ?: textureToValue[baseTexture]
     }
 
-    override fun get(state: IBlockState) = stateToValue[state].let {
-        if (it == null) null else textureToValue[it]
+    override fun get(state: IBlockState, rand: Int): LeafInfo? {
+        val variant = getVariant(state, rand) ?: return null
+        return variantToValue[variant].let { if (it == null) null else textureToValue[it] }
     }
 
-    override fun processStitch(state: IBlockState, key: List<String>, atlas: TextureMap) = atlas[key[0]]
+    override fun processStitch(variant: ModelVariant, key: List<String>, atlas: TextureMap) = atlas[key[0]]
 
-    override fun processTexture(states: List<IBlockState>, texture: TextureAtlasSprite, atlas: TextureMap) {
-        logger?.log(Level.DEBUG, "$logName: leaf texture ${texture.iconName}")
-        logger?.log(Level.DEBUG, "$logName:      #states ${states.size}")
+    override fun processTexture(variants: List<ModelVariant>, texture: TextureAtlasSprite, atlas: TextureMap) {
+        logger?.log(Level.DEBUG, "$logName: leaf texture   ${texture.iconName}")
+        logger?.log(Level.DEBUG, "$logName:      #variants ${variants.size}")
+        logger?.log(Level.DEBUG, "$logName:      #states   ${variants.distinctBy { it.state }.size}")
         registerLeaf(texture, atlas)
-        OptifineCTM.getAllCTM(states, texture).forEach {
+        OptifineCTM.getAllCTM(variants.map { it.state }, texture).forEach {
             logger?.log(Level.DEBUG, "$logName:        CTM ${texture.iconName}")
             registerLeaf(it, atlas)
         }

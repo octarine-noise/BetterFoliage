@@ -13,7 +13,6 @@ import net.minecraft.client.renderer.BlockRendererDispatcher
 import net.minecraft.client.renderer.VertexBuffer
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.util.BlockRenderLayer
-import net.minecraft.util.EnumFacing
 import net.minecraft.util.EnumFacing.*
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
@@ -28,14 +27,18 @@ interface IColumnTextureInfo {
 
 @SideOnly(Side.CLIENT)
 interface IColumnRegistry {
-    operator fun get(state: IBlockState): IColumnTextureInfo?
+    operator fun get(state: IBlockState, rand: Int): IColumnTextureInfo?
 }
 
 @SideOnly(Side.CLIENT)
 data class StaticColumnInfo(override val axis: Axis?,
                             val topTexture: TextureAtlasSprite,
                             val bottomTexture: TextureAtlasSprite,
-                            val sideTexture: TextureAtlasSprite) : IColumnTextureInfo {
+                            val sideTextures: List<TextureAtlasSprite>) : IColumnTextureInfo {
+
+    // index offsets for EnumFacings, to make it less likely for neighboring faces to get the same bark texture
+    val dirToIdx = arrayOf(0, 1, 2, 4, 3, 5)
+
     override val top: QuadIconResolver = { ctx, _, _ ->
         OptifineCTM.override(topTexture, blockContext, UP.rotate(ctx.rotation))
     }
@@ -43,7 +46,9 @@ data class StaticColumnInfo(override val axis: Axis?,
         OptifineCTM.override(bottomTexture, blockContext, DOWN.rotate(ctx.rotation))
     }
     override val side: QuadIconResolver = { ctx, idx, _ ->
-        OptifineCTM.override(sideTexture, blockContext, (if ((idx and 1) == 0) SOUTH else EAST).rotate(ctx.rotation))
+        val worldFace = (if ((idx and 1) == 0) SOUTH else EAST).rotate(ctx.rotation)
+        val baseTexture = sideTextures[(blockContext.random(1) + dirToIdx[worldFace.ordinal]) % sideTextures.size]
+        OptifineCTM.override(baseTexture, blockContext, worldFace)
     }
 }
 
@@ -141,7 +146,7 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
     override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: VertexBuffer, layer: BlockRenderLayer): Boolean {
         if (ctx.isSurroundedBy(surroundPredicate) ) return false
 
-        val columnTextures = registry[ctx.blockState(Int3.zero)]
+        val columnTextures = registry[ctx.blockState(Int3.zero), ctx.random(0)]
         if (columnTextures == null) {
             Client.logRenderError(ctx.blockState(Int3.zero), ctx.pos)
             return renderWorldBlockBase(ctx, dispatcher, renderer, null)
@@ -346,7 +351,7 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
         return if (!blockPredicate(state)) {
             if (state.isOpaqueCube) SOLID else NONSOLID
         } else {
-            (registry[state]?.axis ?: if (Config.roundLogs.defaultY) Axis.Y else null)?.let {
+            (registry[state, random(0)]?.axis ?: if (Config.roundLogs.defaultY) Axis.Y else null)?.let {
                 if (it == axis) PARALLEL else PERPENDICULAR
             } ?: SOLID
         }
