@@ -23,7 +23,8 @@ import java.util.*
     modid = BetterFoliageMod.MOD_ID,
     name = BetterFoliageMod.MOD_NAME,
     acceptedMinecraftVersions = BetterFoliageMod.MC_VERSIONS,
-    guiFactory = BetterFoliageMod.GUI_FACTORY
+    guiFactory = BetterFoliageMod.GUI_FACTORY,
+    clientSideOnly = true
 )
 object BetterFoliageMod {
 
