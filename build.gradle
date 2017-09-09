@@ -2,7 +2,7 @@ apply plugin: "net.minecraftforge.gradle.forge"
 apply plugin: 'kotlin'
 
 group = 'com.github.octarine-noise'
-version = "2.1.9"
+version = "2.1.10"
 archivesBaseName = rootProject.name + '-MC1.12'
 
 buildscript {
