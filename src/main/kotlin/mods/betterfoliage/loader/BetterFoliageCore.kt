@@ -13,7 +13,6 @@ import org.objectweb.asm.Opcodes.*
     "kotlin",
     "mods.octarinecore.kotlin"
 )
-@IFMLLoadingPlugin.MCVersion("1.12")
 @IFMLLoadingPlugin.SortingIndex(1400)
 class BetterFoliageLoader : ASMPlugin(BetterFoliageTransformer::class.java)
 
