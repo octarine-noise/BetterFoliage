@@ -22,7 +22,8 @@ import java.util.*
     modid = BetterFoliageMod.MOD_ID,
     name = BetterFoliageMod.MOD_NAME,
     acceptedMinecraftVersions = BetterFoliageMod.MC_VERSIONS,
-    guiFactory = BetterFoliageMod.GUI_FACTORY
+    guiFactory = BetterFoliageMod.GUI_FACTORY,
+    clientSideOnly = true
 )
 object BetterFoliageMod {
 
@@ -65,11 +66,9 @@ object BetterFoliageMod {
 
     @Mod.EventHandler
     fun postInit(event: FMLPostInitializationEvent) {
-        if (FMLCommonHandler.instance().effectiveSide == Side.CLIENT) {
-            Config.attach(config!!)
-            Client.log(INFO, "BetterFoliage initialized")
-            isAfterPostInit = true
-        }
+        Config.attach(config!!)
+        Client.log(INFO, "BetterFoliage initialized")
+        isAfterPostInit = true
     }
 
     /** Mod is cosmetic only, always allow connection. */
