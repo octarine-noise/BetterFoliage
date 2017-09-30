@@ -93,7 +93,7 @@ object OptifineCTM {
             renderEnv.reset(ctx.world!!, ctx.blockState(Int3.zero), ctx.pos)
             Refs.getColorMultiplier.invokeStatic(fakeQuad, ctx.blockState(Int3.zero), ctx.world!!, ctx.pos, renderEnv.wrapped) as? Int
         } else null
-        return ofColor ?: ctx.blockData(Int3.zero).color
+        return if (ofColor == null || ofColor == -1) ctx.blockData(Int3.zero).color else ofColor
     }
 }
 
