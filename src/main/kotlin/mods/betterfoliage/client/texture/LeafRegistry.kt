@@ -87,6 +87,17 @@ object LeafRegistry {
                 }
             }
         }
+
+        listOf("deciduous", "conifers", "jungle", "willow", "maple", "palm").forEach { leafType ->
+            listOf("plain", "fancy", "changed").forEach { renderType ->
+                val location = "forestry:leaves/$leafType.$renderType"
+                val original = event.map.getTextureExtry(location)
+                if (original != null) {
+                    Client.log(INFO, "Found Forestry leaf texture: $location")
+                    registerLeaf(event.map, original)
+                }
+            }
+        }
     }
 
     fun registerLeaf(atlas: TextureMap, icon: TextureAtlasSprite) {
