@@ -134,7 +134,7 @@ class BlockContext() {
     val biomeId: Int get() = world!!.getBiomeGenForCoords(x, z).biomeID
 
     /** Get the texture on a given face of the block at the given offset. */
-    fun icon(face: ForgeDirection, offset: Int3 = Int3.zero) = block(offset).getIcon(face.ordinal, meta(offset)).let {
+    fun icon(face: ForgeDirection, offset: Int3 = Int3.zero) = block(offset).getIcon(world, x + offset.x, y + offset.y, z + offset.z, face.ordinal).let {
         if (!OptifineCTM.isAvailable) it
         else Refs.getConnectedTexture.invokeStatic(world!!, block(offset), x + offset.x, y + offset.y, z + offset.z, face.ordinal, it) as IIcon
     }
