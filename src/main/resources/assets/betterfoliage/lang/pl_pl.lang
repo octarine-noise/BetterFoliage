@@ -1,0 +1,241 @@
+key.betterfoliage.gui=Otwórz ustawienia
+
+betterfoliage.global.enabled=Włącz mod
+betterfoliage.global.enabled.tooltip=Jeśli ustawione na false, BetterFoliage nie będzie niczego renderował
+betterfoliage.global.nVidia=NVIDIA GPU
+betterfoliage.global.nVidia.tooltip=Określ, czy posiadasz GPU od firmy NVIDIA
+
+betterfoliage.enabled=Włączone
+betterfoliage.enabled.tooltip=Czy ta właściwość jest włączona?
+betterfoliage.hOffset=Horyzontalny offset
+betterfoliage.hOffset.tooltip=Odległość, o jaką ten element jest przesunięty horyzontalnie, w blokach
+betterfoliage.vOffset=Wertykalny offset
+betterfoliage.vOffset.tooltip=Odległość, o jaką ten element jest przesunięty wertykalnie, w blokach
+betterfoliage.size=Rozmiar
+betterfoliage.size.tooltip=Rozmiar tego elementu
+betterfoliage.heightMin=Minimalna wysokość
+betterfoliage.heightMin.tooltip=Minimalna wysokość elementu
+betterfoliage.heightMax=Maksymalna wysokość
+betterfoliage.heightMax.tooltip=Maksymalna wysokość elementu
+betterfoliage.population=Populacja
+betterfoliage.population.tooltip=Szansa (N na 64) na to, że dany blok będzie miał tę właściwość
+betterfoliage.shaderWind=Shaderowe efekty wiatru
+betterfoliage.shaderWind.tooltip=Zastosować efekty wiatru ze ShaderMod dla tego elementu?
+betterfoliage.distance=Limit odległości
+betterfoliage.distance.tooltip=Maksymalna odległość od gracza, w której ma być renderowana ta właściwość
+
+betterfoliage.rendererror=§a[BetterFoliage]§f Błąd renderowania bloku %s na pozycji %s
+
+betterfoliage.blocks=Rodzaje bloków
+betterfoliage.blocks.tooltip=Skonfiguruj listy klas bloków, do których powinny zostać zastosowane określone właściwości
+
+betterfoliage.blocks.dirtWhitelist=Whitelista ziemi
+betterfoliage.blocks.dirtBlacklist=Blacklista ziemi
+betterfoliage.blocks.dirtWhitelist.arrayEntry=%d pozycje
+betterfoliage.blocks.dirtBlacklist.arrayEntry=%d pozycje
+betterfoliage.blocks.dirtWhitelist.tooltip=Bloki uznawane jako ziemia. Ma wpływ na rośliny wodne, glony, połączoną trawę
+betterfoliage.blocks.dirtBlacklist.tooltip=Bloki nigdy nie uznawane jako ziemia. Ma wpływ na rośliny wodne, glony, połączoną trawę
+
+betterfoliage.blocks.grassClassesWhitelist=Whitelista trawy
+betterfoliage.blocks.grassClassesBlacklist=Blacklista trawy
+betterfoliage.blocks.grassClassesWhitelist.arrayEntry=%d pozycje
+betterfoliage.blocks.grassClassesBlacklist.arrayEntry=%d pozycje
+betterfoliage.blocks.grassModels=Modele trawy
+betterfoliage.blocks.grassModels.arrayEntry=%d pozycje
+betterfoliage.blocks.grassWhitelist.tooltip=Bloki uznawane jako trawa. Ma wpływ na krótką trawę, połączoną trawę
+betterfoliage.blocks.grassBlacklist.tooltip=Bloki nigdy nie uznawane jako trawa. Ma wpływ na krótką trawę, połączoną trawę
+betterfoliage.blocks.grassModels.tooltip=Modele i tekstury uznawane jako bloki trawy
+
+betterfoliage.blocks.leavesClassesWhitelist=Whitelista liści
+betterfoliage.blocks.leavesClassesBlacklist=Blacklista liści
+betterfoliage.blocks.leavesClassesWhitelist.arrayEntry=%d pozycje
+betterfoliage.blocks.leavesClassesBlacklist.arrayEntry=%d pozycje
+betterfoliage.blocks.leavesModels=Modele liści
+betterfoliage.blocks.leavesModels.arrayEntry=%d pozycje
+betterfoliage.blocks.leavesClassesWhitelist.tooltip=Bloki uznawane jako liście. Ma wpływ na dodatkowe liście, spadające liście. Liście będą renderowane z ID bloków liści w programach do shaderów
+betterfoliage.blocks.leavesClassesBlacklist.tooltip=Bloki nigdy nie uznawane jako liście. Ma wpływ na dodatkowe liście, spadające liście. Liście będą renderowane z ID bloków liści w programach do shaderów
+betterfoliage.blocks.leavesModels.tooltip=Modele i tekstury uznawane jako bloki liści
+
+betterfoliage.blocks.cropsWhitelist=Whitelista plonów
+betterfoliage.blocks.cropsBlacklist=Blacklista plonów
+betterfoliage.blocks.cropsWhitelist.arrayEntry=%d pozycje
+betterfoliage.blocks.cropsBlacklist.arrayEntry=%d pozycje
+betterfoliage.blocks.cropsWhitelist.tooltip=Bloki uznawane jako plony. Plony będą renderowane z ID bloków wysokiej trawy w programach do shaderów
+betterfoliage.blocks.cropsBlacklist.tooltip=Bloki nigdy nie uznawane jako plony. Plony będą renderowane z ID bloków wysokiej trawy w programach do shaderów
+
+betterfoliage.blocks.logClassesWhitelist=Whitelista kłód drewna
+betterfoliage.blocks.logClassesBlacklist=Blacklista kłód drewna
+betterfoliage.blocks.logClassesWhitelist.arrayEntry=%d pozycje
+betterfoliage.blocks.logClassesBlacklist.arrayEntry=%d pozycje
+betterfoliage.blocks.logModels=Modele kłód drewna
+betterfoliage.blocks.logModels.arrayEntry=%d pozycje
+betterfoliage.blocks.logClassesWhitelist.tooltip=Bloki uznawane jako kłody drewna. Ma wpływ na zaokrąglone kłody drewna
+betterfoliage.blocks.logClassesBlacklist.tooltip=Bloki nigdy nie uznawane jako kłody drewna. Ma wpływ na zaokrąglone kłody drewna
+betterfoliage.blocks.logModels.tooltip=Modele i tekstury uznawane jako bloki kłód drewna
+
+betterfoliage.blocks.sandWhitelist=Whitelista piasku
+betterfoliage.blocks.sandBlacklist=Blacklista piasku
+betterfoliage.blocks.sandWhitelist.arrayEntry=%d pozycje
+betterfoliage.blocks.sandBlacklist.arrayEntry=%d pozycje
+betterfoliage.blocks.sandWhitelist.tooltip=Bloki uznawane jako piasek. Ma wpływ na koralowce
+betterfoliage.blocks.sandBlacklist.tooltip=Bloki nigdy nie uznawane jako piasek. Ma wpływ na koralowce
+
+betterfoliage.blocks.lilypadWhitelist=Whitelista lilii wodnych
+betterfoliage.blocks.lilypadBlacklist=Blacklista lilii wodnych
+betterfoliage.blocks.lilypadWhitelist.arrayEntry=%d pozycje
+betterfoliage.blocks.lilypadBlacklist.arrayEntry=%d pozycje
+betterfoliage.blocks.lilypadWhitelist.tooltip=Bloki uznawane jako lilie wodne. Ma wpływ na ładniejsze lilie wodne
+betterfoliage.blocks.lilypadBlacklist.tooltip=Bloki nigdy nie uznawane jako lilie wodne. Ma wpływ na ładniejsze lilie wodne
+
+betterfoliage.blocks.cactusWhitelist=Whitelista kaktusów
+betterfoliage.blocks.cactusBlacklist=Blacklista kaktusów
+betterfoliage.blocks.cactusWhitelist.arrayEntry=%d pozycje
+betterfoliage.blocks.cactusBlacklist.arrayEntry=%d pozycje
+betterfoliage.blocks.cactusWhitelist.tooltip=Bloki uznawane jako kaktusy. Ma wpływ na ładniejsze kaktusy
+betterfoliage.blocks.cactusBlacklist.tooltip=Bloki nigdy nie uznawane jako kaktusy. Ma wpływ na ładniejsze kaktusy
+
+betterfoliage.blocks.myceliumWhitelist=Whitelista grzybni
+betterfoliage.blocks.myceliumBlacklist=Blacklista grzybni
+betterfoliage.blocks.myceliumWhitelist.arrayEntry=%d pozycje
+betterfoliage.blocks.myceliumBlacklist.arrayEntry=%d pozycje
+betterfoliage.blocks.myceliumWhitelist.tooltip=Bloki uznawane jako grzybnia. Ma wpływ na ładniejszą trawę
+betterfoliage.blocks.myceliumBlacklist.tooltip=Bloki nigdy nie uznawane jako grzybnia. Ma wpływ na ładniejszą trawę
+
+betterfoliage.blocks.netherrackWhitelist=Whitelista netherracka
+betterfoliage.blocks.netherrackBlacklist=Blacklista netherracka
+betterfoliage.blocks.netherrackWhitelist.arrayEntry=%d pozycje
+betterfoliage.blocks.netherrackBlacklist.arrayEntry=%d pozycje
+betterfoliage.blocks.netherrackWhitelist.tooltip=Bloki uznawane jako netherrack. Ma wpływ na netherrackowe pnącza
+betterfoliage.blocks.netherrackBlacklist.tooltip=Bloki nigdy nie uznawane jako netherrack. Ma wpływ na netherrackowe pnącza
+
+betterfoliage.leaves=Dodatkowe liście
+betterfoliage.leaves.tooltip=Dodatkowe zaokrąglone liście w blokach liści
+betterfoliage.leaves.dense=Tryb gęsty
+betterfoliage.leaves.dense.tooltip=Tryb gęsty oferuje jeszcze więcej zaokrąglonych liści
+betterfoliage.leaves.snowEnabled=Włącz śnieg
+betterfoliage.leaves.snowEnabled.tooltip=Włączyć śnieg na dodatkowych liściach?
+
+betterfoliage.shortGrass=Krótka trawa i grzybnia
+betterfoliage.shortGrass.tooltip=Kępy trawy/grzybni na górze odpowiednich bloków
+betterfoliage.shortGrass.useGenerated=Używaj wygenerowanej tekstury dla trawy
+betterfoliage.shortGrass.useGenerated.tooltip=Wygenerowana tekstura jest tworzona poprzez przycięcie w połowie tekstury wysokiej trawy z aktywnej paczki zasobów
+betterfoliage.shortGrass.myceliumEnabled=Włącz grzybnię
+betterfoliage.shortGrass.myceliumEnabled.tooltip=Czy ta właściwość jest włączona dla bloków grzybni?
+betterfoliage.shortGrass.grassEnabled=Włącz trawę
+betterfoliage.shortGrass.grassEnabled.tooltip=Czy ta właściwość jest włączona dla bloków trawy?
+betterfoliage.shortGrass.snowEnabled=Włącz pod śniegiem
+betterfoliage.shortGrass.snowEnabled.tooltip=Czy ta właściwość jest włączona dla ośnieżonych bloków trawy?
+betterfoliage.shortGrass.saturationThreshold=Próg nasycenia
+betterfoliage.shortGrass.saturationThreshold.tooltip=Nasycenie koloru pomiędzy "bezbarwnymi" (używającymi koloru tożsamego z kolorem danego biomu) a "kolorowymi" blokami (używającymi własnego koloru)
+
+betterfoliage.hangingGrass=Zwisająca trawa
+betterfoliage.hangingGrass.tooltip=Kępy trawy zwisające z górnych krawędzi bloków trawy
+betterfoliage.hangingGrass.separation=Oddzielenie
+betterfoliage.hangingGrass.separation.tooltip=Jak dużo zwisającej trawy oddziela się od bloku
+
+betterfoliage.cactus=Ładniejsze kaktusy
+betterfoliage.cactus.tooltip=Wzbogać kaktusy o dodatkowe elementy i gładkie cieniowanie
+betterfoliage.cactus.sizeVariation=Zmienność rozmiarów
+betterfoliage.cactus.sizeVariation.tooltip=Liczba losowych wariacji rozmiarów kaktusów
+
+betterfoliage.lilypad=Ładniejsze lilie wodne
+betterfoliage.lilypad.tooltip=Wzbogać lilie wodne o korzenie oraz sporadycznie kwiaty
+betterfoliage.lilypad.flowerChance=Szansa na kwiat
+betterfoliage.lilypad.flowerChance.tooltip=Szansa (N na 64) na to, że dana lilia wodna będzie posiadała kwiat
+
+betterfoliage.reed=Rośliny wodne
+betterfoliage.reed.tooltip=Rośliny wodne na blokach ziemi w płytkiej wodzie
+betterfoliage.reed.biomes=Lista biomów
+betterfoliage.reed.biomes.tooltip=Skonfiguruj, na których biomach mają występować rośliny wodne
+betterfoliage.reed.biomes.tooltip.element=Czy rośliny wodne powinny występować na biomie %s?
+
+betterfoliage.algae=Glony
+betterfoliage.algae.tooltip=Glony na blokach ziemi na głębokiej wodzie
+betterfoliage.algae.biomes=Lista biomów
+betterfoliage.algae.biomes.tooltip=Skonfiguruj, na których biomach mają występować glony
+betterfoliage.algae.biomes.tooltip.element=Czy glony powinny występować na biomie %s?
+
+betterfoliage.coral=Koralowce
+betterfoliage.coral.tooltip=Koralowce na blokach piasku na głębokiej wodzie
+betterfoliage.coral.size=Rozmiar koralowców
+betterfoliage.coral.size.tooltip=Rozmiar wystających koralowców
+betterfoliage.coral.crustSize=Rozmiar skorupy
+betterfoliage.coral.crustSize.tooltip=Rozmiar płaskiej części koralowca
+betterfoliage.coral.chance=Szansa na koralowiec
+betterfoliage.coral.chance.tooltip=Szansa (N na 64) na to, że na danej ścianie bloku będzie mógł być koralowiec 
+betterfoliage.coral.biomes=Lista biomów
+betterfoliage.coral.biomes.tooltip=Skonfiguruj, na których biomach mają występować koralowce
+betterfoliage.coral.biomes.tooltip.element=Czy koralowce powinny występować na biomie %s?
+betterfoliage.coral.shallowWater=Koralowce w płytkiej wodzie
+betterfoliage.coral.shallowWater.tooltip=Czy koralowce powinny występować w wodzie o głębokości 1 bloku?
+
+betterfoliage.netherrack=Netherrackowe pnącza
+betterfoliage.netherrack.tooltip=Zwisające pnącza pod netherrackiem
+
+betterfoliage.fallingLeaves=Spadające liście
+betterfoliage.fallingLeaves.tooltip=Efekty cząsteczkowe spadających liści emitowane ze spodu bloku liści
+betterfoliage.fallingLeaves.speed=Szybkość cząsteczek
+betterfoliage.fallingLeaves.speed.tooltip=Ogólna szybkość cząsteczek
+betterfoliage.fallingLeaves.windStrength=Siła wiatru
+betterfoliage.fallingLeaves.windStrength.tooltip=Wielkość efektu wiatru przy dobrej pogodzie (wyśrodkowane na 0 oznacza normalne rozprzestrzenianie się)
+betterfoliage.fallingLeaves.stormStrength=Siła wichury
+betterfoliage.fallingLeaves.stormStrength.tooltip=Dodatkowa wielkość efektu wiatru podczas deszczowej pogody (wyśrodkowane na 0 oznacza normalne rozprzestrzenianie się)
+betterfoliage.fallingLeaves.size=Rozmiar cząsteczek
+betterfoliage.fallingLeaves.chance=Szansa na cząsteczki
+betterfoliage.fallingLeaves.chance.tooltip=Szansa na to, że dany losowy tick spowoduje utworzenie się cząsteczki z bloku liści
+betterfoliage.fallingLeaves.perturb=Zamieszanie
+betterfoliage.fallingLeaves.perturb.tooltip=Wielkość efektu zamieszania. Dodaje do cząsteczek ruch podobny do korkociągu, zsynchronizowany z ich obrotem
+betterfoliage.fallingLeaves.lifetime=Maksymalny czas życia
+betterfoliage.fallingLeaves.lifetime.tooltip=Maksymalny czas życia cząsteczek w sekundach. Minimalny czas życia to 60%% z tej wartości
+betterfoliage.fallingLeaves.opacityHack=Nieprzezroczyste cząsteczki
+betterfoliage.fallingLeaves.opacityHack.tooltip=Zatrzymaj przysłanianie cząsteczek przez przezroczyste bloki, nawet jeśli cząsteczka znajduje się z przodu. OSTRZEŻENIE: może powodować glitche
+
+betterfoliage.risingSoul=Wznoszące się dusze
+betterfoliage.risingSoul.tooltip=Efekty cząsteczkowe wznoszących się dusz emitowane z wierzchu bloku piasku dusz
+betterfoliage.risingSoul.chance=Szansa na cząsteczki
+betterfoliage.risingSoul.chance.tooltip=Szansa na to, że dany losowy tick spowoduje utworzenie się cząsteczki z bloku piasku dusz
+betterfoliage.risingSoul.speed=Szybkość cząsteczek
+betterfoliage.risingSoul.speed.tooltip=Szybkość cząsteczek dusz w pionie
+betterfoliage.risingSoul.perturb=Zamieszanie
+betterfoliage.risingSoul.perturb.tooltip=Wielkość efektu zamieszania. Dodaje do cząsteczek ruch podobny do korkociągu
+betterfoliage.risingSoul.headSize=Rozmiar dusz
+betterfoliage.risingSoul.headSize.tooltip=Rozmiar cząsteczek dusz
+betterfoliage.risingSoul.trailSize=Rozmiar smugi
+betterfoliage.risingSoul.trailSize.tooltip=Początkowy rozmiar cząsteczek smugi
+betterfoliage.risingSoul.opacity=Nieprzezroczystość
+betterfoliage.risingSoul.opacity.tooltip=Nieprzezroczystość efektu cząsteczkowego
+betterfoliage.risingSoul.sizeDecay=Zanikanie rozmiaru
+betterfoliage.risingSoul.sizeDecay.tooltip=Rozmiar cząsteczek smugi w stosunku do ich rozmiaru w poprzednim ticku
+betterfoliage.risingSoul.opacityDecay=Zanikanie nieprzezroczystości
+betterfoliage.risingSoul.opacityDecay.tooltip=Nieprzezroczystość cząsteczek smugi w stosunku do ich nieprzezroczystości w poprzednim ticku
+betterfoliage.risingSoul.lifetime=Maksymalny czas życia
+betterfoliage.risingSoul.lifetime.tooltip=Maksymalny czas życia efektów cząsteczkowych w sekundach. Minimalny czas życia to 60%% z tej wartości
+betterfoliage.risingSoul.trailLength=Długość smugi
+betterfoliage.risingSoul.trailLength.tooltip=Liczba poprzednich pozycji w tickach, które cząsteczki pamiętają
+betterfoliage.risingSoul.trailDensity=Gęstość smugi
+betterfoliage.risingSoul.trailDensity.tooltip=Renderuj każdą N-tą poprzednią pozycję cząsteczek smugi
+
+betterfoliage.connectedGrass=Tekstury połączonej trawy
+betterfoliage.connectedGrass.enabled=Włącz
+betterfoliage.connectedGrass.enabled.tooltip=Jeśli na bloku ziemi znajduje się blok trawy, na wszystkich ścianach bloku tarwy narysuj górną teksturę trawy
+
+betterfoliage.roundLogs=Zaokrąglone kłody drewna
+betterfoliage.roundLogs.tooltip=Połączyć zaokrąglone bloki ze stałymi, pełnymi blokami?
+betterfoliage.roundLogs.connectSolids=Połącz ze stałymi
+betterfoliage.roundLogs.connectSolids.tooltip=Połączyć zaokrąglone bloki ze stałymi, pełnymi blokami?
+betterfoliage.roundLogs.connectPerpendicular=Połącz z prostopadłymi kłodami drewna
+betterfoliage.roundLogs.connectPerpendicular.tooltip=Połączyć zaokrąglone kłody drewna z prostopadłymi kłodami wzdłuż ich osi?
+betterfoliage.roundLogs.lenientConnect=Łagodne zaokrąglanie
+betterfoliage.roundLogs.lenientConnect.tooltip=Połącz ze sobą równoległe zaokrąglone kłody drewna również w kształcie litery L, a nie tylko 2x2
+betterfoliage.roundLogs.connectGrass=Połącz trawę
+betterfoliage.roundLogs.connectGrass.tooltip=Renderuj pod drzewami bloki trawy zamiast ziemi, jeśli w ich pobliżu znajduje się trawa
+betterfoliage.roundLogs.radiusSmall=Promień ścięcia
+betterfoliage.roundLogs.radiusSmall.tooltip=Jak bardzo ściąć narożniki kłód drewna
+betterfoliage.roundLogs.radiusLarge=Promień ścięcia podczas połączenia
+betterfoliage.roundLogs.radiusLarge.tooltip=Jak bardzo ściąć zewnętrzne narożniki połączonych ze sobą kłód drewna
+betterfoliage.roundLogs.dimming=Przyciemnianie
+betterfoliage.roundLogs.dimming.tooltip=Liczba ścian bloku kłody drewna, które mają zostać przyciemnione
+betterfoliage.roundLogs.zProtection=Ochrona osi Z
+betterfoliage.roundLogs.zProtection.tooltip=Liczba bitów do skalowania połączenia równoległego, aby zatrzymać Z-fighting (migotanie). Postaraj się ustawić tę wartość tak wysoko, jak to tylko możliwe, sprawdzając, czy nie pojawiają się glitche
+betterfoliage.roundLogs.defaultY=Domyślnie dla wertykalnych
+betterfoliage.roundLogs.defaultY.tooltip=Jeśli true, kłody drewna, których orientacja nie może zostać określona, będą renderowane jako pionowe. W przeciwnym razie będą one renderowane jako bloki sześcianów
