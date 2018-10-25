@@ -27,7 +27,7 @@ val resourceManager: SimpleReloadableResourceManager get() =
     Minecraft.getMinecraft().resourceManager as SimpleReloadableResourceManager
 
 /** Append a string to the [ResourceLocation]'s path. */
-operator fun ResourceLocation.plus(str: String) = ResourceLocation(resourceDomain, resourcePath + str)
+operator fun ResourceLocation.plus(str: String) = ResourceLocation(namespace, path + str)
 
 /** Index operator to get a resource. */
 operator fun IResourceManager.get(domain: String, path: String): IResource? = get(ResourceLocation(domain, path))
@@ -66,7 +66,7 @@ val BufferedImage.asStream: InputStream get() =
  */
 val TextureAtlasSprite.averageColor: Int? get() {
     val locationNoDirs = ResourceLocation(iconName).stripStart("blocks/")
-    val locationWithDirs = ResourceLocation(locationNoDirs.resourceDomain, "textures/blocks/%s.png".format(locationNoDirs.resourcePath))
+    val locationWithDirs = ResourceLocation(locationNoDirs.namespace, "textures/blocks/%s.png".format(locationNoDirs.path))
     val image = resourceManager[locationWithDirs]?.loadImage() ?: return null
 
     var numOpaque = 0
@@ -97,8 +97,8 @@ val TextureAtlasSprite.averageColor: Int? get() {
  * Get the actual location of a texture from the name of its [TextureAtlasSprite].
  */
 fun textureLocation(iconName: String) = ResourceLocation(iconName).let {
-    if (it.resourcePath.startsWith("mcpatcher")) it
-    else ResourceLocation(it.resourceDomain, "textures/${it.resourcePath}")
+    if (it.path.startsWith("mcpatcher")) it
+    else ResourceLocation(it.namespace, "textures/${it.path}")
 }
 
 @Suppress("UNCHECKED_CAST")

@@ -34,13 +34,13 @@ class GeneratorPack(val name: String, vararg val generators: GeneratorBase) : IR
     override fun resourceExists(location: ResourceLocation?): Boolean =
             if (location == null) false
             else generators.find {
-                it.domain == location.resourceDomain && it.resourceExists(location)
+                it.domain == location.namespace && it.resourceExists(location)
             } != null
 
     override fun getInputStream(location: ResourceLocation?): InputStream? =
             if (location == null) null
             else generators.filter {
-                it.domain == location.resourceDomain && it.resourceExists(location)
+                it.domain == location.namespace && it.resourceExists(location)
             }.map { it.getInputStream(location) }
             .filterNotNull().first()
 
@@ -114,7 +114,7 @@ abstract class ParameterBasedGenerator(domain: String) : GeneratorBase(domain) {
     abstract fun getInputStream(params: ParameterList): InputStream?
 
     override fun resourceExists(location: ResourceLocation?) =
-            resourceExists(ParameterList.fromString(location?.resourcePath ?: ""))
+            resourceExists(ParameterList.fromString(location?.path ?: ""))
     override fun getInputStream(location: ResourceLocation?) =
-            getInputStream(ParameterList.fromString(location?.resourcePath ?: ""))
+            getInputStream(ParameterList.fromString(location?.path ?: ""))
 }

@@ -22,7 +22,7 @@ fun biomeList(defaults: (Biome) -> Boolean) = intList {
 }.apply { guiClass = BiomeListConfigEntry::class.java }
 
 // Biome filter methods
-private fun Biome.filterTemp(min: Float?, max: Float?) = (min == null || min <= temperature) && (max == null || max >= temperature)
+private fun Biome.filterTemp(min: Float?, max: Float?) = (min == null || min <= defaultTemperature) && (max == null || max >= defaultTemperature)
 private fun Biome.filterRain(min: Float?, max: Float?) = (min == null || min <= rainfall) && (max == null || max >= rainfall)
 private fun Biome.filterClass(vararg name: String) = name.any { it in this.javaClass.name.toLowerCase() }
 

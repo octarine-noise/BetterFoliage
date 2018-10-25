@@ -32,7 +32,7 @@ abstract class TextureGenerator(domain: String) : ParameterBasedGenerator(domain
         domain,
         textureLocation(iconName).let {
             ParameterList(
-                mapOf("dom" to it.resourceDomain, "path" to it.resourcePath) +
+                mapOf("dom" to it.namespace, "path" to it.path) +
                     extraParams.map { Pair(it.first, it.second.toString()) },
                 "generate"
             ).toString()

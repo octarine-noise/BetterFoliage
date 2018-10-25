@@ -12,8 +12,8 @@ class TextureMatcher() {
     data class Mapping(val domain: String?, val path: String, val type: String) {
         fun matches(icon: TextureAtlasSprite): Boolean {
             val iconLocation = ResourceLocation(icon.iconName)
-            return (domain == null || domain == iconLocation.resourceDomain) &&
-                iconLocation.resourcePath.stripStart("blocks/").contains(path, ignoreCase = true)
+            return (domain == null || domain == iconLocation.namespace) &&
+                iconLocation.path.stripStart("blocks/").contains(path, ignoreCase = true)
         }
     }
 

@@ -171,7 +171,7 @@ class RenderVertex() {
 
 fun BufferBuilder.ensureSpaceForQuads(num: Int) {
     rawIntBuffer.position(bufferSize)
-    growBuffer(num * vertexFormat.nextOffset)
+    growBuffer(num * vertexFormat.size)
 }
 
 val allFaces: (EnumFacing) -> Boolean = { true }

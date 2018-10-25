@@ -12,7 +12,7 @@ const val PI2 = 2.0 * PI
 inline fun String.stripStart(str: String) = if (startsWith(str)) substring(str.length) else this
 
 /** Strip the given prefix off the start of the resource path, if present */
-inline fun ResourceLocation.stripStart(str: String) = ResourceLocation(resourceDomain, resourcePath.stripStart(str))
+inline fun ResourceLocation.stripStart(str: String) = ResourceLocation(namespace, path.stripStart(str))
 
 /** Mutating version of _map_. Replace each element of the list with the result of the given transformation. */
 inline fun <reified T> MutableList<T>.replace(transform: (T) -> T) = forEachIndexed { idx, value -> this[idx] = transform(value) }

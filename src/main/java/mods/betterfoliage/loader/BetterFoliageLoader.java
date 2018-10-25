@@ -9,7 +9,7 @@ import java.util.Map;
     "mods.octarinecore.metaprog",
     "kotlin"
 })
-@IFMLLoadingPlugin.MCVersion("1.12")
+@IFMLLoadingPlugin.MCVersion("1.12.2")
 @IFMLLoadingPlugin.SortingIndex(1400)
 public class BetterFoliageLoader implements IFMLLoadingPlugin {
     @Override
