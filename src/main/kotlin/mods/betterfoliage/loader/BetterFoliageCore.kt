@@ -1,10 +1,8 @@
 package mods.betterfoliage.loader
 
-import mods.octarinecore.metaprog.ASMPlugin
 import mods.octarinecore.metaprog.Transformer
 import mods.octarinecore.metaprog.allAvailable
 import net.minecraftforge.fml.relauncher.FMLLaunchHandler
-import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin
 import org.objectweb.asm.Opcodes.*
 
 class BetterFoliageTransformer : Transformer() {

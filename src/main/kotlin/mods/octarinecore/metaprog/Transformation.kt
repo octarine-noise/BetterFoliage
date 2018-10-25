@@ -11,18 +11,6 @@ import org.objectweb.asm.tree.*
 import java.io.File
 import java.io.FileOutputStream
 
-@IFMLLoadingPlugin.TransformerExclusions(
-    "mods.octarinecore.metaprog",
-    "kotlin"
-)
-open class ASMPlugin(vararg val classes: Class<*>) : IFMLLoadingPlugin {
-    override fun getASMTransformerClass() = classes.map { it.canonicalName }.toTypedArray()
-    override fun getAccessTransformerClass() = null
-    override fun getModContainerClass() = null
-    override fun getSetupClass() = null
-    override fun injectData(data: Map<String, Any>) {}
-}
-
 /**
  * Base class for convenient bytecode transformers.
  */
@@ -44,6 +32,7 @@ open class Transformer : IClassTransformer {
         if (classData == null) return null
         val classNode = ClassNode().apply { val reader = ClassReader(classData); reader.accept(this, 0) }
         var workDone = false
+        var writerFlags = 0
 
         synchronized(this) {
             methodTransformers.forEach { (targetMethod, transform) ->
@@ -66,13 +55,13 @@ open class Transformer : IClassTransformer {
                     //}
 
                     // transform
-                    MethodTransformContext(method, namespace).transform()
+                    writerFlags = MethodTransformContext(method, namespace, writerFlags).apply(transform).writerFlags
                     workDone = true
                 }
             }
         }
 
-        return if (!workDone) classData else ClassWriter(0).apply { classNode.accept(this) }.toByteArray()
+        return if (!workDone) classData else ClassWriter(writerFlags).apply { classNode.accept(this) }.toByteArray()
     }
 }
 
@@ -83,7 +72,9 @@ open class Transformer : IClassTransformer {
  * @param[method] the [MethodNode] currently being transformed
  * @param[environment] the type of environment we are in
  */
-class MethodTransformContext(val method: MethodNode, val environment: Namespace) {
+class MethodTransformContext(val method: MethodNode, val environment: Namespace, var writerFlags: Int) {
+
+    fun applyWriterFlags(vararg flagValue: Int) { flagValue.forEach { writerFlags = writerFlags or it } }
 
     fun makePublic() {
         method.access = (method.access or Opcodes.ACC_PUBLIC) and (Opcodes.ACC_PRIVATE or Opcodes.ACC_PROTECTED).inv()
