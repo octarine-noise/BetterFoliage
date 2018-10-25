@@ -7,16 +7,6 @@ import net.minecraftforge.fml.relauncher.FMLLaunchHandler
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin
 import org.objectweb.asm.Opcodes.*
 
-@IFMLLoadingPlugin.TransformerExclusions(
-    "mods.betterfoliage.loader",
-    "mods.octarinecore.metaprog",
-    "kotlin",
-    "mods.octarinecore.kotlin"
-)
-@IFMLLoadingPlugin.MCVersion("1.10.2")
-@IFMLLoadingPlugin.SortingIndex(1400)
-class BetterFoliageLoader : ASMPlugin(BetterFoliageTransformer::class.java)
-
 class BetterFoliageTransformer : Transformer() {
 
     val isOptifinePresent = allAvailable(Refs.OptifineClassTransformer)
