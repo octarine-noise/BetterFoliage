@@ -3,6 +3,9 @@ package mods.betterfoliage.loader
 import mods.octarinecore.metaprog.Transformer
 import mods.octarinecore.metaprog.allAvailable
 import net.minecraftforge.fml.relauncher.FMLLaunchHandler
+import org.objectweb.asm.ClassWriter
+import org.objectweb.asm.ClassWriter.COMPUTE_FRAMES
+import org.objectweb.asm.ClassWriter.COMPUTE_MAXS
 import org.objectweb.asm.Opcodes.*
 
 class BetterFoliageTransformer : Transformer() {
@@ -90,6 +93,7 @@ class BetterFoliageTransformer : Transformer() {
         // what: invoke code to overrule result of Block.canRenderInLayer()
         // why: allows us to render transparent quads for blocks which are only on the SOLID layer
         transformMethod(Refs.rebuildChunk) {
+            applyWriterFlags(COMPUTE_FRAMES, COMPUTE_MAXS)
             find(invokeRef(Refs.renderBlock))?.replace {
                 log.info("[BetterFoliageLoader] Applying RenderChunk block render override")
                 varinsn(ALOAD, if (isOptifinePresent) 22 else 20)
