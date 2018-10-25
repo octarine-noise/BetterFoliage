@@ -90,7 +90,7 @@ class IconSet(val domain: String, val namePattern: String) : IStitchListener {
     var num = 0
 
     override fun onStitch(atlas: TextureMap) {
-        num = 0;
+        num = 0
         (0..15).forEach { idx ->
             icons[idx] = null
             val locReal = ResourceLocation(domain, "textures/${namePattern.format(idx)}.png")
@@ -103,13 +103,13 @@ class IconSet(val domain: String, val namePattern: String) : IStitchListener {
 
 class ModelSet(val num: Int, val init: Model.(Int)->Unit): IConfigChangeListener {
     val models = Array(num) { Model().apply{ init(it) } }
-    override fun onConfigChange() { (0..num-1).forEach { models[it] = Model().apply{ init(it) } } }
+    override fun onConfigChange() { (0 until num).forEach { models[it] = Model().apply{ init(it) } } }
     operator fun get(idx: Int) = models[idx % num]
 }
 
 class VectorSet(val num: Int, val init: (Int)->Double3): IConfigChangeListener {
     val models = Array(num) { init(it) }
-    override fun onConfigChange() { (0..num-1).forEach { models[it] = init(it) } }
+    override fun onConfigChange() { (0 until num).forEach { models[it] = init(it) } }
     operator fun get(idx: Int) = models[idx % num]
 }
 
@@ -117,7 +117,7 @@ class SimplexNoise() : IWorldLoadListener {
     var noise = NoiseGeneratorSimplex()
     override fun onWorldLoad(world: World) { noise = NoiseGeneratorSimplex(Random(world.worldInfo.seed))
     }
-    operator fun get(x: Int, z: Int) = MathHelper.floor_double((noise.getValue(x.toDouble(), z.toDouble()) + 1.0) * 32.0)
+    operator fun get(x: Int, z: Int) = MathHelper.floor((noise.getValue(x.toDouble(), z.toDouble()) + 1.0) * 32.0)
     operator fun get(pos: Int3) = get(pos.x, pos.z)
     operator fun get(pos: BlockPos) = get(pos.x, pos.z)
 }

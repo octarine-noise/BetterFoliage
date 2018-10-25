@@ -114,8 +114,8 @@ class BlockContext {
     /** Get the distance of the block from the camera (player). */
     val cameraDistance: Int get() {
         val camera = Minecraft.getMinecraft().renderViewEntity ?: return 0
-        return Math.abs(pos.x - MathHelper.floor_double(camera.posX)) +
-               Math.abs(pos.y - MathHelper.floor_double(camera.posY)) +
-               Math.abs(pos.z - MathHelper.floor_double(camera.posZ))
+        return Math.abs(pos.x - MathHelper.floor(camera.posX)) +
+               Math.abs(pos.y - MathHelper.floor(camera.posY)) +
+               Math.abs(pos.z - MathHelper.floor(camera.posZ))
     }
 }

@@ -95,7 +95,7 @@ object Client {
 
         val blockName = Block.REGISTRY.getNameForObject(state.block).toString()
         val blockLoc = "${location.x},${location.y},${location.z}"
-        Minecraft.getMinecraft().thePlayer.addChatMessage(TextComponentTranslation(
+        Minecraft.getMinecraft().ingameGUI.chatGUI.printChatMessage(TextComponentTranslation(
             "betterfoliage.rendererror",
             textComponent(blockName, TextFormatting.GOLD),
             textComponent(blockLoc, TextFormatting.GOLD)
