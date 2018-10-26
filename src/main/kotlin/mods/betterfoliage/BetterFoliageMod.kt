@@ -23,6 +23,8 @@ import java.util.*
     name = BetterFoliageMod.MOD_NAME,
     acceptedMinecraftVersions = BetterFoliageMod.MC_VERSIONS,
     guiFactory = BetterFoliageMod.GUI_FACTORY,
+    dependencies = "after:forgelin",
+    modLanguageAdapter = "net.shadowfacts.forgelin.KotlinAdapter",
     clientSideOnly = true
 )
 object BetterFoliageMod {
@@ -39,11 +41,6 @@ object BetterFoliageMod {
 
     var config: Configuration? = null
     var isAfterPostInit = false
-
-    @JvmStatic
-    @Mod.InstanceFactory
-    // the fun never stops with the fun factory! :)
-    fun factory() = this
 
     @Mod.EventHandler
     fun preInit(event: FMLPreInitializationEvent) {
