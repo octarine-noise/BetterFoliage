@@ -24,6 +24,8 @@ import java.util.*
     name = BetterFoliageMod.MOD_NAME,
     acceptedMinecraftVersions = BetterFoliageMod.MC_VERSIONS,
     guiFactory = BetterFoliageMod.GUI_FACTORY,
+    dependencies = "after:forgelin",
+    modLanguageAdapter = "net.shadowfacts.forgelin.KotlinAdapter",
     clientSideOnly = true
 )
 object BetterFoliageMod {
@@ -40,14 +42,10 @@ object BetterFoliageMod {
 
     var config: Configuration? = null
 
-    @JvmStatic
-    @Mod.InstanceFactory
-    // the fun never stops with the fun factory! :)
-    fun factory(): BetterFoliageMod {
+    init {
         // inject pack into default list at construction time to get domains enumerated
         // there's no 2nd resource reload pass anymore
         Client.generatorPack.inject()
-        return this
     }
 
     @Mod.EventHandler
