@@ -21,7 +21,9 @@ import net.minecraftforge.fml.relauncher.SideOnly
 import org.apache.logging.log4j.Level.INFO
 
 /**
- * Integration for OptiFine.
+ * Integration for OptiFine CTM.
+ *
+ * Currently broken and unused
  */
 @Suppress("UNCHECKED_CAST")
 @SideOnly(Side.CLIENT)
@@ -33,17 +35,13 @@ object OptifineCTM {
         Refs.CTblockProperties, Refs.CTtileProperties,
         Refs.CPtileIcons, Refs.CPmatchesIcon
     )
-    val isColorAvailable = allAvailable(
-        Refs.CustomColors, Refs.getColorMultiplier
-    )
 
     init {
         Client.log(INFO, "Optifine CTM support is ${if (isCTMAvailable) "enabled" else "disabled" }")
-        Client.log(INFO, "Optifine custom color support is ${if (isColorAvailable) "enabled" else "disabled" }")
     }
 
     val renderEnv by ThreadLocalDelegate { OptifineRenderEnv() }
-    val fakeQuad = BakedQuad(IntArray(0), 1, EnumFacing.UP, null, true, DefaultVertexFormats.BLOCK)
+
     val isCustomColors: Boolean get() = if (!isCTMAvailable) false else Minecraft.getMinecraft().gameSettings.reflectField<Boolean>("ofCustomColors") ?: false
 
     val connectedProperties: Iterable<Any> get() {
@@ -88,13 +86,7 @@ object OptifineCTM {
         }
     }
 
-    fun getBlockColor(ctx: BlockContext): Int {
-        val ofColor = if (isColorAvailable && Minecraft.getMinecraft().gameSettings.reflectField<Boolean>("ofCustomColors") == true) {
-            renderEnv.reset(ctx.world!!, ctx.blockState(Int3.zero), ctx.pos)
-            Refs.getColorMultiplier.invokeStatic(fakeQuad, ctx.blockState(Int3.zero), ctx.world!!, ctx.pos, renderEnv.wrapped) as? Int
-        } else null
-        return if (ofColor == null || ofColor == -1) ctx.blockData(Int3.zero).color else ofColor
-    }
+
 }
 
 @SideOnly(Side.CLIENT)

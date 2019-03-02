@@ -4,6 +4,7 @@ import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.Config
 import mods.betterfoliage.client.integration.OptifineCTM
+import mods.betterfoliage.client.integration.OptifineCustomColors
 import mods.betterfoliage.client.integration.ShadersModIntegration
 import mods.betterfoliage.client.texture.GrassRegistry
 import mods.octarinecore.client.render.*
@@ -69,7 +70,7 @@ class RenderGrass : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
             Client.logRenderError(ctx.blockState(Int3.zero), ctx.pos)
             return renderWorldBlockBase(ctx, dispatcher, renderer, null)
         }
-        val blockColor = OptifineCTM.getBlockColor(ctx)
+        val blockColor = OptifineCustomColors.getBlockColor(ctx)
 
         if (connectedGrass) {
             // get full AO data

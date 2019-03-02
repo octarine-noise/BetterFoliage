@@ -76,7 +76,7 @@ object StandardGrassSupport :
     override fun get(state: IBlockState, world: IBlockAccess, pos: BlockPos, face: EnumFacing, rand: Int): GrassInfo? {
         val variant = getVariant(state, rand) ?: return null
         val baseTexture = variantToValue[variant] ?: return null
-        return textureToValue[OptifineCTM.override(baseTexture, world, pos, face)] ?: textureToValue[baseTexture]
+        return textureToValue[baseTexture]
     }
 
     override fun get(state: IBlockState, rand: Int): GrassInfo? {
@@ -85,13 +85,7 @@ object StandardGrassSupport :
     }
 
     override fun processStitch(variant: ModelVariant, key: List<String>, atlas: TextureMap) = atlas.registerSprite(key[0])
-
-    override fun processTexture(variants: List<ModelVariant>, texture: TextureAtlasSprite, atlas: TextureMap) {
-        registerGrass(texture, atlas)
-        OptifineCTM.getAllCTM(variants.map { it.state }, texture).forEach {
-            registerGrass(it, atlas)
-        }
-    }
+    override fun processTexture(variants: List<ModelVariant>, texture: TextureAtlasSprite, atlas: TextureMap) { registerGrass(texture, atlas) }
 
     fun registerGrass(texture: TextureAtlasSprite, atlas: TextureMap) {
         logger.log(Level.DEBUG, "$logName: texture ${texture.iconName}")

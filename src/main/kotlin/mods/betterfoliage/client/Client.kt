@@ -71,7 +71,7 @@ object Client {
             LeafWindTracker,
             RisingSoulTextures,
             ShadersModIntegration,
-            OptifineCTM,
+            OptifineCustomColors,
             ForestryIntegration,
             IC2Integration,
             TechRebornIntegration,

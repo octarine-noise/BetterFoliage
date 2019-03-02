@@ -108,7 +108,7 @@ object StandardLeafSupport :
     override fun get(state: IBlockState, world: IBlockAccess, pos: BlockPos, face: EnumFacing, rand: Int): LeafInfo? {
         val variant = getVariant(state, rand) ?: return null
         val baseTexture = variantToValue[variant] ?: return null
-        return textureToValue[OptifineCTM.override(baseTexture, world, pos, face)] ?: textureToValue[baseTexture]
+        return textureToValue[baseTexture]
     }
 
     override fun get(state: IBlockState, rand: Int): LeafInfo? {
@@ -123,10 +123,6 @@ object StandardLeafSupport :
         logger?.log(Level.DEBUG, "$logName:      #variants ${variants.size}")
         logger?.log(Level.DEBUG, "$logName:      #states   ${variants.distinctBy { it.state }.size}")
         registerLeaf(texture, atlas)
-        OptifineCTM.getAllCTM(variants.map { it.state }, texture).forEach {
-            logger?.log(Level.DEBUG, "$logName:        CTM ${texture.iconName}")
-            registerLeaf(it, atlas)
-        }
     }
 
     fun registerLeaf(texture: TextureAtlasSprite, atlas: TextureMap) {

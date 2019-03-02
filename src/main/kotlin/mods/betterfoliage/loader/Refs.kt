@@ -93,25 +93,27 @@ object Refs {
     val getBlockId = MethodRef(BlockStateBase, "getBlockId", ClassRef.int);
     val getMetadata = MethodRef(BlockStateBase, "getMetadata", ClassRef.int);
 
-    val RenderEnv = ClassRef("RenderEnv")
+    // Optifine: CTM
+    val RenderEnv = ClassRef("net.optifine.render.RenderEnv")
     val RenderEnv_reset = MethodRef(RenderEnv, "reset", ClassRef.void, IBlockAccess, IBlockState, BlockPos)
-    val ConnectedTextures = ClassRef("ConnectedTextures")
+    val ConnectedTextures = ClassRef("net.optifine.ConnectedTextures")
     val getConnectedTexture = MethodRef(ConnectedTextures, "getConnectedTextureMultiPass", TextureAtlasSprite, IBlockAccess, IBlockState, BlockPos, EnumFacing, TextureAtlasSprite, RenderEnv)
     val CTblockProperties = FieldRef(ConnectedTextures, "blockProperties", null)
     val CTtileProperties = FieldRef(ConnectedTextures, "tileProperties", null)
 
-    val ConnectedProperties = ClassRef("ConnectedProperties")
+    val ConnectedProperties = ClassRef("net.optifine.ConnectedProperties")
     val CPtileIcons = FieldRef(ConnectedProperties, "tileIcons", null)
     val CPmatchesBlock = MethodRef(ConnectedProperties, "matchesBlock", ClassRef.boolean, ClassRef.int, ClassRef.int)
     val CPmatchesIcon = MethodRef(ConnectedProperties, "matchesIcon", ClassRef.boolean, TextureAtlasSprite)
 
     val quadSprite = FieldRef(BufferBuilder, "quadSprite", TextureAtlasSprite)
 
-    val CustomColors = ClassRef("CustomColors")
+    // Optifine: custom colors
+    val CustomColors = ClassRef("net.optifine.CustomColors")
     val getColorMultiplier = MethodRef(CustomColors, "getColorMultiplier", ClassRef.int, BakedQuad, IBlockState, IBlockAccess, BlockPos, RenderEnv)
 
 
-    // ShadersMod
+    // Optifine: shaders
     val SVertexBuilder = ClassRef("net.optifine.shaders.SVertexBuilder")
     val sVertexBuilder = FieldRef(BufferBuilder, "sVertexBuilder", SVertexBuilder)
     val pushEntity_state = MethodRef(SVertexBuilder, "pushEntity", ClassRef.void, IBlockState, BlockPos, IBlockAccess, BufferBuilder)

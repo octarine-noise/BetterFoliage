@@ -10,6 +10,7 @@ import mods.betterfoliage.client.render.StaticColumnInfo
 import mods.betterfoliage.client.texture.StandardLeafSupport
 import mods.betterfoliage.loader.Refs
 import mods.octarinecore.client.render.Quad
+import mods.octarinecore.client.render.QuadIconResolver
 import mods.octarinecore.client.render.ShadingContext
 import mods.octarinecore.client.render.blockContext
 import mods.octarinecore.client.resource.*
@@ -72,16 +73,11 @@ data class RubberLogColumnInfo(override val axis: EnumFacing.Axis?,
                                val bottomTexture: TextureAtlasSprite,
                                val sideTexture: TextureAtlasSprite,
                                val spotTexture: TextureAtlasSprite): IColumnTextureInfo {
-    override val top = { ctx: ShadingContext, idx: Int, quad: Quad ->
-        OptifineCTM.override(topTexture, blockContext, EnumFacing.UP.rotate(ctx.rotation))
-    }
-    override val bottom = { ctx: ShadingContext, idx: Int, quad: Quad ->
-        OptifineCTM.override(bottomTexture, blockContext, EnumFacing.DOWN.rotate(ctx.rotation))
-    }
-    override val side = { ctx: ShadingContext, idx: Int, quad: Quad ->
+    override val top: QuadIconResolver = { _, _, _ -> topTexture }
+    override val bottom: QuadIconResolver = { _, _, _ -> bottomTexture }
+    override val side: QuadIconResolver = { ctx: ShadingContext, idx: Int, quad: Quad ->
         val worldRelativeSide = (if ((idx and 1) == 0) EnumFacing.SOUTH else EnumFacing.EAST).rotate(ctx.rotation)
-        val texture = if (worldRelativeSide == spotDir) spotTexture else sideTexture
-        OptifineCTM.override(texture, blockContext, worldRelativeSide)
+        if (worldRelativeSide == spotDir) spotTexture else sideTexture
     }
 }
 

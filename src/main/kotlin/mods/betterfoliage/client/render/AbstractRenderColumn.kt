@@ -39,16 +39,11 @@ data class StaticColumnInfo(override val axis: Axis?,
     // index offsets for EnumFacings, to make it less likely for neighboring faces to get the same bark texture
     val dirToIdx = arrayOf(0, 1, 2, 4, 3, 5)
 
-    override val top: QuadIconResolver = { ctx, _, _ ->
-        OptifineCTM.override(topTexture, blockContext, UP.rotate(ctx.rotation))
-    }
-    override val bottom: QuadIconResolver = { ctx, _, _ ->
-        OptifineCTM.override(bottomTexture, blockContext, DOWN.rotate(ctx.rotation))
-    }
+    override val top: QuadIconResolver = { _, _, _ -> topTexture }
+    override val bottom: QuadIconResolver = { _, _, _ -> bottomTexture }
     override val side: QuadIconResolver = { ctx, idx, _ ->
         val worldFace = (if ((idx and 1) == 0) SOUTH else EAST).rotate(ctx.rotation)
-        val baseTexture = sideTextures[(blockContext.random(1) + dirToIdx[worldFace.ordinal]) % sideTextures.size]
-        OptifineCTM.override(baseTexture, blockContext, worldFace)
+        sideTextures[(blockContext.random(1) + dirToIdx[worldFace.ordinal]) % sideTextures.size]
     }
 }
 
