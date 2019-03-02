@@ -112,7 +112,7 @@ object Refs {
 
 
     // ShadersMod
-    val SVertexBuilder = ClassRef("shadersmod.client.SVertexBuilder")
+    val SVertexBuilder = ClassRef("net.optifine.shaders.SVertexBuilder")
     val sVertexBuilder = FieldRef(BufferBuilder, "sVertexBuilder", SVertexBuilder)
     val pushEntity_state = MethodRef(SVertexBuilder, "pushEntity", ClassRef.void, IBlockState, BlockPos, IBlockAccess, BufferBuilder)
     val pushEntity_num = MethodRef(SVertexBuilder, "pushEntity", ClassRef.void, ClassRef.long)

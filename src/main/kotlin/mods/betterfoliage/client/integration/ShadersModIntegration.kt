@@ -19,7 +19,7 @@ import org.apache.logging.log4j.Level.INFO
 @SideOnly(Side.CLIENT)
 object ShadersModIntegration {
 
-    @JvmStatic var isPresent = false
+    @JvmStatic var isAvailable = allAvailable(Refs.sVertexBuilder, Refs.pushEntity_state, Refs.pushEntity_num, Refs.popEntity)
     @JvmStatic val tallGrassEntityData = entityDataFor(Blocks.TALLGRASS.defaultState.withProperty(BlockTallGrass.TYPE, BlockTallGrass.EnumType.GRASS))
     @JvmStatic val leavesEntityData = entityDataFor(Blocks.LEAVES.defaultState)
 
@@ -40,15 +40,12 @@ object ShadersModIntegration {
     }
 
     init {
-        if (allAvailable(Refs.sVertexBuilder, Refs.pushEntity_state, Refs.pushEntity_num, Refs.popEntity)) {
-            Client.log(INFO, "ShadersMod integration enabled")
-            isPresent = true
-        }
+        Client.log(INFO, "ShadersMod integration is ${if (isAvailable) "enabled" else "disabled" }")
     }
 
     /** Quads rendered inside this block will use the given block entity data in shader programs. */
     inline fun renderAs(blockEntityData: Long, renderer: BufferBuilder, enabled: Boolean = true, func: ()->Unit) {
-        if ((isPresent && enabled)) {
+        if ((isAvailable && enabled)) {
             val vertexBuilder = Refs.sVertexBuilder.get(renderer)!!
             Refs.pushEntity_num.invoke(vertexBuilder, blockEntityData)
             func()
