@@ -198,7 +198,7 @@ object Config : DelegatingConfig(BetterFoliageMod.MOD_ID, BetterFoliageMod.DOMAI
         blocks.leavesModels,
         blocks.grassClasses,
         blocks.grassModels,
-        shortGrass["saturationThreshold"]
+        shortGrass["saturationThreshold"]!!
     )
 
     override fun onChange(event: ConfigChangedEvent.PostConfigChangedEvent) {

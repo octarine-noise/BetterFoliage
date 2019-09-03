@@ -92,7 +92,7 @@ abstract class DelegatingConfig(val modId: String, val langPrefix: String) {
      * Returns true if any of the given configuration elements have changed.
      * Supports both categories and
      */
-    fun hasChanged(elements: List<*>): Boolean {
+    fun hasChanged(elements: List<ConfigPropertyBase>): Boolean {
         reflectNestedObjects.forEach { category ->
             if (category.second in elements && config?.getCategory(category.first)?.hasChanged() ?: false) return true
         }

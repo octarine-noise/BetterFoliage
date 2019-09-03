@@ -27,7 +27,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly "net.shadowfacts:Forgelin:$forgelin_version"
+    compile "net.shadowfacts:Forgelin:$forgelin_version"
 }
 
 minecraft {

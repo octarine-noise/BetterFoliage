@@ -22,6 +22,7 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.MathHelper
 import net.minecraft.world.IBlockAccess
 import net.minecraft.world.biome.Biome
+import kotlin.math.abs
 
 /**
  * [ThreadLocal] instance of [BlockContext] representing the block being rendered.
@@ -114,8 +115,8 @@ class BlockContext {
     /** Get the distance of the block from the camera (player). */
     val cameraDistance: Int get() {
         val camera = Minecraft.getMinecraft().renderViewEntity ?: return 0
-        return Math.abs(pos.x - MathHelper.floor(camera.posX)) +
-               Math.abs(pos.y - MathHelper.floor(camera.posY)) +
-               Math.abs(pos.z - MathHelper.floor(camera.posZ))
+        return abs(pos.x - MathHelper.floor(camera.posX)) +
+               abs(pos.y - MathHelper.floor(camera.posY)) +
+               abs(pos.z - MathHelper.floor(camera.posZ))
     }
 }
