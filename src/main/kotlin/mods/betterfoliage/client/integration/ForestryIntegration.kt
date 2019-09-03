@@ -11,6 +11,8 @@ import mods.betterfoliage.loader.Refs
 import mods.octarinecore.client.resource.ModelProcessor
 import mods.octarinecore.client.resource.ModelVariant
 import mods.octarinecore.client.resource.registerSprite
+import mods.octarinecore.getTileEntitySafe
+import mods.octarinecore.isBlockLoaded
 import mods.octarinecore.metaprog.ClassRef
 import mods.octarinecore.metaprog.FieldRef
 import mods.octarinecore.metaprog.MethodRef
@@ -117,7 +119,7 @@ object ForestryLeavesSupport : ILeafRegistry {
         }
 
         // extract leaf texture information from TileEntity
-        val tile = tryDefault(null) { world.getTileEntity(pos) } ?: return null
+        val tile = world.getTileEntitySafe(pos) ?: return null
         if (!ForestryIntegration.TileLeaves.isInstance(tile)) return null
         val textureLoc = ForestryIntegration.TiLgetLeaveSprite.invoke(tile, Minecraft.isFancyGraphicsEnabled()) ?: return null
         return textureToValue[textureLoc]

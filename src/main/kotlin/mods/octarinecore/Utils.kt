@@ -2,7 +2,12 @@
 @file:Suppress("NOTHING_TO_INLINE")
 package mods.octarinecore
 
+import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.ResourceLocation
+import net.minecraft.util.math.BlockPos
+import net.minecraft.world.ChunkCache
+import net.minecraft.world.IBlockAccess
+import net.minecraft.world.World
 import kotlin.reflect.KProperty
 import java.lang.Math.*
 
@@ -92,4 +97,22 @@ fun Int.minmax(minVal: Int, maxVal: Int) = min(max(this, minVal), maxVal)
 
 fun nextPowerOf2(x: Int): Int {
     return 1 shl (if (x == 0) 0 else 32 - Integer.numberOfLeadingZeros(x - 1))
+}
+
+/**
+ * Check if the Chunk containing the given [BlockPos] is loaded.
+ * Works for both [World] and [ChunkCache] instances.
+ */
+fun IBlockAccess.isBlockLoaded(pos: BlockPos) = when(this) {
+    is World -> isBlockLoaded(pos, false)
+    is ChunkCache -> world.isBlockLoaded(pos, false)
+    else -> false
+}
+
+/**
+ * Get the [TileEntity] at the given position, suppressing exceptions.
+ * Also returns null if the chunk is unloaded, which can happen because of multithreaded rendering.
+ */
+fun IBlockAccess.getTileEntitySafe(pos: BlockPos): TileEntity? = tryDefault(null) {
+    if (isBlockLoaded(pos)) getTileEntity(pos) else null
 }
