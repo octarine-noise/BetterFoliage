@@ -34,8 +34,7 @@ class RenderNetherrack : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) 
 
     override fun isEligible(ctx: BlockContext): Boolean {
         if (!Config.enabled || !Config.netherrack.enabled) return false
-        return Config.blocks.netherrack.matchesClass(ctx.block) &&
-            ctx.cameraDistance < Config.netherrack.distance
+        return Config.blocks.netherrack.matchesClass(ctx.block)
     }
 
     override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: BufferBuilder, layer: BlockRenderLayer): Boolean {

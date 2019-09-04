@@ -46,7 +46,6 @@ class RenderReeds : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
 
     override fun isEligible(ctx: BlockContext) =
         Config.enabled && Config.reed.enabled &&
-        ctx.cameraDistance < Config.reed.distance &&
         ctx.blockState(up2).material == Material.AIR &&
         ctx.blockState(up1).material == Material.WATER &&
         Config.blocks.dirt.matchesClass(ctx.block) &&

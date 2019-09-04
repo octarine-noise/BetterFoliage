@@ -49,7 +49,6 @@ class RenderGrass : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
 
     override fun isEligible(ctx: BlockContext) =
         Config.enabled &&
-        ctx.cameraDistance < Config.shortGrass.distance &&
         (Config.shortGrass.grassEnabled || Config.connectedGrass.enabled) &&
         GrassRegistry[ctx, UP] != null
 

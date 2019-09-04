@@ -25,7 +25,6 @@ class RenderLog : AbstractRenderColumn(BetterFoliageMod.MOD_ID) {
 
     override fun isEligible(ctx: BlockContext) =
         Config.enabled && Config.roundLogs.enabled &&
-        ctx.cameraDistance < Config.roundLogs.distance &&
         Config.blocks.logClasses.matchesClass(ctx.block)
 
     override val registry: IColumnRegistry get() = LogRegistry

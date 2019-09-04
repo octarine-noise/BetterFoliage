@@ -47,7 +47,6 @@ class RenderCoral : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
 
     override fun isEligible(ctx: BlockContext) =
         Config.enabled && Config.coral.enabled &&
-        ctx.cameraDistance < Config.coral.distance &&
         (ctx.blockState(up2).material == Material.WATER || Config.coral.shallowWater) &&
         ctx.blockState(up1).material == Material.WATER &&
         Config.blocks.sand.matchesClass(ctx.block) &&

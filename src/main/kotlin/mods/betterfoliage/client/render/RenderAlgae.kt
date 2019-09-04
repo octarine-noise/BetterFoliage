@@ -29,7 +29,6 @@ class RenderAlgae : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
 
     override fun isEligible(ctx: BlockContext) =
         Config.enabled && Config.algae.enabled &&
-        ctx.cameraDistance < Config.algae.distance &&
         ctx.blockState(up2).material == Material.WATER &&
         ctx.blockState(up1).material == Material.WATER &&
         Config.blocks.dirt.matchesClass(ctx.block) &&

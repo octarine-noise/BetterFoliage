@@ -46,7 +46,6 @@ class RenderLeaves : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
     override fun isEligible(ctx: BlockContext) =
         Config.enabled &&
         Config.leaves.enabled &&
-        ctx.cameraDistance < Config.leaves.distance &&
         LeafRegistry[ctx, DOWN] != null
 
     override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: BufferBuilder, layer: BlockRenderLayer): Boolean {
