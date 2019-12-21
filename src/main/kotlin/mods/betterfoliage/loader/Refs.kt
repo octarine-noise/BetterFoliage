@@ -26,6 +26,7 @@ object Refs {
 
     val World = ClassRef("net.minecraft.world.World")
     val WorldClient = ClassRef("net.minecraft.client.multiplayer.WorldClient")
+    val ChunkCache = ClassRef("net.minecraft.world.ChunkCache")
     val showBarrierParticles = MethodRef(WorldClient, "showBarrierParticles", "func_184153_a", ClassRef.void, ClassRef.int, ClassRef.int, ClassRef.int, ClassRef.int, Random, ClassRef.boolean, MutableBlockPos)
 
     val Block = ClassRef("net.minecraft.block.Block")
@@ -89,29 +90,20 @@ object Refs {
 
     // Optifine
     val OptifineClassTransformer = ClassRef("optifine.OptiFineClassTransformer")
+    val OptifineChunkCache = ClassRef("net.optifine.override.ChunkCacheOF")
+    val CCOFChunkCache = FieldRef(OptifineChunkCache, "chunkCache", ChunkCache)
 
     val getBlockId = MethodRef(BlockStateBase, "getBlockId", ClassRef.int);
     val getMetadata = MethodRef(BlockStateBase, "getMetadata", ClassRef.int);
 
-    // Optifine: CTM
+    // Optifine
     val RenderEnv = ClassRef("net.optifine.render.RenderEnv")
     val RenderEnv_reset = MethodRef(RenderEnv, "reset", ClassRef.void, IBlockAccess, IBlockState, BlockPos)
-    val ConnectedTextures = ClassRef("net.optifine.ConnectedTextures")
-    val getConnectedTexture = MethodRef(ConnectedTextures, "getConnectedTextureMultiPass", TextureAtlasSprite, IBlockAccess, IBlockState, BlockPos, EnumFacing, TextureAtlasSprite, RenderEnv)
-    val CTblockProperties = FieldRef(ConnectedTextures, "blockProperties", null)
-    val CTtileProperties = FieldRef(ConnectedTextures, "tileProperties", null)
-
-    val ConnectedProperties = ClassRef("net.optifine.ConnectedProperties")
-    val CPtileIcons = FieldRef(ConnectedProperties, "tileIcons", null)
-    val CPmatchesBlock = MethodRef(ConnectedProperties, "matchesBlock", ClassRef.boolean, ClassRef.int, ClassRef.int)
-    val CPmatchesIcon = MethodRef(ConnectedProperties, "matchesIcon", ClassRef.boolean, TextureAtlasSprite)
-
     val quadSprite = FieldRef(BufferBuilder, "quadSprite", TextureAtlasSprite)
 
     // Optifine: custom colors
     val CustomColors = ClassRef("net.optifine.CustomColors")
     val getColorMultiplier = MethodRef(CustomColors, "getColorMultiplier", ClassRef.int, BakedQuad, IBlockState, IBlockAccess, BlockPos, RenderEnv)
-
 
     // Optifine: shaders
     val SVertexBuilder = ClassRef("net.optifine.shaders.SVertexBuilder")

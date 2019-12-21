@@ -2,7 +2,6 @@ package mods.betterfoliage.client.texture
 
 import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.config.Config
-import mods.betterfoliage.client.integration.OptifineCTM
 import mods.octarinecore.client.render.BlockContext
 import mods.octarinecore.client.render.HSB
 import mods.octarinecore.client.resource.*
