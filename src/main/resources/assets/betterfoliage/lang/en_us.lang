@@ -114,6 +114,8 @@ betterfoliage.leaves.dense=Dense mode
 betterfoliage.leaves.dense.tooltip=Dense mode has more round leaves
 betterfoliage.leaves.snowEnabled=Enable snow
 betterfoliage.leaves.snowEnabled.tooltip=Enable snow on extra leaves?
+betterfoliage.leaves.hideInternal=Hide internal leaves
+betterfoliage.leaves.hideInternal.tooltip=Skip rendering extra leaves if leaf block is completely surrounded by other leaves or solid blocks
 
 betterfoliage.shortGrass=Short Grass & Mycelium
 betterfoliage.shortGrass.tooltip=Tufts of grass/mycelium on top of appropriate blocks

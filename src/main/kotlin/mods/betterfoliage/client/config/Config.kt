@@ -62,6 +62,7 @@ object Config : DelegatingConfig(BetterFoliageMod.MOD_ID, BetterFoliageMod.DOMAI
         val vOffset by double(max=0.4, default=0.1).lang("vOffset")
         val size by double(min=0.75, max=2.5, default=1.4).lang("size")
         val dense by boolean(false)
+        val hideInternal by boolean(true)
     }
 
     object shortGrass {

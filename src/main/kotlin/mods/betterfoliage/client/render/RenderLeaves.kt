@@ -45,7 +45,8 @@ class RenderLeaves : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
     override fun isEligible(ctx: BlockContext) =
         Config.enabled &&
         Config.leaves.enabled &&
-        LeafRegistry[ctx, DOWN] != null
+        LeafRegistry[ctx, DOWN] != null &&
+        !(Config.leaves.hideInternal && ctx.isSurroundedBy { it.isFullCube || it.material == Material.LEAVES } )
 
     override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: BufferBuilder, layer: BlockRenderLayer): Boolean {
         val isSnowed = ctx.blockState(up1).material.let {
