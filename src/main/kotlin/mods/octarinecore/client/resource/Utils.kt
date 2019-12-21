@@ -4,6 +4,7 @@ package mods.octarinecore.client.resource
 import mods.betterfoliage.loader.Refs
 import mods.octarinecore.PI2
 import mods.octarinecore.client.render.HSB
+import mods.octarinecore.metaprog.reflectField
 import mods.octarinecore.stripStart
 import mods.octarinecore.tryDefault
 import net.minecraft.client.Minecraft
@@ -108,11 +109,13 @@ val IModel.modelBlockAndLoc: List<Pair<ModelBlock, ResourceLocation>> get() {
     else if (Refs.WeightedRandomModel.isInstance(this)) Refs.models_WRM.get(this)?.let {
         return (it as List<IModel>).flatMap(IModel::modelBlockAndLoc)
     }
-    else if (Refs.MultiModel.isInstance(this)) Refs.base_MM.get(this)?.let {
-        return (it as IModel).modelBlockAndLoc
-    }
     else if (Refs.MultipartModel.isInstance(this)) Refs.partModels_MPM.get(this)?.let {
         return (it as Map<Any, IModel>).flatMap { it.value.modelBlockAndLoc }
+    } else {
+        this::class.java.declaredFields.find { it.type.isInstance(IModel::class.java) }?.let { modelField ->
+            modelField.isAccessible = true
+            return (modelField.get(this) as IModel).modelBlockAndLoc
+        }
     }
     return listOf()
 }
