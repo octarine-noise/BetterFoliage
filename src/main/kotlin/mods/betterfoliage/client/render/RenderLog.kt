@@ -1,6 +1,7 @@
 package mods.betterfoliage.client.render
 
 import mods.betterfoliage.BetterFoliageMod
+import mods.betterfoliage.client.chunk.ChunkOverlayManager
 import mods.betterfoliage.client.config.Config
 import mods.octarinecore.client.render.BlockContext
 import mods.octarinecore.client.resource.ModelVariant
@@ -27,17 +28,23 @@ class RenderLog : AbstractRenderColumn(BetterFoliageMod.MOD_ID) {
         Config.enabled && Config.roundLogs.enabled &&
         Config.blocks.logClasses.matchesClass(ctx.block)
 
-    override val registry: IColumnRegistry get() = LogRegistry
+    override val overlayLayer = RoundLogOverlayLayer()
+    override val connectPerpendicular: Boolean get() = Config.roundLogs.connectPerpendicular
+    override val radiusSmall: Double get() = Config.roundLogs.radiusSmall
+    override val radiusLarge: Double get() = Config.roundLogs.radiusLarge
+    init {
+        ChunkOverlayManager.layers.add(overlayLayer)
+    }
+}
 
+class RoundLogOverlayLayer : ColumnRenderLayer() {
+    override val registry: IColumnRegistry get() = LogRegistry
     override val blockPredicate = { state: IBlockState -> Config.blocks.logClasses.matchesClass(state.block) }
     override val surroundPredicate = { state: IBlockState -> state.isOpaqueCube && !Config.blocks.logClasses.matchesClass(state.block) }
 
-    override val connectPerpendicular: Boolean get() = Config.roundLogs.connectPerpendicular
     override val connectSolids: Boolean get() = Config.roundLogs.connectSolids
     override val lenientConnect: Boolean get() = Config.roundLogs.lenientConnect
-    override val radiusLarge: Double get() = Config.roundLogs.radiusLarge
-    override val radiusSmall: Double get() = Config.roundLogs.radiusSmall
-
+    override val defaultToY: Boolean get() = Config.roundLogs.defaultY
 }
 
 @SideOnly(Side.CLIENT)

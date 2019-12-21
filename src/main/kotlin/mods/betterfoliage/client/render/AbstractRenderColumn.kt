@@ -1,11 +1,14 @@
 package mods.betterfoliage.client.render
 
 import mods.betterfoliage.client.Client
+import mods.betterfoliage.client.chunk.ChunkOverlayLayer
+import mods.betterfoliage.client.chunk.ChunkOverlayManager
 import mods.betterfoliage.client.config.Config
-import mods.betterfoliage.client.integration.OptifineCTM
 import mods.betterfoliage.client.integration.ShadersModIntegration
-import mods.betterfoliage.client.render.AbstractRenderColumn.BlockType.*
-import mods.betterfoliage.client.render.AbstractRenderColumn.QuadrantType.*
+import mods.betterfoliage.client.integration.ShadersModIntegration.renderAs
+import mods.betterfoliage.client.render.ColumnLayerData.SpecialRender.BlockType.*
+import mods.betterfoliage.client.render.ColumnLayerData.SpecialRender.QuadrantType
+import mods.betterfoliage.client.render.ColumnLayerData.SpecialRender.QuadrantType.*
 import mods.octarinecore.client.render.*
 import mods.octarinecore.common.*
 import net.minecraft.block.state.IBlockState
@@ -14,6 +17,8 @@ import net.minecraft.client.renderer.BufferBuilder
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.util.BlockRenderLayer
 import net.minecraft.util.EnumFacing.*
+import net.minecraft.util.math.BlockPos
+import net.minecraft.world.IBlockAccess
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
 
@@ -23,6 +28,41 @@ interface IColumnTextureInfo {
     val top: QuadIconResolver
     val bottom: QuadIconResolver
     val side: QuadIconResolver
+}
+
+/**
+ * Sealed class hierarchy for all possible render outcomes
+ */
+@SideOnly(Side.CLIENT)
+sealed class ColumnLayerData {
+    /**
+     * Data structure to cache texture and world neighborhood data relevant to column rendering
+     */
+    @Suppress("ArrayInDataClass") // not used in comparisons anywhere
+    @SideOnly(Side.CLIENT)
+    data class SpecialRender(
+        val column: IColumnTextureInfo,
+        val upType: BlockType,
+        val downType: BlockType,
+        val quadrants: Array<QuadrantType>,
+        val quadrantsTop: Array<QuadrantType>,
+        val quadrantsBottom: Array<QuadrantType>
+    ) : ColumnLayerData() {
+        enum class BlockType { SOLID, NONSOLID, PARALLEL, PERPENDICULAR }
+        enum class QuadrantType { SMALL_RADIUS, LARGE_RADIUS, SQUARE, INVISIBLE }
+    }
+
+    /** Column block should not be rendered at all */
+    @SideOnly(Side.CLIENT)
+    object SkipRender : ColumnLayerData()
+
+    /** Column block must be rendered normally */
+    @SideOnly(Side.CLIENT)
+    object NormalRender : ColumnLayerData()
+
+    /** Error while resolving render data, column block must be rendered normally */
+    @SideOnly(Side.CLIENT)
+    object ResolveError : ColumnLayerData()
 }
 
 @SideOnly(Side.CLIENT)
@@ -60,21 +100,16 @@ const val SW = 3
 @Suppress("NOTHING_TO_INLINE")
 abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandler(modId) {
 
-    enum class BlockType { SOLID, NONSOLID, PARALLEL, PERPENDICULAR }
-    enum class QuadrantType { SMALL_RADIUS, LARGE_RADIUS, SQUARE, INVISIBLE }
-
     /** The rotations necessary to bring the models in position for the 4 quadrants */
     val quadrantRotations = Array(4) { Rotation.rot90[UP.ordinal] * it }
 
     // ============================
     // Configuration
     // ============================
+    abstract val overlayLayer: ColumnRenderLayer
+    abstract val connectPerpendicular: Boolean
     abstract val radiusSmall: Double
     abstract val radiusLarge: Double
-    abstract val surroundPredicate: (IBlockState) -> Boolean
-    abstract val connectPerpendicular: Boolean
-    abstract val connectSolids: Boolean
-    abstract val lenientConnect: Boolean
 
     // ============================
     // Models
@@ -133,54 +168,45 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
     inline fun continuous(q1: QuadrantType, q2: QuadrantType) =
         q1 == q2 || ((q1 == SQUARE || q1 == INVISIBLE) && (q2 == SQUARE || q2 == INVISIBLE))
 
-    abstract val blockPredicate: (IBlockState)->Boolean
-
-    abstract val registry: IColumnRegistry
-
     @Suppress("NON_EXHAUSTIVE_WHEN")
     override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: BufferBuilder, layer: BlockRenderLayer): Boolean {
-        if (ctx.isSurroundedBy(surroundPredicate) ) return false
 
-        val columnTextures = registry[ctx.blockState(Int3.zero), ctx.random(0)]
-        if (columnTextures == null) {
-            Client.logRenderError(ctx.blockState(Int3.zero), ctx.pos)
+        val roundLog = ChunkOverlayManager.get(overlayLayer, ctx.world!!, ctx.pos)
+        when(roundLog) {
+            ColumnLayerData.SkipRender -> return true
+            ColumnLayerData.NormalRender -> return renderWorldBlockBase(ctx, dispatcher, renderer, null)
+            ColumnLayerData.ResolveError, null -> {
+                Client.logRenderError(ctx.blockState(Int3.zero), ctx.pos)
+                return renderWorldBlockBase(ctx, dispatcher, renderer, null)
+            }
+        }
+
+        // if log axis is not defined and "Default to vertical" config option is not set, render normally
+        if ((roundLog as ColumnLayerData.SpecialRender).column.axis == null && !overlayLayer.defaultToY) {
             return renderWorldBlockBase(ctx, dispatcher, renderer, null)
         }
 
         // get AO data
         modelRenderer.updateShading(Int3.zero, allFaces)
 
-        // check log neighborhood
-        // if log axis is not defined and "Default to vertical" config option is not set, render normally
-        val logAxis = columnTextures.axis ?: if (Config.roundLogs.defaultY) Axis.Y else return renderWorldBlockBase(ctx, dispatcher, renderer, null)
-        val baseRotation = rotationFromUp[(logAxis to AxisDirection.POSITIVE).face.ordinal]
-
-        val upType = ctx.blockType(baseRotation, logAxis, Int3(0, 1, 0))
-        val downType = ctx.blockType(baseRotation, logAxis, Int3(0, -1, 0))
-
-        val quadrants = Array(4) { SMALL_RADIUS }.checkNeighbors(ctx, baseRotation, logAxis, 0)
-        val quadrantsTop = Array(4) { SMALL_RADIUS }
-        if (upType == PARALLEL) quadrantsTop.checkNeighbors(ctx, baseRotation, logAxis, 1)
-        val quadrantsBottom = Array(4) { SMALL_RADIUS }
-        if (downType == PARALLEL) quadrantsBottom.checkNeighbors(ctx, baseRotation, logAxis, -1)
-
-        ShadersModIntegration.renderAs(ctx.blockState(Int3.zero), renderer) {
+        val baseRotation = rotationFromUp[((roundLog.column.axis ?: Axis.Y) to AxisDirection.POSITIVE).face.ordinal]
+        renderAs(ctx.blockState(Int3.zero), renderer) {
             quadrantRotations.forEachIndexed { idx, quadrantRotation ->
                 // set rotation for the current quadrant
                 val rotation = baseRotation + quadrantRotation
 
                 // disallow sharp discontinuities in the chamfer radius, or tapering-in where inappropriate
-                if (quadrants[idx] == LARGE_RADIUS &&
-                    upType == PARALLEL && quadrantsTop[idx] != LARGE_RADIUS &&
-                    downType == PARALLEL && quadrantsBottom[idx] != LARGE_RADIUS) {
-                    quadrants[idx] = SMALL_RADIUS
+                if (roundLog.quadrants[idx] == LARGE_RADIUS &&
+                    roundLog.upType == PARALLEL && roundLog.quadrantsTop[idx] != LARGE_RADIUS &&
+                    roundLog.downType == PARALLEL && roundLog.quadrantsBottom[idx] != LARGE_RADIUS) {
+                    roundLog.quadrants[idx] = SMALL_RADIUS
                 }
 
                 // render side of current quadrant
-                val sideModel = when (quadrants[idx]) {
+                val sideModel = when (roundLog.quadrants[idx]) {
                     SMALL_RADIUS -> sideRoundSmall.model
-                    LARGE_RADIUS -> if (upType == PARALLEL && quadrantsTop[idx] == SMALL_RADIUS) transitionTop.model
-                    else if (downType == PARALLEL && quadrantsBottom[idx] == SMALL_RADIUS) transitionBottom.model
+                    LARGE_RADIUS -> if (roundLog.upType == PARALLEL && roundLog.quadrantsTop[idx] == SMALL_RADIUS) transitionTop.model
+                    else if (roundLog.downType == PARALLEL && roundLog.quadrantsBottom[idx] == SMALL_RADIUS) transitionBottom.model
                     else sideRoundLarge.model
                     SQUARE -> sideSquare.model
                     else -> null
@@ -190,51 +216,51 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
                     renderer,
                     sideModel,
                     rotation,
-                    icon = columnTextures.side,
+                    icon = roundLog.column.side,
                     postProcess = noPost
                 )
 
                 // render top and bottom end of current quadrant
                 var upModel: Model? = null
                 var downModel: Model? = null
-                var upIcon = columnTextures.top
-                var downIcon = columnTextures.bottom
+                var upIcon = roundLog.column.top
+                var downIcon = roundLog.column.bottom
                 var isLidUp = true
                 var isLidDown = true
 
-                when (upType) {
-                    NONSOLID -> upModel = flatTop(quadrants[idx])
+                when (roundLog.upType) {
+                    NONSOLID -> upModel = flatTop(roundLog.quadrants[idx])
                     PERPENDICULAR -> {
                         if (!connectPerpendicular) {
-                            upModel = flatTop(quadrants[idx])
+                            upModel = flatTop(roundLog.quadrants[idx])
                         } else {
-                            upIcon = columnTextures.side
-                            upModel = extendTop(quadrants[idx])
+                            upIcon = roundLog.column.side
+                            upModel = extendTop(roundLog.quadrants[idx])
                             isLidUp = false
                         }
                     }
                     PARALLEL -> {
-                        if (!continuous(quadrants[idx], quadrantsTop[idx])) {
-                            if (quadrants[idx] == SQUARE || quadrants[idx] == INVISIBLE) {
+                        if (!continuous(roundLog.quadrants[idx], roundLog.quadrantsTop[idx])) {
+                            if (roundLog.quadrants[idx] == SQUARE || roundLog.quadrants[idx] == INVISIBLE) {
                                 upModel = topSquare.model
                             }
                         }
                     }
                 }
-                when (downType) {
-                    NONSOLID -> downModel = flatBottom(quadrants[idx])
+                when (roundLog.downType) {
+                    NONSOLID -> downModel = flatBottom(roundLog.quadrants[idx])
                     PERPENDICULAR -> {
                         if (!connectPerpendicular) {
-                            downModel = flatBottom(quadrants[idx])
+                            downModel = flatBottom(roundLog.quadrants[idx])
                         } else {
-                            downIcon = columnTextures.side
-                            downModel = extendBottom(quadrants[idx])
+                            downIcon = roundLog.column.side
+                            downModel = extendBottom(roundLog.quadrants[idx])
                             isLidDown = false
                         }
                     }
                     PARALLEL -> {
-                        if (!continuous(quadrants[idx], quadrantsBottom[idx]) &&
-                            (quadrants[idx] == SQUARE || quadrants[idx] == INVISIBLE)) {
+                        if (!continuous(roundLog.quadrants[idx], roundLog.quadrantsBottom[idx]) &&
+                            (roundLog.quadrants[idx] == SQUARE || roundLog.quadrants[idx] == INVISIBLE)) {
                             downModel = bottomSquare.model
                         }
                     }
@@ -247,7 +273,7 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
                     icon = upIcon,
                     postProcess = { _, _, _, _, _ ->
                         if (isLidUp) {
-                            rotateUV(idx + if (logAxis == Axis.X) 1 else 0)
+                            rotateUV(idx + if (roundLog.column.axis == Axis.X) 1 else 0)
                         }
                     }
                 )
@@ -258,13 +284,52 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
                     icon = downIcon,
                     postProcess = { _, _, _, _, _ ->
                         if (isLidDown) {
-                            rotateUV((if (logAxis == Axis.X) 0 else 3) - idx)
+                            rotateUV((if (roundLog.column.axis == Axis.X) 0 else 3) - idx)
                         }
                     }
                 )
             }
         }
         return true
+    }
+}
+
+abstract class ColumnRenderLayer : ChunkOverlayLayer<ColumnLayerData> {
+
+    abstract val registry: IColumnRegistry
+    abstract val blockPredicate: (IBlockState)->Boolean
+    abstract val surroundPredicate: (IBlockState) -> Boolean
+    abstract val connectSolids: Boolean
+    abstract val lenientConnect: Boolean
+    abstract val defaultToY: Boolean
+
+    val allNeighborOffsets = (-1..1).flatMap { offsetX -> (-1..1).flatMap { offsetY -> (-1..1).map { offsetZ -> Int3(offsetX, offsetY, offsetZ) }}}
+
+    override fun onBlockUpdate(world: IBlockAccess, pos: BlockPos) {
+        allNeighborOffsets.forEach { offset -> ChunkOverlayManager.clear(this, pos + offset) }
+    }
+
+    override fun calculate(world: IBlockAccess, pos: BlockPos) = calculate(BlockContext(world, pos))
+
+    fun calculate(ctx: BlockContext): ColumnLayerData {
+        if (ctx.isSurroundedBy(surroundPredicate)) return ColumnLayerData.SkipRender
+        val columnTextures = registry[ctx.blockState(Int3.zero), ctx.random(0)] ?: return ColumnLayerData.ResolveError
+
+        // if log axis is not defined and "Default to vertical" config option is not set, render normally
+        val logAxis = columnTextures.axis ?: if (defaultToY) Axis.Y else return ColumnLayerData.NormalRender
+
+        // check log neighborhood
+        val baseRotation = rotationFromUp[(logAxis to AxisDirection.POSITIVE).face.ordinal]
+
+        val upType = ctx.blockType(baseRotation, logAxis, Int3(0, 1, 0))
+        val downType = ctx.blockType(baseRotation, logAxis, Int3(0, -1, 0))
+
+        val quadrants = Array(4) { SMALL_RADIUS }.checkNeighbors(ctx, baseRotation, logAxis, 0)
+        val quadrantsTop = Array(4) { SMALL_RADIUS }
+        if (upType == PARALLEL) quadrantsTop.checkNeighbors(ctx, baseRotation, logAxis, 1)
+        val quadrantsBottom = Array(4) { SMALL_RADIUS }
+        if (downType == PARALLEL) quadrantsBottom.checkNeighbors(ctx, baseRotation, logAxis, -1)
+        return ColumnLayerData.SpecialRender(columnTextures, upType, downType, quadrants, quadrantsTop, quadrantsBottom)
     }
 
     /** Sets the type of the given quadrant only if the new value is "stronger" (larger ordinal). */
@@ -340,7 +405,7 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
     /**
      * Get the type of the block at the given offset in a rotated reference frame.
      */
-    fun BlockContext.blockType(rotation: Rotation, axis: Axis, offset: Int3): BlockType {
+    fun BlockContext.blockType(rotation: Rotation, axis: Axis, offset: Int3): ColumnLayerData.SpecialRender.BlockType {
         val offsetRot = offset.rotate(rotation)
         val state = blockState(offsetRot)
         return if (!blockPredicate(state)) {
@@ -352,3 +417,4 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
         }
     }
 }
+

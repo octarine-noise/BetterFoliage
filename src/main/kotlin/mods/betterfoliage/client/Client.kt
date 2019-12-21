@@ -1,6 +1,7 @@
 package mods.betterfoliage.client
 
 import mods.betterfoliage.BetterFoliageMod
+import mods.betterfoliage.client.chunk.ChunkOverlayManager
 import mods.betterfoliage.client.gui.ConfigGuiFactory
 import mods.betterfoliage.client.integration.*
 import mods.betterfoliage.client.render.*
@@ -66,6 +67,7 @@ object Client {
 
         // init singletons
         val singletons = listOf(
+            ChunkOverlayManager,
             LeafRegistry,
             GrassRegistry,
             LeafWindTracker,

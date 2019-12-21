@@ -71,10 +71,10 @@ data class BlockData(val state: IBlockState, val color: Int, val brightness: Int
  * Represents the block being rendered. Has properties and methods to query the neighborhood of the block in
  * block-relative coordinates.
  */
-class BlockContext {
-    var world: IBlockAccess? = null
-    var pos = BlockPos.ORIGIN
-
+class BlockContext(
+    var world: IBlockAccess? = null,
+    var pos: BlockPos = BlockPos.ORIGIN
+) {
     fun set(world: IBlockAccess, pos: BlockPos) { this.world = world; this.pos = pos; }
 
     val block: Block get() = block(Int3.zero)

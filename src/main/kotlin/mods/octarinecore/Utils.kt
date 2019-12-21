@@ -2,6 +2,7 @@
 @file:Suppress("NOTHING_TO_INLINE")
 package mods.octarinecore
 
+import mods.betterfoliage.loader.Refs
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.ResourceLocation
 import net.minecraft.util.math.BlockPos
@@ -101,11 +102,12 @@ fun nextPowerOf2(x: Int): Int {
 
 /**
  * Check if the Chunk containing the given [BlockPos] is loaded.
- * Works for both [World] and [ChunkCache] instances.
+ * Works for both [World] and [ChunkCache] (vanilla and OptiFine) instances.
  */
-fun IBlockAccess.isBlockLoaded(pos: BlockPos) = when(this) {
-    is World -> isBlockLoaded(pos, false)
-    is ChunkCache -> world.isBlockLoaded(pos, false)
+fun IBlockAccess.isBlockLoaded(pos: BlockPos) = when {
+    this is World -> isBlockLoaded(pos, false)
+    this is ChunkCache -> world.isBlockLoaded(pos, false)
+    Refs.OptifineChunkCache.isInstance(this) -> (Refs.CCOFChunkCache.get(this) as ChunkCache).world.isBlockLoaded(pos, false)
     else -> false
 }
 
@@ -113,6 +115,6 @@ fun IBlockAccess.isBlockLoaded(pos: BlockPos) = when(this) {
  * Get the [TileEntity] at the given position, suppressing exceptions.
  * Also returns null if the chunk is unloaded, which can happen because of multithreaded rendering.
  */
-fun IBlockAccess.getTileEntitySafe(pos: BlockPos): TileEntity? = tryDefault(null) {
+fun IBlockAccess.getTileEntitySafe(pos: BlockPos): TileEntity? = tryDefault(null as TileEntity?) {
     if (isBlockLoaded(pos)) getTileEntity(pos) else null
 }
