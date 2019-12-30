@@ -2,13 +2,9 @@ package mods.betterfoliage.client.integration
 
 import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.Client
-import mods.betterfoliage.client.config.Config
-import mods.betterfoliage.client.render.IColumnRegistry
-import mods.betterfoliage.client.render.IColumnTextureInfo
 import mods.betterfoliage.client.render.LogRegistry
-import mods.betterfoliage.client.render.StaticColumnInfo
-import mods.betterfoliage.client.texture.StandardLeafSupport
-import mods.betterfoliage.loader.Refs
+import mods.betterfoliage.client.render.column.ColumnTextureInfo
+import mods.betterfoliage.client.render.column.SimpleColumnInfo
 import mods.octarinecore.client.render.Quad
 import mods.octarinecore.client.render.QuadIconResolver
 import mods.octarinecore.client.render.ShadingContext
@@ -16,7 +12,6 @@ import mods.octarinecore.client.render.blockContext
 import mods.octarinecore.client.resource.*
 import mods.octarinecore.common.rotate
 import mods.octarinecore.metaprog.ClassRef
-import mods.octarinecore.metaprog.MethodRef
 import mods.octarinecore.metaprog.allAvailable
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.renderer.block.model.ModelResourceLocation
@@ -25,7 +20,6 @@ import net.minecraft.client.renderer.texture.TextureMap
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.model.IModel
-import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.Loader
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
@@ -33,91 +27,68 @@ import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.Logger
 
 @SideOnly(Side.CLIENT)
-object IC2Integration {
+object IC2RubberIntegration {
 
     val BlockRubWood = ClassRef("ic2.core.block.BlockRubWood")
 
     init {
         if (Loader.isModLoaded("ic2") && allAvailable(BlockRubWood)) {
-            Client.log(Level.INFO, "IC2 support initialized")
-            LogRegistry.subRegistries.add(IC2LogSupport)
+            Client.log(Level.INFO, "IC2 rubber support initialized")
+            LogRegistry.addRegistry(IC2LogSupport)
         }
     }
 }
 
 @SideOnly(Side.CLIENT)
-object TechRebornIntegration {
+object TechRebornRubberIntegration {
 
     val BlockRubberLog = ClassRef("techreborn.blocks.BlockRubberLog")
 
     init {
         if (Loader.isModLoaded("techreborn") && allAvailable(BlockRubberLog)) {
-            Client.log(Level.INFO, "TechReborn support initialized")
-            LogRegistry.subRegistries.add(TechRebornLogSupport)
+            Client.log(Level.INFO, "TechReborn rubber support initialized")
+            LogRegistry.addRegistry(TechRebornLogSupport)
         }
     }
 }
 
-@SideOnly(Side.CLIENT)
-data class RubberLogModelInfo(
-    val axis: EnumFacing.Axis?,
-    val spotDir: EnumFacing?,
-    val textures: List<String>
-)
+class RubberLogInfo(
+    axis: EnumFacing.Axis?,
+    val spotDir: EnumFacing,
+    topTexture: TextureAtlasSprite,
+    bottomTexture: TextureAtlasSprite,
+    val spotTexture: TextureAtlasSprite,
+    sideTextures: List<TextureAtlasSprite>
+) : SimpleColumnInfo(axis, topTexture, bottomTexture, sideTextures) {
 
-// TODO avoid copy-paste pattern with regards to StaticColumnInfo
-@SideOnly(Side.CLIENT)
-data class RubberLogColumnInfo(override val axis: EnumFacing.Axis?,
-                               val spotDir: EnumFacing,
-                               val topTexture: TextureAtlasSprite,
-                               val bottomTexture: TextureAtlasSprite,
-                               val sideTexture: TextureAtlasSprite,
-                               val spotTexture: TextureAtlasSprite): IColumnTextureInfo {
-    override val top: QuadIconResolver = { _, _, _ -> topTexture }
-    override val bottom: QuadIconResolver = { _, _, _ -> bottomTexture }
     override val side: QuadIconResolver = { ctx: ShadingContext, idx: Int, quad: Quad ->
-        val worldRelativeSide = (if ((idx and 1) == 0) EnumFacing.SOUTH else EnumFacing.EAST).rotate(ctx.rotation)
-        if (worldRelativeSide == spotDir) spotTexture else sideTexture
+        val worldFace = (if ((idx and 1) == 0) EnumFacing.SOUTH else EnumFacing.EAST).rotate(ctx.rotation)
+        if (worldFace == spotDir) spotTexture else {
+            val sideIdx = if (this.sideTextures.size > 1) (blockContext.random(1) + dirToIdx[worldFace.ordinal]) % this.sideTextures.size else 0
+            this.sideTextures[sideIdx]
+        }
+    }
+
+    class Key(override val logger: Logger, val axis: EnumFacing.Axis?, val spotDir: EnumFacing, val textures: List<String>): ModelRenderKey<ColumnTextureInfo> {
+        override fun resolveSprites(atlas: TextureMap) = RubberLogInfo(
+            axis,
+            spotDir,
+            atlas[textures[0]] ?: atlas.missingSprite,
+            atlas[textures[1]] ?: atlas.missingSprite,
+            atlas[textures[2]] ?: atlas.missingSprite,
+            textures.drop(3).map { atlas[it] ?: atlas.missingSprite }
+        )
     }
 }
 
-@SideOnly(Side.CLIENT)
-abstract class RubberLogSupportBase : ModelProcessor<RubberLogModelInfo, IColumnTextureInfo>, IColumnRegistry {
-
-    override var variants = mutableMapOf<IBlockState, MutableList<ModelVariant>>()
-    override var variantToKey = mutableMapOf<ModelVariant, RubberLogModelInfo>()
-    override var variantToValue = mapOf<ModelVariant, IColumnTextureInfo>()
-
+object IC2LogSupport : ModelRenderRegistryBase<ColumnTextureInfo>() {
     override val logger = BetterFoliageMod.logDetail
 
-    init { MinecraftForge.EVENT_BUS.register(this) }
-
-    override fun processStitch(variant: ModelVariant, key: RubberLogModelInfo, atlas: TextureMap): IColumnTextureInfo? {
-        val topTex = atlas.registerSprite(key.textures[0])
-        val bottomTex = atlas.registerSprite(key.textures[1])
-        val sideTex = atlas.registerSprite(key.textures[2])
-        if (key.spotDir == null)
-            return StaticColumnInfo(key.axis, topTex, bottomTex, listOf(sideTex))
-        else {
-            val spotTex = atlas.registerSprite(key.textures[3])
-            return RubberLogColumnInfo(key.axis, key.spotDir, topTex, bottomTex, sideTex, spotTex)
-        }
-    }
-
-    override fun get(state: IBlockState, rand: Int): IColumnTextureInfo? {
-        val variant = getVariant(state, rand) ?: return null
-        return variantToValue[variant]
-    }
-}
-
-@SideOnly(Side.CLIENT)
-object IC2LogSupport : RubberLogSupportBase() {
-
-    override fun processModelLoad(state: IBlockState, modelLoc: ModelResourceLocation, model: IModel) {
+    override fun processModel(state: IBlockState, modelLoc: ModelResourceLocation, model: IModel): ModelRenderKey<ColumnTextureInfo>? {
         // check for proper block class, existence of ModelBlock, and "state" blockstate property
-        if (!IC2Integration.BlockRubWood.isInstance(state.block)) return
-        val blockLoc = model.modelBlockAndLoc.firstOrNull() ?: return
-        val type = state.properties.entries.find { it.key.getName() == "state" }?.value?.toString() ?: return
+        if (!IC2RubberIntegration.BlockRubWood.isInstance(state.block)) return null
+        val blockLoc = model.modelBlockAndLoc.firstOrNull() ?: return null
+        val type = state.properties.entries.find { it.key.getName() == "state" }?.value?.toString() ?: return null
 
         // logs with no rubber spot
         if (blockLoc.derivesFrom(ResourceLocation("block/cube_column"))) {
@@ -128,12 +99,10 @@ object IC2LogSupport : RubberLogSupportBase() {
                 else -> null
             }
             val textureNames = listOf("end", "end", "side").map { blockLoc.first.resolveTextureName(it) }
+            if (textureNames.any { it == "missingno" }) return null
             logger.log(Level.DEBUG, "IC2LogSupport: block state ${state.toString()}")
             logger.log(Level.DEBUG, "IC2LogSupport:             axis=$axis, end=${textureNames[0]}, side=${textureNames[2]}")
-            if (textureNames.all { it != "missingno" }) {
-                putKeySingle(state, RubberLogModelInfo(axis, null, textureNames))
-            }
-            return
+            return SimpleColumnInfo.Key(logger, axis, textureNames)
         }
 
         // logs with rubber spot
@@ -144,39 +113,35 @@ object IC2LogSupport : RubberLogSupportBase() {
             "dry_east", "wet_east" -> EnumFacing.EAST
             else -> null
         }
-        val textureNames = listOf("up", "down", "south", "north").map { blockLoc.first.resolveTextureName(it) }
+        val textureNames = listOf("up", "down", "north", "south").map { blockLoc.first.resolveTextureName(it) }
+        if (textureNames.any { it == "missingno" }) return null
         logger.log(Level.DEBUG, "IC2LogSupport: block state ${state.toString()}")
         logger.log(Level.DEBUG, "IC2LogSupport:             spotDir=$spotDir, up=${textureNames[0]}, down=${textureNames[1]}, side=${textureNames[2]}, spot=${textureNames[3]}")
-        if (textureNames.all { it != "missingno" }) {
-            putKeySingle(state, RubberLogModelInfo(EnumFacing.Axis.Y, spotDir, textureNames))
-        }
+        return if (spotDir != null) RubberLogInfo.Key(logger, EnumFacing.Axis.Y, spotDir, textureNames) else SimpleColumnInfo.Key(logger, EnumFacing.Axis.Y, textureNames)
     }
 }
 
-@SideOnly(Side.CLIENT)
-object TechRebornLogSupport : RubberLogSupportBase() {
+object TechRebornLogSupport : ModelRenderRegistryBase<ColumnTextureInfo>() {
+    override val logger = BetterFoliageMod.logDetail
 
-    override fun processModelLoad(state: IBlockState, modelLoc: ModelResourceLocation, model: IModel) {
+    override fun processModel(state: IBlockState, modelLoc: ModelResourceLocation, model: IModel): ModelRenderKey<ColumnTextureInfo>? {
         // check for proper block class, existence of ModelBlock
-        if (!TechRebornIntegration.BlockRubberLog.isInstance(state.block)) return
-        val blockLoc = model.modelBlockAndLoc.firstOrNull() ?: return
+        if (!TechRebornRubberIntegration.BlockRubberLog.isInstance(state.block)) return null
+        val blockLoc = model.modelBlockAndLoc.firstOrNull() ?: return null
 
-        val hasSap = state.properties.entries.find { it.key.getName() == "hassap" }?.value as? Boolean ?: return
-        val sapSide = state.properties.entries.find { it.key.getName() == "sapside" }?.value as? EnumFacing ?: return
+        val hasSap = state.properties.entries.find { it.key.getName() == "hassap" }?.value as? Boolean ?: return null
+        val sapSide = state.properties.entries.find { it.key.getName() == "sapside" }?.value as? EnumFacing ?: return null
 
-        val textureNames = listOf("end", "end", "side", "sapside").map { blockLoc.first.resolveTextureName(it) }
-
-        logger.log(Level.DEBUG, "TechRebornLogSupport: block state ${state.toString()}")
+        logger.log(Level.DEBUG, "$logName: block state $state")
         if (hasSap) {
-            logger.log(Level.DEBUG, "TechRebornLogSupport:             spotDir=$sapSide, end=${textureNames[0]}, side=${textureNames[2]}, spot=${textureNames[3]}")
-            if (textureNames.all { it != "missingno" }) {
-                putKeySingle(state, RubberLogModelInfo(EnumFacing.Axis.Y, sapSide, textureNames))
-            }
+            val textureNames = listOf("end", "end", "sapside", "side").map { blockLoc.first.resolveTextureName(it) }
+            logger.log(Level.DEBUG, "$logName:             spotDir=$sapSide, end=${textureNames[0]}, side=${textureNames[2]}, spot=${textureNames[3]}")
+            if (textureNames.all { it != "missingno" }) return RubberLogInfo.Key(logger, EnumFacing.Axis.Y, sapSide, textureNames)
         } else {
-            logger.log(Level.DEBUG, "TechRebornLogSupport:             end=${textureNames[0]}, side=${textureNames[2]}")
-            if (textureNames.all { it != "missingno" }) {
-                putKeySingle(state, RubberLogModelInfo(EnumFacing.Axis.Y, null, textureNames))
-            }
+            val textureNames = listOf("end", "end", "side").map { blockLoc.first.resolveTextureName(it) }
+            logger.log(Level.DEBUG, "$logName:             end=${textureNames[0]}, side=${textureNames[2]}")
+            if (textureNames.all { it != "missingno" })return SimpleColumnInfo.Key(logger, EnumFacing.Axis.Y, textureNames)
         }
+        return null
     }
 }

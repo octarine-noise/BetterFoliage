@@ -1,6 +1,7 @@
 package mods.betterfoliage.client.render
 
 import mods.betterfoliage.client.config.Config
+import mods.betterfoliage.client.texture.LeafParticleRegistry
 import mods.betterfoliage.client.texture.LeafRegistry
 import mods.octarinecore.PI2
 import mods.octarinecore.client.render.AbstractEntityFX
@@ -8,10 +9,8 @@ import mods.octarinecore.client.render.HSB
 import mods.octarinecore.common.Double3
 import mods.octarinecore.minmax
 import mods.octarinecore.random
-import mods.octarinecore.semiRandom
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.BufferBuilder
-import net.minecraft.util.EnumFacing.DOWN
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.MathHelper
 import net.minecraft.world.World
@@ -45,12 +44,12 @@ AbstractEntityFX(world, pos.x.toDouble() + 0.5, pos.y.toDouble(), pos.z.toDouble
 
         val state = world.getBlockState(pos)
         val blockColor = Minecraft.getMinecraft().blockColors.colorMultiplier(state, world, pos, 0)
-        val leafInfo = LeafRegistry.get(state, world, pos, DOWN, semiRandom(pos.x, pos.y, pos.z, 0))
+        val leafInfo = LeafRegistry[state, world, pos]
         if (leafInfo != null) {
-            particleTexture = leafInfo.particleTextures?.get(rand.nextInt(1024))
+            particleTexture = leafInfo.particleTextures[rand.nextInt(1024)]
             calculateParticleColor(leafInfo.averageColor, blockColor)
         } else {
-            particleTexture = LeafRegistry.particles["default"]?.get(rand.nextInt(1024))
+            particleTexture = LeafParticleRegistry["default"][rand.nextInt(1024)]
             setColor(blockColor)
         }
     }

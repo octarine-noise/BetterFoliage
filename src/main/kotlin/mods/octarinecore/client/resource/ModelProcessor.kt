@@ -1,10 +1,14 @@
 package mods.octarinecore.client.resource
 
 import com.google.common.base.Joiner
+import mods.betterfoliage.client.Client
 import mods.betterfoliage.loader.Refs
+import mods.octarinecore.client.render.BlockContext
+import mods.octarinecore.common.Int3
 import mods.octarinecore.common.config.IBlockMatcher
 import mods.octarinecore.common.config.ModelTextureList
 import mods.octarinecore.filterValuesNotNull
+import mods.octarinecore.findFirst
 import net.minecraft.block.Block
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.renderer.block.model.ModelResourceLocation
@@ -13,9 +17,12 @@ import net.minecraft.client.renderer.block.statemap.IStateMapper
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.client.renderer.texture.TextureMap
 import net.minecraft.util.ResourceLocation
+import net.minecraft.util.math.BlockPos
+import net.minecraft.world.IBlockAccess
 import net.minecraftforge.client.event.TextureStitchEvent
 import net.minecraftforge.client.model.IModel
 import net.minecraftforge.client.model.ModelLoader
+import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.eventhandler.Event
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -24,41 +31,43 @@ import org.apache.logging.log4j.Logger
 
 class LoadModelDataEvent(val loader: ModelLoader) : Event()
 
-data class ModelVariant(
-    val state: IBlockState,
-    val modelLocation: ResourceLocation?,
-    val weight: Int
-)
+interface ModelRenderRegistry<T> {
+    operator fun get(ctx: BlockContext) = get(ctx.blockState(Int3.zero), ctx.world!!, ctx.pos)
+    operator fun get(state: IBlockState, world: IBlockAccess, pos: BlockPos): T?
+}
 
-interface ModelProcessor<T1, T2> {
+interface ModelRenderDataExtractor<T> {
+    fun processModel(state: IBlockState, modelLoc: ModelResourceLocation, model: IModel): ModelRenderKey<T>?
+}
+
+interface ModelRenderKey<T> {
     val logger: Logger?
-    var variants: MutableMap<IBlockState, MutableList<ModelVariant>>
-    var variantToKey: MutableMap<ModelVariant, T1>
-    var variantToValue: Map<ModelVariant, T2>
+    fun onPreStitch(atlas: TextureMap) {}
+    fun resolveSprites(atlas: TextureMap): T
+}
 
-    fun addVariant(state: IBlockState, variant: ModelVariant) { variants.getOrPut(state) { mutableListOf() }.add(variant) }
-    fun getVariant(state: IBlockState, rand: Int) = variants[state]?.let { it[rand % it.size] }
-    fun putKeySingle(state: IBlockState, key: T1) {
-        val variant = ModelVariant(state, null, 1)
-        variants[state] = mutableListOf(variant)
-        variantToKey[variant] = key
+abstract class ModelRenderRegistryRoot<T> : ModelRenderRegistry<T> {
+    val subRegistries = mutableListOf<ModelRenderRegistry<T>>()
+    override fun get(state: IBlockState, world: IBlockAccess, pos: BlockPos) = subRegistries.findFirst { it[state, world, pos] }
+    fun addRegistry(registry: ModelRenderRegistry<T>) {
+        subRegistries.add(registry)
+        MinecraftForge.EVENT_BUS.register(registry)
     }
+}
 
-    fun onPostLoad() { }
-    fun onPreStitch() { }
+abstract class ModelRenderRegistryBase<T> : ModelRenderRegistry<T>, ModelRenderDataExtractor<T> {
+    open val logger: Logger? = null
+    open val logName: String get() = this::class.java.name
 
-    fun processModelLoad(state: IBlockState, modelLoc: ModelResourceLocation, model: IModel)
-    fun processStitch(variant: ModelVariant, key: T1, atlas: TextureMap): T2?
+    val stateToKey = mutableMapOf<IBlockState, ModelRenderKey<T>>()
+    var stateToValue = mapOf<IBlockState, T>()
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun clearBeforeLoadModelData(event: LoadModelDataEvent) {
-        variants.clear()
-        variantToKey.clear()
-    }
+    override fun get(state: IBlockState, world: IBlockAccess, pos: BlockPos) = stateToValue[state]
 
+    @Suppress("UNCHECKED_CAST")
     @SubscribeEvent
     fun handleLoadModelData(event: LoadModelDataEvent) {
-        onPostLoad()
+        stateToValue = emptyMap()
 
         val stateMappings = Block.REGISTRY.flatMap { block ->
             val mapper = event.loader.blockModelShapes.blockStateMapper.blockStateMap[block] as? IStateMapper ?: DefaultStateMapper()
@@ -68,33 +77,41 @@ interface ModelProcessor<T1, T2> {
 
         stateMappings.forEach { mapping ->
             if (mapping.key.block != null) stateModels[mapping.value]?.let { model ->
-                processModelLoad(mapping.key, mapping.value, model)
+                try {
+                    processModel(mapping.key, mapping.value, model)?.let { stateToKey[mapping.key] = it }
+                } catch (e: Exception) {
+                    logger?.warn("Exception while trying to process model ${mapping.value}", e)
+                }
             }
         }
     }
 
-    @Suppress("UNCHECKED_CAST")
     @SubscribeEvent(priority = EventPriority.LOW)
     fun handlePreStitch(event: TextureStitchEvent.Pre) {
-        onPreStitch()
-        variantToValue = variantToKey.mapValues { processStitch(it.key, it.value, event.map) }.filterValuesNotNull()
+        stateToKey.forEach { (_, key) -> key.onPreStitch(event.map) }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOW)
+    fun handlePostStitch(event: TextureStitchEvent.Post) {
+        stateToValue = stateToKey.mapValues { (_, key) -> key.resolveSprites(event.map) }
+        stateToKey.clear()
     }
 }
 
-interface TextureListModelProcessor<T2> : ModelProcessor<List<String>, T2> {
-    val logName: String
-    val matchClasses: IBlockMatcher
-    val modelTextures: List<ModelTextureList>
+abstract class ModelRenderRegistryConfigurable<T> : ModelRenderRegistryBase<T>() {
 
-    override fun processModelLoad(state: IBlockState, modelLoc: ModelResourceLocation, model: IModel) {
-        val matchClass = matchClasses.matchingClass(state.block) ?: return
+    abstract val matchClasses: IBlockMatcher
+    abstract val modelTextures: List<ModelTextureList>
+
+    override fun processModel(state: IBlockState, modelLoc: ModelResourceLocation, model: IModel): ModelRenderKey<T>? {
+        val matchClass = matchClasses.matchingClass(state.block) ?: return null
         logger?.log(Level.DEBUG, "$logName: block state ${state.toString()}")
         logger?.log(Level.DEBUG, "$logName:       class ${state.block.javaClass.name} matches ${matchClass.name}")
 
         val allModels = model.modelBlockAndLoc.distinctBy { it.second }
         if (allModels.isEmpty()) {
             logger?.log(Level.DEBUG, "$logName:       no models found")
-            return
+            return null
         }
 
         allModels.forEach { blockLoc ->
@@ -107,53 +124,13 @@ interface TextureListModelProcessor<T2> : ModelProcessor<List<String>, T2> {
                 logger?.log(Level.DEBUG, "$logName:       textures [$texMapString]")
 
                 if (textures.all { it.second != "missingno" }) {
-                    // found a valid variant (all required textures exist)
-                    val variant = ModelVariant(state, blockLoc.second, 1)
-                    addVariant(state, variant)
-                    variantToKey[variant] = textures.map { it.second }
+                    // found a valid model (all required textures exist)
+                    return processModel(state, textures.map { it.second} )
                 }
             }
         }
+        return null
     }
 
-//    override fun processModelLoad(state: IBlockState, modelLoc: ModelResourceLocation, model: IModel): List<String>? {
-//        val matchClass = matchClasses.matchingClass(state.block) ?: return null
-//        logger?.log(Level.DEBUG, "$logName: block state ${state.toString()}")
-//        logger?.log(Level.DEBUG, "$logName:       class ${state.block.javaClass.name} matches ${matchClass.name}")
-//
-//        val allModels = model.modelBlockAndLoc
-//        if (allModels.isEmpty()) {
-//            logger?.log(Level.DEBUG, "$logName:       no models found")
-//            return null
-//        }
-//        allModels.forEach { blockLoc ->
-//            modelTextures.firstOrNull { blockLoc.derivesFrom(it.modelLocation) }?.let{ modelMatch ->
-//                logger?.log(Level.DEBUG, "$logName:       model ${blockLoc.second} matches ${modelMatch.modelLocation.toString()}")
-//
-//                val textures = modelMatch.textureNames.map { it to blockLoc.first.resolveTextureName(it) }
-//                val texMapString = Joiner.on(", ").join(textures.map { "${it.first}=${it.second}" })
-//                logger?.log(Level.DEBUG, "$logName:       textures [$texMapString]")
-//
-//                return if (textures.all { it.second != "missingno" }) textures.map { it.second } else null
-//            }
-//        }
-//        logger?.log(Level.DEBUG, "$logName:       no matching models found")
-//        return null
-//    }
-}
-
-interface TextureMediatedRegistry<T1, T3> : ModelProcessor<T1, TextureAtlasSprite> {
-
-    var textureToValue: MutableMap<TextureAtlasSprite, T3>
-
-    @Suppress("UNCHECKED_CAST")
-    override fun handlePreStitch(event: TextureStitchEvent.Pre) {
-        textureToValue.clear()
-        super.handlePreStitch(event)
-
-        val textureToVariants = variantToValue.entries.groupBy(keySelector = { it.value }, valueTransform = { it.key })
-        variantToValue.values.toSet().forEach { processTexture(textureToVariants[it]!!, it, event.map) }
-    }
-
-    fun processTexture(states: List<ModelVariant>, texture: TextureAtlasSprite, atlas: TextureMap)
+    abstract fun processModel(state: IBlockState, textures: List<String>) : ModelRenderKey<T>?
 }

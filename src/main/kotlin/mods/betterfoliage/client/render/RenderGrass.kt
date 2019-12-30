@@ -41,7 +41,7 @@ class RenderGrass : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
 
     val grassModels = modelSet(64, grassTopQuads(Config.shortGrass.heightMin, Config.shortGrass.heightMax))
 
-    override fun afterStitch() {
+    override fun afterPreStitch() {
         Client.log(INFO, "Registered ${normalIcons.num} grass textures")
         Client.log(INFO, "Registered ${snowedIcons.num} snowed grass textures")
     }
@@ -49,7 +49,7 @@ class RenderGrass : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
     override fun isEligible(ctx: BlockContext) =
         Config.enabled &&
         (Config.shortGrass.grassEnabled || Config.connectedGrass.enabled) &&
-        GrassRegistry[ctx, UP] != null
+        GrassRegistry[ctx] != null
 
     override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: BufferBuilder, layer: BlockRenderLayer): Boolean {
         // render the whole block on the cutout layer
@@ -62,8 +62,8 @@ class RenderGrass : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
         val isSnowed = ctx.blockState(up1).isSnow
         val connectedGrass = isConnected && Config.connectedGrass.enabled && (!isSnowed || Config.connectedGrass.snowEnabled)
 
-        val grassInfo = GrassRegistry[ctx, UP]
-        if (grassInfo == null) {
+        val grass = GrassRegistry[ctx]
+        if (grass == null) {
             // shouldn't happen
             Client.logRenderError(ctx.blockState(Int3.zero), ctx.pos)
             return renderWorldBlockBase(ctx, dispatcher, renderer, null)
@@ -83,12 +83,12 @@ class RenderGrass : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
                     renderer,
                     fullCube,
                     quadFilter = { qi, _ -> !isHidden[qi] },
-                    icon = { _, _, _ -> grassInfo.grassTopTexture },
+                    icon = { _, _, _ -> grass.grassTopTexture },
                     postProcess = { ctx, _, _, _, _ ->
                         rotateUV(2)
                         if (isSnowed) {
                             if (!ctx.aoEnabled) setGrey(1.4f)
-                        } else if (ctx.aoEnabled && grassInfo.overrideColor == null) multiplyColor(blockColor)
+                        } else if (ctx.aoEnabled && grass.overrideColor == null) multiplyColor(blockColor)
                     }
                 )
             }
@@ -116,7 +116,7 @@ class RenderGrass : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
                 Rotation.identity,
                 ctx.blockCenter + (if (isSnowed) snowOffset else Double3.zero),
                 icon = { _, qi, _ -> if (Config.shortGrass.useGenerated) iconGen.icon!! else iconset[rand[qi and 1]]!! },
-                postProcess = { _, _, _, _, _ -> if (isSnowed) setGrey(1.0f) else multiplyColor(grassInfo.overrideColor ?: blockColor) }
+                postProcess = { _, _, _, _, _ -> if (isSnowed) setGrey(1.0f) else multiplyColor(grass.overrideColor ?: blockColor) }
             )
         }
 

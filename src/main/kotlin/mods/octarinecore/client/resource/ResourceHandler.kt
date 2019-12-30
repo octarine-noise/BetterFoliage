@@ -20,7 +20,10 @@ import java.util.*
 // ============================
 // Resource types
 // ============================
-interface IStitchListener { fun onStitch(atlas: TextureMap) }
+interface IStitchListener {
+    fun onPreStitch(atlas: TextureMap)
+    fun onPostStitch(atlas: TextureMap)
+}
 interface IConfigChangeListener { fun onConfigChange() }
 interface IWorldLoadListener { fun onWorldLoad(world: World) }
 
@@ -34,7 +37,8 @@ interface IWorldLoadListener { fun onWorldLoad(world: World) }
 open class ResourceHandler(val modId: String) {
 
     val resources = mutableListOf<Any>()
-    open fun afterStitch() {}
+    open fun afterPreStitch() {}
+    open fun afterPostStitch() {}
 
     // ============================
     // Self-registration
@@ -46,7 +50,7 @@ open class ResourceHandler(val modId: String) {
     // ============================
     fun iconStatic(domain: String, path: String) = IconHolder(domain, path).apply { resources.add(this) }
     fun iconStatic(location: ResourceLocation) = iconStatic(location.namespace, location.path)
-    fun iconSet(domain: String, pathPattern: String) = IconSet(domain, pathPattern).apply { resources.add(this) }
+    fun iconSet(domain: String, pathPattern: String) = IconSet(domain, pathPattern).apply { this@ResourceHandler.resources.add(this) }
     fun iconSet(location: ResourceLocation) = iconSet(location.namespace, location.path)
     fun model(init: Model.()->Unit) = ModelHolder(init).apply { resources.add(this) }
     fun modelSet(num: Int, init: Model.(Int)->Unit) = ModelSet(num, init).apply { resources.add(this) }
@@ -57,9 +61,15 @@ open class ResourceHandler(val modId: String) {
     // Event registration
     // ============================
     @SubscribeEvent
-    fun onStitch(event: TextureStitchEvent.Pre) {
-        resources.forEach { (it as? IStitchListener)?.onStitch(event.map) }
-        afterStitch()
+    fun onPreStitch(event: TextureStitchEvent.Pre) {
+        resources.forEach { (it as? IStitchListener)?.onPreStitch(event.map) }
+        afterPreStitch()
+    }
+
+    @SubscribeEvent
+    fun onPostStitch(event: TextureStitchEvent.Post) {
+        resources.forEach { (it as? IStitchListener)?.onPostStitch(event.map) }
+        afterPostStitch()
     }
 
     @SubscribeEvent
@@ -76,8 +86,10 @@ open class ResourceHandler(val modId: String) {
 // Resource container classes
 // ============================
 class IconHolder(val domain: String, val name: String) : IStitchListener {
+    val iconRes = ResourceLocation(domain, name)
     var icon: TextureAtlasSprite? = null
-    override fun onStitch(atlas: TextureMap) { icon = atlas.registerSprite(ResourceLocation(domain, name)) }
+    override fun onPreStitch(atlas: TextureMap) { atlas.registerSprite(iconRes) }
+    override fun onPostStitch(atlas: TextureMap) { icon = atlas[iconRes] }
 }
 
 class ModelHolder(val init: Model.()->Unit): IConfigChangeListener {
@@ -86,16 +98,21 @@ class ModelHolder(val init: Model.()->Unit): IConfigChangeListener {
 }
 
 class IconSet(val domain: String, val namePattern: String) : IStitchListener {
+    val resources = arrayOfNulls<ResourceLocation>(16)
     val icons = arrayOfNulls<TextureAtlasSprite>(16)
     var num = 0
 
-    override fun onStitch(atlas: TextureMap) {
+    override fun onPreStitch(atlas: TextureMap) {
         num = 0
         (0..15).forEach { idx ->
             icons[idx] = null
             val locReal = ResourceLocation(domain, "textures/${namePattern.format(idx)}.png")
-            if (resourceManager[locReal] != null) icons[num++] = atlas.registerSprite(ResourceLocation(domain, namePattern.format(idx)))
+            if (resourceManager[locReal] != null) resources[num++] = ResourceLocation(domain, namePattern.format(idx)).apply { atlas.registerSprite(this) }
         }
+    }
+
+    override fun onPostStitch(atlas: TextureMap) {
+        (0 until num).forEach { idx -> icons[idx] = atlas[resources[idx]!!] }
     }
 
     operator fun get(idx: Int) = if (num == 0) null else icons[idx % num]

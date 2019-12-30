@@ -3,22 +3,20 @@ package mods.betterfoliage.client.render
 import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.chunk.ChunkOverlayManager
 import mods.betterfoliage.client.config.Config
+import mods.betterfoliage.client.render.column.AbstractRenderColumn
+import mods.betterfoliage.client.render.column.ColumnRenderLayer
+import mods.betterfoliage.client.render.column.ColumnTextureInfo
+import mods.betterfoliage.client.render.column.SimpleColumnInfo
 import mods.octarinecore.client.render.BlockContext
-import mods.octarinecore.client.resource.ModelVariant
-import mods.octarinecore.client.resource.TextureListModelProcessor
-import mods.octarinecore.client.resource.registerSprite
+import mods.octarinecore.client.resource.*
 import mods.octarinecore.common.config.ConfigurableBlockMatcher
 import mods.octarinecore.common.config.ModelTextureList
-import mods.octarinecore.findFirst
 import mods.octarinecore.tryDefault
 import net.minecraft.block.BlockLog
 import net.minecraft.block.state.IBlockState
-import net.minecraft.client.renderer.texture.TextureMap
 import net.minecraft.util.EnumFacing.Axis
-import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
-
 
 class RenderLog : AbstractRenderColumn(BetterFoliageMod.MOD_ID) {
 
@@ -38,7 +36,7 @@ class RenderLog : AbstractRenderColumn(BetterFoliageMod.MOD_ID) {
 }
 
 class RoundLogOverlayLayer : ColumnRenderLayer() {
-    override val registry: IColumnRegistry get() = LogRegistry
+    override val registry: ModelRenderRegistry<ColumnTextureInfo> get() = LogRegistry
     override val blockPredicate = { state: IBlockState -> Config.blocks.logClasses.matchesClass(state.block) }
     override val surroundPredicate = { state: IBlockState -> state.isOpaqueCube && !Config.blocks.logClasses.matchesClass(state.block) }
 
@@ -48,44 +46,17 @@ class RoundLogOverlayLayer : ColumnRenderLayer() {
 }
 
 @SideOnly(Side.CLIENT)
-object LogRegistry : IColumnRegistry {
-    val subRegistries: MutableList<IColumnRegistry> = mutableListOf()
-    override fun get(state: IBlockState, rand: Int) = subRegistries.findFirst { it[state, rand] }
-}
+object LogRegistry : ModelRenderRegistryRoot<ColumnTextureInfo>()
 
-@SideOnly(Side.CLIENT)
-object StandardLogSupport : TextureListModelProcessor<IColumnTextureInfo>, IColumnRegistry {
-
-    init {
-        LogRegistry.subRegistries.add(this)
-        MinecraftForge.EVENT_BUS.register(this)
-    }
-
-    override var variants = mutableMapOf<IBlockState, MutableList<ModelVariant>>()
-    override var variantToKey = mutableMapOf<ModelVariant, List<String>>()
-    override var variantToValue = mapOf<ModelVariant, IColumnTextureInfo>()
-
+object StandardLogRegistry : ModelRenderRegistryConfigurable<ColumnTextureInfo>() {
     override val logger = BetterFoliageMod.logDetail
-    override val logName = "StandardLogSupport"
     override val matchClasses: ConfigurableBlockMatcher get() = Config.blocks.logClasses
     override val modelTextures: List<ModelTextureList> get() = Config.blocks.logModels.list
-
-    override fun processStitch(variant: ModelVariant, key: List<String>, atlas: TextureMap): IColumnTextureInfo? {
-        val topTex = atlas.registerSprite(key[0])
-        val bottomTex = atlas.registerSprite(key[1])
-        val sideTexList = key.drop(2).map { atlas.registerSprite(it) }
-        if (sideTexList.isEmpty()) return null
-        return StaticColumnInfo(getAxis(variant.state), topTex, bottomTex, sideTexList)
-    }
-
-    override fun get(state: IBlockState, rand: Int): IColumnTextureInfo? {
-        val variant = getVariant(state, rand) ?: return null
-        return variantToValue[variant]
-    }
+    override fun processModel(state: IBlockState, textures: List<String>) = SimpleColumnInfo.Key(logger, getAxis(state), textures)
 
     fun getAxis(state: IBlockState): Axis? {
         val axis = tryDefault(null) { state.getValue(BlockLog.LOG_AXIS).toString() } ?:
-            state.properties.entries.find { it.key.getName().toLowerCase() == "axis" }?.value?.toString()
+        state.properties.entries.find { it.key.getName().toLowerCase() == "axis" }?.value?.toString()
         return when (axis) {
             "x" -> Axis.X
             "y" -> Axis.Y

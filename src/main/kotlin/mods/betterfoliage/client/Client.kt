@@ -15,7 +15,6 @@ import net.minecraft.block.Block
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
 import net.minecraft.util.math.BlockPos
-import net.minecraft.util.text.TextComponentString
 import net.minecraft.util.text.TextComponentTranslation
 import net.minecraft.util.text.TextFormatting
 import net.minecraftforge.fml.client.FMLClientHandler
@@ -65,20 +64,28 @@ object Client {
             RenderConnectedGrassLog()
         )
 
-        // init singletons
+        // init other singletons
         val singletons = listOf(
+            StandardCactusRegistry,
+            LeafParticleRegistry,
             ChunkOverlayManager,
-            LeafRegistry,
-            GrassRegistry,
             LeafWindTracker,
-            RisingSoulTextures,
+            RisingSoulTextures
+        )
+
+        // init mod integrations
+        val integrations = listOf(
             ShadersModIntegration,
             OptifineCustomColors,
             ForestryIntegration,
-            IC2Integration,
-            TechRebornIntegration,
-            StandardLogSupport          // add _after_ all other log registries
+            IC2RubberIntegration,
+            TechRebornRubberIntegration
         )
+
+        // add basic block support instances as last
+        GrassRegistry.addRegistry(StandardGrassRegistry)
+        LeafRegistry.addRegistry(StandardLeafRegistry)
+        LogRegistry.addRegistry(StandardLogRegistry)
 
         // init config hotkey
         val configKey = KeyHandler(BetterFoliageMod.MOD_NAME, 66, "key.betterfoliage.gui") {
@@ -87,7 +94,6 @@ object Client {
             )
         }
     }
-
 
     fun log(level: Level, msg: String) {
         BetterFoliageMod.log.log(level, "[BetterFoliage] $msg")

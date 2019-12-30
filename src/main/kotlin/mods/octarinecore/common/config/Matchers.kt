@@ -37,9 +37,9 @@ class ConfigurableBlockMatcher(domain: String, path: String) : IBlockMatcher, Bl
     }
 }
 
-data class ModelTextureList(val modelLocation: ResourceLocation, val textureNames: List<String>)
-
-fun modelTextures(vararg args: String) = ModelTextureList(ResourceLocation(args[0]), listOf(*args).drop(1))
+data class ModelTextureList(val modelLocation: ResourceLocation, val textureNames: List<String>) {
+    constructor(vararg args: String) : this(ResourceLocation(args[0]), listOf(*args).drop(1))
+}
 
 class ModelTextureListConfigOption(domain: String, path: String, val minTextures: Int) : StringListConfigOption<ModelTextureList>(domain, path) {
     override fun convertValue(line: String): ModelTextureList? {

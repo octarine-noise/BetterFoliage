@@ -71,7 +71,7 @@ object RisingSoulTextures : ResourceHandler(BetterFoliageMod.MOD_ID) {
     val headIcons = iconSet(BetterFoliageMod.LEGACY_DOMAIN, "blocks/rising_soul_%d")
     val trackIcon = iconStatic(BetterFoliageMod.LEGACY_DOMAIN, "blocks/soul_track")
 
-    override fun afterStitch() {
+    override fun afterPreStitch() {
         Client.log(INFO, "Registered ${headIcons.num} soul particle textures")
     }
 }

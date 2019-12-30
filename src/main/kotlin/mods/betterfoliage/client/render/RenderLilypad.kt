@@ -34,7 +34,7 @@ class RenderLilypad : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
     val flowerIcon = iconSet(BetterFoliageMod.LEGACY_DOMAIN, "blocks/better_lilypad_flower_%d")
     val perturbs = vectorSet(64) { modelIdx -> xzDisk(modelIdx) * Config.lilypad.hOffset }
 
-    override fun afterStitch() {
+    override fun afterPreStitch() {
         Client.log(Level.INFO, "Registered ${rootIcon.num} lilypad root textures")
         Client.log(Level.INFO, "Registered ${flowerIcon.num} lilypad flower textures")
     }

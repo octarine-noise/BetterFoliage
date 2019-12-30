@@ -3,25 +3,32 @@ package mods.betterfoliage.client.render
 import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.Config
+import mods.betterfoliage.client.render.column.ColumnTextureInfo
+import mods.betterfoliage.client.render.column.SimpleColumnInfo
 import mods.octarinecore.client.render.*
-import mods.octarinecore.client.resource.ModelVariant
-import mods.octarinecore.client.resource.TextureListModelProcessor
-import mods.octarinecore.client.resource.registerSprite
+import mods.octarinecore.client.resource.ModelRenderRegistryConfigurable
 import mods.octarinecore.common.Int3
 import mods.octarinecore.common.Rotation
+import mods.octarinecore.common.config.ModelTextureList
 import mods.octarinecore.common.config.SimpleBlockMatcher
-import mods.octarinecore.common.config.modelTextures
 import net.minecraft.block.BlockCactus
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.renderer.BlockRendererDispatcher
 import net.minecraft.client.renderer.BufferBuilder
-import net.minecraft.client.renderer.texture.TextureMap
 import net.minecraft.util.BlockRenderLayer
 import net.minecraft.util.EnumFacing.*
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
 import org.apache.logging.log4j.Level
+
+object StandardCactusRegistry : ModelRenderRegistryConfigurable<ColumnTextureInfo>() {
+    override val logger = BetterFoliageMod.logDetail
+    override val matchClasses = SimpleBlockMatcher(BlockCactus::class.java)
+    override val modelTextures = listOf(ModelTextureList("block/cactus", "top", "bottom", "side"))
+    override fun processModel(state: IBlockState, textures: List<String>) = SimpleColumnInfo.Key(logger, Axis.Y, textures)
+    init { MinecraftForge.EVENT_BUS.register(this) }
+}
 
 @SideOnly(Side.CLIENT)
 class RenderCactus : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
@@ -31,34 +38,6 @@ class RenderCactus : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
 
     val iconCross = iconStatic(BetterFoliageMod.LEGACY_DOMAIN, "blocks/better_cactus")
     val iconArm = iconSet(BetterFoliageMod.LEGACY_DOMAIN, "blocks/better_cactus_arm_%d")
-
-    val cactusTextures: IColumnRegistry = object : TextureListModelProcessor<IColumnTextureInfo>, IColumnRegistry {
-
-        init { MinecraftForge.EVENT_BUS.register(this) }
-
-        override var variants = mutableMapOf<IBlockState, MutableList<ModelVariant>>()
-        override var variantToKey = mutableMapOf<ModelVariant, List<String>>()
-        override var variantToValue = mapOf<ModelVariant, IColumnTextureInfo>()
-
-        override val logger = BetterFoliageMod.logDetail
-        override val logName = "CactusTextures"
-        override val matchClasses = SimpleBlockMatcher(BlockCactus::class.java)
-        override val modelTextures = listOf(
-            modelTextures("block/cactus", "top", "bottom", "side")
-        )
-
-        override fun processStitch(variant: ModelVariant, key: List<String>, atlas: TextureMap): IColumnTextureInfo? {
-            val topTex = atlas.registerSprite(key[0])
-            val bottomTex = atlas.registerSprite(key[1])
-            val sideTex = atlas.registerSprite(key[2])
-            return StaticColumnInfo(Axis.Y, topTex, bottomTex, listOf(sideTex))
-        }
-
-        override fun get(state: IBlockState, rand: Int): IColumnTextureInfo? {
-            val variant = getVariant(state, rand) ?: return null
-            return variantToValue[variant]
-        }
-    }
 
     val modelStem = model {
         horizontalRectangle(x1 = -cactusStemRadius, x2 = cactusStemRadius, z1 = -cactusStemRadius, z2 = cactusStemRadius, y = 0.5)
@@ -88,7 +67,7 @@ class RenderCactus : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
         .toCross(UP) { it.move(xzDisk(modelIdx) * Config.cactus.hOffset) }.addAll()
     }
 
-    override fun afterStitch() {
+    override fun afterPreStitch() {
         Client.log(Level.INFO, "Registered ${iconArm.num} cactus arm textures")
     }
 
@@ -102,7 +81,7 @@ class RenderCactus : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
 
         // get AO data
         modelRenderer.updateShading(Int3.zero, allFaces)
-        val icons = cactusTextures[ctx.blockState(Int3.zero), ctx.random(0)] ?: return renderWorldBlockBase(ctx, dispatcher, renderer, null)
+        val icons = StandardCactusRegistry[ctx] ?: return renderWorldBlockBase(ctx, dispatcher, renderer, null)
 
         modelRenderer.render(
             renderer,

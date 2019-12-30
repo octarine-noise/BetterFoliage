@@ -40,7 +40,7 @@ class RenderReeds : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
         }
     }
 
-    override fun afterStitch() {
+    override fun afterPreStitch() {
         Client.log(Level.INFO, "Registered ${reedIcons.num} reed textures")
     }
 

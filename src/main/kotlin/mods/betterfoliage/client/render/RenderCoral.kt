@@ -40,7 +40,7 @@ class RenderCoral : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
         }
     }
 
-    override fun afterStitch() {
+    override fun afterPreStitch() {
         Client.log(INFO, "Registered ${coralIcons.num} coral textures")
         Client.log(INFO, "Registered ${crustIcons.num} coral crust textures")
     }

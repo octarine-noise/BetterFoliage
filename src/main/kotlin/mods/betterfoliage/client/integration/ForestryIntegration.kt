@@ -3,38 +3,47 @@ package mods.betterfoliage.client.integration
 import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.Config
-import mods.betterfoliage.client.render.*
-import mods.betterfoliage.client.texture.ILeafRegistry
+import mods.betterfoliage.client.render.LogRegistry
+import mods.betterfoliage.client.render.StandardLogRegistry
+import mods.betterfoliage.client.render.column.ColumnTextureInfo
+import mods.betterfoliage.client.render.column.SimpleColumnInfo
 import mods.betterfoliage.client.texture.LeafInfo
 import mods.betterfoliage.client.texture.LeafRegistry
+import mods.betterfoliage.client.texture.StandardLeafKey
 import mods.betterfoliage.loader.Refs
-import mods.octarinecore.client.resource.ModelProcessor
-import mods.octarinecore.client.resource.ModelVariant
-import mods.octarinecore.client.resource.registerSprite
+import mods.octarinecore.client.resource.ModelRenderKey
+import mods.octarinecore.client.resource.ModelRenderRegistry
+import mods.octarinecore.client.resource.ModelRenderRegistryBase
 import mods.octarinecore.getTileEntitySafe
-import mods.octarinecore.isBlockLoaded
 import mods.octarinecore.metaprog.ClassRef
 import mods.octarinecore.metaprog.FieldRef
 import mods.octarinecore.metaprog.MethodRef
 import mods.octarinecore.metaprog.allAvailable
-import mods.octarinecore.tryDefault
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.block.model.ModelResourceLocation
-import net.minecraft.client.renderer.texture.TextureMap
-import net.minecraft.util.EnumFacing
 import net.minecraft.util.ResourceLocation
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.IBlockAccess
 import net.minecraftforge.client.event.TextureStitchEvent
 import net.minecraftforge.client.model.IModel
-import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.Loader
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
 import org.apache.logging.log4j.Level
-
+import kotlin.collections.Map
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.emptyMap
+import kotlin.collections.find
+import kotlin.collections.forEach
+import kotlin.collections.get
+import kotlin.collections.listOf
+import kotlin.collections.mapValues
+import kotlin.collections.mutableMapOf
+import kotlin.collections.set
 
 @SideOnly(Side.CLIENT)
 object ForestryIntegration {
@@ -64,50 +73,18 @@ object ForestryIntegration {
     init {
         if (Loader.isModLoaded("forestry") && allAvailable(TiLgetLeaveSprite, getLeafSpriteProvider, getSprite)) {
             Client.log(Level.INFO, "Forestry support initialized")
-            LeafRegistry.subRegistries.add(ForestryLeavesSupport)
-            LogRegistry.subRegistries.add(ForestryLogSupport)
+            LeafRegistry.addRegistry(ForestryLeafRegistry)
+            LogRegistry.addRegistry(ForestryLogRegistry)
         }
     }
 }
 
-@SideOnly(Side.CLIENT)
-object ForestryLeavesSupport : ILeafRegistry {
+object ForestryLeafRegistry : ModelRenderRegistry<LeafInfo> {
+    val logger = BetterFoliageMod.logDetail
+    val textureToKey = mutableMapOf<ResourceLocation, ModelRenderKey<LeafInfo>>()
+    var textureToValue = emptyMap<ResourceLocation, LeafInfo>()
 
-    val textureToValue = mutableMapOf<ResourceLocation, LeafInfo>()
-
-    init { MinecraftForge.EVENT_BUS.register(this) }
-
-    @SubscribeEvent
-    fun handlePreStitch(event: TextureStitchEvent.Pre) {
-        textureToValue.clear()
-        val allLeaves = ForestryIntegration.TeLleafTextures.getStatic() as Map<*, *>
-        allLeaves.entries.forEach {
-            Client.logDetail("ForestryLeavesSupport: base leaf type ${it.key.toString()}")
-            listOf(
-                ForestryIntegration.TeLplain.get(it.value) as ResourceLocation,
-                ForestryIntegration.TeLfancy.get(it.value) as ResourceLocation,
-                ForestryIntegration.TeLpollplain.get(it.value) as ResourceLocation,
-                ForestryIntegration.TeLpollfancy.get(it.value) as ResourceLocation
-            ).forEach { leafLocation ->
-                registerLeaf(leafLocation, event.map)
-            }
-        }
-    }
-
-    fun registerLeaf(textureLocation: ResourceLocation, atlas: TextureMap) {
-        val texture = atlas.registerSprite(textureLocation)
-        val leafType = LeafRegistry.typeMappings.getType(texture) ?: "default"
-        Client.logDetail("ForestryLeavesSupport:        texture ${texture.iconName}")
-        Client.logDetail("ForestryLeavesSupport:        particle $leafType")
-        val generated = atlas.registerSprite(
-            Client.genLeaves.generatedResource(texture.iconName, "type" to leafType)
-        )
-        textureToValue[textureLocation] = LeafInfo(generated, LeafRegistry.getParticleType(texture, atlas))
-    }
-
-    override fun get(state: IBlockState, rand: Int) = null
-
-    override fun get(state: IBlockState, world: IBlockAccess, pos: BlockPos, face: EnumFacing, rand: Int): LeafInfo? {
+    override fun get(state: IBlockState, world: IBlockAccess, pos: BlockPos): LeafInfo? {
         // check variant property (used in decorative leaves)
         state.properties.entries.find {
             ForestryIntegration.PropertyTreeType.isInstance(it.key) && ForestryIntegration.TreeDefinition.isInstance(it.value)
@@ -124,44 +101,54 @@ object ForestryLeavesSupport : ILeafRegistry {
         val textureLoc = ForestryIntegration.TiLgetLeaveSprite.invoke(tile, Minecraft.isFancyGraphicsEnabled()) ?: return null
         return textureToValue[textureLoc]
     }
+
+    @SubscribeEvent
+    fun handlePreStitch(event: TextureStitchEvent.Pre) {
+        textureToValue = emptyMap()
+
+        val allLeaves = ForestryIntegration.TeLleafTextures.getStatic() as Map<*, *>
+        allLeaves.entries.forEach {
+            logger.log(Level.DEBUG, "ForestryLeavesSupport: base leaf type ${it.key.toString()}")
+            listOf(
+                ForestryIntegration.TeLplain.get(it.value) as ResourceLocation,
+                ForestryIntegration.TeLfancy.get(it.value) as ResourceLocation,
+                ForestryIntegration.TeLpollplain.get(it.value) as ResourceLocation,
+                ForestryIntegration.TeLpollfancy.get(it.value) as ResourceLocation
+            ).forEach { textureLocation ->
+                val key = StandardLeafKey(logger, textureLocation.toString()).apply { onPreStitch(event.map) }
+                textureToKey[textureLocation] = key
+            }
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOW)
+    fun handlePostStitch(event: TextureStitchEvent.Post) {
+        textureToValue = textureToKey.mapValues { (_, key) -> key.resolveSprites(event.map) }
+        textureToKey.clear()
+    }
 }
 
-@SideOnly(Side.CLIENT)
-object ForestryLogSupport : ModelProcessor<List<String>, IColumnTextureInfo>, IColumnRegistry {
-
-    override var variants = mutableMapOf<IBlockState, MutableList<ModelVariant>>()
-    override var variantToKey = mutableMapOf<ModelVariant, List<String>>()
-    override var variantToValue = mapOf<ModelVariant, IColumnTextureInfo>()
-
+object ForestryLogRegistry : ModelRenderRegistryBase<ColumnTextureInfo>() {
     override val logger = BetterFoliageMod.logDetail
 
-    init { MinecraftForge.EVENT_BUS.register(this) }
-
-    override fun processModelLoad(state: IBlockState, modelLoc: ModelResourceLocation, model: IModel) {
+    override fun processModel(state: IBlockState, modelLoc: ModelResourceLocation, model: IModel): ModelRenderKey<ColumnTextureInfo>? {
         // respect class list to avoid triggering on fences, stairs, etc.
-        if (!Config.blocks.logClasses.matchesClass(state.block)) return
+        if (!Config.blocks.logClasses.matchesClass(state.block)) return null
 
         // find wood type property
         val woodType = state.properties.entries.find {
             ForestryIntegration.PropertyWoodType.isInstance(it.key) && ForestryIntegration.IWoodType.isInstance(it.value)
-        } ?: return
+        } ?: return null
 
-        logger.log(Level.DEBUG, "ForestryLogSupport: block state ${state.toString()}")
-        logger.log(Level.DEBUG, "ForestryLogSupport:     variant ${woodType.value.toString()}")
+        logger.log(Level.DEBUG, "ForestryLogRegistry: block state $state")
+        logger.log(Level.DEBUG, "ForestryLogRegistry:     variant ${woodType.value}")
 
         // get texture names for wood type
         val bark = ForestryIntegration.barkTex.invoke(woodType.value) as String?
         val heart = ForestryIntegration.heartTex.invoke(woodType.value) as String?
 
         logger.log(Level.DEBUG, "ForestryLogSupport:    textures [heart=$heart, bark=$bark]")
-        if (bark != null && heart != null) putKeySingle(state, listOf(heart, bark))
+        if (bark != null && heart != null) return SimpleColumnInfo.Key(logger, StandardLogRegistry.getAxis(state), listOf(heart, heart, bark))
+        return null
     }
-
-    override fun processStitch(variant: ModelVariant, key: List<String>, atlas: TextureMap): IColumnTextureInfo? {
-        val heart = atlas.registerSprite(key[0])
-        val bark = atlas.registerSprite(key[1])
-        return StaticColumnInfo(StandardLogSupport.getAxis(variant.state), heart, heart, listOf(bark))
-    }
-
-    override fun get(state: IBlockState, rand: Int) = variants[state]?.let { variantToValue[it[0]] }
 }

@@ -28,7 +28,7 @@ class RenderNetherrack : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) 
 
     }
 
-    override fun afterStitch() {
+    override fun afterPreStitch() {
         Client.log(INFO, "Registered ${netherrackIcon.num} netherrack textures")
     }
 
