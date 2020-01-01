@@ -228,6 +228,15 @@ class ConfigPropertyInt(val min: Int, val max: Int, val default: Int) :
     override fun Property.write(value: Int) = property!!.set(value)
 }
 
+/** [Long]-typed property delegate. Still uses [Int] internally */
+class ConfigPropertyLong(val min: Int, val max: Int, val default: Int) :
+    ConfigPropertyDelegate<Long>() {
+    override fun resolve(target: Configuration, category: String, name: String) =
+        target.get(category, name, default, null).apply { setMinValue(min); setMaxValue(max) }
+    override fun Property.read() = property!!.long
+    override fun Property.write(value: Long) = property!!.set(value)
+}
+
 /** [Boolean]-typed property delegate. */
 class ConfigPropertyBoolean(val default: Boolean) :
     ConfigPropertyDelegate<Boolean>() {
@@ -252,5 +261,6 @@ class ConfigPropertyIntList(val defaults: ()->Array<Int>) :
 fun double(min: Double = 0.0, max: Double = 1.0, default: Double) = ConfigPropertyDouble(min, max, default)
 fun float(min: Double = 0.0, max: Double = 1.0, default: Double) = ConfigPropertyFloat(min, max, default)
 fun int(min: Int = 0, max: Int, default: Int) = ConfigPropertyInt(min, max, default)
+fun long(min: Int = 0, max: Int, default: Int) = ConfigPropertyLong(min, max, default)
 fun intList(defaults: ()->Array<Int>) = ConfigPropertyIntList(defaults)
 fun boolean(default: Boolean) = ConfigPropertyBoolean(default)

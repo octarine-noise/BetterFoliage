@@ -17,6 +17,8 @@ import net.minecraft.client.renderer.BlockRendererDispatcher
 import net.minecraft.client.renderer.BufferBuilder
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.util.BlockRenderLayer
+import net.minecraft.util.EnumBlockRenderType
+import net.minecraft.util.EnumBlockRenderType.MODEL
 import net.minecraft.util.EnumFacing.*
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.IBlockAccess
@@ -117,7 +119,7 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
         modelRenderer.updateShading(Int3.zero, allFaces)
 
         val baseRotation = rotationFromUp[((roundLog.column.axis ?: Axis.Y) to AxisDirection.POSITIVE).face.ordinal]
-        renderAs(ctx.blockState(Int3.zero), renderer) {
+        renderAs(ctx.blockState(Int3.zero), MODEL, renderer) {
             quadrantRotations.forEachIndexed { idx, quadrantRotation ->
                 // set rotation for the current quadrant
                 val rotation = baseRotation + quadrantRotation

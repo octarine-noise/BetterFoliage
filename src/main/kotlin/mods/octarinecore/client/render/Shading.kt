@@ -47,11 +47,10 @@ class AoData() {
 }
 
 class AoFaceData(val face: EnumFacing) {
-    val ao = Refs.AmbientOcclusionFace.element!!.let {
-        if (allAvailable(Refs.OptifineClassTransformer)) it.getDeclaredConstructor().newInstance()
-        else it.getDeclaredConstructor(Refs.BlockModelRenderer.element!!)
-            .newInstance(BlockModelRenderer(Minecraft.getMinecraft().blockColors))
-    } as BlockModelRenderer.AmbientOcclusionFace
+    val ao = Refs.AmbientOcclusionFace.element!!.getDeclaredConstructor(Refs.BlockModelRenderer.element!!)
+        .newInstance(BlockModelRenderer(Minecraft.getMinecraft().blockColors))
+        as BlockModelRenderer.AmbientOcclusionFace
+
     val top = faceCorners[face.ordinal].topLeft.first
     val left = faceCorners[face.ordinal].topLeft.second
 

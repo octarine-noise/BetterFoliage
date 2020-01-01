@@ -12,6 +12,8 @@ import mods.octarinecore.random
 import net.minecraft.client.renderer.BlockRendererDispatcher
 import net.minecraft.client.renderer.BufferBuilder
 import net.minecraft.util.BlockRenderLayer
+import net.minecraft.util.EnumBlockRenderType
+import net.minecraft.util.EnumBlockRenderType.MODEL
 import net.minecraft.util.EnumFacing.Axis
 import net.minecraft.util.EnumFacing.UP
 import net.minecraftforge.fml.relauncher.Side
@@ -78,7 +80,7 @@ class RenderGrass : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
             val isHidden = forgeDirs.map { ctx.blockState(it.offset).isOpaqueCube }
 
             // render full grass block
-            ShadersModIntegration.renderAs(ctx.blockState(Int3.zero), renderer) {
+            ShadersModIntegration.renderAs(ctx.blockState(Int3.zero), MODEL, renderer) {
                 modelRenderer.render(
                     renderer,
                     fullCube,

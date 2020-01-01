@@ -2,6 +2,7 @@ package mods.betterfoliage.client.config
 
 import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.gui.BiomeListConfigEntry
+import mods.betterfoliage.client.integration.ShadersModIntegration
 import mods.octarinecore.common.config.*
 import net.minecraft.client.Minecraft
 import net.minecraft.world.biome.Biome
@@ -31,6 +32,11 @@ object Config : DelegatingConfig(BetterFoliageMod.MOD_ID, BetterFoliageMod.DOMAI
 
     var enabled by boolean(true)
     var nVidia by boolean(GL11.glGetString(GL11.GL_VENDOR).toLowerCase().contains("nvidia"))
+
+    object shaders {
+        val leavesId by long(min = 1, max = 65535, default = ShadersModIntegration.leavesDefaultBlockId.toInt())
+        val grassId by long(min = 1, max = 65535, default = ShadersModIntegration.grassDefaultBlockId.toInt())
+    }
 
     object blocks {
         val leavesClasses = ConfigurableBlockMatcher(BetterFoliageMod.DOMAIN, "leaves_blocks_default.cfg")
