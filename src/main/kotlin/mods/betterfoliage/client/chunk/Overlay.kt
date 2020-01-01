@@ -92,14 +92,16 @@ object ChunkOverlayManager : IBlockUpdateListener {
 }
 
 class ChunkOverlayData(layers: List<ChunkOverlayLayer<*>>) {
+    val BlockPos.isValid: Boolean get() = y in validYRange
     val rawData = layers.associateWith { emptyOverlay() }
-    fun <T> get(layer: ChunkOverlayLayer<T>, pos: BlockPos): T? = rawData[layer]?.get(pos.x and 15)?.get(pos.z and 15)?.get(pos.y) as T?
-    fun <T> set(layer: ChunkOverlayLayer<T>, pos: BlockPos, data: T) = rawData[layer]?.get(pos.x and 15)?.get(pos.z and 15)?.set(pos.y, data)
-    fun <T> clear(layer: ChunkOverlayLayer<T>, pos: BlockPos) = rawData[layer]?.get(pos.x and 15)?.get(pos.z and 15)?.set(pos.y, UNCALCULATED)
+    fun <T> get(layer: ChunkOverlayLayer<T>, pos: BlockPos): T? = if (pos.isValid) rawData[layer]?.get(pos.x and 15)?.get(pos.z and 15)?.get(pos.y) as T? else null
+    fun <T> set(layer: ChunkOverlayLayer<T>, pos: BlockPos, data: T) = if (pos.isValid) rawData[layer]?.get(pos.x and 15)?.get(pos.z and 15)?.set(pos.y, data) else null
+    fun <T> clear(layer: ChunkOverlayLayer<T>, pos: BlockPos) = if (pos.isValid) rawData[layer]?.get(pos.x and 15)?.get(pos.z and 15)?.set(pos.y, UNCALCULATED) else null
 
     companion object {
         val UNCALCULATED = object {}
         fun emptyOverlay() = Array(16) { Array(16) { Array<Any?>(256) { UNCALCULATED }}}
+        val validYRange = 0 until 256
     }
 }
 
