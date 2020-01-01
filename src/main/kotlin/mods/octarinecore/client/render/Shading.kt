@@ -1,15 +1,10 @@
 package mods.octarinecore.client.render
 
-import mods.betterfoliage.BetterFoliage
-import mods.betterfoliage.loader.Refs
 import mods.octarinecore.common.*
-import mods.octarinecore.metaprog.allAvailable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.BlockModelRenderer
-import net.minecraft.client.renderer.BlockModelRenderer.AmbientOcclusionFace
 import net.minecraft.util.Direction
 import net.minecraft.util.Direction.*
-import org.apache.logging.log4j.Level
 import java.lang.Math.min
 import java.util.*
 

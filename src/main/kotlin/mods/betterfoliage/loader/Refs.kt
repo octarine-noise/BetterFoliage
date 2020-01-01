@@ -37,7 +37,7 @@ object Refs {
 
     // Optifine
     val RenderEnv = ClassRef("net.optifine.render.RenderEnv")
-    val RenderEnv_reset = MethodRef(RenderEnv, "reset", ClassRef.void, IBlockReader, BlockState, BlockPos)
+    val RenderEnv_reset = MethodRef(RenderEnv, "reset", ClassRef.void, BlockState, BlockPos)
     val quadSprite = FieldRef(BufferBuilder, "quadSprite", TextureAtlasSprite)
     val BlockPosM = ClassRef("net.optifine.BlockPosM")
     val IColorizer = ClassRef("net.optifine.CustomColors\$IColorizer")

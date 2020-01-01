@@ -12,10 +12,9 @@ import mods.octarinecore.common.Int3
 import mods.octarinecore.common.Rotation
 import mods.octarinecore.common.face
 import mods.octarinecore.common.rot
+import net.minecraft.block.BlockRenderType.MODEL
 import net.minecraft.client.renderer.BlockRendererDispatcher
 import net.minecraft.client.renderer.BufferBuilder
-import net.minecraft.client.renderer.chunk.ChunkRenderCache
-import net.minecraft.client.world.ClientWorld
 import net.minecraft.util.BlockRenderLayer
 import net.minecraft.util.Direction.*
 import net.minecraftforge.client.model.data.IModelData
@@ -115,7 +114,7 @@ abstract class AbstractRenderColumn(modId: String, modBus: IEventBus) : Abstract
         modelRenderer.updateShading(Int3.zero, allFaces)
 
         val baseRotation = rotationFromUp[((roundLog.column.axis ?: Axis.Y) to AxisDirection.POSITIVE).face.ordinal]
-        renderAs(ctx.blockState(Int3.zero), renderer) {
+        renderAs(ctx.blockState(Int3.zero), MODEL, renderer) {
             quadrantRotations.forEachIndexed { idx, quadrantRotation ->
                 // set rotation for the current quadrant
                 val rotation = baseRotation + quadrantRotation

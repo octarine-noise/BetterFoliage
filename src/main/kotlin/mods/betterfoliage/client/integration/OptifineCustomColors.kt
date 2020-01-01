@@ -35,7 +35,7 @@ object OptifineCustomColors {
 
     fun getBlockColor(ctx: BlockContext): Int {
         val ofColor = if (isColorAvailable && Minecraft.getInstance().gameSettings.reflectField<Boolean>("ofCustomColors") == true) {
-            renderEnv.reset(ctx.reader!!, ctx.blockState(Int3.zero), ctx.pos)
+            renderEnv.reset(ctx.blockState(Int3.zero), ctx.pos)
             Refs.getColorMultiplier.invokeStatic(fakeQuad, ctx.blockState(Int3.zero), ctx.reader!!, ctx.pos, renderEnv.wrapped) as? Int
         } else null
         return if (ofColor == null || ofColor == -1) ctx.blockData(Int3.zero).color else ofColor
@@ -44,13 +44,13 @@ object OptifineCustomColors {
 
 class OptifineRenderEnv {
     val wrapped: Any = Refs.RenderEnv.element!!.getDeclaredConstructor(
-        Refs.IBlockReader.element, Refs.BlockState.element, Refs.BlockPos.element
+        Refs.BlockState.element, Refs.BlockPos.element
     ).let {
         it.isAccessible = true
-        it.newInstance(null, null, null)
+        it.newInstance(null, null)
     }
 
-    fun reset(blockAccess: IBlockReader, state: BlockState, pos: BlockPos) {
-        Refs.RenderEnv_reset.invoke(wrapped, blockAccess, state, pos)
+    fun reset(state: BlockState, pos: BlockPos) {
+        Refs.RenderEnv_reset.invoke(wrapped, state, pos)
     }
 }

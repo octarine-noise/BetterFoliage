@@ -64,6 +64,14 @@ class DelegatingIntValue(
     override fun getConfigValue(name: String, builder: ForgeConfigSpec.Builder) = builder.defineInRange(name, defaultValue, minValue, maxValue)
 }
 
+class DelegatingLongValue(
+    val minValue: Long = 0,
+    val maxValue: Long = 1,
+    val defaultValue: Long = 0
+) : ConfigDelegate<Long>() {
+    override fun getConfigValue(name: String, builder: ForgeConfigSpec.Builder) = builder.defineInRange(name, defaultValue, minValue, maxValue)
+}
+
 class DelegatingDoubleValue(
     val minValue: Double = 0.0,
     val maxValue: Double = 1.0,
@@ -77,4 +85,5 @@ class DelegatingDoubleValue(
 // ============================
 fun double(min: Double = 0.0, max: Double = 1.0, default: Double) = DelegatingDoubleValue(min, max, default)
 fun int(min: Int = 0, max: Int, default: Int) = DelegatingIntValue(min, max, default)
+fun long(min: Long = 0, max: Long, default: Long) = DelegatingLongValue(min, max, default)
 fun boolean(default: Boolean) = DelegatingBooleanValue(default)

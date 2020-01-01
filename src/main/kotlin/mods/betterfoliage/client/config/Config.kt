@@ -1,28 +1,13 @@
 package mods.betterfoliage.client.config
 
 import mods.betterfoliage.BetterFoliage
+import mods.betterfoliage.client.integration.ShadersModIntegration
 import mods.octarinecore.client.resource.LoadModelDataEvent
 import mods.octarinecore.common.config.*
 import net.minecraft.util.ResourceLocation
-import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.eventbus.api.SubscribeEvent
 
-// BetterFoliage-specific property delegates
-//private val OBSOLETE = ObsoleteConfigProperty()
 private fun featureEnable() = boolean(true).lang("enabled")
-/*
-fun biomeList(defaults: (Biome) -> Boolean) = intList {
-    Biome.REGISTRY
-        .filter { it != null && defaults(it) }
-        .map { Biome.REGISTRY.getIDForObject(it) }
-        .toTypedArray()
-}.apply { guiClass = BiomeListConfigEntry::class.java }
-
-// Biome filter methods
-private fun Biome.filterTemp(min: Float?, max: Float?) = (min == null || min <= defaultTemperature) && (max == null || max >= defaultTemperature)
-private fun Biome.filterRain(min: Float?, max: Float?) = (min == null || min <= rainfall) && (max == null || max >= rainfall)
-private fun Biome.filterClass(vararg name: String) = name.any { it in this.javaClass.name.toLowerCase() }
-*/
 
 // Config singleton
 object Config : DelegatingConfig(BetterFoliage.MOD_ID, BetterFoliage.MOD_ID) {
@@ -30,30 +15,10 @@ object Config : DelegatingConfig(BetterFoliage.MOD_ID, BetterFoliage.MOD_ID) {
     val enabled by boolean(true)
     val nVidia by boolean(false)
 
-    /*
-    object blocks {
-        val leavesClasses = ConfigurableBlockMatcher(BetterFoliageMod.DOMAIN, "leaves_blocks_default.cfg")
-        val leavesModels = ModelTextureListConfigOption(BetterFoliageMod.DOMAIN, "leaves_models_default.cfg", 1)
-        val grassClasses = ConfigurableBlockMatcher(BetterFoliageMod.DOMAIN, "grass_blocks_default.cfg")
-        val grassModels = ModelTextureListConfigOption(BetterFoliageMod.DOMAIN, "grass_models_default.cfg", 1)
-        val mycelium = ConfigurableBlockMatcher(BetterFoliageMod.DOMAIN, "mycelium_blocks_default.cfg")
-        val dirt = ConfigurableBlockMatcher(BetterFoliageMod.DOMAIN, "dirt_default.cfg")
-        val crops = ConfigurableBlockMatcher(BetterFoliageMod.DOMAIN, "crop_default.cfg")
-        val logClasses = ConfigurableBlockMatcher(BetterFoliageMod.DOMAIN, "log_blocks_default.cfg")
-        val logModels = ModelTextureListConfigOption(BetterFoliageMod.DOMAIN, "log_models_default.cfg", 3)
-        val sand = ConfigurableBlockMatcher(BetterFoliageMod.DOMAIN, "sand_default.cfg")
-        val lilypad = ConfigurableBlockMatcher(BetterFoliageMod.DOMAIN, "lilypad_default.cfg")
-        val cactus = ConfigurableBlockMatcher(BetterFoliageMod.DOMAIN, "cactus_default.cfg")
-        val netherrack = ConfigurableBlockMatcher(BetterFoliageMod.DOMAIN, "netherrack_blocks_default.cfg")
-
-        val leavesWhitelist = OBSOLETE
-        val leavesBlacklist = OBSOLETE
-        val grassWhitelist = OBSOLETE
-        val grassBlacklist = OBSOLETE
-        val logsWhitelist = OBSOLETE
-        val logsBlacklist = OBSOLETE
+    object shaders {
+        val leavesId by long(min = 1, max = 65535, default = ShadersModIntegration.leavesDefaultBlockId)
+        val grassId by long(min = 1, max = 65535, default = ShadersModIntegration.grassDefaultBlockId)
     }
-*/
 
     object leaves : ConfigCategory() {
         val enabled by featureEnable()
@@ -178,22 +143,6 @@ object Config : DelegatingConfig(BetterFoliage.MOD_ID, BetterFoliage.MOD_ID) {
         val trailLength by int(min=2, max=128, default=48)
         val trailDensity by int(min=1, max=16, default=3)
     }
-/*
-    val forceReloadOptions = listOf(
-        blocks.leavesClasses,
-        blocks.leavesModels,
-        blocks.grassClasses,
-        blocks.grassModels,
-        shortGrass["saturationThreshold"]!!
-    )
-
-    override fun onChange(event: ConfigChangedEvent.PostConfigChangedEvent) {
-        if (hasChanged(forceReloadOptions))
-            Minecraft.getInstance().refreshResources()
-        else
-            Minecraft.getInstance().renderGlobal.loadRenderers()
-    }
-*/
 }
 
 object BlockConfig {

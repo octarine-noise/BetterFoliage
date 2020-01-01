@@ -91,7 +91,7 @@ class BetterFoliageTransformer : Transformer() {
             }
             if (isOptifinePresent) {
                 find(varinsn(ISTORE, 23))?.insertAfter {
-                    log.info("[BetterFoliageLoader] Applying RenderChunk block layer override")
+                    log.info("[BetterFoliageLoader] Applying RenderChunk block layer override (Optifine)")
                     varinsn(ALOAD, 19)
                     varinsn(ALOAD, 18)
                     varinsn(ALOAD, 22)
@@ -100,7 +100,7 @@ class BetterFoliageTransformer : Transformer() {
                 }
             } else {
                 find(invokeRef(Refs.canRenderInLayer))?.replace {
-                    log.info("[BetterFoliageLoader] Applying RenderChunk block layer override")
+                    log.info("[BetterFoliageLoader] Applying RenderChunk block layer override (non-Optifine)")
                     invokeStatic(Refs.canRenderBlockInLayer)
                 }
             }

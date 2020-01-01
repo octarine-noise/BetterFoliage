@@ -10,6 +10,8 @@ import mods.octarinecore.client.render.*
 import mods.octarinecore.common.*
 import mods.octarinecore.random
 import net.minecraft.block.Block
+import net.minecraft.block.BlockRenderType
+import net.minecraft.block.BlockRenderType.MODEL
 import net.minecraft.client.renderer.BlockRendererDispatcher
 import net.minecraft.client.renderer.BufferBuilder
 import net.minecraft.tags.BlockTags
@@ -77,7 +79,7 @@ class RenderGrass : AbstractBlockRenderingHandler(BetterFoliage.MOD_ID, BetterFo
             val isVisible = forgeDirs.map { ctx.shouldSideBeRendered(it) }
 
             // render full grass block
-            ShadersModIntegration.renderAs(ctx.blockState(Int3.zero), renderer) {
+            ShadersModIntegration.renderAs(ctx.blockState(Int3.zero), MODEL, renderer) {
                 modelRenderer.render(
                     renderer,
                     fullCube,
