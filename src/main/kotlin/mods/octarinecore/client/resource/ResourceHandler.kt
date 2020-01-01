@@ -3,29 +3,42 @@ package mods.octarinecore.client.resource
 import mods.octarinecore.client.render.Model
 import mods.octarinecore.common.Double3
 import mods.octarinecore.common.Int3
+import mods.octarinecore.stripEnd
+import mods.octarinecore.stripStart
+import net.minecraft.client.renderer.texture.AtlasTexture
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
-import net.minecraft.client.renderer.texture.TextureMap
 import net.minecraft.util.ResourceLocation
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.MathHelper
-import net.minecraft.world.World
-import net.minecraft.world.gen.NoiseGeneratorSimplex
+import net.minecraft.world.IWorld
+import net.minecraft.world.gen.SimplexNoiseGenerator
 import net.minecraftforge.client.event.TextureStitchEvent
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.event.world.WorldEvent
+import net.minecraftforge.eventbus.api.IEventBus
+import net.minecraftforge.eventbus.api.SubscribeEvent
 import net.minecraftforge.fml.client.event.ConfigChangedEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.config.ModConfig
 import java.util.*
+
+enum class Atlas(val basePath: String) {
+    BLOCKS("textures"),
+    PARTICLES("textures/particle");
+
+    fun wrap(resource: ResourceLocation) = ResourceLocation(resource.namespace, "$basePath/${resource.path}.png")
+    fun unwrap(resource: ResourceLocation) = resource.stripStart("$basePath/").stripEnd(".png")
+    fun matches(event: TextureStitchEvent) = event.map.basePath == basePath
+}
 
 // ============================
 // Resource types
 // ============================
 interface IStitchListener {
-    fun onPreStitch(atlas: TextureMap)
-    fun onPostStitch(atlas: TextureMap)
+    fun onPreStitch(event: TextureStitchEvent.Pre)
+    fun onPostStitch(atlas: AtlasTexture)
 }
 interface IConfigChangeListener { fun onConfigChange() }
-interface IWorldLoadListener { fun onWorldLoad(world: World) }
+interface IWorldLoadListener { fun onWorldLoad(world: IWorld) }
 
 /**
  * Base class for declarative resource handling.
@@ -34,7 +47,11 @@ interface IWorldLoadListener { fun onWorldLoad(world: World) }
  *
  * @param[modId] mod ID associated with this handler (used to filter config change events)
  */
-open class ResourceHandler(val modId: String) {
+open class ResourceHandler(
+    val modId: String,
+    val modBus: IEventBus,
+    val targetAtlas: Atlas = Atlas.BLOCKS
+) {
 
     val resources = mutableListOf<Any>()
     open fun afterPreStitch() {}
@@ -43,15 +60,15 @@ open class ResourceHandler(val modId: String) {
     // ============================
     // Self-registration
     // ============================
-    init { MinecraftForge.EVENT_BUS.register(this) }
+    init { modBus.register(this) }
 
     // ============================
     // Resource declarations
     // ============================
-    fun iconStatic(domain: String, path: String) = IconHolder(domain, path).apply { resources.add(this) }
-    fun iconStatic(location: ResourceLocation) = iconStatic(location.namespace, location.path)
-    fun iconSet(domain: String, pathPattern: String) = IconSet(domain, pathPattern).apply { this@ResourceHandler.resources.add(this) }
-    fun iconSet(location: ResourceLocation) = iconSet(location.namespace, location.path)
+    fun iconStatic(location: ()->ResourceLocation) = IconHolder(location).apply { resources.add(this) }
+    fun iconStatic(location: ResourceLocation) = iconStatic { location }
+    fun iconStatic(domain: String, path: String) = iconStatic(ResourceLocation(domain, path))
+    fun iconSet(targetAtlas: Atlas = Atlas.BLOCKS, location: (Int)->ResourceLocation) = IconSet(targetAtlas, location).apply { this@ResourceHandler.resources.add(this) }
     fun model(init: Model.()->Unit) = ModelHolder(init).apply { resources.add(this) }
     fun modelSet(num: Int, init: Model.(Int)->Unit) = ModelSet(num, init).apply { resources.add(this) }
     fun vectorSet(num: Int, init: (Int)-> Double3) = VectorSet(num, init).apply { resources.add(this) }
@@ -62,19 +79,21 @@ open class ResourceHandler(val modId: String) {
     // ============================
     @SubscribeEvent
     fun onPreStitch(event: TextureStitchEvent.Pre) {
-        resources.forEach { (it as? IStitchListener)?.onPreStitch(event.map) }
+        if (!targetAtlas.matches(event)) return
+        resources.forEach { (it as? IStitchListener)?.onPreStitch(event) }
         afterPreStitch()
     }
 
     @SubscribeEvent
     fun onPostStitch(event: TextureStitchEvent.Post) {
+        if (!targetAtlas.matches(event)) return
         resources.forEach { (it as? IStitchListener)?.onPostStitch(event.map) }
         afterPostStitch()
     }
 
     @SubscribeEvent
-    fun handleConfigChange(event: ConfigChangedEvent.OnConfigChangedEvent) {
-        if (event.modID == modId) resources.forEach { (it as? IConfigChangeListener)?.onConfigChange() }
+    fun handleModConfigChange(event: ModConfig.ModConfigEvent) {
+        resources.forEach { (it as? IConfigChangeListener)?.onConfigChange() }
     }
 
     @SubscribeEvent
@@ -85,33 +104,38 @@ open class ResourceHandler(val modId: String) {
 // ============================
 // Resource container classes
 // ============================
-class IconHolder(val domain: String, val name: String) : IStitchListener {
-    val iconRes = ResourceLocation(domain, name)
+class IconHolder(val location: ()->ResourceLocation) : IStitchListener {
+    var iconRes: ResourceLocation? = null
     var icon: TextureAtlasSprite? = null
-    override fun onPreStitch(atlas: TextureMap) { atlas.registerSprite(iconRes) }
-    override fun onPostStitch(atlas: TextureMap) { icon = atlas[iconRes] }
+    override fun onPreStitch(event: TextureStitchEvent.Pre) {
+        iconRes = location()
+        event.addSprite(iconRes)
+    }
+    override fun onPostStitch(atlas: AtlasTexture) {
+        icon = atlas[iconRes!!]
+    }
 }
 
 class ModelHolder(val init: Model.()->Unit): IConfigChangeListener {
-    var model: Model = Model().apply(init)
+    var model: Model = Model()
     override fun onConfigChange() { model = Model().apply(init) }
 }
 
-class IconSet(val domain: String, val namePattern: String) : IStitchListener {
+class IconSet(val targetAtlas: Atlas, val location: (Int)->ResourceLocation) : IStitchListener {
     val resources = arrayOfNulls<ResourceLocation>(16)
     val icons = arrayOfNulls<TextureAtlasSprite>(16)
     var num = 0
 
-    override fun onPreStitch(atlas: TextureMap) {
+    override fun onPreStitch(event: TextureStitchEvent.Pre) {
         num = 0
         (0..15).forEach { idx ->
             icons[idx] = null
-            val locReal = ResourceLocation(domain, "textures/${namePattern.format(idx)}.png")
-            if (resourceManager[locReal] != null) resources[num++] = ResourceLocation(domain, namePattern.format(idx)).apply { atlas.registerSprite(this) }
+            val loc = location(idx)
+            if (resourceManager[targetAtlas.wrap(loc)] != null) resources[num++] = loc.apply { event.addSprite(this) }
         }
     }
 
-    override fun onPostStitch(atlas: TextureMap) {
+    override fun onPostStitch(atlas: AtlasTexture) {
         (0 until num).forEach { idx -> icons[idx] = atlas[resources[idx]!!] }
     }
 
@@ -119,20 +143,20 @@ class IconSet(val domain: String, val namePattern: String) : IStitchListener {
 }
 
 class ModelSet(val num: Int, val init: Model.(Int)->Unit): IConfigChangeListener {
-    val models = Array(num) { Model().apply{ init(it) } }
+    val models = Array(num) { Model() }
     override fun onConfigChange() { (0 until num).forEach { models[it] = Model().apply{ init(it) } } }
     operator fun get(idx: Int) = models[idx % num]
 }
 
 class VectorSet(val num: Int, val init: (Int)->Double3): IConfigChangeListener {
-    val models = Array(num) { init(it) }
+    val models = Array(num) { Double3.zero }
     override fun onConfigChange() { (0 until num).forEach { models[it] = init(it) } }
     operator fun get(idx: Int) = models[idx % num]
 }
 
-class SimplexNoise() : IWorldLoadListener {
-    var noise = NoiseGeneratorSimplex()
-    override fun onWorldLoad(world: World) { noise = NoiseGeneratorSimplex(Random(world.worldInfo.seed))
+class SimplexNoise : IWorldLoadListener {
+    var noise = SimplexNoiseGenerator(Random())
+    override fun onWorldLoad(world: IWorld) { noise = SimplexNoiseGenerator(Random(world.worldInfo.seed))
     }
     operator fun get(x: Int, z: Int) = MathHelper.floor((noise.getValue(x.toDouble(), z.toDouble()) + 1.0) * 32.0)
     operator fun get(pos: Int3) = get(pos.x, pos.z)

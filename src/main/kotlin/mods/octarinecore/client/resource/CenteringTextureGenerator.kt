@@ -1,13 +1,23 @@
 package mods.octarinecore.client.resource
 
+import net.minecraft.util.ResourceLocation
+import net.minecraftforge.resource.VanillaResourceType
 import java.awt.image.BufferedImage
+import java.io.InputStream
 import java.lang.Math.*
 
-class CenteringTextureGenerator(domain: String, val aspectWidth: Int, val aspectHeight: Int) : TextureGenerator(domain) {
+class CenteringTextureGenerator(
+    domain: String,
+    val aspectWidth: Int,
+    val aspectHeight: Int
+) : GeneratorBase<ResourceLocation>(domain, VanillaResourceType.TEXTURES) {
 
-    override fun generate(params: ParameterList): BufferedImage? {
-        val target = targetResource(params)!!
-        val baseTexture = resourceManager[target.second]?.loadImage() ?: return null
+    override val locationMapper = Atlas.BLOCKS::unwrap
+
+    override fun exists(key: ResourceLocation) = resourceManager.hasResource(Atlas.BLOCKS.wrap(key))
+
+    override fun get(key: ResourceLocation): InputStream? {
+        val baseTexture = resourceManager[Atlas.BLOCKS.wrap(key)]?.loadImage() ?: return null
 
         val frameWidth = baseTexture.width
         val frameHeight = baseTexture.width * aspectHeight / aspectWidth
@@ -28,6 +38,6 @@ class CenteringTextureGenerator(domain: String, val aspectWidth: Int, val aspect
             graphics.drawImage(resultFrame, 0, size * frame, null)
         }
 
-        return resultTexture
+        return resultTexture.asStream
     }
 }

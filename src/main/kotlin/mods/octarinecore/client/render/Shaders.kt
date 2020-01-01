@@ -1,7 +1,7 @@
 package mods.octarinecore.client.render
 
 import mods.octarinecore.common.*
-import net.minecraft.util.EnumFacing
+import net.minecraft.util.Direction
 
 
 const val defaultCornerDimming = 0.5f
@@ -10,17 +10,17 @@ const val defaultEdgeDimming = 0.8f
 // ================================
 // Shader instantiation lambdas
 // ================================
-fun cornerAo(fallbackAxis: EnumFacing.Axis): CornerShaderFactory = { face, dir1, dir2 ->
+fun cornerAo(fallbackAxis: Direction.Axis): CornerShaderFactory = { face, dir1, dir2 ->
     val fallbackDir = listOf(face, dir1, dir2).find { it.axis == fallbackAxis }!!
     CornerSingleFallback(face, dir1, dir2, fallbackDir)
 }
-val cornerFlat = { face: EnumFacing, dir1: EnumFacing, dir2: EnumFacing -> FaceFlat(face) }
-fun cornerAoTri(func: (AoData, AoData)-> AoData) = { face: EnumFacing, dir1: EnumFacing, dir2: EnumFacing ->
+val cornerFlat = { face: Direction, dir1: Direction, dir2: Direction -> FaceFlat(face) }
+fun cornerAoTri(func: (AoData, AoData)-> AoData) = { face: Direction, dir1: Direction, dir2: Direction ->
     CornerTri(face, dir1, dir2, func)
 }
 val cornerAoMaxGreen = cornerAoTri { s1, s2 -> if (s1.green > s2.green) s1 else s2 }
 
-fun cornerInterpolate(edgeAxis: EnumFacing.Axis, weight: Float, dimming: Float): CornerShaderFactory = { dir1, dir2, dir3 ->
+fun cornerInterpolate(edgeAxis: Direction.Axis, weight: Float, dimming: Float): CornerShaderFactory = { dir1, dir2, dir3 ->
     val edgeDir = listOf(dir1, dir2, dir3).find { it.axis == edgeAxis }!!
     val faceDirs = listOf(dir1, dir2, dir3).filter { it.axis != edgeAxis }
     CornerInterpolateDimming(faceDirs[0], faceDirs[1], edgeDir, weight, dimming)
@@ -34,7 +34,7 @@ object NoShader : Shader {
     override fun rotate(rot: Rotation) = this
 }
 
-class CornerSingleFallback(val face: EnumFacing, val dir1: EnumFacing, val dir2: EnumFacing, val fallbackDir: EnumFacing, val fallbackDimming: Float = defaultCornerDimming) : Shader {
+class CornerSingleFallback(val face: Direction, val dir1: Direction, val dir2: Direction, val fallbackDir: Direction, val fallbackDimming: Float = defaultCornerDimming) : Shader {
     val offset = Int3(fallbackDir)
     override fun shade(context: ShadingContext, vertex: RenderVertex) {
         val shading = context.aoShading(face, dir1, dir2)
@@ -56,7 +56,7 @@ inline fun accumulate(v1: AoData?, v2: AoData?, func: ((AoData, AoData)-> AoData
     return null
 }
 
-class CornerTri(val face: EnumFacing, val dir1: EnumFacing, val dir2: EnumFacing,
+class CornerTri(val face: Direction, val dir1: Direction, val dir2: Direction,
                 val func: ((AoData, AoData)-> AoData)) : Shader {
     override fun shade(context: ShadingContext, vertex: RenderVertex) {
         var acc = accumulate(
@@ -72,15 +72,15 @@ class CornerTri(val face: EnumFacing, val dir1: EnumFacing, val dir2: EnumFacing
     override fun rotate(rot: Rotation) = CornerTri(face.rotate(rot), dir1.rotate(rot), dir2.rotate(rot), func)
 }
 
-class EdgeInterpolateFallback(val face: EnumFacing, val edgeDir: EnumFacing, val pos: Double, val fallbackDimming: Float = defaultEdgeDimming): Shader {
+class EdgeInterpolateFallback(val face: Direction, val edgeDir: Direction, val pos: Double, val fallbackDimming: Float = defaultEdgeDimming): Shader {
     val offset = Int3(edgeDir)
     val edgeAxis = axes.find { it != face.axis && it != edgeDir.axis }!!
     val weightN = (0.5 - pos).toFloat()
     val weightP = (0.5 + pos).toFloat()
 
     override fun shade(context: ShadingContext, vertex: RenderVertex) {
-        val shadingP = context.aoShading(face, edgeDir, (edgeAxis to EnumFacing.AxisDirection.POSITIVE).face)
-        val shadingN = context.aoShading(face, edgeDir, (edgeAxis to EnumFacing.AxisDirection.NEGATIVE).face)
+        val shadingP = context.aoShading(face, edgeDir, (edgeAxis to Direction.AxisDirection.POSITIVE).face)
+        val shadingN = context.aoShading(face, edgeDir, (edgeAxis to Direction.AxisDirection.NEGATIVE).face)
         if (!shadingP.valid && !shadingN.valid) context.blockData(offset).let {
             return vertex.shade(it.brightness brMul fallbackDimming, it.color colorMul fallbackDimming)
         }
@@ -91,7 +91,7 @@ class EdgeInterpolateFallback(val face: EnumFacing, val edgeDir: EnumFacing, val
     override fun rotate(rot: Rotation) = EdgeInterpolateFallback(face.rotate(rot), edgeDir.rotate(rot), pos)
 }
 
-class CornerInterpolateDimming(val face1: EnumFacing, val face2: EnumFacing, val edgeDir: EnumFacing,
+class CornerInterpolateDimming(val face1: Direction, val face2: Direction, val edgeDir: Direction,
                                val weight: Float, val dimming: Float, val fallbackDimming: Float = defaultCornerDimming) : Shader {
     val offset = Int3(edgeDir)
     override fun shade(context: ShadingContext, vertex: RenderVertex) {
@@ -111,7 +111,7 @@ class CornerInterpolateDimming(val face1: EnumFacing, val face2: EnumFacing, val
         CornerInterpolateDimming(face1.rotate(rot), face2.rotate(rot), edgeDir.rotate(rot), weight, dimming, fallbackDimming)
 }
 
-class FaceCenter(val face: EnumFacing): Shader {
+class FaceCenter(val face: Direction): Shader {
     override fun shade(context: ShadingContext, vertex: RenderVertex) {
         vertex.red = 0.0f; vertex.green = 0.0f; vertex.blue = 0.0f;
         val b = IntArray(4)
@@ -128,7 +128,7 @@ class FaceCenter(val face: EnumFacing): Shader {
     override fun rotate(rot: Rotation) = FaceCenter(face.rotate(rot))
 }
 
-class FaceFlat(val face: EnumFacing): Shader {
+class FaceFlat(val face: Direction): Shader {
     override fun shade(context: ShadingContext, vertex: RenderVertex) {
         val color = context.blockData(Int3.zero).color
         vertex.shade(context.blockData(face.offset).brightness, color)

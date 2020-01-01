@@ -1,8 +1,8 @@
 @file:JvmName("Utils")
 package mods.octarinecore.client.gui
 
+import net.minecraft.util.text.StringTextComponent
 import net.minecraft.util.text.Style
-import net.minecraft.util.text.TextComponentString
 import net.minecraft.util.text.TextFormatting
 import net.minecraft.util.text.TextFormatting.AQUA
 import net.minecraft.util.text.TextFormatting.GRAY
@@ -16,7 +16,7 @@ fun stripTooltipDefaultText(tooltip: MutableList<String>) {
     }
 }
 
-fun textComponent(msg: String, color: TextFormatting = GRAY): TextComponentString {
+fun textComponent(msg: String, color: TextFormatting = GRAY): StringTextComponent {
     val style = Style().apply { this.color = color }
-    return TextComponentString(msg).apply { this.style = style }
+    return StringTextComponent(msg).apply { this.style = style }
 }

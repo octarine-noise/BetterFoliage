@@ -6,19 +6,19 @@ import mods.betterfoliage.loader.Refs
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.ResourceLocation
 import net.minecraft.util.math.BlockPos
-import net.minecraft.world.ChunkCache
-import net.minecraft.world.IBlockAccess
-import net.minecraft.world.World
+import net.minecraft.world.*
 import kotlin.reflect.KProperty
 import java.lang.Math.*
 
 const val PI2 = 2.0 * PI
 
 /** Strip the given prefix off the start of the string, if present */
-inline fun String.stripStart(str: String) = if (startsWith(str)) substring(str.length) else this
+inline fun String.stripStart(str: String, ignoreCase: Boolean = true) = if (startsWith(str, ignoreCase)) substring(str.length) else this
+inline fun String.stripEnd(str: String, ignoreCase: Boolean = true) = if (endsWith(str, ignoreCase)) substring(0, length - str.length) else this
 
 /** Strip the given prefix off the start of the resource path, if present */
 inline fun ResourceLocation.stripStart(str: String) = ResourceLocation(namespace, path.stripStart(str))
+inline fun ResourceLocation.stripEnd(str: String) = ResourceLocation(namespace, path.stripEnd(str))
 
 /** Mutating version of _map_. Replace each element of the list with the result of the given transformation. */
 inline fun <reified T> MutableList<T>.replace(transform: (T) -> T) = forEachIndexed { idx, value -> this[idx] = transform(value) }
@@ -104,17 +104,18 @@ fun nextPowerOf2(x: Int): Int {
  * Check if the Chunk containing the given [BlockPos] is loaded.
  * Works for both [World] and [ChunkCache] (vanilla and OptiFine) instances.
  */
-fun IBlockAccess.isBlockLoaded(pos: BlockPos) = when {
-    this is World -> isBlockLoaded(pos, false)
-    this is ChunkCache -> world.isBlockLoaded(pos, false)
-    Refs.OptifineChunkCache.isInstance(this) -> (Refs.CCOFChunkCache.get(this) as ChunkCache).world.isBlockLoaded(pos, false)
-    else -> false
-}
+//fun IWorldReader.isBlockLoaded(pos: BlockPos) = when {
+//    this is World -> isBlockLoaded(pos, false)
+//    this is RenderChunkCache -> isworld.isBlockLoaded(pos, false)
+//    Refs.OptifineChunkCache.isInstance(this) -> (Refs.CCOFChunkCache.get(this) as ChunkCache).world.isBlockLoaded(pos, false)
+//    else -> false
+//}
+
 
 /**
  * Get the [TileEntity] at the given position, suppressing exceptions.
  * Also returns null if the chunk is unloaded, which can happen because of multithreaded rendering.
  */
-fun IBlockAccess.getTileEntitySafe(pos: BlockPos): TileEntity? = tryDefault(null as TileEntity?) {
+fun IWorldReader.getTileEntitySafe(pos: BlockPos): TileEntity? = tryDefault(null as TileEntity?) {
     if (isBlockLoaded(pos)) getTileEntity(pos) else null
 }

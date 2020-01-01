@@ -2,6 +2,7 @@ package mods.betterfoliage.client.render.column
 
 import mods.betterfoliage.client.chunk.ChunkOverlayLayer
 import mods.betterfoliage.client.chunk.ChunkOverlayManager
+import mods.betterfoliage.client.chunk.dimType
 import mods.betterfoliage.client.config.Config
 import mods.betterfoliage.client.render.column.ColumnLayerData.SpecialRender.BlockType.*
 import mods.betterfoliage.client.render.column.ColumnLayerData.SpecialRender.QuadrantType
@@ -13,12 +14,11 @@ import mods.octarinecore.common.Int3
 import mods.octarinecore.common.Rotation
 import mods.octarinecore.common.face
 import mods.octarinecore.common.plus
-import net.minecraft.block.state.IBlockState
-import net.minecraft.util.EnumFacing
+import net.minecraft.block.BlockState
+import net.minecraft.util.Direction.Axis
+import net.minecraft.util.Direction.AxisDirection
 import net.minecraft.util.math.BlockPos
-import net.minecraft.world.IBlockAccess
-import net.minecraftforge.fml.relauncher.Side
-import net.minecraftforge.fml.relauncher.SideOnly
+import net.minecraft.world.IEnviromentBlockReader
 
 /** Index of SOUTH-EAST quadrant. */
 const val SE = 0
@@ -32,13 +32,11 @@ const val SW = 3
 /**
  * Sealed class hierarchy for all possible render outcomes
  */
-@SideOnly(Side.CLIENT)
 sealed class ColumnLayerData {
     /**
      * Data structure to cache texture and world neighborhood data relevant to column rendering
      */
     @Suppress("ArrayInDataClass") // not used in comparisons anywhere
-    @SideOnly(Side.CLIENT)
     data class SpecialRender(
         val column: ColumnTextureInfo,
         val upType: BlockType,
@@ -52,15 +50,12 @@ sealed class ColumnLayerData {
     }
 
     /** Column block should not be rendered at all */
-    @SideOnly(Side.CLIENT)
     object SkipRender : ColumnLayerData()
 
     /** Column block must be rendered normally */
-    @SideOnly(Side.CLIENT)
     object NormalRender : ColumnLayerData()
 
     /** Error while resolving render data, column block must be rendered normally */
-    @SideOnly(Side.CLIENT)
     object ResolveError : ColumnLayerData()
 }
 
@@ -68,29 +63,29 @@ sealed class ColumnLayerData {
 abstract class ColumnRenderLayer : ChunkOverlayLayer<ColumnLayerData> {
 
     abstract val registry: ModelRenderRegistry<ColumnTextureInfo>
-    abstract val blockPredicate: (IBlockState)->Boolean
-    abstract val surroundPredicate: (IBlockState) -> Boolean
+    abstract val blockPredicate: (BlockState)->Boolean
+    abstract val surroundPredicate: (BlockState) -> Boolean
     abstract val connectSolids: Boolean
     abstract val lenientConnect: Boolean
     abstract val defaultToY: Boolean
 
     val allNeighborOffsets = (-1..1).flatMap { offsetX -> (-1..1).flatMap { offsetY -> (-1..1).map { offsetZ -> Int3(offsetX, offsetY, offsetZ) }}}
 
-    override fun onBlockUpdate(world: IBlockAccess, pos: BlockPos) {
-        allNeighborOffsets.forEach { offset -> ChunkOverlayManager.clear(this, pos + offset) }
+    override fun onBlockUpdate(reader: IEnviromentBlockReader, pos: BlockPos) {
+        allNeighborOffsets.forEach { offset -> ChunkOverlayManager.clear(reader.dimType, this, pos + offset) }
     }
 
-    override fun calculate(world: IBlockAccess, pos: BlockPos) = calculate(BlockContext(world, pos))
+    override fun calculate(reader: IEnviromentBlockReader, pos: BlockPos) = calculate(BlockContext(reader, pos))
 
     fun calculate(ctx: BlockContext): ColumnLayerData {
-        if (ctx.isSurroundedBy(surroundPredicate)) return ColumnLayerData.SkipRender
+        if (ctx.isSurroundedBy(surroundPredicate) && ctx.isSurroundedByNormal) return ColumnLayerData.SkipRender
         val columnTextures = registry[ctx] ?: return ColumnLayerData.ResolveError
 
         // if log axis is not defined and "Default to vertical" config option is not set, render normally
-        val logAxis = columnTextures.axis ?: if (defaultToY) EnumFacing.Axis.Y else return ColumnLayerData.NormalRender
+        val logAxis = columnTextures.axis ?: if (defaultToY) Axis.Y else return ColumnLayerData.NormalRender
 
         // check log neighborhood
-        val baseRotation = rotationFromUp[(logAxis to EnumFacing.AxisDirection.POSITIVE).face.ordinal]
+        val baseRotation = rotationFromUp[(logAxis to AxisDirection.POSITIVE).face.ordinal]
 
         val upType = ctx.blockType(baseRotation, logAxis, Int3(0, 1, 0))
         val downType = ctx.blockType(baseRotation, logAxis, Int3(0, -1, 0))
@@ -109,7 +104,7 @@ abstract class ColumnRenderLayer : ChunkOverlayLayer<ColumnLayerData> {
     }
 
     /** Fill the array of [QuadrantType]s based on the blocks to the sides of this one. */
-    fun Array<QuadrantType>.checkNeighbors(ctx: BlockContext, rotation: Rotation, logAxis: EnumFacing.Axis, yOff: Int): Array<QuadrantType> {
+    fun Array<QuadrantType>.checkNeighbors(ctx: BlockContext, rotation: Rotation, logAxis: Axis, yOff: Int): Array<QuadrantType> {
         val blkS = ctx.blockType(rotation, logAxis, Int3(0, yOff, 1))
         val blkE = ctx.blockType(rotation, logAxis, Int3(1, yOff, 0))
         val blkN = ctx.blockType(rotation, logAxis, Int3(0, yOff, -1))
@@ -176,13 +171,13 @@ abstract class ColumnRenderLayer : ChunkOverlayLayer<ColumnLayerData> {
     /**
      * Get the type of the block at the given offset in a rotated reference frame.
      */
-    fun BlockContext.blockType(rotation: Rotation, axis: EnumFacing.Axis, offset: Int3): ColumnLayerData.SpecialRender.BlockType {
+    fun BlockContext.blockType(rotation: Rotation, axis: Axis, offset: Int3): ColumnLayerData.SpecialRender.BlockType {
         val offsetRot = offset.rotate(rotation)
         val state = blockState(offsetRot)
         return if (!blockPredicate(state)) {
-            if (state.isOpaqueCube) SOLID else NONSOLID
+            if (isNormalCube(offsetRot)) SOLID else NONSOLID
         } else {
-            (registry[state, world!!, pos + offsetRot]?.axis ?: if (Config.roundLogs.defaultY) EnumFacing.Axis.Y else null)?.let {
+            (registry[state, reader!!, pos + offsetRot]?.axis ?: if (Config.roundLogs.defaultY) Axis.Y else null)?.let {
                 if (it == axis) PARALLEL else PERPENDICULAR
             } ?: SOLID
         }

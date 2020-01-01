@@ -5,7 +5,8 @@ import mods.betterfoliage.client.config.Config
 import mods.octarinecore.client.render.*
 import mods.octarinecore.common.Double3
 import mods.octarinecore.exchange
-import net.minecraft.util.EnumFacing.*
+import net.minecraft.util.Direction
+import net.minecraft.util.Direction.*
 import org.lwjgl.opengl.GL11
 
 /** Weight of the same-side AO values on the outer edges of the 45deg chamfered column faces. */
@@ -25,10 +26,10 @@ fun Model.columnSide(radius: Double, yBottom: Double, yTop: Double, transform: (
         verticalRectangle(x1 = 0.5 - radius, z1 = 0.5, x2 = 0.5 - halfRadius, z2 = 0.5 - halfRadius, yBottom = yBottom, yTop = yTop)
         .clampUV(minU = 0.5 - radius)
         .setAoShader(
-            faceOrientedAuto(overrideFace = SOUTH, corner = cornerInterpolate(Axis.Y, chamferAffinity, Config.roundLogs.dimming))
+            faceOrientedAuto(overrideFace = SOUTH, corner = cornerInterpolate(Axis.Y, chamferAffinity, Config.roundLogs.dimming.toFloat()))
         )
         .setAoShader(
-            faceOrientedAuto(overrideFace = SOUTH, corner = cornerInterpolate(Axis.Y, 0.5f, Config.roundLogs.dimming)),
+            faceOrientedAuto(overrideFace = SOUTH, corner = cornerInterpolate(Axis.Y, 0.5f, Config.roundLogs.dimming.toFloat())),
             predicate = { v, vi -> vi == 1 || vi == 2}
         )
     ).forEach { transform(it.setFlatShader(FaceFlat(SOUTH))).add() }
@@ -37,9 +38,9 @@ fun Model.columnSide(radius: Double, yBottom: Double, yTop: Double, transform: (
         verticalRectangle(x1 = 0.5 - halfRadius, z1 = 0.5 - halfRadius, x2 = 0.5, z2 = 0.5 - radius, yBottom = yBottom, yTop = yTop)
         .clampUV(maxU = radius - 0.5)
         .setAoShader(
-            faceOrientedAuto(overrideFace = EAST, corner = cornerInterpolate(Axis.Y, chamferAffinity, Config.roundLogs.dimming)))
+            faceOrientedAuto(overrideFace = EAST, corner = cornerInterpolate(Axis.Y, chamferAffinity, Config.roundLogs.dimming.toFloat())))
         .setAoShader(
-            faceOrientedAuto(overrideFace = EAST, corner = cornerInterpolate(Axis.Y, 0.5f, Config.roundLogs.dimming)),
+            faceOrientedAuto(overrideFace = EAST, corner = cornerInterpolate(Axis.Y, 0.5f, Config.roundLogs.dimming.toFloat())),
             predicate = { v, vi -> vi == 0 || vi == 3}
         ),
 

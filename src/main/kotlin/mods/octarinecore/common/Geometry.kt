@@ -1,11 +1,11 @@
 package mods.octarinecore.common
 
 import mods.octarinecore.cross
-import net.minecraft.util.EnumFacing
-import net.minecraft.util.EnumFacing.*
-import net.minecraft.util.EnumFacing.Axis.*
-import net.minecraft.util.EnumFacing.AxisDirection.NEGATIVE
-import net.minecraft.util.EnumFacing.AxisDirection.POSITIVE
+import net.minecraft.util.Direction
+import net.minecraft.util.Direction.*
+import net.minecraft.util.Direction.Axis.*
+import net.minecraft.util.Direction.AxisDirection.NEGATIVE
+import net.minecraft.util.Direction.AxisDirection.POSITIVE
 import net.minecraft.util.math.BlockPos
 
 // ================================
@@ -13,19 +13,19 @@ import net.minecraft.util.math.BlockPos
 // ================================
 val axes = listOf(X, Y, Z)
 val axisDirs = listOf(POSITIVE, NEGATIVE)
-val EnumFacing.dir: AxisDirection get() = axisDirection
+val Direction.dir: AxisDirection get() = axisDirection
 val AxisDirection.sign: String get() = when(this) { POSITIVE -> "+"; NEGATIVE -> "-" }
-val forgeDirs = EnumFacing.values()
+val forgeDirs = Direction.values()
 val forgeDirsHorizontal = listOf(NORTH, SOUTH, EAST, WEST)
 val forgeDirOffsets = forgeDirs.map { Int3(it) }
-val Pair<Axis, AxisDirection>.face: EnumFacing get() = when(this) {
+val Pair<Axis, AxisDirection>.face: Direction get() = when(this) {
     X to POSITIVE -> EAST; X to NEGATIVE -> WEST;
     Y to POSITIVE -> UP; Y to NEGATIVE -> DOWN;
     Z to POSITIVE -> SOUTH; else -> NORTH;
 }
-val EnumFacing.perpendiculars: List<EnumFacing> get() =
+val Direction.perpendiculars: List<Direction> get() =
     axes.filter { it != this.axis }.cross(axisDirs).map { it.face }
-val EnumFacing.offset: Int3 get() = forgeDirOffsets[ordinal]
+val Direction.offset: Int3 get() = forgeDirOffsets[ordinal]
 
 /** Old ForgeDirection rotation matrix yanked from 1.7.10 */
 val ROTATION_MATRIX: Array<IntArray> get() = arrayOf(
@@ -40,15 +40,15 @@ val ROTATION_MATRIX: Array<IntArray> get() = arrayOf(
 // ================================
 // Vectors
 // ================================
-operator fun EnumFacing.times(scale: Double) =
+operator fun Direction.times(scale: Double) =
     Double3(directionVec.x.toDouble() * scale, directionVec.y.toDouble() * scale, directionVec.z.toDouble() * scale)
-val EnumFacing.vec: Double3 get() = Double3(directionVec.x.toDouble(), directionVec.y.toDouble(), directionVec.z.toDouble())
+val Direction.vec: Double3 get() = Double3(directionVec.x.toDouble(), directionVec.y.toDouble(), directionVec.z.toDouble())
 operator fun BlockPos.plus(other: Int3) = BlockPos(x + other.x, y + other.y, z + other.z)
 
 /** 3D vector of [Double]s. Offers both mutable operations, and immutable operations in operator notation. */
 data class Double3(var x: Double, var y: Double, var z: Double) {
     constructor(x: Float, y: Float, z: Float) : this(x.toDouble(), y.toDouble(), z.toDouble())
-    constructor(dir: EnumFacing) : this(dir.directionVec.x.toDouble(), dir.directionVec.y.toDouble(), dir.directionVec.z.toDouble())
+    constructor(dir: Direction) : this(dir.directionVec.x.toDouble(), dir.directionVec.y.toDouble(), dir.directionVec.z.toDouble())
     companion object {
         val zero: Double3 get() = Double3(0.0, 0.0, 0.0)
         fun weight(v1: Double3, weight1: Double, v2: Double3, weight2: Double) =
@@ -92,13 +92,13 @@ data class Double3(var x: Double, var y: Double, var z: Double) {
     infix fun cross(o: Double3) = Double3(y * o.z - z * o.y, z * o.x - x * o.z, x * o.y - y * o.x)
     val length: Double get() = Math.sqrt(x * x + y * y + z * z)
     val normalize: Double3 get() = (1.0 / length).let { Double3(x * it, y * it, z * it) }
-    val nearestCardinal: EnumFacing get() = nearestAngle(this, forgeDirs.asIterable()) { it.vec }.first
+    val nearestCardinal: Direction get() = nearestAngle(this, forgeDirs.asIterable()) { it.vec }.first
 }
 
 /** 3D vector of [Int]s. Offers both mutable operations, and immutable operations in operator notation. */
 data class Int3(var x: Int, var y: Int, var z: Int) {
-    constructor(dir: EnumFacing) : this(dir.directionVec.x, dir.directionVec.y, dir.directionVec.z)
-    constructor(offset: Pair<Int, EnumFacing>) : this(
+    constructor(dir: Direction) : this(dir.directionVec.x, dir.directionVec.y, dir.directionVec.z)
+    constructor(offset: Pair<Int, Direction>) : this(
         offset.first * offset.second.directionVec.x,
         offset.first * offset.second.directionVec.y,
         offset.first * offset.second.directionVec.z
@@ -109,7 +109,7 @@ data class Int3(var x: Int, var y: Int, var z: Int) {
 
     // immutable operations
     operator fun plus(other: Int3) = Int3(x + other.x, y + other.y, z + other.z)
-    operator fun plus(other: Pair<Int, EnumFacing>) = Int3(
+    operator fun plus(other: Pair<Int, Direction>) = Int3(
         x + other.first * other.second.directionVec.x,
         y + other.first * other.second.directionVec.y,
         z + other.first * other.second.directionVec.z
@@ -145,17 +145,17 @@ data class Int3(var x: Int, var y: Int, var z: Int) {
 // ================================
 // Rotation
 // ================================
-val EnumFacing.rotations: Array<EnumFacing> get() =
-    Array(6) { idx -> EnumFacing.values()[ROTATION_MATRIX[ordinal][idx]] }
-fun EnumFacing.rotate(rot: Rotation) = rot.forward[ordinal]
-fun rot(axis: EnumFacing) = Rotation.rot90[axis.ordinal]
+val Direction.rotations: Array<Direction> get() =
+    Array(6) { idx -> Direction.values()[ROTATION_MATRIX[ordinal][idx]] }
+fun Direction.rotate(rot: Rotation) = rot.forward[ordinal]
+fun rot(axis: Direction) = Rotation.rot90[axis.ordinal]
 
 /**
  * Class representing an arbitrary rotation (or combination of rotations) around cardinal axes by 90 degrees.
  * In effect, a permutation of [ForgeDirection]s.
  */
 @Suppress("NOTHING_TO_INLINE")
-class Rotation(val forward: Array<EnumFacing>, val reverse: Array<EnumFacing>) {
+class Rotation(val forward: Array<Direction>, val reverse: Array<Direction>) {
     operator fun plus(other: Rotation) = Rotation(
         Array(6) { idx -> forward[other.forward[idx].ordinal] },
         Array(6) { idx -> other.reverse[reverse[idx].ordinal] }
@@ -163,9 +163,9 @@ class Rotation(val forward: Array<EnumFacing>, val reverse: Array<EnumFacing>) {
     operator fun unaryMinus() = Rotation(reverse, forward)
     operator fun times(num: Int) = when(num % 4) { 1 -> this; 2 -> this + this; 3 -> -this; else -> identity }
 
-    inline fun rotatedComponent(dir: EnumFacing, x: Int, y: Int, z: Int) =
+    inline fun rotatedComponent(dir: Direction, x: Int, y: Int, z: Int) =
         when(reverse[dir.ordinal]) { EAST -> x; WEST -> -x; UP -> y; DOWN -> -y; SOUTH -> z; NORTH -> -z; else -> 0 }
-    inline fun rotatedComponent(dir: EnumFacing, x: Double, y: Double, z: Double) =
+    inline fun rotatedComponent(dir: Direction, x: Double, y: Double, z: Double) =
         when(reverse[dir.ordinal]) { EAST -> x; WEST -> -x; UP -> y; DOWN -> -y; SOUTH -> z; NORTH -> -z; else -> 0.0 }
 
     companion object {
@@ -204,11 +204,11 @@ fun <T> nearestPosition(vertex: Double3, objs: Iterable<T>, objPos: (T)-> Double
 fun <T> nearestAngle(vector: Double3, objs: Iterable<T>, objAngle: (T)-> Double3): Pair<T, Double> =
         objs.map { it to objAngle(it).dot(vector) }.maxBy { it.second }!!
 
-data class FaceCorners(val topLeft: Pair<EnumFacing, EnumFacing>,
-                       val topRight: Pair<EnumFacing, EnumFacing>,
-                       val bottomLeft: Pair<EnumFacing, EnumFacing>,
-                       val bottomRight: Pair<EnumFacing, EnumFacing>) {
-    constructor(top: EnumFacing, left: EnumFacing) :
+data class FaceCorners(val topLeft: Pair<Direction, Direction>,
+                       val topRight: Pair<Direction, Direction>,
+                       val bottomLeft: Pair<Direction, Direction>,
+                       val bottomRight: Pair<Direction, Direction>) {
+    constructor(top: Direction, left: Direction) :
     this(top to left, top to left.opposite, top.opposite to left, top.opposite to left.opposite)
 
     val asArray = arrayOf(topLeft, topRight, bottomLeft, bottomRight)

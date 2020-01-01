@@ -4,16 +4,17 @@ package mods.octarinecore.client.resource
 import mods.betterfoliage.loader.Refs
 import mods.octarinecore.PI2
 import mods.octarinecore.client.render.HSB
-import mods.octarinecore.metaprog.reflectField
+import mods.octarinecore.stripEnd
 import mods.octarinecore.stripStart
 import mods.octarinecore.tryDefault
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.block.model.ModelBlock
+import net.minecraft.client.renderer.model.BlockModel
+import net.minecraft.client.renderer.texture.AtlasTexture
+import net.minecraft.client.renderer.texture.MissingTextureSprite
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
-import net.minecraft.client.renderer.texture.TextureMap
-import net.minecraft.client.resources.IResource
-import net.minecraft.client.resources.IResourceManager
-import net.minecraft.client.resources.SimpleReloadableResourceManager
+import net.minecraft.resources.IResource
+import net.minecraft.resources.IResourceManager
+import net.minecraft.resources.SimpleReloadableResourceManager
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.model.IModel
 import java.awt.image.BufferedImage
@@ -24,8 +25,9 @@ import java.lang.Math.*
 import javax.imageio.ImageIO
 
 /** Concise getter for the Minecraft resource manager. */
-val resourceManager: SimpleReloadableResourceManager get() =
-    Minecraft.getMinecraft().resourceManager as SimpleReloadableResourceManager
+val resourceManager: SimpleReloadableResourceManager
+    get() =
+    Minecraft.getInstance().resourceManager as SimpleReloadableResourceManager
 
 /** Append a string to the [ResourceLocation]'s path. */
 operator fun ResourceLocation.plus(str: String) = ResourceLocation(namespace, path + str)
@@ -36,8 +38,10 @@ operator fun IResourceManager.get(domain: String, path: String): IResource? = ge
 operator fun IResourceManager.get(location: ResourceLocation): IResource? = tryDefault(null) { getResource(location) }
 
 /** Index operator to get a texture sprite. */
-operator fun TextureMap.get(name: String): TextureAtlasSprite? = getTextureExtry(ResourceLocation(name).toString())
-operator fun TextureMap.get(res: ResourceLocation): TextureAtlasSprite? = getTextureExtry(res.toString())
+operator fun AtlasTexture.get(res: ResourceLocation): TextureAtlasSprite? = getSprite(res)
+operator fun AtlasTexture.get(name: String): TextureAtlasSprite? = getSprite(ResourceLocation(name))
+
+val missingSprite: TextureAtlasSprite get() = MissingTextureSprite.func_217790_a()
 
 /** Load an image resource. */
 fun IResource.loadImage(): BufferedImage? = ImageIO.read(this.inputStream)
@@ -65,18 +69,18 @@ val BufferedImage.asStream: InputStream get() =
  * and the result transformed back to the RGB color space.
  */
 val TextureAtlasSprite.averageColor: Int? get() {
-    val locationNoDirs = ResourceLocation(iconName).stripStart("blocks/")
-    val locationWithDirs = ResourceLocation(locationNoDirs.namespace, "textures/blocks/%s.png".format(locationNoDirs.path))
-    val image = resourceManager[locationWithDirs]?.loadImage() ?: return null
+//    val locationNoDirs = ResourceLocation(iconName).stripStart("blocks/")
+//    val locationWithDirs = ResourceLocation(locationNoDirs.namespace, "textures/blocks/%s.png".format(locationNoDirs.path))
+//    val image = resourceManager[locationWithDirs]?.loadImage() ?: return null
 
     var numOpaque = 0
     var sumHueX = 0.0
     var sumHueY = 0.0
     var sumSaturation = 0.0f
     var sumBrightness = 0.0f
-    for (x in 0..image.width - 1)
-        for (y in 0..image.height - 1) {
-            val pixel = image[x, y]
+    for (x in 0..width - 1)
+        for (y in 0..height - 1) {
+            val pixel = getPixelRGBA(0, x, y);
             val alpha = (pixel shr 24) and 255
             val hsb = HSB.fromColor(pixel)
             if (alpha == 255) {
@@ -101,27 +105,9 @@ fun textureLocation(iconName: String) = ResourceLocation(iconName).let {
     else ResourceLocation(it.namespace, "textures/${it.path}")
 }
 
-@Suppress("UNCHECKED_CAST")
-val IModel.modelBlockAndLoc: List<Pair<ModelBlock, ResourceLocation>> get() {
-    if (Refs.VanillaModelWrapper.isInstance(this))
-        return listOf(Pair(Refs.model_VMW.get(this) as ModelBlock, Refs.location_VMW.get(this) as ResourceLocation))
-    else if (Refs.WeightedRandomModel.isInstance(this)) Refs.models_WRM.get(this)?.let {
-        return (it as List<IModel>).flatMap(IModel::modelBlockAndLoc)
-    }
-    else if (Refs.MultipartModel.isInstance(this)) Refs.partModels_MPM.get(this)?.let {
-        return (it as Map<Any, IModel>).flatMap { it.value.modelBlockAndLoc }
-    } else {
-        this::class.java.declaredFields.find { it.type.isInstance(IModel::class.java) }?.let { modelField ->
-            modelField.isAccessible = true
-            return (modelField.get(this) as IModel).modelBlockAndLoc
-        }
-    }
-    return listOf()
-}
-
-fun Pair<ModelBlock, ResourceLocation>.derivesFrom(targetLocation: ResourceLocation): Boolean {
+fun Pair<BlockModel, ResourceLocation>.derivesFrom(targetLocation: ResourceLocation): Boolean {
     if (second.stripStart("models/") == targetLocation) return true
     if (first.parent != null && first.parentLocation != null)
-        return Pair(first.parent, first.parentLocation!!).derivesFrom(targetLocation)
+        return Pair(first.parent!!, first.parentLocation!!).derivesFrom(targetLocation)
     return false
 }

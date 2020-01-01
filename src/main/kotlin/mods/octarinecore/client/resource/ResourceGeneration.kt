@@ -1,65 +1,111 @@
 package mods.octarinecore.client.resource
 
-import mods.octarinecore.metaprog.reflectField
-import net.minecraft.client.resources.IResourcePack
-import net.minecraft.client.resources.data.IMetadataSection
-import net.minecraft.client.resources.data.IMetadataSectionSerializer
-import net.minecraft.client.resources.data.MetadataSerializer
-import net.minecraft.client.resources.data.PackMetadataSection
+import net.minecraft.client.Minecraft
+import net.minecraft.resources.*
+import net.minecraft.resources.ResourcePackType.CLIENT_RESOURCES
+import net.minecraft.resources.data.IMetadataSectionSerializer
+import net.minecraft.resources.data.PackMetadataSection
 import net.minecraft.util.ResourceLocation
-import net.minecraft.util.text.TextComponentString
-import net.minecraftforge.fml.client.FMLClientHandler
+import net.minecraft.util.text.StringTextComponent
+import net.minecraftforge.resource.IResourceType
+import net.minecraftforge.resource.ISelectiveResourceReloadListener
 import java.io.InputStream
 import java.util.*
+import java.util.function.Predicate
+import java.util.function.Supplier
 
 /**
- * [IResourcePack] containing generated resources. Adds itself to the default resource pack list
- * of Minecraft, so it is invisible and always active.
+ * [IResourcePack] containing generated resources
  *
  * @param[name] Name of the resource pack
  * @param[generators] List of resource generators
  */
-class GeneratorPack(val name: String, vararg val generators: GeneratorBase) : IResourcePack {
+class GeneratorPack(val packName: String, val packDescription: String, val packImage: String) : IResourcePack {
 
-    fun inject() {
-        FMLClientHandler.instance().reflectField<MutableList<IResourcePack>>("resourcePackList")!!.add(this)
+    val generators = mutableListOf<GeneratorBase<*>>()
+
+    val packFinder = Finder(this)
+    override fun getName() = packName
+    override fun getResourceNamespaces(type: ResourcePackType) = if (type == CLIENT_RESOURCES) generators.map { it.namespace }.toSet() else emptySet()
+
+    override fun <T : Any?> getMetadata(deserializer: IMetadataSectionSerializer<T>): T? {
+        if (deserializer.sectionName != "pack") return null
+        return PackMetadataSection(StringTextComponent(packDescription), 4) as? T
     }
 
-    override fun getPackName() = name
-    override fun getPackImage() = null
-    override fun getResourceDomains() = HashSet(generators.map { it.domain })
-    override fun <T : IMetadataSection?> getPackMetadata(serializer: MetadataSerializer?, sectionName: String?) =
-        if (sectionName == "pack") PackMetadataSection(TextComponentString("Generated resources"), 1) as? T else null
+    override fun resourceExists(type: ResourcePackType, location: ResourceLocation?) =
+        location != null &&
+        type == CLIENT_RESOURCES &&
+        generators.find { it.namespace == location.namespace && it.resourceExists(location) } != null
 
-    override fun resourceExists(location: ResourceLocation?): Boolean =
-            if (location == null) false
-            else generators.find {
-                it.domain == location.namespace && it.resourceExists(location)
-            } != null
+    override fun getResourceStream(type: ResourcePackType, location: ResourceLocation) =
+        if (location != null && type == CLIENT_RESOURCES)
+            generators.firstOrNull { it.namespace == location.namespace && it.resourceExists(location) }?.getInputStream(location)
+        else
+            null
 
-    override fun getInputStream(location: ResourceLocation?): InputStream? =
-            if (location == null) null
-            else generators.filter {
-                it.domain == location.namespace && it.resourceExists(location)
-            }.map { it.getInputStream(location) }
-            .filterNotNull().first()
+    override fun getAllResourceLocations(type: ResourcePackType, pathIn: String, maxDepth: Int, filter: Predicate<String>) = emptyList<ResourceLocation>()
+    override fun getRootResourceStream(fileName: String) = fileName.let { if (it == "pack.png") packImage else it }.let { this::class.java.classLoader.getResourceAsStream(it) }
+    override fun close() {}
 
-//    override fun <T : IMetadataSection?> getPackMetadata(p_135058_1_: IMetadataSerializer?, p_135058_2_: String?): T {
-//        return if (type == "pack") PackMetadataSection(ChatComponentText("Generated resources"), 1) else null
-//    }
+    class Finder(val pack: GeneratorPack) : IPackFinder {
+        override fun <T : ResourcePackInfo> addPackInfosToMap(nameToPackMap: MutableMap<String, T>, packInfoFactory: ResourcePackInfo.IFactory<T>) {
+            val packInfo = ResourcePackInfo.createResourcePack(
+                pack.packName,
+                true,
+                Supplier { pack } as Supplier<IResourcePack>,
+                packInfoFactory,
+                ResourcePackInfo.Priority.BOTTOM
+            )
+            nameToPackMap[pack.packName] = packInfo!!
+        }
+    }
 }
 
 /**
  * Abstract base class for resource generators
  *
- * @param[domain] Resource domain of generator
+ * @param[namespace] Resource namespace of generator
+ * @param[generatedType] IResourceType of generated resources
  */
-abstract class GeneratorBase(val domain: String) {
-    /** @see [IResourcePack.resourceExists] */
-    abstract fun resourceExists(location: ResourceLocation?): Boolean
+abstract class GeneratorBase<T>(val namespace: String, val generatedType: IResourceType) : ISelectiveResourceReloadListener {
+    val keyToId = mutableMapOf<T, String>()
+    val idToKey = mutableMapOf<String, T>()
+    open val locationMapper: (ResourceLocation)->ResourceLocation = { it }
 
-    /** @see [IResourcePack.getInputStream] */
-    abstract fun getInputStream(location: ResourceLocation?): InputStream?
+    init { resourceManager.addReloadListener(this) }
+
+    abstract fun get(key: T): InputStream?
+    abstract fun exists(key: T): Boolean
+
+    fun registerResource(key: T): ResourceLocation {
+        keyToId[key]?.let { return ResourceLocation(namespace, it) }
+        val id = UUID.randomUUID().toString()
+        keyToId[key] = id
+        idToKey[id] = key
+        return ResourceLocation(namespace, id)
+    }
+
+    fun resourceExists(location: ResourceLocation?): Boolean {
+        val key = location?.let { locationMapper(it) }?.path?.let { idToKey[it] } ?: return false
+        return exists(key)
+    }
+
+    fun getInputStream(location: ResourceLocation?): InputStream? {
+        val key = location?.let { locationMapper(it) }?.path?.let { idToKey[it] } ?: return null
+        return get(key)
+    }
+
+    open fun onReload(resourceManager: IResourceManager) {
+        keyToId.clear()
+        idToKey.clear()
+    }
+
+    override fun onResourceManagerReload(resourceManager: IResourceManager, resourcePredicate: Predicate<IResourceType>) {
+        if (resourcePredicate.test(generatedType)) onReload(resourceManager)
+    }
+
+
 }
 
 /**
@@ -70,6 +116,7 @@ abstract class GeneratorBase(val domain: String) {
  * @param[params] key-value pairs
  * @param[value] keyless extra value
  */
+/*
 class ParameterList(val params: Map<String, String>, val value: String?) {
     override fun toString() =
             params.entries
@@ -118,3 +165,4 @@ abstract class ParameterBasedGenerator(domain: String) : GeneratorBase(domain) {
     override fun getInputStream(location: ResourceLocation?) =
             getInputStream(ParameterList.fromString(location?.path ?: ""))
 }
+ */

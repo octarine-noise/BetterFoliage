@@ -43,6 +43,14 @@ fun Any.reflectFieldsOfType(vararg types: Class<*>) = this.javaClass.declaredFie
     .map { field -> field.name to field.let { it.isAccessible = true; it.get(this) } }
     .filterNotNull()
 
+fun <T> Any.reflectFields(type: Class<T>) = this.javaClass.declaredFields
+    .filter { field -> type.isAssignableFrom(field.type) }
+    .map { field -> field.name to field.let { it.isAccessible = true; it.get(this) as T } }
+
+fun <T> Any.reflectDelegates(type: Class<T>) = this.javaClass.declaredFields
+    .filter { field -> type.isAssignableFrom(field.type) && field.name.contains("$") }
+    .map { field -> field.name.split("$")[0] to field.let { it.isAccessible = true; it.get(this) } as T }
+
 enum class Namespace { MCP, SRG }
 
 abstract class Resolvable<T> {

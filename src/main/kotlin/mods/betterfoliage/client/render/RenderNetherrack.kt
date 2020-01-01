@@ -1,7 +1,8 @@
 package mods.betterfoliage.client.render
 
-import mods.betterfoliage.BetterFoliageMod
+import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.client.Client
+import mods.betterfoliage.client.config.BlockConfig
 import mods.betterfoliage.client.config.Config
 import mods.octarinecore.client.render.*
 import mods.octarinecore.common.Int3
@@ -10,15 +11,16 @@ import mods.octarinecore.random
 import net.minecraft.client.renderer.BlockRendererDispatcher
 import net.minecraft.client.renderer.BufferBuilder
 import net.minecraft.util.BlockRenderLayer
-import net.minecraft.util.EnumFacing.*
-import net.minecraftforge.fml.relauncher.Side
-import net.minecraftforge.fml.relauncher.SideOnly
-import org.apache.logging.log4j.Level.INFO
+import net.minecraft.util.Direction.Axis
+import net.minecraft.util.Direction.*
+import net.minecraft.util.ResourceLocation
+import net.minecraftforge.client.model.data.IModelData
+import org.apache.logging.log4j.Level.DEBUG
+import java.util.*
 
-@SideOnly(Side.CLIENT)
-class RenderNetherrack : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
+class RenderNetherrack : AbstractBlockRenderingHandler(BetterFoliage.MOD_ID, BetterFoliage.modBus) {
 
-    val netherrackIcon = iconSet(BetterFoliageMod.LEGACY_DOMAIN, "blocks/better_netherrack_%d")
+    val netherrackIcon = iconSet { idx -> ResourceLocation(BetterFoliage.MOD_ID, "blocks/better_netherrack_$idx") }
     val netherrackModel = modelSet(64) { modelIdx ->
         verticalRectangle(x1 = -0.5, z1 = 0.5, x2 = 0.5, z2 = -0.5, yTop = -0.5,
         yBottom = -0.5 - random(Config.netherrack.heightMin, Config.netherrack.heightMax))
@@ -29,19 +31,19 @@ class RenderNetherrack : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) 
     }
 
     override fun afterPreStitch() {
-        Client.log(INFO, "Registered ${netherrackIcon.num} netherrack textures")
+        Client.log(DEBUG, "Registered ${netherrackIcon.num} netherrack textures")
     }
 
     override fun isEligible(ctx: BlockContext): Boolean {
         if (!Config.enabled || !Config.netherrack.enabled) return false
-        return Config.blocks.netherrack.matchesClass(ctx.block)
+        return BlockConfig.netherrack.matchesClass(ctx.block)
     }
 
-    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: BufferBuilder, layer: BlockRenderLayer): Boolean {
-        val baseRender = renderWorldBlockBase(ctx, dispatcher, renderer, layer)
+    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: BufferBuilder, random: Random, modelData: IModelData, layer: BlockRenderLayer): Boolean {
+        val baseRender = renderWorldBlockBase(ctx, dispatcher, renderer, random, modelData, layer)
         if (!layer.isCutout) return baseRender
 
-        if (ctx.blockState(down1).isOpaqueCube) return baseRender
+        if (ctx.isNormalCube(down1)) return baseRender
 
         modelRenderer.updateShading(Int3.zero, allFaces)
 

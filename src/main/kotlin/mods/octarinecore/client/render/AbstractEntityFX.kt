@@ -3,13 +3,16 @@ package mods.octarinecore.client.render
 import mods.octarinecore.PI2
 import mods.octarinecore.common.Double3
 import net.minecraft.client.Minecraft
+import net.minecraft.client.particle.IParticleRenderType
 import net.minecraft.client.particle.Particle
+import net.minecraft.client.particle.SpriteTexturedParticle
+import net.minecraft.client.renderer.ActiveRenderInfo
 import net.minecraft.client.renderer.BufferBuilder
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.entity.Entity
 import net.minecraft.world.World
 
-abstract class AbstractEntityFX(world: World, x: Double, y: Double, z: Double) : Particle(world, x, y, z) {
+abstract class AbstractEntityFX(world: World, x: Double, y: Double, z: Double) : SpriteTexturedParticle(world, x, y, z) {
 
     companion object {
         @JvmStatic val sin = Array(64) { idx -> Math.sin(PI2 / 64.0 * idx) }
@@ -21,8 +24,8 @@ abstract class AbstractEntityFX(world: World, x: Double, y: Double, z: Double) :
     val prevPos = Double3.zero
     val velocity = Double3.zero
 
-    override fun onUpdate() {
-        super.onUpdate()
+    override fun tick() {
+        super.tick()
         currentPos.setTo(posX, posY, posZ)
         prevPos.setTo(prevPosX, prevPosY, prevPosZ)
         velocity.setTo(motionX, motionY, motionZ)
@@ -41,12 +44,12 @@ abstract class AbstractEntityFX(world: World, x: Double, y: Double, z: Double) :
     abstract val isValid: Boolean
 
     /** Add the particle to the effect renderer if it is valid. */
-    fun addIfValid() { if (isValid) Minecraft.getMinecraft().effectRenderer.addEffect(this) }
+    fun addIfValid() { if (isValid) Minecraft.getInstance().particles.addEffect(this) }
 
-    override fun renderParticle(worldRenderer: BufferBuilder, entity: Entity, partialTickTime: Float, rotX: Float, rotZ: Float, rotYZ: Float, rotXY: Float, rotXZ: Float) {
+    override fun renderParticle(buffer: BufferBuilder, entity: ActiveRenderInfo, partialTicks: Float, rotX: Float, rotZ: Float, rotYZ: Float, rotXY: Float, rotXZ: Float) {
         billboardRot.first.setTo(rotX + rotXY, rotZ, rotYZ + rotXZ)
         billboardRot.second.setTo(rotX - rotXY, -rotZ, rotYZ - rotXZ)
-        render(worldRenderer, partialTickTime)
+        render(buffer, partialTicks)
     }
     /**
      * Render a particle quad.
@@ -67,7 +70,7 @@ abstract class AbstractEntityFX(world: World, x: Double, y: Double, z: Double) :
                            prevPos: Double3 = this.prevPos,
                            size: Double = particleScale.toDouble(),
                            rotation: Int = 0,
-                           icon: TextureAtlasSprite = particleTexture,
+                           icon: TextureAtlasSprite = sprite,
                            isMirrored: Boolean = false,
                            alpha: Float = this.particleAlpha) {
 
@@ -115,7 +118,8 @@ abstract class AbstractEntityFX(world: World, x: Double, y: Double, z: Double) :
             .endVertex()
     }
 
-    override fun getFXLayer() = 1
+    //    override fun getFXLayer() = 1
+    override fun getRenderType(): IParticleRenderType = IParticleRenderType.PARTICLE_SHEET_TRANSLUCENT
 
     fun setColor(color: Int) {
         particleBlue = (color and 255) / 256.0f

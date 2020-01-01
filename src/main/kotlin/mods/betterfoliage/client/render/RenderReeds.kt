@@ -1,27 +1,30 @@
 package mods.betterfoliage.client.render
 
-import mods.betterfoliage.BetterFoliageMod
+import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.client.Client
+import mods.betterfoliage.client.config.BlockConfig
 import mods.betterfoliage.client.config.Config
 import mods.betterfoliage.client.integration.ShadersModIntegration
 import mods.octarinecore.client.render.*
 import mods.octarinecore.common.Int3
 import mods.octarinecore.common.Rotation
 import mods.octarinecore.random
+import net.minecraft.block.Block
 import net.minecraft.block.material.Material
 import net.minecraft.client.renderer.BlockRendererDispatcher
 import net.minecraft.client.renderer.BufferBuilder
+import net.minecraft.tags.BlockTags
 import net.minecraft.util.BlockRenderLayer
-import net.minecraft.util.EnumFacing.UP
-import net.minecraftforge.fml.relauncher.Side
-import net.minecraftforge.fml.relauncher.SideOnly
-import org.apache.logging.log4j.Level
+import net.minecraft.util.Direction.UP
+import net.minecraft.util.ResourceLocation
+import net.minecraftforge.client.model.data.IModelData
+import org.apache.logging.log4j.Level.DEBUG
+import java.util.*
 
-@SideOnly(Side.CLIENT)
-class RenderReeds : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
+class RenderReeds : AbstractBlockRenderingHandler(BetterFoliage.MOD_ID, BetterFoliage.modBus) {
 
     val noise = simplexNoise()
-    val reedIcons = iconSet(Client.genReeds.generatedResource("${BetterFoliageMod.LEGACY_DOMAIN}:blocks/better_reed_%d"))
+    val reedIcons = iconSet { idx -> Client.genReeds.registerResource(ResourceLocation(BetterFoliage.MOD_ID, "blocks/better_reed_$idx")) }
     val reedModels = modelSet(64) { modelIdx ->
         val height = random(Config.reed.heightMin, Config.reed.heightMax)
         val waterline = 0.875f
@@ -41,19 +44,19 @@ class RenderReeds : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
     }
 
     override fun afterPreStitch() {
-        Client.log(Level.INFO, "Registered ${reedIcons.num} reed textures")
+        Client.log(DEBUG, "Registered ${reedIcons.num} reed textures")
     }
 
     override fun isEligible(ctx: BlockContext) =
         Config.enabled && Config.reed.enabled &&
         ctx.blockState(up2).material == Material.AIR &&
         ctx.blockState(up1).material == Material.WATER &&
-        Config.blocks.dirt.matchesClass(ctx.block) &&
-        ctx.biomeId in Config.reed.biomes &&
+        BlockTags.DIRT_LIKE.contains(ctx.block) &&
+        ctx.biome.let { it.downfall > Config.reed.minBiomeRainfall && it.defaultTemperature >= Config.reed.minBiomeTemp } &&
         noise[ctx.pos] < Config.reed.population
 
-    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: BufferBuilder, layer: BlockRenderLayer): Boolean {
-        val baseRender = renderWorldBlockBase(ctx, dispatcher, renderer, layer)
+    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: BufferBuilder, random: Random, modelData: IModelData, layer: BlockRenderLayer): Boolean {
+        val baseRender = renderWorldBlockBase(ctx, dispatcher, renderer, random, modelData, layer)
         if (!layer.isCutout) return baseRender
 
         modelRenderer.updateShading(Int3.zero, allFaces)

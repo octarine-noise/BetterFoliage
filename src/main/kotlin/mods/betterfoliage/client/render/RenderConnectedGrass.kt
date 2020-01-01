@@ -1,36 +1,36 @@
 package mods.betterfoliage.client.render
 
-import mods.betterfoliage.BetterFoliageMod
+import mods.betterfoliage.BetterFoliage
+import mods.betterfoliage.client.config.BlockConfig
 import mods.betterfoliage.client.config.Config
+import mods.betterfoliage.client.texture.GrassRegistry
 import mods.octarinecore.client.render.AbstractBlockRenderingHandler
 import mods.octarinecore.client.render.BlockContext
-import mods.octarinecore.client.render.withOffset
+import mods.octarinecore.client.render.offset
 import mods.octarinecore.common.Int3
 import mods.octarinecore.common.forgeDirsHorizontal
 import mods.octarinecore.common.offset
+import net.minecraft.block.Block
 import net.minecraft.client.renderer.BlockRendererDispatcher
 import net.minecraft.client.renderer.BufferBuilder
+import net.minecraft.tags.BlockTags
 import net.minecraft.util.BlockRenderLayer
-import net.minecraftforge.fml.relauncher.Side
-import net.minecraftforge.fml.relauncher.SideOnly
+import net.minecraftforge.client.model.data.IModelData
+import java.util.*
 
-@SideOnly(Side.CLIENT)
-class RenderConnectedGrass : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
+class RenderConnectedGrass : AbstractBlockRenderingHandler(BetterFoliage.MOD_ID, BetterFoliage.modBus) {
     override fun isEligible(ctx: BlockContext) =
         Config.enabled && Config.connectedGrass.enabled &&
-        Config.blocks.dirt.matchesClass(ctx.block) &&
-        Config.blocks.grassClasses.matchesClass(ctx.block(up1)) &&
+        BlockTags.DIRT_LIKE.contains(ctx.block) &&
+        GrassRegistry[ctx, up1] != null &&
         (Config.connectedGrass.snowEnabled || !ctx.blockState(up2).isSnow)
 
-    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: BufferBuilder, layer: BlockRenderLayer): Boolean {
+    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: BufferBuilder, random: Random, modelData: IModelData, layer: BlockRenderLayer): Boolean {
         // if the block sides are not visible anyway, render normally
-        if (forgeDirsHorizontal.all { ctx.blockState(it.offset).isOpaqueCube }) return renderWorldBlockBase(ctx, dispatcher, renderer, layer)
+        if (forgeDirsHorizontal.none { ctx.shouldSideBeRendered(it) }) return renderWorldBlockBase(ctx, dispatcher, renderer, random, modelData, layer)
 
-        if (ctx.isSurroundedBy { it.isOpaqueCube } ) return false
-        return ctx.withOffset(Int3.zero, up1) {
-            ctx.withOffset(up1, up2) {
-                renderWorldBlockBase(ctx, dispatcher, renderer, layer)
-            }
+        return ctx.offset(Int3.zero, up1).offset(up1, up2).let { offsetCtx ->
+            renderWorldBlockBase(offsetCtx, dispatcher, renderer, random, modelData, layer)
         }
     }
 }

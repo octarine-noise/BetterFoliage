@@ -1,62 +1,99 @@
-apply plugin: "net.minecraftforge.gradle.forge"
-apply plugin: 'kotlin'
-
-archivesBaseName = jarName
-
 buildscript {
     repositories {
+        mavenLocal()
         mavenCentral()
+        jcenter()
         maven {
             name = "forge"
             url = "http://files.minecraftforge.net/maven"
         }
+        maven {
+            name = 'sponge'
+            url = 'https://repo.spongepowered.org/maven'
+        }
     }
     dependencies {
-        classpath "net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT"
+        classpath(group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true) {
+            exclude group: 'trove', module: 'trove'
+        }
+        classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
+apply plugin: "net.minecraftforge.gradle"
+apply plugin: 'org.spongepowered.mixin'
+apply plugin: 'kotlin'
+
+sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
 
 repositories {
     mavenCentral()
     jcenter()
     maven {
-        name = "shadowfacts"
-        url = "https://maven.shadowfacts.net/"
+        name = "forge"
+        url = "http://files.minecraftforge.net/maven"
+    }
+    maven {
+        name = 'Curse'
+        url = 'https://minecraft.curseforge.com/api/maven/'
+    }
+    maven {
+        name = 'sponge'
+        url = 'https://repo.spongepowered.org/maven'
     }
 }
 
 dependencies {
-    compile "net.shadowfacts:Forgelin:$forgelin_version"
+    minecraft "net.minecraftforge:forge:$mc_version-$forge_version"
+    implementation "kottle:Kottle:$kottle_version"
+    implementation "org.spongepowered:mixin:0.8-SNAPSHOT"
+}
+
+mixin {
+    add sourceSets.main, "betterfoliage.refmap.json"
 }
 
 minecraft {
-    version = mc_version + "-" + forge_version
-    mappings = mcp_mappings
-    runDir = 'run'
-}
-processResources {
-    from(sourceSets.main.resources) { exclude 'mcmod.info' }
-    from(sourceSets.main.resources) { include 'mcmod.info' expand 'version':version, 'mcversion':minecraft.version }
+    mappings channel: "$mcp_mappings_channel", version: "$mcp_mappings_version"
+    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
-    into "${buildDir}/classes/main"
+    runs {
+        client {
+            workingDirectory project.file('run')
+            property 'forge.logging.markers', 'CORE'
+            property 'forge.logging.console.level', 'debug'
+            mods {
+                betterfoliage {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        server {
+            workingDirectory project.file('run')
+            property 'forge.logging.markers', 'CORE'
+            property 'forge.logging.console.level', 'debug'
+            mods {
+                betterfoliage {
+                    source sourceSets.main
+                }
+            }
+        }
+    }
 }
 
-def manifestCfg = {
-    attributes "FMLCorePlugin": "mods.betterfoliage.loader.BetterFoliageLoader"
-    attributes "FMLCorePluginContainsFMLMod": "mods.betterfoliage.BetterFoliageMod"
-    attributes "FMLAT": "BetterFoliage_at.cfg"
+compileKotlin {
+    kotlinOptions {
+        freeCompilerArgs += ("-Xno-param-assertions")
+        freeCompilerArgs += ("-Xno-call-assertions")
+    }
 }
 
 jar {
-    manifest manifestCfg
-    exclude "optifine"
-}
+    archiveName = "BetterFoliage-${version}-Forge-${mc_version}.jar"
 
-task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
-    manifest manifestCfg
-    from(sourceSets.main.kotlin)
-    from(sourceSets.main.resources) { exclude 'mcmod.info' }
-    from(sourceSets.main.resources) { include 'mcmod.info' expand 'version':version, 'mcversion':minecraft.version }
+    manifest {
+        from "src/main/resources/META-INF/MANIFEST.MF"
+        attributes "Implementation-Version": "${version}"
+    }
 }

@@ -1,25 +1,15 @@
 package mods.betterfoliage.client.texture
 
-import mods.betterfoliage.BetterFoliageMod
-import mods.betterfoliage.client.Client
+import mods.betterfoliage.BetterFoliage
+import mods.betterfoliage.client.config.BlockConfig
 import mods.betterfoliage.client.config.Config
-import mods.octarinecore.client.render.BlockContext
 import mods.octarinecore.client.render.HSB
 import mods.octarinecore.client.resource.*
-import mods.octarinecore.common.Int3
 import mods.octarinecore.common.config.ConfigurableBlockMatcher
-import mods.octarinecore.common.config.IBlockMatcher
 import mods.octarinecore.common.config.ModelTextureList
-import mods.octarinecore.findFirst
-import net.minecraft.block.state.IBlockState
+import net.minecraft.block.BlockState
+import net.minecraft.client.renderer.texture.AtlasTexture
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
-import net.minecraft.client.renderer.texture.TextureMap
-import net.minecraft.util.EnumFacing
-import net.minecraft.util.math.BlockPos
-import net.minecraft.world.IBlockAccess
-import net.minecraftforge.common.MinecraftForge
-import net.minecraftforge.fml.relauncher.Side
-import net.minecraftforge.fml.relauncher.SideOnly
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.Logger
 import java.lang.Math.min
@@ -43,16 +33,17 @@ class GrassInfo(
 object GrassRegistry : ModelRenderRegistryRoot<GrassInfo>()
 
 object StandardGrassRegistry : ModelRenderRegistryConfigurable<GrassInfo>() {
-    override val logger = BetterFoliageMod.logDetail
-    override val matchClasses: ConfigurableBlockMatcher get() = Config.blocks.grassClasses
-    override val modelTextures: List<ModelTextureList> get() = Config.blocks.grassModels.list
-    override fun processModel(state: IBlockState, textures: List<String>) = StandardGrassKey(logger, textures[0])
+    override val logger = BetterFoliage.logDetail
+    override val matchClasses: ConfigurableBlockMatcher get() = BlockConfig.grassBlocks
+    override val modelTextures: List<ModelTextureList> get() = BlockConfig.grassModels.modelList
+    override fun processModel(state: BlockState, textures: List<String>) = StandardGrassKey(logger, textures[0])
+    init { BetterFoliage.modBus.register(this) }
 }
 
 class StandardGrassKey(override val logger: Logger, val textureName: String) : ModelRenderKey<GrassInfo> {
-    override fun resolveSprites(atlas: TextureMap): GrassInfo {
+    override fun resolveSprites(atlas: AtlasTexture): GrassInfo {
         val logName = "StandardGrassKey"
-        val texture = atlas[textureName] ?: atlas.missingSprite
+        val texture = atlas[textureName] ?: missingSprite
         logger.log(Level.DEBUG, "$logName: texture $textureName")
         val hsb = HSB.fromColor(texture.averageColor ?: defaultGrassColor)
         val overrideColor = if (hsb.saturation >= Config.shortGrass.saturationThreshold) {

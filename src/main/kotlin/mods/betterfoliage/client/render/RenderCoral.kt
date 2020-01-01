@@ -1,7 +1,8 @@
 package mods.betterfoliage.client.render
 
-import mods.betterfoliage.BetterFoliageMod
+import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.client.Client
+import mods.betterfoliage.client.config.BlockConfig
 import mods.betterfoliage.client.config.Config
 import mods.octarinecore.client.render.*
 import mods.octarinecore.common.Int3
@@ -12,19 +13,22 @@ import net.minecraft.block.material.Material
 import net.minecraft.client.renderer.BlockRendererDispatcher
 import net.minecraft.client.renderer.BufferBuilder
 import net.minecraft.util.BlockRenderLayer
-import net.minecraft.util.EnumFacing.Axis
-import net.minecraft.util.EnumFacing.UP
-import net.minecraftforge.fml.relauncher.Side
-import net.minecraftforge.fml.relauncher.SideOnly
-import org.apache.logging.log4j.Level.INFO
+import net.minecraft.util.Direction.Axis
+import net.minecraft.util.Direction.UP
+import net.minecraft.util.ResourceLocation
+import net.minecraft.world.biome.Biome
+import net.minecraftforge.api.distmarker.Dist
+import net.minecraftforge.client.model.data.IModelData
+import net.minecraftforge.fml.common.Mod
+import org.apache.logging.log4j.Level.DEBUG
+import java.util.*
 
-@SideOnly(Side.CLIENT)
-class RenderCoral : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
+class RenderCoral : AbstractBlockRenderingHandler(BetterFoliage.MOD_ID, BetterFoliage.modBus) {
 
     val noise = simplexNoise()
 
-    val coralIcons = iconSet(BetterFoliageMod.LEGACY_DOMAIN, "blocks/better_coral_%d")
-    val crustIcons = iconSet(BetterFoliageMod.LEGACY_DOMAIN, "blocks/better_crust_%d")
+    val coralIcons = iconSet { idx -> ResourceLocation(BetterFoliage.MOD_ID, "blocks/better_coral_$idx") }
+    val crustIcons = iconSet { idx -> ResourceLocation(BetterFoliage.MOD_ID, "blocks/better_crust_$idx") }
     val coralModels = modelSet(64) { modelIdx ->
         verticalRectangle(x1 = -0.5, z1 = 0.5, x2 = 0.5, z2 = -0.5, yBottom = 0.0, yTop = 1.0)
         .scale(Config.coral.size).move(0.5 to UP)
@@ -41,26 +45,26 @@ class RenderCoral : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
     }
 
     override fun afterPreStitch() {
-        Client.log(INFO, "Registered ${coralIcons.num} coral textures")
-        Client.log(INFO, "Registered ${crustIcons.num} coral crust textures")
+        Client.log(DEBUG, "Registered ${coralIcons.num} coral textures")
+        Client.log(DEBUG, "Registered ${crustIcons.num} coral crust textures")
     }
 
     override fun isEligible(ctx: BlockContext) =
         Config.enabled && Config.coral.enabled &&
         (ctx.blockState(up2).material == Material.WATER || Config.coral.shallowWater) &&
         ctx.blockState(up1).material == Material.WATER &&
-        Config.blocks.sand.matchesClass(ctx.block) &&
-        ctx.biomeId in Config.coral.biomes &&
+        BlockConfig.sand.matchesClass(ctx.block) &&
+        ctx.biome.category.let { it == Biome.Category.OCEAN || it == Biome.Category.BEACH } &&
         noise[ctx.pos] < Config.coral.population
 
-    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: BufferBuilder, layer: BlockRenderLayer): Boolean {
-        val baseRender = renderWorldBlockBase(ctx, dispatcher, renderer, layer)
+    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: BufferBuilder, random: Random, modelData: IModelData, layer: BlockRenderLayer): Boolean {
+        val baseRender = renderWorldBlockBase(ctx, dispatcher, renderer, random, modelData, layer)
         if (!layer.isCutout) return baseRender
 
         modelRenderer.updateShading(Int3.zero, allFaces)
 
         forgeDirs.forEachIndexed { idx, face ->
-            if (!ctx.blockState(forgeDirOffsets[idx]).isOpaqueCube && blockContext.random(idx) < Config.coral.chance) {
+            if (!ctx.isNormalCube(forgeDirOffsets[idx]) && blockContext.random(idx) < Config.coral.chance) {
                 var variation = blockContext.random(6)
                 modelRenderer.render(
                     renderer,

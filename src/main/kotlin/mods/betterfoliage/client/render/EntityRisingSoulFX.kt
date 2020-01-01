@@ -1,22 +1,21 @@
 package mods.betterfoliage.client.render
 
-import mods.betterfoliage.BetterFoliageMod
+import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.Config
 import mods.octarinecore.client.render.AbstractEntityFX
+import mods.octarinecore.client.resource.Atlas
 import mods.octarinecore.client.resource.ResourceHandler
 import mods.octarinecore.common.Double3
 import mods.octarinecore.forEachPairIndexed
 import net.minecraft.client.renderer.BufferBuilder
+import net.minecraft.util.ResourceLocation
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.MathHelper
 import net.minecraft.world.World
-import net.minecraftforge.fml.relauncher.Side
-import net.minecraftforge.fml.relauncher.SideOnly
-import org.apache.logging.log4j.Level.INFO
+import org.apache.logging.log4j.Level.DEBUG
 import java.util.*
 
-@SideOnly(Side.CLIENT)
 class EntityRisingSoulFX(world: World, pos: BlockPos) :
 AbstractEntityFX(world, pos.x.toDouble() + 0.5, pos.y.toDouble() + 1.0, pos.z.toDouble() + 0.5) {
 
@@ -26,14 +25,14 @@ AbstractEntityFX(world, pos.x.toDouble() + 0.5, pos.y.toDouble() + 1.0, pos.z.to
     init {
         motionY = 0.1
         particleGravity = 0.0f
-        particleTexture = RisingSoulTextures.headIcons[rand.nextInt(256)]
-        particleMaxAge = MathHelper.floor((0.6 + 0.4 * rand.nextDouble()) * Config.risingSoul.lifetime * 20.0)
+        sprite = RisingSoulTextures.headIcons[rand.nextInt(256)]
+        maxAge = MathHelper.floor((0.6 + 0.4 * rand.nextDouble()) * Config.risingSoul.lifetime * 20.0)
     }
 
     override val isValid: Boolean get() = true
 
     override fun update() {
-        val phase = (initialPhase + particleAge) % 64
+        val phase = (initialPhase + age) % 64
         velocity.setTo(cos[phase] * Config.risingSoul.perturb, 0.1, sin[phase] * Config.risingSoul.perturb)
 
         particleTrail.addFirst(currentPos.copy())
@@ -43,8 +42,8 @@ AbstractEntityFX(world, pos.x.toDouble() + 0.5, pos.y.toDouble() + 1.0, pos.z.to
     }
 
     override fun render(worldRenderer: BufferBuilder, partialTickTime: Float) {
-        var alpha = Config.risingSoul.opacity
-        if (particleAge > particleMaxAge - 40) alpha *= (particleMaxAge - particleAge) / 40.0f
+        var alpha = Config.risingSoul.opacity.toFloat()
+        if (age > maxAge - 40) alpha *= (maxAge - age) / 40.0f
 
         renderParticleQuad(worldRenderer, partialTickTime,
             size = Config.risingSoul.headSize * 0.25,
@@ -54,7 +53,7 @@ AbstractEntityFX(world, pos.x.toDouble() + 0.5, pos.y.toDouble() + 1.0, pos.z.to
         var scale = Config.risingSoul.trailSize * 0.25
         particleTrail.forEachPairIndexed { idx, current, previous ->
             scale *= Config.risingSoul.sizeDecay
-            alpha *= Config.risingSoul.opacityDecay
+            alpha *= Config.risingSoul.opacityDecay.toFloat()
             if (idx % Config.risingSoul.trailDensity == 0) renderParticleQuad(worldRenderer, partialTickTime,
                 currentPos = current,
                 prevPos = previous,
@@ -66,12 +65,11 @@ AbstractEntityFX(world, pos.x.toDouble() + 0.5, pos.y.toDouble() + 1.0, pos.z.to
     }
 }
 
-@SideOnly(Side.CLIENT)
-object RisingSoulTextures : ResourceHandler(BetterFoliageMod.MOD_ID) {
-    val headIcons = iconSet(BetterFoliageMod.LEGACY_DOMAIN, "blocks/rising_soul_%d")
-    val trackIcon = iconStatic(BetterFoliageMod.LEGACY_DOMAIN, "blocks/soul_track")
+object RisingSoulTextures : ResourceHandler(BetterFoliage.MOD_ID, BetterFoliage.modBus, targetAtlas = Atlas.PARTICLES) {
+    val headIcons = iconSet { idx -> ResourceLocation(BetterFoliage.MOD_ID, "rising_soul_$idx") }
+    val trackIcon = iconStatic(BetterFoliage.MOD_ID, "soul_track")
 
     override fun afterPreStitch() {
-        Client.log(INFO, "Registered ${headIcons.num} soul particle textures")
+        Client.log(DEBUG, "Registered ${headIcons.num} soul particle textures")
     }
 }

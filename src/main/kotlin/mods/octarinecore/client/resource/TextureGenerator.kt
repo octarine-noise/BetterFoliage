@@ -1,7 +1,7 @@
 package mods.octarinecore.client.resource
 
 import mods.octarinecore.client.resource.ResourceType.*
-import net.minecraft.client.resources.IResource
+import net.minecraft.resources.IResource
 import net.minecraft.util.ResourceLocation
 import java.awt.image.BufferedImage
 import java.io.InputStream
@@ -20,6 +20,7 @@ enum class ResourceType {
  *
  * @param[domain] Resource domain of generator
  */
+/*
 abstract class TextureGenerator(domain: String) : ParameterBasedGenerator(domain) {
 
     /**
@@ -29,7 +30,7 @@ abstract class TextureGenerator(domain: String) : ParameterBasedGenerator(domain
      * @param[extraParams] additional parameters of the generated texture
      */
     fun generatedResource(iconName: String, vararg extraParams: Pair<String, Any>) = ResourceLocation(
-        domain,
+        namespace,
         textureLocation(iconName).let {
             ParameterList(
                 mapOf("dom" to it.namespace, "path" to it.path) +
@@ -84,3 +85,5 @@ abstract class TextureGenerator(domain: String) : ParameterBasedGenerator(domain
         return sizes.map { resourceManager[maskPath(it)] }.filterNotNull().firstOrNull()
     }
 }
+
+ */

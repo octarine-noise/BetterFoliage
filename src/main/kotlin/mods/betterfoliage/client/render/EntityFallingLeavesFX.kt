@@ -15,18 +15,22 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.MathHelper
 import net.minecraft.world.World
 import net.minecraftforge.common.MinecraftForge
+import net.minecraftforge.event.TickEvent
 import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import net.minecraftforge.fml.relauncher.Side
-import net.minecraftforge.fml.relauncher.SideOnly
+import net.minecraftforge.eventbus.api.SubscribeEvent
 import org.lwjgl.opengl.GL11
-import java.lang.Math.*
 import java.util.*
+import kotlin.math.abs
+import kotlin.math.cos
+import kotlin.math.sin
 
-@SideOnly(Side.CLIENT)
-class EntityFallingLeavesFX(world: World, pos: BlockPos) :
-AbstractEntityFX(world, pos.x.toDouble() + 0.5, pos.y.toDouble(), pos.z.toDouble() + 0.5) {
+const val rotationFactor = PI2.toFloat() / 64.0f
+
+class EntityFallingLeavesFX(
+    world: World, pos: BlockPos
+) : AbstractEntityFX(
+    world, pos.x.toDouble() + 0.5, pos.y.toDouble(), pos.z.toDouble() + 0.5
+) {
 
     companion object {
         @JvmStatic val biomeBrightnessMultiplier = 0.5f
@@ -38,38 +42,40 @@ AbstractEntityFX(world, pos.x.toDouble() + 0.5, pos.y.toDouble(), pos.z.toDouble
     var wasCollided = false
 
     init {
-        particleMaxAge = MathHelper.floor(random(0.6, 1.0) * Config.fallingLeaves.lifetime * 20.0)
+        maxAge = MathHelper.floor(random(0.6, 1.0) * Config.fallingLeaves.lifetime * 20.0)
         motionY = -Config.fallingLeaves.speed
+
         particleScale = Config.fallingLeaves.size.toFloat() * 0.1f
 
         val state = world.getBlockState(pos)
-        val blockColor = Minecraft.getMinecraft().blockColors.colorMultiplier(state, world, pos, 0)
         val leafInfo = LeafRegistry[state, world, pos]
+        val blockColor = Minecraft.getInstance().blockColors.getColor(state, world, pos, 0)
         if (leafInfo != null) {
-            particleTexture = leafInfo.particleTextures[rand.nextInt(1024)]
+            sprite = leafInfo.particleTextures[rand.nextInt(1024)]
             calculateParticleColor(leafInfo.averageColor, blockColor)
         } else {
-            particleTexture = LeafParticleRegistry["default"][rand.nextInt(1024)]
+            sprite = LeafParticleRegistry["default"][rand.nextInt(1024)]
             setColor(blockColor)
         }
     }
 
-    override val isValid: Boolean get() = (particleTexture != null)
+    override val isValid: Boolean get() = (sprite != null)
 
     override fun update() {
         if (rand.nextFloat() > 0.95f) rotPositive = !rotPositive
-        if (particleAge > particleMaxAge - 20) particleAlpha = 0.05f * (particleMaxAge - particleAge)
+        if (age > maxAge - 20) particleAlpha = 0.05f * (maxAge - age)
 
         if (onGround || wasCollided) {
             velocity.setTo(0.0, 0.0, 0.0)
             if (!wasCollided) {
-                particleAge = Math.max(particleAge, particleMaxAge - 20)
+                age = Math.max(age, maxAge - 20)
                 wasCollided = true
             }
         } else {
             velocity.setTo(cos[particleRot], 0.0, sin[particleRot]).mul(Config.fallingLeaves.perturb)
                     .add(LeafWindTracker.current).add(0.0, -1.0, 0.0).mul(Config.fallingLeaves.speed)
             particleRot = (particleRot + (if (rotPositive) 1 else -1)) and 63
+            particleAngle = rotationFactor * particleRot.toFloat()
         }
     }
 
@@ -96,7 +102,6 @@ AbstractEntityFX(world, pos.x.toDouble() + 0.5, pos.y.toDouble(), pos.z.toDouble
     }
 }
 
-@SideOnly(Side.CLIENT)
 object LeafWindTracker {
     var random = Random()
     val target = Double3.zero
@@ -108,7 +113,7 @@ object LeafWindTracker {
     }
 
     fun changeWind(world: World) {
-        nextChange = world.worldInfo.worldTime + 120 + random.nextInt(80)
+        nextChange = world.worldInfo.gameTime + 120 + random.nextInt(80)
         val direction = PI2 * random.nextDouble()
         val speed = abs(random.nextGaussian()) * Config.fallingLeaves.windStrength +
             (if (!world.isRaining) 0.0 else abs(random.nextGaussian()) * Config.fallingLeaves.stormStrength)
@@ -117,9 +122,9 @@ object LeafWindTracker {
 
     @SubscribeEvent
     fun handleWorldTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase == TickEvent.Phase.START) Minecraft.getMinecraft().world?.let { world ->
+        if (event.phase == TickEvent.Phase.START) Minecraft.getInstance().world?.let { world ->
             // change target wind speed
-            if (world.worldInfo.worldTime >= nextChange) changeWind(world)
+            if (world.worldInfo.dayTime >= nextChange) changeWind(world)
 
             // change current wind speed
             val changeRate = if (world.isRaining) 0.015 else 0.005
@@ -132,5 +137,5 @@ object LeafWindTracker {
     }
 
     @SubscribeEvent
-    fun handleWorldLoad(event: WorldEvent.Load) { if (event.world.isRemote) changeWind(event.world) }
+    fun handleWorldLoad(event: WorldEvent.Load) { if (event.world.isRemote) changeWind(event.world.world) }
 }

@@ -5,8 +5,8 @@ import mods.octarinecore.common.*
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.BufferBuilder
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
-import net.minecraft.util.EnumFacing
-import net.minecraft.util.EnumFacing.*
+import net.minecraft.util.Direction
+import net.minecraft.util.Direction.*
 
 typealias QuadIconResolver = (ShadingContext, Int, Quad) -> TextureAtlasSprite?
 typealias PostProcessLambda = RenderVertex.(ShadingContext, Int, Quad, Int, Vertex) -> Unit
@@ -43,7 +43,7 @@ class ModelRenderer : ShadingContext() {
         aoEnabled = Minecraft.isAmbientOcclusionEnabled()
 
         // make sure we have space in the buffer for our quads plus one
-        worldRenderer.ensureSpaceForQuads(model.quads.size + 1)
+//        worldRenderer.ensureSpaceForQuads(model.quads.size + 1)
 
         model.quads.forEachIndexed { quadIdx, quad ->
             if (quadFilter(quadIdx, quad)) {
@@ -81,18 +81,18 @@ open class ShadingContext {
     var aoEnabled = Minecraft.isAmbientOcclusionEnabled()
     val aoFaces = Array(6) { AoFaceData(forgeDirs[it]) }
 
-    val EnumFacing.aoMultiplier: Float get() = when(this) {
+    val Direction.aoMultiplier: Float get() = when(this) {
         UP -> 1.0f
         DOWN -> 0.5f
         NORTH, SOUTH -> 0.8f
         EAST, WEST -> 0.6f
     }
 
-    fun updateShading(offset: Int3, predicate: (EnumFacing) -> Boolean = { true }) {
+    fun updateShading(offset: Int3, predicate: (Direction) -> Boolean = { true }) {
         forgeDirs.forEach { if (predicate(it)) aoFaces[it.ordinal].update(offset, multiplier = it.aoMultiplier) }
     }
 
-    fun aoShading(face: EnumFacing, corner1: EnumFacing, corner2: EnumFacing) =
+    fun aoShading(face: Direction, corner1: Direction, corner2: Direction) =
         aoFaces[face.rotate(rotation).ordinal][corner1.rotate(rotation), corner2.rotate(rotation)]
 
     fun blockData(offset: Int3) = blockContext.blockData(offset.rotate(rotation))
@@ -169,13 +169,13 @@ class RenderVertex() {
 
 }
 
-fun BufferBuilder.ensureSpaceForQuads(num: Int) {
-    rawIntBuffer.position(bufferSize)
-    growBuffer(num * vertexFormat.size)
-}
+//fun BufferBuilder.ensureSpaceForQuads(num: Int) {
+//    rawIntBuffer.position(bufferSize)
+//    growBuffer(num * vertexFormat.size)
+//}
 
-val allFaces: (EnumFacing) -> Boolean = { true }
-val topOnly: (EnumFacing) -> Boolean = { it == UP }
+val allFaces: (Direction) -> Boolean = { true }
+val topOnly: (Direction) -> Boolean = { it == UP }
 
 /** Perform no post-processing */
 val noPost: PostProcessLambda = { _, _, _, _, _ -> }

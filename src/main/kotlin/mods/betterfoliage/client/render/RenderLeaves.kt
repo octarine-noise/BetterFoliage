@@ -1,6 +1,6 @@
 package mods.betterfoliage.client.render
 
-import mods.betterfoliage.BetterFoliageMod
+import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.Config
 import mods.betterfoliage.client.integration.OptifineCustomColors
@@ -17,15 +17,14 @@ import net.minecraft.block.material.Material
 import net.minecraft.client.renderer.BlockRendererDispatcher
 import net.minecraft.client.renderer.BufferBuilder
 import net.minecraft.util.BlockRenderLayer
-import net.minecraft.util.EnumFacing.DOWN
-import net.minecraft.util.EnumFacing.UP
-import net.minecraftforge.fml.relauncher.Side
-import net.minecraftforge.fml.relauncher.SideOnly
+import net.minecraft.util.Direction.*
+import net.minecraft.util.ResourceLocation
+import net.minecraftforge.client.model.data.IModelData
 import java.lang.Math.cos
 import java.lang.Math.sin
+import java.util.*
 
-@SideOnly(Side.CLIENT)
-class RenderLeaves : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
+class RenderLeaves : AbstractBlockRenderingHandler(BetterFoliage.MOD_ID, BetterFoliage.modBus) {
 
     val leavesModel = model {
         verticalRectangle(x1 = -0.5, z1 = 0.5, x2 = 0.5, z2 = -0.5, yBottom = -0.5 * 1.41, yTop = 0.5 * 1.41)
@@ -34,7 +33,7 @@ class RenderLeaves : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
         .scale(Config.leaves.size)
         .toCross(UP).addAll()
     }
-    val snowedIcon = iconSet(BetterFoliageMod.LEGACY_DOMAIN, "blocks/better_leaves_snowed_%d")
+    val snowedIcon = iconSet { idx -> ResourceLocation(BetterFoliage.MOD_ID, "blocks/better_leaves_snowed_$idx") }
 
     val perturbs = vectorSet(64) { idx ->
         val angle = PI2 * idx / 64.0
@@ -46,21 +45,19 @@ class RenderLeaves : AbstractBlockRenderingHandler(BetterFoliageMod.MOD_ID) {
         Config.enabled &&
         Config.leaves.enabled &&
         LeafRegistry[ctx] != null &&
-        !(Config.leaves.hideInternal && ctx.isSurroundedBy { it.isFullCube || it.material == Material.LEAVES } )
+        !(Config.leaves.hideInternal && ctx.isSurroundedByNormal)
 
-    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: BufferBuilder, layer: BlockRenderLayer): Boolean {
-        val isSnowed = ctx.blockState(up1).material.let {
-            it == Material.SNOW || it == Material.CRAFTED_SNOW
-        }
+    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: BufferBuilder, random: Random, modelData: IModelData, layer: BlockRenderLayer): Boolean {
+        val isSnowed = ctx.blockState(up1).isSnow
         val leafInfo = LeafRegistry[ctx]
         if (leafInfo == null) {
             // shouldn't happen
             Client.logRenderError(ctx.blockState(Int3.zero), ctx.pos)
-            return renderWorldBlockBase(ctx, dispatcher, renderer, layer)
+            return renderWorldBlockBase(ctx, dispatcher, renderer, random, modelData, layer)
         }
         val blockColor = OptifineCustomColors.getBlockColor(ctx)
 
-        renderWorldBlockBase(ctx, dispatcher, renderer, layer)
+        renderWorldBlockBase(ctx, dispatcher, renderer, random, modelData, layer)
         if (!layer.isCutout) return true
 
         modelRenderer.updateShading(Int3.zero, allFaces)

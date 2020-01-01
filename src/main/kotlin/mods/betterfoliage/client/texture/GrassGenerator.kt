@@ -2,7 +2,9 @@ package mods.betterfoliage.client.texture
 
 import mods.octarinecore.client.resource.*
 import net.minecraft.util.ResourceLocation
+import net.minecraftforge.resource.VanillaResourceType.TEXTURES
 import java.awt.image.BufferedImage
+import java.io.InputStream
 
 /**
  * Generate Short Grass textures from [Blocks.tallgrass] block textures.
@@ -10,13 +12,16 @@ import java.awt.image.BufferedImage
  *
  * @param[domain] Resource domain of generator
  */
-class GrassGenerator(domain: String) : TextureGenerator(domain) {
+class GrassGenerator(domain: String) : GeneratorBase<GrassGenerator.Key>(domain, TEXTURES) {
 
-    override fun generate(params: ParameterList): BufferedImage? {
-        val target = targetResource(params)!!
-        val isSnowed = params["snowed"]?.toBoolean() ?: false
+    override val locationMapper = Atlas.BLOCKS::unwrap
 
-        val baseTexture = resourceManager[target.second]?.loadImage() ?: return null
+    fun register(texture: String, isSnowed: Boolean) = registerResource(Key(ResourceLocation(texture), isSnowed))
+
+    override fun exists(key: Key) = resourceManager.hasResource(Atlas.BLOCKS.wrap(key.texture))
+
+    override fun get(key: Key): InputStream? {
+        val baseTexture = resourceManager[Atlas.BLOCKS.wrap(key.texture)]?.loadImage() ?: return null
 
         val result = BufferedImage(baseTexture.width, baseTexture.height, BufferedImage.TYPE_4BYTE_ABGR)
         val graphics = result.createGraphics()
@@ -39,12 +44,14 @@ class GrassGenerator(domain: String) : TextureGenerator(domain) {
         }
 
         // blend with white if snowed
-        if (isSnowed && target.first == ResourceType.COLOR) {
+        if (key.isSnowed) {
             for (x in 0..result.width - 1) for (y in 0..result.height - 1) {
                 result[x, y] = blendRGB(result[x, y], 16777215, 2, 3)
             }
         }
 
-        return result
+        return result.asStream
     }
+
+    data class Key(val texture: ResourceLocation, val isSnowed: Boolean)
 }

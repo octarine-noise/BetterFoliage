@@ -2,17 +2,20 @@
 package mods.betterfoliage.client.render
 
 import mods.octarinecore.PI2
-import mods.octarinecore.client.render.*
+import mods.octarinecore.client.render.Model
+import mods.octarinecore.client.render.PostProcessLambda
+import mods.octarinecore.client.render.Quad
 import mods.octarinecore.common.Double3
 import mods.octarinecore.common.Int3
 import mods.octarinecore.common.Rotation
 import mods.octarinecore.common.times
-import net.minecraft.block.Block
+import net.minecraft.block.BlockState
 import net.minecraft.block.material.Material
-import net.minecraft.block.state.IBlockState
 import net.minecraft.util.BlockRenderLayer
-import net.minecraft.util.EnumFacing
-import net.minecraft.util.EnumFacing.*
+import net.minecraft.util.Direction
+import net.minecraft.util.Direction.*
+import kotlin.math.cos
+import kotlin.math.sin
 
 val up1 = Int3(1 to UP)
 val up2 = Int3(2 to UP)
@@ -25,15 +28,15 @@ val denseLeavesRot = arrayOf(Rotation.identity, Rotation.rot90[EAST.ordinal], Ro
 val whitewash: PostProcessLambda = { _, _, _, _, _ -> setGrey(1.4f) }
 val greywash: PostProcessLambda = { _, _, _, _, _ -> setGrey(1.0f) }
 
-val IBlockState.isSnow: Boolean get() = material.let { it == Material.SNOW || it == Material.CRAFTED_SNOW }
+val BlockState.isSnow: Boolean get() = material.let { it == Material.SNOW }
 
-fun Quad.toCross(rotAxis: EnumFacing, trans: (Quad)->Quad) =
+fun Quad.toCross(rotAxis: Direction, trans: (Quad)->Quad) =
     (0..3).map { rotIdx ->
         trans(rotate(Rotation.rot90[rotAxis.ordinal] * rotIdx).mirrorUV(rotIdx > 1, false))
     }
-fun Quad.toCross(rotAxis: EnumFacing) = toCross(rotAxis) { it }
+fun Quad.toCross(rotAxis: Direction) = toCross(rotAxis) { it }
 
-fun xzDisk(modelIdx: Int) = (PI2 * modelIdx / 64.0).let { Double3(Math.cos(it), 0.0, Math.sin(it)) }
+fun xzDisk(modelIdx: Int) = (PI2 * modelIdx / 64.0).let { Double3(cos(it), 0.0, sin(it)) }
 
 val rotationFromUp = arrayOf(
     Rotation.rot90[EAST.ordinal] * 2,
@@ -58,5 +61,5 @@ fun Model.mix(first: Model, second: Model, predicate: (Int)->Boolean) {
 
 val BlockRenderLayer.isCutout: Boolean get() = (this == BlockRenderLayer.CUTOUT) || (this == BlockRenderLayer.CUTOUT_MIPPED)
 
-fun IBlockState.canRenderInLayer(layer: BlockRenderLayer) = this.block.canRenderInLayer(this, layer)
-fun IBlockState.canRenderInCutout() = this.block.canRenderInLayer(this, BlockRenderLayer.CUTOUT) || this.block.canRenderInLayer(this, BlockRenderLayer.CUTOUT_MIPPED)
+fun BlockState.canRenderInLayer(layer: BlockRenderLayer) = this.block.canRenderInLayer(this, layer)
+fun BlockState.canRenderInCutout() = this.block.canRenderInLayer(this, BlockRenderLayer.CUTOUT) || this.block.canRenderInLayer(this, BlockRenderLayer.CUTOUT_MIPPED)

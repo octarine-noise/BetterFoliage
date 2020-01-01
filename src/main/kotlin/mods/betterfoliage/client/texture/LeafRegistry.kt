@@ -1,28 +1,16 @@
 package mods.betterfoliage.client.texture
 
-import mods.betterfoliage.BetterFoliageMod
+import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.client.Client
-import mods.betterfoliage.client.config.Config
-import mods.octarinecore.client.render.BlockContext
+import mods.betterfoliage.client.config.BlockConfig
 import mods.octarinecore.client.resource.*
-import mods.octarinecore.common.Int3
 import mods.octarinecore.common.config.ConfigurableBlockMatcher
-import mods.octarinecore.common.config.IBlockMatcher
 import mods.octarinecore.common.config.ModelTextureList
-import mods.octarinecore.findFirst
-import net.minecraft.block.state.IBlockState
+import net.minecraft.block.BlockState
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
-import net.minecraft.client.renderer.texture.TextureMap
-import net.minecraft.util.EnumFacing
+import net.minecraft.client.renderer.texture.AtlasTexture
 import net.minecraft.util.ResourceLocation
-import net.minecraft.util.math.BlockPos
-import net.minecraft.world.IBlockAccess
 import net.minecraftforge.client.event.TextureStitchEvent
-import net.minecraftforge.common.MinecraftForge
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.relauncher.Side
-import net.minecraftforge.fml.relauncher.SideOnly
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.Logger
 
@@ -46,25 +34,26 @@ class LeafInfo(
 object LeafRegistry : ModelRenderRegistryRoot<LeafInfo>()
 
 object StandardLeafRegistry : ModelRenderRegistryConfigurable<LeafInfo>() {
-    override val logger = BetterFoliageMod.logDetail
-    override val matchClasses: ConfigurableBlockMatcher get() = Config.blocks.leavesClasses
-    override val modelTextures: List<ModelTextureList> get() = Config.blocks.leavesModels.list
-    override fun processModel(state: IBlockState, textures: List<String>) = StandardLeafKey(logger, textures[0])
+    override val logger = BetterFoliage.logDetail
+    override val matchClasses: ConfigurableBlockMatcher get() = BlockConfig.leafBlocks
+    override val modelTextures: List<ModelTextureList> get() = BlockConfig.leafModels.modelList
+    override fun processModel(state: BlockState, textures: List<String>) = StandardLeafKey(logger, textures[0])
+    init { BetterFoliage.modBus.register(this) }
 }
 
 class StandardLeafKey(override val logger: Logger, val textureName: String) : ModelRenderKey<LeafInfo> {
     lateinit var leafType: String
     lateinit var generated: ResourceLocation
 
-    override fun onPreStitch(atlas: TextureMap) {
+    override fun onPreStitch(event: TextureStitchEvent.Pre) {
         val logName = "StandardLeafKey"
         leafType = LeafParticleRegistry.typeMappings.getType(textureName) ?: "default"
-        generated = Client.genLeaves.generatedResource(textureName, "type" to leafType)
-        atlas.registerSprite(generated)
+        generated = Client.genLeaves.register(ResourceLocation(textureName), leafType)
+        event.addSprite(generated)
 
         logger.log(Level.DEBUG, "$logName: leaf texture   $textureName")
         logger.log(Level.DEBUG, "$logName:      particle $leafType")
     }
 
-    override fun resolveSprites(atlas: TextureMap) = LeafInfo(atlas[generated] ?: atlas.missingSprite, leafType)
+    override fun resolveSprites(atlas: AtlasTexture) = LeafInfo(atlas[generated] ?: missingSprite, leafType)
 }

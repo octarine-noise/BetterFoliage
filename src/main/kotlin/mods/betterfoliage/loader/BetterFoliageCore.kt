@@ -1,31 +1,23 @@
 package mods.betterfoliage.loader
 
-import mods.octarinecore.metaprog.Transformer
+//import mods.octarinecore.metaprog.Transformer
 import mods.octarinecore.metaprog.allAvailable
-import net.minecraftforge.fml.relauncher.FMLLaunchHandler
-import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.ClassWriter.COMPUTE_FRAMES
 import org.objectweb.asm.ClassWriter.COMPUTE_MAXS
 import org.objectweb.asm.Opcodes.*
 
+/*
 class BetterFoliageTransformer : Transformer() {
 
     val isOptifinePresent = allAvailable(Refs.OptifineClassTransformer)
 
     init {
-        if (FMLLaunchHandler.side().isClient) setupClient()
-    }
-
-    fun setupClient() {
-        // where: WorldClient.showBarrierParticles(), right after invoking Block.randomDisplayTick
+        // where: WorldClient.animateTick(), replacing invocation to Block.animateTick
         // what: invoke BF code for every random display tick
-        // why: allows us to catch random display ticks, without touching block code
-        transformMethod(Refs.showBarrierParticles) {
-            find(invokeRef(Refs.randomDisplayTick))?.insertAfter {
+        // why: allows us to catch random display ticks
+        transformMethod(Refs.WC_animeteTick) {
+            find(invokeRef(Refs.B_animateTick))?.replace {
                 log.info("[BetterFoliageLoader] Applying random display tick call hook")
-                varinsn(ALOAD, 0)
-                varinsn(ALOAD, 11)
-                varinsn(ALOAD, 7)
                 invokeStatic(Refs.onRandomDisplayTick)
             } ?: log.warn("[BetterFoliageLoader] Failed to apply random display tick call hook!")
         }
@@ -58,9 +50,7 @@ class BetterFoliageTransformer : Transformer() {
         transformMethod(Refs.doesSideBlockRendering) {
             find(IRETURN)?.insertBefore {
                 log.info("[BetterFoliageLoader] Applying doesSideBlockRendering() override")
-                varinsn(ALOAD, 1)
-                varinsn(ALOAD, 2)
-                varinsn(ALOAD, 3)
+                varinsn(ALOAD, 0)
                 invokeStatic(Refs.doesSideBlockRenderingOverride)
             } ?: log.warn("[BetterFoliageLoader] Failed to apply doesSideBlockRendering() override!")
         }
@@ -76,11 +66,11 @@ class BetterFoliageTransformer : Transformer() {
             } ?: log.warn("[BetterFoliageLoader] Failed to apply isOpaqueCube() override!")
         }
 
-        // where: ModelLoader.setupModelRegistry(), right before the textures are loaded
-        // what: invoke handler code with ModelLoader instance
-        // why: allows us to iterate the unbaked models in ModelLoader in time to register textures
+        // where: ModelBakery.setupModelRegistry(), after all models are loaded
+        // what: invoke handler code with ModelBakery instance
+        // why: allows us to iterate the unbaked models in ModelBakery in time to register textures
         transformMethod(Refs.setupModelRegistry) {
-            find(invokeName("addAll"))?.insertAfter {
+            find(invokeName("newLinkedHashSet"))?.insertBefore {
                 log.info("[BetterFoliageLoader] Applying ModelLoader lifecycle callback")
                 varinsn(ALOAD, 0)
                 invokeStatic(Refs.onAfterLoadModelDefinitions)
@@ -136,3 +126,5 @@ class BetterFoliageTransformer : Transformer() {
         }
     }
 }
+
+ */

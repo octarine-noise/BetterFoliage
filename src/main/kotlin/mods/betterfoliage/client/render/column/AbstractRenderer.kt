@@ -1,31 +1,29 @@
 package mods.betterfoliage.client.render.column
 
 import mods.betterfoliage.client.Client
-import mods.betterfoliage.client.chunk.ChunkOverlayLayer
 import mods.betterfoliage.client.chunk.ChunkOverlayManager
-import mods.betterfoliage.client.config.Config
 import mods.betterfoliage.client.integration.ShadersModIntegration.renderAs
 import mods.betterfoliage.client.render.*
 import mods.betterfoliage.client.render.column.ColumnLayerData.SpecialRender.BlockType.*
 import mods.betterfoliage.client.render.column.ColumnLayerData.SpecialRender.QuadrantType
 import mods.betterfoliage.client.render.column.ColumnLayerData.SpecialRender.QuadrantType.*
 import mods.octarinecore.client.render.*
-import mods.octarinecore.client.resource.ModelRenderRegistry
-import mods.octarinecore.common.*
-import net.minecraft.block.state.IBlockState
+import mods.octarinecore.common.Int3
+import mods.octarinecore.common.Rotation
+import mods.octarinecore.common.face
+import mods.octarinecore.common.rot
 import net.minecraft.client.renderer.BlockRendererDispatcher
 import net.minecraft.client.renderer.BufferBuilder
-import net.minecraft.client.renderer.texture.TextureAtlasSprite
+import net.minecraft.client.renderer.chunk.ChunkRenderCache
+import net.minecraft.client.world.ClientWorld
 import net.minecraft.util.BlockRenderLayer
-import net.minecraft.util.EnumFacing.*
-import net.minecraft.util.math.BlockPos
-import net.minecraft.world.IBlockAccess
-import net.minecraftforge.fml.relauncher.Side
-import net.minecraftforge.fml.relauncher.SideOnly
+import net.minecraft.util.Direction.*
+import net.minecraftforge.client.model.data.IModelData
+import net.minecraftforge.eventbus.api.IEventBus
+import java.util.*
 
-@SideOnly(Side.CLIENT)
 @Suppress("NOTHING_TO_INLINE")
-abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandler(modId) {
+abstract class AbstractRenderColumn(modId: String, modBus: IEventBus) : AbstractBlockRenderingHandler(modId, modBus) {
 
     /** The rotations necessary to bring the models in position for the 4 quadrants */
     val quadrantRotations = Array(4) { Rotation.rot90[UP.ordinal] * it }
@@ -96,21 +94,21 @@ abstract class AbstractRenderColumn(modId: String) : AbstractBlockRenderingHandl
         q1 == q2 || ((q1 == SQUARE || q1 == INVISIBLE) && (q2 == SQUARE || q2 == INVISIBLE))
 
     @Suppress("NON_EXHAUSTIVE_WHEN")
-    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: BufferBuilder, layer: BlockRenderLayer): Boolean {
+    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: BufferBuilder, random: Random, modelData: IModelData, layer: BlockRenderLayer): Boolean {
 
-        val roundLog = ChunkOverlayManager.get(overlayLayer, ctx.world!!, ctx.pos)
+        val roundLog = ChunkOverlayManager.get(overlayLayer, ctx.reader!!, ctx.pos)
         when(roundLog) {
             ColumnLayerData.SkipRender -> return true
-            ColumnLayerData.NormalRender -> return renderWorldBlockBase(ctx, dispatcher, renderer, null)
+            ColumnLayerData.NormalRender -> return renderWorldBlockBase(ctx, dispatcher, renderer, random, modelData, null)
             ColumnLayerData.ResolveError, null -> {
                 Client.logRenderError(ctx.blockState(Int3.zero), ctx.pos)
-                return renderWorldBlockBase(ctx, dispatcher, renderer, null)
+                return renderWorldBlockBase(ctx, dispatcher, renderer, random, modelData, null)
             }
         }
 
         // if log axis is not defined and "Default to vertical" config option is not set, render normally
         if ((roundLog as ColumnLayerData.SpecialRender).column.axis == null && !overlayLayer.defaultToY) {
-            return renderWorldBlockBase(ctx, dispatcher, renderer, null)
+            return renderWorldBlockBase(ctx, dispatcher, renderer, random, modelData, null)
         }
 
         // get AO data
