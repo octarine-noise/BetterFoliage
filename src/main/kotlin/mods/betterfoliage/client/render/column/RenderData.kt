@@ -1,7 +1,6 @@
 package mods.betterfoliage.client.render.column
 
-import mods.octarinecore.client.render.QuadIconResolver
-import mods.octarinecore.client.render.blockContext
+import mods.octarinecore.client.render.lighting.QuadIconResolver
 import mods.octarinecore.client.resource.ModelRenderKey
 import mods.octarinecore.client.resource.get
 import mods.octarinecore.client.resource.missingSprite
@@ -31,8 +30,8 @@ open class SimpleColumnInfo(
     override val top: QuadIconResolver = { _, _, _ -> topTexture }
     override val bottom: QuadIconResolver = { _, _, _ -> bottomTexture }
     override val side: QuadIconResolver = { ctx, idx, _ ->
-        val worldFace = (if ((idx and 1) == 0) SOUTH else EAST).rotate(ctx.rotation)
-        val sideIdx = if (sideTextures.size > 1) (blockContext.random(1) + dirToIdx[worldFace.ordinal]) % sideTextures.size else 0
+        val worldFace = (if ((idx and 1) == 0) SOUTH else EAST).rotate(ctx.modelRotation)
+        val sideIdx = if (sideTextures.size > 1) (ctx.semiRandom(1) + dirToIdx[worldFace.ordinal]) % sideTextures.size else 0
         sideTextures[sideIdx]
     }
 

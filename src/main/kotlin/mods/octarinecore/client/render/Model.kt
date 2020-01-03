@@ -1,5 +1,6 @@
 package mods.octarinecore.client.render
 
+import mods.octarinecore.client.render.lighting.*
 import mods.octarinecore.common.*
 import mods.octarinecore.minmax
 import mods.octarinecore.replace
@@ -40,13 +41,13 @@ data class UV(val u: Double, val v: Double) {
  *
  * @param[xyz] x, y, z coordinates
  * @param[uv] u, v coordinates
- * @param[aoShader] [Shader] instance to use with AO rendering
- * @param[flatShader] [Shader] instance to use with non-AO rendering
+ * @param[aoShader] [ModelLighter] instance to use with AO rendering
+ * @param[flatShader] [ModelLighter] instance to use with non-AO rendering
  */
 data class Vertex(val xyz: Double3 = Double3(0.0, 0.0, 0.0),
                   val uv: UV = UV(0.0, 0.0),
-                  val aoShader: Shader = NoShader,
-                  val flatShader: Shader = NoShader)
+                  val aoShader: ModelLighter = NoLighting,
+                  val flatShader: ModelLighter = NoLighting)
 
 /**
  * Model quad
@@ -78,7 +79,7 @@ data class Quad(val v1: Vertex, val v2: Vertex, val v3: Vertex, val v4: Vertex) 
         transformVI { vertex, idx ->
             if (!predicate(vertex, idx)) vertex else vertex.copy(flatShader = factory(this@Quad, vertex))
         }
-    fun setFlatShader(shader: Shader) = transformVI { vertex, idx -> vertex.copy(flatShader = shader) }
+    fun setFlatShader(shader: ModelLighter) = transformVI { vertex, idx -> vertex.copy(flatShader = shader) }
     val flipped: Quad get() = Quad(v4, v3, v2, v1)
 
     fun cycleVertices(n: Int) = when(n % 4) {
@@ -125,8 +126,8 @@ class Model() {
 
     fun faceQuad(face: Direction): Quad {
         val base = face.vec * 0.5
-        val top = faceCorners[face.ordinal].topLeft.first.vec * 0.5
-        val left = faceCorners[face.ordinal].topLeft.second.vec * 0.5
+        val top = boxFaces[face].top * 0.5
+        val left = boxFaces[face].left * 0.5
         return Quad(
                 Vertex(base + top + left, UV.topLeft),
                 Vertex(base - top + left, UV.bottomLeft),
@@ -137,7 +138,7 @@ class Model() {
 }
 
 val fullCube = Model().apply {
-    forgeDirs.forEach {
+    allDirections.forEach {
         faceQuad(it)
         .setAoShader(faceOrientedAuto(corner = cornerAo(it.axis), edge = null))
         .setFlatShader(faceOrientedAuto(corner = cornerFlat, edge = null))

@@ -5,7 +5,7 @@ import mods.betterfoliage.client.texture.LeafParticleRegistry
 import mods.betterfoliage.client.texture.LeafRegistry
 import mods.octarinecore.PI2
 import mods.octarinecore.client.render.AbstractEntityFX
-import mods.octarinecore.client.render.HSB
+import mods.octarinecore.client.render.lighting.HSB
 import mods.octarinecore.common.Double3
 import mods.octarinecore.minmax
 import mods.octarinecore.random

@@ -2,26 +2,19 @@ package mods.betterfoliage.client.render
 
 import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.client.Client
-import mods.betterfoliage.client.config.BlockConfig
 import mods.betterfoliage.client.config.Config
 import mods.betterfoliage.client.integration.ShadersModIntegration
-import mods.octarinecore.client.render.*
-import mods.octarinecore.common.Int3
-import mods.octarinecore.common.Rotation
+import mods.octarinecore.client.render.CombinedContext
+import mods.octarinecore.client.render.RenderDecorator
+import mods.octarinecore.client.render.lighting.FlatOffsetNoColor
 import mods.octarinecore.random
-import net.minecraft.block.Block
 import net.minecraft.block.material.Material
-import net.minecraft.client.renderer.BlockRendererDispatcher
-import net.minecraft.client.renderer.BufferBuilder
 import net.minecraft.tags.BlockTags
-import net.minecraft.util.BlockRenderLayer
 import net.minecraft.util.Direction.UP
 import net.minecraft.util.ResourceLocation
-import net.minecraftforge.client.model.data.IModelData
 import org.apache.logging.log4j.Level.DEBUG
-import java.util.*
 
-class RenderReeds : AbstractBlockRenderingHandler(BetterFoliage.MOD_ID, BetterFoliage.modBus) {
+class RenderReeds : RenderDecorator(BetterFoliage.MOD_ID, BetterFoliage.modBus) {
 
     val noise = simplexNoise()
     val reedIcons = iconSet { idx -> Client.genReeds.registerResource(ResourceLocation(BetterFoliage.MOD_ID, "blocks/better_reed_$idx")) }
@@ -47,31 +40,27 @@ class RenderReeds : AbstractBlockRenderingHandler(BetterFoliage.MOD_ID, BetterFo
         Client.log(DEBUG, "Registered ${reedIcons.num} reed textures")
     }
 
-    override fun isEligible(ctx: BlockContext) =
+    override fun isEligible(ctx: CombinedContext) =
         Config.enabled && Config.reed.enabled &&
-        ctx.blockState(up2).material == Material.AIR &&
-        ctx.blockState(up1).material == Material.WATER &&
-        BlockTags.DIRT_LIKE.contains(ctx.block) &&
+        ctx.state(up2).material == Material.AIR &&
+        ctx.state(UP).material == Material.WATER &&
+        BlockTags.DIRT_LIKE.contains(ctx.state.block) &&
         ctx.biome.let { it.downfall > Config.reed.minBiomeRainfall && it.defaultTemperature >= Config.reed.minBiomeTemp } &&
         noise[ctx.pos] < Config.reed.population
 
-    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: BufferBuilder, random: Random, modelData: IModelData, layer: BlockRenderLayer): Boolean {
-        val baseRender = renderWorldBlockBase(ctx, dispatcher, renderer, random, modelData, layer)
-        if (!layer.isCutout) return baseRender
+    override val onlyOnCutout get() = false
 
-        modelRenderer.updateShading(Int3.zero, allFaces)
+    override fun render(ctx: CombinedContext) {
+        ctx.render()
+        if (!ctx.isCutout) return
 
-        val iconVar = ctx.random(1)
-        ShadersModIntegration.grass(renderer, Config.reed.shaderWind) {
-            modelRenderer.render(
-                renderer,
-                reedModels[ctx.random(0)],
-                Rotation.identity,
+        val iconVar = ctx.semiRandom(1)
+        ShadersModIntegration.grass(ctx, Config.reed.shaderWind) {
+            ctx.render(
+                reedModels[ctx.semiRandom(0)],
                 forceFlat = true,
-                icon = { _, _, _ -> reedIcons[iconVar]!! },
-                postProcess = noPost
+                icon = { _, _, _ -> reedIcons[iconVar]!! }
             )
         }
-        return true
     }
 }

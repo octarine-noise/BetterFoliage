@@ -1,7 +1,8 @@
 package mods.octarinecore.client.resource
 
 import com.google.common.base.Joiner
-import mods.octarinecore.client.render.BlockContext
+import mods.octarinecore.client.render.BlockCtx
+import mods.octarinecore.client.render.CombinedContext
 import mods.octarinecore.common.Int3
 import mods.octarinecore.common.config.IBlockMatcher
 import mods.octarinecore.common.config.ModelTextureList
@@ -14,8 +15,8 @@ import net.minecraft.client.renderer.texture.AtlasTexture
 import net.minecraft.util.ResourceLocation
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.IBlockReader
+import net.minecraft.world.IEnviromentBlockReader
 import net.minecraftforge.client.event.TextureStitchEvent
-import net.minecraftforge.client.model.ModelLoader
 import net.minecraftforge.eventbus.api.Event
 import net.minecraftforge.eventbus.api.EventPriority
 import net.minecraftforge.eventbus.api.SubscribeEvent
@@ -26,8 +27,8 @@ import org.apache.logging.log4j.Logger
 class LoadModelDataEvent(val bakery: ModelBakery) : Event()
 
 interface ModelRenderRegistry<T> {
-    operator fun get(ctx: BlockContext) = get(ctx.blockState(Int3.zero), ctx.reader!!, ctx.pos)
-    operator fun get(ctx: BlockContext, offset: Int3) = get(ctx.blockState(offset), ctx.reader!!, ctx.pos + offset)
+    operator fun get(ctx: BlockCtx) = get(ctx.state(Int3.zero), ctx.world, ctx.pos)
+    operator fun get(ctx: BlockCtx, offset: Int3) = get(ctx.state(offset), ctx.world, ctx.pos + offset)
     operator fun get(state: BlockState, world: IBlockReader, pos: BlockPos): T?
 }
 

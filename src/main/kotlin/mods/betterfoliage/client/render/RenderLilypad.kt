@@ -5,20 +5,16 @@ import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.BlockConfig
 import mods.betterfoliage.client.config.Config
 import mods.betterfoliage.client.integration.ShadersModIntegration
-import mods.octarinecore.client.render.*
+import mods.octarinecore.client.render.CombinedContext
+import mods.octarinecore.client.render.RenderDecorator
+import mods.octarinecore.client.render.lighting.FlatOffsetNoColor
 import mods.octarinecore.common.Int3
-import mods.octarinecore.common.Rotation
-import net.minecraft.client.renderer.BlockRendererDispatcher
-import net.minecraft.client.renderer.BufferBuilder
-import net.minecraft.util.BlockRenderLayer
 import net.minecraft.util.Direction.DOWN
 import net.minecraft.util.Direction.UP
 import net.minecraft.util.ResourceLocation
-import net.minecraftforge.client.model.data.IModelData
 import org.apache.logging.log4j.Level.DEBUG
-import java.util.*
 
-class RenderLilypad : AbstractBlockRenderingHandler(BetterFoliage.MOD_ID, BetterFoliage.modBus) {
+class RenderLilypad : RenderDecorator(BetterFoliage.MOD_ID, BetterFoliage.modBus) {
 
     val rootModel = model {
         verticalRectangle(x1 = -0.5, z1 = 0.5, x2 = 0.5, z2 = -0.5, yBottom = -1.5, yTop = -0.5)
@@ -40,41 +36,28 @@ class RenderLilypad : AbstractBlockRenderingHandler(BetterFoliage.MOD_ID, Better
         Client.log(DEBUG, "Registered ${flowerIcon.num} lilypad flower textures")
     }
 
-    override fun isEligible(ctx: BlockContext): Boolean =
+    override fun isEligible(ctx: CombinedContext): Boolean =
         Config.enabled && Config.lilypad.enabled &&
-        BlockConfig.lilypad.matchesClass(ctx.block)
+        BlockConfig.lilypad.matchesClass(ctx.state.block)
 
-    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: BufferBuilder, random: Random, modelData: IModelData, layer: BlockRenderLayer): Boolean {
-        // render the whole block on the cutout layer
-        if (!layer.isCutout) return false
-
-        renderWorldBlockBase(ctx, dispatcher, renderer, random, modelData, null)
-        modelRenderer.updateShading(Int3.zero, allFaces)
+    override fun render(ctx: CombinedContext) {
+        ctx.render()
 
         val rand = ctx.semiRandomArray(5)
-
-        ShadersModIntegration.grass(renderer) {
-            modelRenderer.render(
-                renderer,
+        ShadersModIntegration.grass(ctx) {
+            ctx.render(
                 rootModel.model,
-                Rotation.identity,
-                ctx.blockCenter.add(perturbs[rand[2]]),
+                translation = ctx.blockCenter.add(perturbs[rand[2]]),
                 forceFlat = true,
-                icon = { ctx, qi, q -> rootIcon[rand[qi and 1]]!! },
-                postProcess = noPost
+                icon = { ctx, qi, q -> rootIcon[rand[qi and 1]]!! }
             )
         }
 
-        if (rand[3] < Config.lilypad.flowerChance) modelRenderer.render(
-            renderer,
+        if (rand[3] < Config.lilypad.flowerChance) ctx.render(
             flowerModel.model,
-            Rotation.identity,
-            ctx.blockCenter.add(perturbs[rand[4]]),
+            translation = ctx.blockCenter.add(perturbs[rand[4]]),
             forceFlat = true,
-            icon = { _, _, _ -> flowerIcon[rand[0]]!! },
-            postProcess = noPost
+            icon = { _, _, _ -> flowerIcon[rand[0]]!! }
         )
-
-        return true
     }
 }

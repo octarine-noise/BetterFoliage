@@ -1,30 +1,27 @@
 package mods.betterfoliage.client.render
 
 import mods.betterfoliage.BetterFoliage
-import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.Config
 import mods.betterfoliage.client.integration.OptifineCustomColors
 import mods.betterfoliage.client.integration.ShadersModIntegration
 import mods.betterfoliage.client.texture.LeafRegistry
 import mods.octarinecore.PI2
-import mods.octarinecore.client.render.*
+import mods.octarinecore.client.render.CombinedContext
+import mods.octarinecore.client.render.RenderDecorator
+import mods.octarinecore.client.render.lighting.FlatOffset
+import mods.octarinecore.client.render.lighting.cornerAoMaxGreen
+import mods.octarinecore.client.render.lighting.edgeOrientedAuto
 import mods.octarinecore.common.Double3
 import mods.octarinecore.common.Int3
-import mods.octarinecore.common.Rotation
+import mods.octarinecore.common.allDirections
 import mods.octarinecore.common.vec
 import mods.octarinecore.random
-import net.minecraft.block.material.Material
-import net.minecraft.client.renderer.BlockRendererDispatcher
-import net.minecraft.client.renderer.BufferBuilder
-import net.minecraft.util.BlockRenderLayer
-import net.minecraft.util.Direction.*
+import net.minecraft.util.Direction.UP
 import net.minecraft.util.ResourceLocation
-import net.minecraftforge.client.model.data.IModelData
 import java.lang.Math.cos
 import java.lang.Math.sin
-import java.util.*
 
-class RenderLeaves : AbstractBlockRenderingHandler(BetterFoliage.MOD_ID, BetterFoliage.modBus) {
+class RenderLeaves : RenderDecorator(BetterFoliage.MOD_ID, BetterFoliage.modBus) {
 
     val leavesModel = model {
         verticalRectangle(x1 = -0.5, z1 = 0.5, x2 = 0.5, z2 = -0.5, yBottom = -0.5 * 1.41, yTop = 0.5 * 1.41)
@@ -41,34 +38,28 @@ class RenderLeaves : AbstractBlockRenderingHandler(BetterFoliage.MOD_ID, BetterF
             UP.vec * random(-1.0, 1.0) * Config.leaves.vOffset
     }
 
-    override fun isEligible(ctx: BlockContext) =
+    override fun isEligible(ctx: CombinedContext) =
         Config.enabled &&
         Config.leaves.enabled &&
         LeafRegistry[ctx] != null &&
-        !(Config.leaves.hideInternal && ctx.isSurroundedByNormal)
+        !(Config.leaves.hideInternal && allDirections.all { ctx.offset(it).isNormalCube } )
 
-    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: BufferBuilder, random: Random, modelData: IModelData, layer: BlockRenderLayer): Boolean {
-        val isSnowed = ctx.blockState(up1).isSnow
-        val leafInfo = LeafRegistry[ctx]
-        if (leafInfo == null) {
-            // shouldn't happen
-            Client.logRenderError(ctx.blockState(Int3.zero), ctx.pos)
-            return renderWorldBlockBase(ctx, dispatcher, renderer, random, modelData, layer)
-        }
+    override val onlyOnCutout get() = true
+
+    override fun render(ctx: CombinedContext) {
+        val isSnowed = ctx.state(UP).isSnow
+        val leafInfo = LeafRegistry[ctx]!!
         val blockColor = OptifineCustomColors.getBlockColor(ctx)
 
-        renderWorldBlockBase(ctx, dispatcher, renderer, random, modelData, layer)
-        if (!layer.isCutout) return true
+        ctx.render(force = true)
 
-        modelRenderer.updateShading(Int3.zero, allFaces)
-        ShadersModIntegration.leaves(renderer) {
+        ShadersModIntegration.leaves(ctx) {
             val rand = ctx.semiRandomArray(2)
             (if (Config.leaves.dense) denseLeavesRot else normalLeavesRot).forEach { rotation ->
-                modelRenderer.render(
-                    renderer,
+                ctx.render(
                     leavesModel.model,
                     rotation,
-                    ctx.blockCenter + perturbs[rand[0]],
+                    translation = ctx.blockCenter + perturbs[rand[0]],
                     icon = { _, _, _ -> leafInfo.roundLeafTexture },
                     postProcess = { _, _, _, _, _ ->
                         rotateUV(rand[1])
@@ -76,16 +67,12 @@ class RenderLeaves : AbstractBlockRenderingHandler(BetterFoliage.MOD_ID, BetterF
                     }
                 )
             }
-            if (isSnowed && Config.leaves.snowEnabled) modelRenderer.render(
-                renderer,
+            if (isSnowed && Config.leaves.snowEnabled) ctx.render(
                 leavesModel.model,
-                Rotation.identity,
-                ctx.blockCenter + perturbs[rand[0]],
+                translation = ctx.blockCenter + perturbs[rand[0]],
                 icon = { _, _, _ -> snowedIcon[rand[1]]!! },
                 postProcess = whitewash
             )
         }
-
-        return true
     }
 }

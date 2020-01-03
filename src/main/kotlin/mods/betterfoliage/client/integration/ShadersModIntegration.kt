@@ -4,6 +4,7 @@ import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.BlockConfig
 import mods.betterfoliage.client.config.Config
 import mods.betterfoliage.loader.Refs
+import mods.octarinecore.client.render.CombinedContext
 import mods.octarinecore.metaprog.allAvailable
 import net.minecraft.block.BlockRenderType
 import net.minecraft.block.BlockRenderType.MODEL
@@ -40,7 +41,6 @@ object ShadersModIntegration {
 
     /** Quads rendered inside this block will use the given block entity data in shader programs. */
     inline fun renderAs(blockId: Long, renderType: BlockRenderType, renderer: BufferBuilder, enabled: Boolean = true, func: ()->Unit) {
-        val blockData = blockId or (renderType.ordinal shl 16).toLong()
         if ((isAvailable && enabled)) {
             val vertexBuilder = Refs.sVertexBuilder.get(renderer)!!
             Refs.pushEntity_num.invoke(vertexBuilder, blockId)
@@ -54,12 +54,13 @@ object ShadersModIntegration {
     /** Quads rendered inside this block will use the given block entity data in shader programs. */
     // temporarily NO-OP
     inline fun renderAs(state: BlockState, renderType: BlockRenderType, renderer: BufferBuilder, enabled: Boolean = true, func: ()->Unit) = func()
+    inline fun renderAs(ctx: CombinedContext, renderType: BlockRenderType, enabled: Boolean = true, func: ()->Unit) = func()
 
     /** Quads rendered inside this block will behave as tallgrass blocks in shader programs. */
-    inline fun grass(renderer: BufferBuilder, enabled: Boolean = true, func: ()->Unit) =
-        renderAs(Config.shaders.grassId, MODEL, renderer, enabled, func)
+    inline fun grass(ctx: CombinedContext, enabled: Boolean = true, func: ()->Unit) =
+        renderAs(Config.shaders.grassId, MODEL, ctx.renderCtx!!.renderBuffer, enabled, func)
 
     /** Quads rendered inside this block will behave as leaf blocks in shader programs. */
-    inline fun leaves(renderer: BufferBuilder, enabled: Boolean = true, func: ()->Unit) =
-        renderAs(Config.shaders.leavesId, MODEL, renderer, enabled, func)
+    inline fun leaves(ctx: CombinedContext, enabled: Boolean = true, func: ()->Unit) =
+        renderAs(Config.shaders.leavesId, MODEL, ctx.renderCtx!!.renderBuffer, enabled, func)
 }

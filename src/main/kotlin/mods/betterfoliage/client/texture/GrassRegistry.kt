@@ -3,7 +3,7 @@ package mods.betterfoliage.client.texture
 import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.client.config.BlockConfig
 import mods.betterfoliage.client.config.Config
-import mods.octarinecore.client.render.HSB
+import mods.octarinecore.client.render.lighting.HSB
 import mods.octarinecore.client.resource.*
 import mods.octarinecore.common.config.ConfigurableBlockMatcher
 import mods.octarinecore.common.config.ModelTextureList

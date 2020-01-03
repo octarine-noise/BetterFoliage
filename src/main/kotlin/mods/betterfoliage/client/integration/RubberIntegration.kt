@@ -5,10 +5,10 @@ import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.render.LogRegistry
 import mods.betterfoliage.client.render.column.ColumnTextureInfo
 import mods.betterfoliage.client.render.column.SimpleColumnInfo
+import mods.octarinecore.client.render.CombinedContext
 import mods.octarinecore.client.render.Quad
-import mods.octarinecore.client.render.QuadIconResolver
-import mods.octarinecore.client.render.ShadingContext
-import mods.octarinecore.client.render.blockContext
+import mods.octarinecore.client.render.lighting.QuadIconResolver
+import mods.octarinecore.client.render.lighting.LightingCtx
 import mods.octarinecore.client.resource.*
 import mods.octarinecore.common.rotate
 import mods.octarinecore.metaprog.ClassRef
@@ -22,7 +22,6 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.util.Direction
 import net.minecraft.util.Direction.*
 import net.minecraft.util.ResourceLocation
-import net.minecraftforge.client.model.IModel
 import net.minecraftforge.fml.ModList
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.Level.DEBUG
@@ -61,10 +60,10 @@ class RubberLogInfo(
     sideTextures: List<TextureAtlasSprite>
 ) : SimpleColumnInfo(axis, topTexture, bottomTexture, sideTextures) {
 
-    override val side: QuadIconResolver = { ctx: ShadingContext, idx: Int, quad: Quad ->
-        val worldFace = (if ((idx and 1) == 0) SOUTH else EAST).rotate(ctx.rotation)
+    override val side: QuadIconResolver = { ctx: CombinedContext, idx: Int, quad: Quad ->
+        val worldFace = (if ((idx and 1) == 0) SOUTH else EAST).rotate(ctx.modelRotation)
         if (worldFace == spotDir) spotTexture else {
-            val sideIdx = if (this.sideTextures.size > 1) (blockContext.random(1) + dirToIdx[worldFace.ordinal]) % this.sideTextures.size else 0
+            val sideIdx = if (this.sideTextures.size > 1) (ctx.semiRandom(1) + dirToIdx[worldFace.ordinal]) % this.sideTextures.size else 0
             this.sideTextures[sideIdx]
         }
     }

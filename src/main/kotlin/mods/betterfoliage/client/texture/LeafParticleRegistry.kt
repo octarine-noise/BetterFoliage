@@ -3,10 +3,9 @@ package mods.betterfoliage.client.texture
 import mods.betterfoliage.BetterFoliage
 import mods.octarinecore.client.resource.*
 import mods.octarinecore.stripStart
+import mods.octarinecore.client.resource.Atlas
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.event.TextureStitchEvent
-import net.minecraftforge.common.MinecraftForge
-import net.minecraftforge.eventbus.api.EventPriority
 import net.minecraftforge.eventbus.api.SubscribeEvent
 
 object LeafParticleRegistry {

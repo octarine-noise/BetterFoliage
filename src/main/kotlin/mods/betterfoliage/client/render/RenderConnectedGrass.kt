@@ -1,36 +1,45 @@
 package mods.betterfoliage.client.render
 
 import mods.betterfoliage.BetterFoliage
-import mods.betterfoliage.client.config.BlockConfig
 import mods.betterfoliage.client.config.Config
 import mods.betterfoliage.client.texture.GrassRegistry
-import mods.octarinecore.client.render.AbstractBlockRenderingHandler
-import mods.octarinecore.client.render.BlockContext
-import mods.octarinecore.client.render.offset
+import mods.octarinecore.client.render.CombinedContext
+import mods.octarinecore.client.render.RenderDecorator
 import mods.octarinecore.common.Int3
-import mods.octarinecore.common.forgeDirsHorizontal
+import mods.octarinecore.common.horizontalDirections
 import mods.octarinecore.common.offset
-import net.minecraft.block.Block
-import net.minecraft.client.renderer.BlockRendererDispatcher
-import net.minecraft.client.renderer.BufferBuilder
 import net.minecraft.tags.BlockTags
-import net.minecraft.util.BlockRenderLayer
-import net.minecraftforge.client.model.data.IModelData
-import java.util.*
 
-class RenderConnectedGrass : AbstractBlockRenderingHandler(BetterFoliage.MOD_ID, BetterFoliage.modBus) {
-    override fun isEligible(ctx: BlockContext) =
+class RenderConnectedGrass : RenderDecorator(BetterFoliage.MOD_ID, BetterFoliage.modBus) {
+    override fun isEligible(ctx: CombinedContext) =
         Config.enabled && Config.connectedGrass.enabled &&
-        BlockTags.DIRT_LIKE.contains(ctx.block) &&
+        BlockTags.DIRT_LIKE.contains(ctx.state.block) &&
         GrassRegistry[ctx, up1] != null &&
-        (Config.connectedGrass.snowEnabled || !ctx.blockState(up2).isSnow)
+        (Config.connectedGrass.snowEnabled || !ctx.state(up2).isSnow)
 
-    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: BufferBuilder, random: Random, modelData: IModelData, layer: BlockRenderLayer): Boolean {
+    override fun render(ctx: CombinedContext) {
         // if the block sides are not visible anyway, render normally
-        if (forgeDirsHorizontal.none { ctx.shouldSideBeRendered(it) }) return renderWorldBlockBase(ctx, dispatcher, renderer, random, modelData, layer)
+        if (horizontalDirections.none { ctx.shouldSideBeRendered(it) }) {
+            ctx.render()
+        } else {
+            ctx.exchange(Int3.zero, up1).exchange(up1, up2).render()
+        }
+    }
+}
 
-        return ctx.offset(Int3.zero, up1).offset(up1, up2).let { offsetCtx ->
-            renderWorldBlockBase(offsetCtx, dispatcher, renderer, random, modelData, layer)
+class RenderConnectedGrassLog : RenderDecorator(BetterFoliage.MOD_ID, BetterFoliage.modBus) {
+
+    override fun isEligible(ctx: CombinedContext) =
+        Config.enabled && Config.roundLogs.enabled && Config.roundLogs.connectGrass &&
+        BlockTags.DIRT_LIKE.contains(ctx.state.block) &&
+        LogRegistry[ctx, up1] != null
+
+    override fun render(ctx: CombinedContext) {
+        val grassDir = horizontalDirections.find { GrassRegistry[ctx, it.offset] != null }
+        if (grassDir == null) {
+            ctx.render()
+        } else {
+            ctx.exchange(Int3.zero, grassDir.offset).render()
         }
     }
 }

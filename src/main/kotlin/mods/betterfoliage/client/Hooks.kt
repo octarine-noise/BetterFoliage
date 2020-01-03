@@ -7,7 +7,10 @@ import mods.betterfoliage.client.config.BlockConfig
 import mods.betterfoliage.client.config.Config
 import mods.betterfoliage.client.render.*
 import mods.betterfoliage.loader.Refs
-import mods.octarinecore.client.render.blockContext
+import mods.octarinecore.ThreadLocalDelegate
+import mods.octarinecore.client.render.*
+import mods.octarinecore.client.render.lighting.DefaultLightingCtx
+import mods.octarinecore.client.render.lighting.LightingCtx
 import mods.octarinecore.client.resource.LoadModelDataEvent
 import mods.octarinecore.common.plus
 import mods.octarinecore.metaprog.allAvailable
@@ -75,6 +78,7 @@ fun getVoxelShapeOverride(state: BlockState, reader: IBlockReader, pos: BlockPos
     return state.func_215702_a(reader, pos, dir)
 }
 
+val lightingCtx by ThreadLocalDelegate { DefaultLightingCtx(BasicBlockCtx(NonNullWorld, BlockPos.ZERO)) }
 fun renderWorldBlock(dispatcher: BlockRendererDispatcher,
                      state: BlockState,
                      pos: BlockPos,
@@ -84,21 +88,32 @@ fun renderWorldBlock(dispatcher: BlockRendererDispatcher,
                      modelData: IModelData,
                      layer: BlockRenderLayer
 ): Boolean {
+    // build context
+    val blockCtx = CachedBlockCtx(reader, pos)
+    val renderCtx = RenderCtx(dispatcher, buffer, layer, random)
+    lightingCtx.reset(blockCtx)
+    val combinedCtx = CombinedContext(blockCtx, renderCtx, lightingCtx)
+
+    // loop render decorators
     val doBaseRender = state.canRenderInLayer(layer) || (layer == targetCutoutLayer && state.canRenderInLayer(otherCutoutLayer))
-    blockContext.let { ctx ->
-        ctx.set(reader, pos)
-        Client.renderers.forEach { renderer ->
-            if (renderer.isEligible(ctx)) {
-                // render on the block's default layer
-                // also render on the cutout layer if the renderer requires it
-                if (doBaseRender || (renderer.addToCutout && layer == targetCutoutLayer)) {
-                    return renderer.render(ctx, dispatcher, buffer, random, modelData, layer)
-                }
+    Client.renderers.forEach { renderer ->
+        if (renderer.isEligible(combinedCtx)) {
+            // render on the block's default layer
+            // also render on the cutout layer if the renderer requires it
+
+            val doCutoutRender = renderer.renderOnCutout && layer == targetCutoutLayer
+            val stopRender = renderer.onlyOnCutout && !layer.isCutout
+
+            if ((doBaseRender || doCutoutRender) && !stopRender) {
+                renderer.render(combinedCtx)
+                return combinedCtx.hasRendered
             }
         }
     }
 
-    return if (doBaseRender) dispatcher.renderBlock(state, pos, reader, buffer, random, modelData) else false
+    // no render decorators have taken on this block, proceed to normal rendering
+    combinedCtx.render()
+    return combinedCtx.hasRendered
 }
 
 fun canRenderInLayerOverride(state: BlockState, layer: BlockRenderLayer) = state.canRenderInLayer(layer) || layer == targetCutoutLayer

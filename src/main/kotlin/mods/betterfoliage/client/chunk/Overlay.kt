@@ -3,12 +3,12 @@ package mods.betterfoliage.client.chunk
 import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.client.Client
 import mods.betterfoliage.loader.Refs
-import net.minecraft.block.BlockState
+import mods.octarinecore.client.render.BasicBlockCtx
+import mods.octarinecore.client.render.BlockCtx
 import net.minecraft.client.renderer.chunk.ChunkRenderCache
 import net.minecraft.client.world.ClientWorld
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.ChunkPos
-import net.minecraft.world.IBlockReader
 import net.minecraft.world.IEnviromentBlockReader
 import net.minecraft.world.IWorldReader
 import net.minecraft.world.dimension.DimensionType
@@ -30,8 +30,8 @@ val IEnviromentBlockReader.dimType: DimensionType get() = when {
  * Represents some form of arbitrary non-persistent data that can be calculated and cached for each block position
  */
 interface ChunkOverlayLayer<T> {
-    abstract fun calculate(reader: IEnviromentBlockReader, pos: BlockPos): T
-    abstract fun onBlockUpdate(reader: IEnviromentBlockReader, pos: BlockPos)
+    fun calculate(ctx: BlockCtx): T
+    fun onBlockUpdate(world: IEnviromentBlockReader, pos: BlockPos)
 }
 
 /**
@@ -56,12 +56,12 @@ object ChunkOverlayManager {
      * @param reader World to use if calculation of overlay value is necessary
      * @param pos Block position
      */
-    fun <T> get(layer: ChunkOverlayLayer<T>, reader: IEnviromentBlockReader, pos: BlockPos): T? {
-        val data = chunkData[reader.dimType]?.get(ChunkPos(pos)) ?: return null
-        data.get(layer, pos).let { value ->
+    fun <T> get(layer: ChunkOverlayLayer<T>, ctx: BlockCtx): T? {
+        val data = chunkData[ctx.world.dimType]?.get(ChunkPos(ctx.pos)) ?: return null
+        data.get(layer, ctx.pos).let { value ->
             if (value !== ChunkOverlayData.UNCALCULATED) return value
-            val newValue = layer.calculate(reader, pos)
-            data.set(layer, pos, newValue)
+            val newValue = layer.calculate(ctx)
+            data.set(layer, ctx.pos, newValue)
             return newValue
         }
     }

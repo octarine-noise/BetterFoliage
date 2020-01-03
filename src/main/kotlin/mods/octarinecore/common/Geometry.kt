@@ -15,9 +15,9 @@ val axes = listOf(X, Y, Z)
 val axisDirs = listOf(POSITIVE, NEGATIVE)
 val Direction.dir: AxisDirection get() = axisDirection
 val AxisDirection.sign: String get() = when(this) { POSITIVE -> "+"; NEGATIVE -> "-" }
-val forgeDirs = Direction.values()
-val forgeDirsHorizontal = listOf(NORTH, SOUTH, EAST, WEST)
-val forgeDirOffsets = forgeDirs.map { Int3(it) }
+val allDirections = Direction.values()
+val horizontalDirections = listOf(NORTH, SOUTH, EAST, WEST)
+val allDirOffsets = allDirections.map { Int3(it) }
 val Pair<Axis, AxisDirection>.face: Direction get() = when(this) {
     X to POSITIVE -> EAST; X to NEGATIVE -> WEST;
     Y to POSITIVE -> UP; Y to NEGATIVE -> DOWN;
@@ -25,7 +25,7 @@ val Pair<Axis, AxisDirection>.face: Direction get() = when(this) {
 }
 val Direction.perpendiculars: List<Direction> get() =
     axes.filter { it != this.axis }.cross(axisDirs).map { it.face }
-val Direction.offset: Int3 get() = forgeDirOffsets[ordinal]
+val Direction.offset: Int3 get() = allDirOffsets[ordinal]
 
 /** Old ForgeDirection rotation matrix yanked from 1.7.10 */
 val ROTATION_MATRIX: Array<IntArray> get() = arrayOf(
@@ -43,6 +43,7 @@ val ROTATION_MATRIX: Array<IntArray> get() = arrayOf(
 operator fun Direction.times(scale: Double) =
     Double3(directionVec.x.toDouble() * scale, directionVec.y.toDouble() * scale, directionVec.z.toDouble() * scale)
 val Direction.vec: Double3 get() = Double3(directionVec.x.toDouble(), directionVec.y.toDouble(), directionVec.z.toDouble())
+
 operator fun BlockPos.plus(other: Int3) = BlockPos(x + other.x, y + other.y, z + other.z)
 
 /** 3D vector of [Double]s. Offers both mutable operations, and immutable operations in operator notation. */
@@ -92,7 +93,7 @@ data class Double3(var x: Double, var y: Double, var z: Double) {
     infix fun cross(o: Double3) = Double3(y * o.z - z * o.y, z * o.x - x * o.z, x * o.y - y * o.x)
     val length: Double get() = Math.sqrt(x * x + y * y + z * z)
     val normalize: Double3 get() = (1.0 / length).let { Double3(x * it, y * it, z * it) }
-    val nearestCardinal: Direction get() = nearestAngle(this, forgeDirs.asIterable()) { it.vec }.first
+    val nearestCardinal: Direction get() = nearestAngle(this, allDirections.asIterable()) { it.vec }.first
 }
 
 /** 3D vector of [Int]s. Offers both mutable operations, and immutable operations in operator notation. */
@@ -170,8 +171,8 @@ class Rotation(val forward: Array<Direction>, val reverse: Array<Direction>) {
 
     companion object {
         // Forge rotation matrix is left-hand
-        val rot90 = Array(6) { idx -> Rotation(forgeDirs[idx].opposite.rotations, forgeDirs[idx].rotations) }
-        val identity = Rotation(forgeDirs, forgeDirs)
+        val rot90 = Array(6) { idx -> Rotation(allDirections[idx].opposite.rotations, allDirections[idx].rotations) }
+        val identity = Rotation(allDirections, allDirections)
     }
 
 }
@@ -179,8 +180,24 @@ class Rotation(val forward: Array<Direction>, val reverse: Array<Direction>) {
 // ================================
 // Miscellaneous
 // ================================
+
+inline operator fun <reified T> Array<T>.get(face: Direction): T = get(face.ordinal)
+
+data class BoxFace(val top: Direction, val left: Direction) {
+
+    val allCorners = listOf(top to left, top to left.opposite, top.opposite to left, top.opposite to left.opposite)
+}
+val boxFaces = allDirections.map { when(it) {
+    DOWN -> BoxFace(SOUTH, WEST)
+    UP -> BoxFace(SOUTH, EAST)
+    NORTH -> BoxFace(WEST, UP)
+    SOUTH -> BoxFace(UP, WEST)
+    WEST -> BoxFace(SOUTH, UP)
+    EAST -> BoxFace(SOUTH, DOWN)
+}}.toTypedArray()
+
 /** List of all 12 box edges, represented as a [Pair] of [ForgeDirection]s */
-val boxEdges = forgeDirs.flatMap { face1 -> forgeDirs.filter { it.axis > face1.axis }.map { face1 to it } }
+val boxEdges = allDirections.flatMap { face1 -> allDirections.filter { it.axis > face1.axis }.map { face1 to it } }
 
 /**
  * Get the closest object to the specified point from a list of objects.
@@ -203,23 +220,3 @@ fun <T> nearestPosition(vertex: Double3, objs: Iterable<T>, objPos: (T)-> Double
  */
 fun <T> nearestAngle(vector: Double3, objs: Iterable<T>, objAngle: (T)-> Double3): Pair<T, Double> =
         objs.map { it to objAngle(it).dot(vector) }.maxBy { it.second }!!
-
-data class FaceCorners(val topLeft: Pair<Direction, Direction>,
-                       val topRight: Pair<Direction, Direction>,
-                       val bottomLeft: Pair<Direction, Direction>,
-                       val bottomRight: Pair<Direction, Direction>) {
-    constructor(top: Direction, left: Direction) :
-    this(top to left, top to left.opposite, top.opposite to left, top.opposite to left.opposite)
-
-    val asArray = arrayOf(topLeft, topRight, bottomLeft, bottomRight)
-    val asList = listOf(topLeft, topRight, bottomLeft, bottomRight)
-}
-
-val faceCorners = forgeDirs.map { when(it) {
-    DOWN -> FaceCorners(SOUTH, WEST)
-    UP -> FaceCorners(SOUTH, EAST)
-    NORTH -> FaceCorners(WEST, UP)
-    SOUTH -> FaceCorners(UP, WEST)
-    WEST -> FaceCorners(SOUTH, UP)
-    EAST -> FaceCorners(SOUTH, DOWN)
-}}

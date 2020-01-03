@@ -3,7 +3,7 @@ package mods.betterfoliage.client.render
 
 import mods.octarinecore.PI2
 import mods.octarinecore.client.render.Model
-import mods.octarinecore.client.render.PostProcessLambda
+import mods.octarinecore.client.render.lighting.PostProcessLambda
 import mods.octarinecore.client.render.Quad
 import mods.octarinecore.common.Double3
 import mods.octarinecore.common.Int3

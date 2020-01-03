@@ -10,17 +10,14 @@ import mods.betterfoliage.client.integration.TechRebornRubberIntegration
 import mods.betterfoliage.client.render.*
 import mods.betterfoliage.client.texture.*
 import mods.octarinecore.client.gui.textComponent
-import mods.octarinecore.client.render.AbstractBlockRenderingHandler
+import mods.octarinecore.client.render.RenderDecorator
 import mods.octarinecore.client.resource.CenteringTextureGenerator
-import mods.octarinecore.client.resource.GeneratorPack
 import mods.octarinecore.client.resource.IConfigChangeListener
 import net.minecraft.block.BlockState
 import net.minecraft.client.Minecraft
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.text.TextFormatting
 import net.minecraft.util.text.TranslationTextComponent
-import net.minecraftforge.eventbus.api.SubscribeEvent
-import net.minecraftforge.fml.config.ModConfig
 import net.minecraftforge.registries.ForgeRegistries
 import org.apache.logging.log4j.Level
 
@@ -29,7 +26,7 @@ import org.apache.logging.log4j.Level
  * except for the call hooks.
  */
 object Client {
-    var renderers= emptyList<AbstractBlockRenderingHandler>()
+    var renderers= emptyList<RenderDecorator>()
     var configListeners = emptyList<IConfigChangeListener>()
 
     val suppressRenderErrors = mutableSetOf<BlockState>()

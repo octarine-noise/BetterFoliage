@@ -1,10 +1,8 @@
 @file:JvmName("Utils")
 package mods.octarinecore.client.resource
 
-import mods.betterfoliage.loader.Refs
 import mods.octarinecore.PI2
-import mods.octarinecore.client.render.HSB
-import mods.octarinecore.stripEnd
+import mods.octarinecore.client.render.lighting.HSB
 import mods.octarinecore.stripStart
 import mods.octarinecore.tryDefault
 import net.minecraft.client.Minecraft
@@ -16,7 +14,6 @@ import net.minecraft.resources.IResource
 import net.minecraft.resources.IResourceManager
 import net.minecraft.resources.SimpleReloadableResourceManager
 import net.minecraft.util.ResourceLocation
-import net.minecraftforge.client.model.IModel
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream

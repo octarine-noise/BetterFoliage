@@ -1,6 +1,7 @@
 package mods.betterfoliage.client.texture
 
 import mods.octarinecore.client.resource.*
+import mods.octarinecore.client.resource.Atlas
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.resource.VanillaResourceType.TEXTURES
 import java.awt.image.BufferedImage

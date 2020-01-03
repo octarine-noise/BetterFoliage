@@ -2,7 +2,7 @@ package mods.betterfoliage.client.texture
 
 import mods.betterfoliage.BetterFoliage
 import mods.octarinecore.client.resource.*
-import mods.octarinecore.stripStart
+import mods.octarinecore.client.resource.Atlas
 import net.minecraft.resources.IResource
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.resource.VanillaResourceType.TEXTURES

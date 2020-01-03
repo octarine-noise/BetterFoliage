@@ -50,5 +50,3 @@ class OffsetEnvBlockReader(val original: IEnviromentBlockReader, val modded: Blo
 //    reader = original
 //    return result
 //}
-
-inline fun BlockContext.offset(modded: Int3, target: Int3) = BlockContext(OffsetEnvBlockReader(reader!!, pos + modded, pos + target), pos)

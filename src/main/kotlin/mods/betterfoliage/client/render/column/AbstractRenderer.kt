@@ -7,22 +7,19 @@ import mods.betterfoliage.client.render.*
 import mods.betterfoliage.client.render.column.ColumnLayerData.SpecialRender.BlockType.*
 import mods.betterfoliage.client.render.column.ColumnLayerData.SpecialRender.QuadrantType
 import mods.betterfoliage.client.render.column.ColumnLayerData.SpecialRender.QuadrantType.*
-import mods.octarinecore.client.render.*
-import mods.octarinecore.common.Int3
+import mods.octarinecore.client.render.CombinedContext
+import mods.octarinecore.client.render.Model
+import mods.octarinecore.client.render.RenderDecorator
+import mods.octarinecore.client.render.noPost
 import mods.octarinecore.common.Rotation
 import mods.octarinecore.common.face
 import mods.octarinecore.common.rot
 import net.minecraft.block.BlockRenderType.MODEL
-import net.minecraft.client.renderer.BlockRendererDispatcher
-import net.minecraft.client.renderer.BufferBuilder
-import net.minecraft.util.BlockRenderLayer
 import net.minecraft.util.Direction.*
-import net.minecraftforge.client.model.data.IModelData
 import net.minecraftforge.eventbus.api.IEventBus
-import java.util.*
 
 @Suppress("NOTHING_TO_INLINE")
-abstract class AbstractRenderColumn(modId: String, modBus: IEventBus) : AbstractBlockRenderingHandler(modId, modBus) {
+abstract class AbstractRenderColumn(modId: String, modBus: IEventBus) : RenderDecorator(modId, modBus) {
 
     /** The rotations necessary to bring the models in position for the 4 quadrants */
     val quadrantRotations = Array(4) { Rotation.rot90[UP.ordinal] * it }
@@ -93,28 +90,25 @@ abstract class AbstractRenderColumn(modId: String, modBus: IEventBus) : Abstract
         q1 == q2 || ((q1 == SQUARE || q1 == INVISIBLE) && (q2 == SQUARE || q2 == INVISIBLE))
 
     @Suppress("NON_EXHAUSTIVE_WHEN")
-    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: BufferBuilder, random: Random, modelData: IModelData, layer: BlockRenderLayer): Boolean {
+    override fun render(ctx: CombinedContext) {
 
-        val roundLog = ChunkOverlayManager.get(overlayLayer, ctx.reader!!, ctx.pos)
+        val roundLog = ChunkOverlayManager.get(overlayLayer, ctx)
         when(roundLog) {
-            ColumnLayerData.SkipRender -> return true
-            ColumnLayerData.NormalRender -> return renderWorldBlockBase(ctx, dispatcher, renderer, random, modelData, null)
+            ColumnLayerData.SkipRender -> return
+            ColumnLayerData.NormalRender -> return ctx.render()
             ColumnLayerData.ResolveError, null -> {
-                Client.logRenderError(ctx.blockState(Int3.zero), ctx.pos)
-                return renderWorldBlockBase(ctx, dispatcher, renderer, random, modelData, null)
+                Client.logRenderError(ctx.state, ctx.pos)
+                return ctx.render()
             }
         }
 
         // if log axis is not defined and "Default to vertical" config option is not set, render normally
         if ((roundLog as ColumnLayerData.SpecialRender).column.axis == null && !overlayLayer.defaultToY) {
-            return renderWorldBlockBase(ctx, dispatcher, renderer, random, modelData, null)
+            return ctx.render()
         }
 
-        // get AO data
-        modelRenderer.updateShading(Int3.zero, allFaces)
-
         val baseRotation = rotationFromUp[((roundLog.column.axis ?: Axis.Y) to AxisDirection.POSITIVE).face.ordinal]
-        renderAs(ctx.blockState(Int3.zero), MODEL, renderer) {
+        renderAs(ctx, MODEL) {
             quadrantRotations.forEachIndexed { idx, quadrantRotation ->
                 // set rotation for the current quadrant
                 val rotation = baseRotation + quadrantRotation
@@ -136,8 +130,7 @@ abstract class AbstractRenderColumn(modId: String, modBus: IEventBus) : Abstract
                     else -> null
                 }
 
-                if (sideModel != null) modelRenderer.render(
-                    renderer,
+                if (sideModel != null) ctx.render(
                     sideModel,
                     rotation,
                     icon = roundLog.column.side,
@@ -190,8 +183,7 @@ abstract class AbstractRenderColumn(modId: String, modBus: IEventBus) : Abstract
                     }
                 }
 
-                if (upModel != null) modelRenderer.render(
-                    renderer,
+                if (upModel != null) ctx.render(
                     upModel,
                     rotation,
                     icon = upIcon,
@@ -201,8 +193,7 @@ abstract class AbstractRenderColumn(modId: String, modBus: IEventBus) : Abstract
                         }
                     }
                 )
-                if (downModel != null) modelRenderer.render(
-                    renderer,
+                if (downModel != null) ctx.render(
                     downModel,
                     rotation,
                     icon = downIcon,
@@ -214,6 +205,5 @@ abstract class AbstractRenderColumn(modId: String, modBus: IEventBus) : Abstract
                 )
             }
         }
-        return true
     }
 }

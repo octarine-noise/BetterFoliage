@@ -2,11 +2,11 @@ package mods.betterfoliage.client.render
 
 import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.client.Client
-import mods.betterfoliage.client.config.BlockConfig
 import mods.betterfoliage.client.config.Config
 import mods.betterfoliage.client.render.column.ColumnTextureInfo
 import mods.betterfoliage.client.render.column.SimpleColumnInfo
 import mods.octarinecore.client.render.*
+import mods.octarinecore.client.render.lighting.*
 import mods.octarinecore.client.resource.ModelRenderRegistryConfigurable
 import mods.octarinecore.common.Int3
 import mods.octarinecore.common.Rotation
@@ -31,7 +31,7 @@ object StandardCactusRegistry : ModelRenderRegistryConfigurable<ColumnTextureInf
     init { BetterFoliage.modBus.register(this) }
 }
 
-class RenderCactus : AbstractBlockRenderingHandler(BetterFoliage.MOD_ID, BetterFoliage.modBus) {
+class RenderCactus : RenderDecorator(BetterFoliage.MOD_ID, BetterFoliage.modBus) {
 
     val cactusStemRadius = 0.4375
     val cactusArmRotation = listOf(NORTH, SOUTH, EAST, WEST).map { Rotation.rot90[it.ordinal] }
@@ -71,41 +71,30 @@ class RenderCactus : AbstractBlockRenderingHandler(BetterFoliage.MOD_ID, BetterF
         Client.log(DEBUG, "Registered ${iconArm.num} cactus arm textures")
     }
 
-    override fun isEligible(ctx: BlockContext): Boolean =
+    override fun isEligible(ctx: CombinedContext): Boolean =
         Config.enabled && Config.cactus.enabled &&
         StandardCactusRegistry[ctx] != null
 
-    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: BufferBuilder, random: Random, modelData: IModelData, layer: BlockRenderLayer): Boolean {
-        // render the whole block on the cutout layer
-        if (!layer.isCutout) return false
+    override val onlyOnCutout get() = true
 
-        // get AO data
-        modelRenderer.updateShading(Int3.zero, allFaces)
-        val icons = StandardCactusRegistry[ctx] ?: return renderWorldBlockBase(ctx, dispatcher, renderer, random, modelData, null)
+    override fun render(ctx: CombinedContext) {
+        val icons = StandardCactusRegistry[ctx]!!
 
-        modelRenderer.render(
-            renderer,
+        ctx.render(
             modelStem.model,
-            Rotation.identity,
             icon = { ctx, qi, q -> when(qi) {
                 0 -> icons.bottom(ctx, qi, q); 1 -> icons.top(ctx, qi, q); else -> icons.side(ctx, qi, q)
-            } },
-            postProcess = noPost
+            } }
         )
-        modelRenderer.render(
-            renderer,
-            modelCross[ctx.random(0)],
-            Rotation.identity,
-            icon = { _, _, _ -> iconCross.icon!!},
-            postProcess = noPost
+        ctx.render(
+            modelCross[ctx.semiRandom(0)],
+            icon = { _, _, _ -> iconCross.icon!!}
         )
-        modelRenderer.render(
-            renderer,
-            modelArm[ctx.random(1)],
-            cactusArmRotation[ctx.random(2) % 4],
-            icon = { _, _, _ -> iconArm[ctx.random(3)]!!},
-            postProcess = noPost
+
+        ctx.render(
+            modelArm[ctx.semiRandom(1)],
+            cactusArmRotation[ctx.semiRandom(2) % 4],
+            icon = { _, _, _ -> iconArm[ctx.semiRandom(3)]!!}
         )
-        return true
     }
 }

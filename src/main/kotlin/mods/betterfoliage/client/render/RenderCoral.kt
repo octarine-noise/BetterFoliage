@@ -5,9 +5,11 @@ import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.BlockConfig
 import mods.betterfoliage.client.config.Config
 import mods.octarinecore.client.render.*
+import mods.octarinecore.client.render.lighting.*
 import mods.octarinecore.common.Int3
-import mods.octarinecore.common.forgeDirOffsets
-import mods.octarinecore.common.forgeDirs
+import mods.octarinecore.common.allDirOffsets
+import mods.octarinecore.common.allDirections
+import mods.octarinecore.common.offset
 import mods.octarinecore.random
 import net.minecraft.block.material.Material
 import net.minecraft.client.renderer.BlockRendererDispatcher
@@ -17,13 +19,11 @@ import net.minecraft.util.Direction.Axis
 import net.minecraft.util.Direction.UP
 import net.minecraft.util.ResourceLocation
 import net.minecraft.world.biome.Biome
-import net.minecraftforge.api.distmarker.Dist
 import net.minecraftforge.client.model.data.IModelData
-import net.minecraftforge.fml.common.Mod
 import org.apache.logging.log4j.Level.DEBUG
 import java.util.*
 
-class RenderCoral : AbstractBlockRenderingHandler(BetterFoliage.MOD_ID, BetterFoliage.modBus) {
+class RenderCoral : RenderDecorator(BetterFoliage.MOD_ID, BetterFoliage.modBus) {
 
     val noise = simplexNoise()
 
@@ -49,33 +49,27 @@ class RenderCoral : AbstractBlockRenderingHandler(BetterFoliage.MOD_ID, BetterFo
         Client.log(DEBUG, "Registered ${crustIcons.num} coral crust textures")
     }
 
-    override fun isEligible(ctx: BlockContext) =
+    override fun isEligible(ctx: CombinedContext) =
         Config.enabled && Config.coral.enabled &&
-        (ctx.blockState(up2).material == Material.WATER || Config.coral.shallowWater) &&
-        ctx.blockState(up1).material == Material.WATER &&
-        BlockConfig.sand.matchesClass(ctx.block) &&
+        (ctx.state(up2).material == Material.WATER || Config.coral.shallowWater) &&
+        ctx.state(up1).material == Material.WATER &&
+        BlockConfig.sand.matchesClass(ctx.state.block) &&
         ctx.biome.category.let { it == Biome.Category.OCEAN || it == Biome.Category.BEACH } &&
         noise[ctx.pos] < Config.coral.population
 
-    override fun render(ctx: BlockContext, dispatcher: BlockRendererDispatcher, renderer: BufferBuilder, random: Random, modelData: IModelData, layer: BlockRenderLayer): Boolean {
-        val baseRender = renderWorldBlockBase(ctx, dispatcher, renderer, random, modelData, layer)
-        if (!layer.isCutout) return baseRender
+    override fun render(ctx: CombinedContext) {
+        val baseRender = ctx.render()
+        if (!ctx.isCutout) return
 
-        modelRenderer.updateShading(Int3.zero, allFaces)
-
-        forgeDirs.forEachIndexed { idx, face ->
-            if (!ctx.isNormalCube(forgeDirOffsets[idx]) && blockContext.random(idx) < Config.coral.chance) {
-                var variation = blockContext.random(6)
-                modelRenderer.render(
-                    renderer,
+        allDirections.forEachIndexed { idx, face ->
+            if (ctx.state(face).material == Material.WATER && ctx.semiRandom(idx) < Config.coral.chance) {
+                var variation = ctx.semiRandom(6)
+                ctx.render(
                     coralModels[variation++],
                     rotationFromUp[idx],
-                    icon = { _, qi, _ -> if (qi == 4) crustIcons[variation]!! else coralIcons[variation + (qi and 1)]!!},
-                    postProcess = noPost
+                    icon = { _, qi, _ -> if (qi == 4) crustIcons[variation]!! else coralIcons[variation + (qi and 1)]!!}
                 )
             }
         }
-
-        return true
     }
 }

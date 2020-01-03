@@ -8,12 +8,9 @@ import mods.betterfoliage.client.render.column.ColumnLayerData.SpecialRender.Blo
 import mods.betterfoliage.client.render.column.ColumnLayerData.SpecialRender.QuadrantType
 import mods.betterfoliage.client.render.column.ColumnLayerData.SpecialRender.QuadrantType.*
 import mods.betterfoliage.client.render.rotationFromUp
-import mods.octarinecore.client.render.BlockContext
+import mods.octarinecore.client.render.BlockCtx
 import mods.octarinecore.client.resource.ModelRenderRegistry
-import mods.octarinecore.common.Int3
-import mods.octarinecore.common.Rotation
-import mods.octarinecore.common.face
-import mods.octarinecore.common.plus
+import mods.octarinecore.common.*
 import net.minecraft.block.BlockState
 import net.minecraft.util.Direction.Axis
 import net.minecraft.util.Direction.AxisDirection
@@ -64,21 +61,18 @@ abstract class ColumnRenderLayer : ChunkOverlayLayer<ColumnLayerData> {
 
     abstract val registry: ModelRenderRegistry<ColumnTextureInfo>
     abstract val blockPredicate: (BlockState)->Boolean
-    abstract val surroundPredicate: (BlockState) -> Boolean
     abstract val connectSolids: Boolean
     abstract val lenientConnect: Boolean
     abstract val defaultToY: Boolean
 
     val allNeighborOffsets = (-1..1).flatMap { offsetX -> (-1..1).flatMap { offsetY -> (-1..1).map { offsetZ -> Int3(offsetX, offsetY, offsetZ) }}}
 
-    override fun onBlockUpdate(reader: IEnviromentBlockReader, pos: BlockPos) {
-        allNeighborOffsets.forEach { offset -> ChunkOverlayManager.clear(reader.dimType, this, pos + offset) }
+    override fun onBlockUpdate(world: IEnviromentBlockReader, pos: BlockPos) {
+        allNeighborOffsets.forEach { offset -> ChunkOverlayManager.clear(world.dimType, this, pos + offset) }
     }
 
-    override fun calculate(reader: IEnviromentBlockReader, pos: BlockPos) = calculate(BlockContext(reader, pos))
-
-    fun calculate(ctx: BlockContext): ColumnLayerData {
-        if (ctx.isSurroundedBy(surroundPredicate) && ctx.isSurroundedByNormal) return ColumnLayerData.SkipRender
+    override fun calculate(ctx: BlockCtx): ColumnLayerData {
+        if (allDirections.all { ctx.offset(it).isNormalCube }) return ColumnLayerData.SkipRender
         val columnTextures = registry[ctx] ?: return ColumnLayerData.ResolveError
 
         // if log axis is not defined and "Default to vertical" config option is not set, render normally
@@ -104,7 +98,7 @@ abstract class ColumnRenderLayer : ChunkOverlayLayer<ColumnLayerData> {
     }
 
     /** Fill the array of [QuadrantType]s based on the blocks to the sides of this one. */
-    fun Array<QuadrantType>.checkNeighbors(ctx: BlockContext, rotation: Rotation, logAxis: Axis, yOff: Int): Array<QuadrantType> {
+    fun Array<QuadrantType>.checkNeighbors(ctx: BlockCtx, rotation: Rotation, logAxis: Axis, yOff: Int): Array<QuadrantType> {
         val blkS = ctx.blockType(rotation, logAxis, Int3(0, yOff, 1))
         val blkE = ctx.blockType(rotation, logAxis, Int3(1, yOff, 0))
         val blkN = ctx.blockType(rotation, logAxis, Int3(0, yOff, -1))
@@ -171,13 +165,13 @@ abstract class ColumnRenderLayer : ChunkOverlayLayer<ColumnLayerData> {
     /**
      * Get the type of the block at the given offset in a rotated reference frame.
      */
-    fun BlockContext.blockType(rotation: Rotation, axis: Axis, offset: Int3): ColumnLayerData.SpecialRender.BlockType {
+    fun BlockCtx.blockType(rotation: Rotation, axis: Axis, offset: Int3): ColumnLayerData.SpecialRender.BlockType {
         val offsetRot = offset.rotate(rotation)
-        val state = blockState(offsetRot)
+        val state = state(offsetRot)
         return if (!blockPredicate(state)) {
-            if (isNormalCube(offsetRot)) SOLID else NONSOLID
+            if (offset(offsetRot).isNormalCube) SOLID else NONSOLID
         } else {
-            (registry[state, reader!!, pos + offsetRot]?.axis ?: if (Config.roundLogs.defaultY) Axis.Y else null)?.let {
+            (registry[state, world, pos + offsetRot]?.axis ?: if (Config.roundLogs.defaultY) Axis.Y else null)?.let {
                 if (it == axis) PARALLEL else PERPENDICULAR
             } ?: SOLID
         }
