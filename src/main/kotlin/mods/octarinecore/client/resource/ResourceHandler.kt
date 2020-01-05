@@ -1,10 +1,10 @@
 package mods.octarinecore.client.resource
 
+import mods.betterfoliage.client.resource.Identifier
+import mods.betterfoliage.client.resource.Sprite
 import mods.octarinecore.client.render.Model
 import mods.octarinecore.common.Double3
 import mods.octarinecore.common.Int3
-import mods.octarinecore.resource.Identifier
-import mods.octarinecore.resource.Sprite
 import mods.octarinecore.stripEnd
 import mods.octarinecore.stripStart
 import net.minecraft.client.renderer.texture.AtlasTexture
@@ -63,10 +63,10 @@ open class ResourceHandler(
     // ============================
     // Resource declarations
     // ============================
-    fun iconStatic(location: ()->Identifier) = IconHolder(location).apply { resources.add(this) }
+    fun iconStatic(location: ()-> Identifier) = IconHolder(location).apply { resources.add(this) }
     fun iconStatic(location: Identifier) = iconStatic { location }
     fun iconStatic(domain: String, path: String) = iconStatic(Identifier(domain, path))
-    fun iconSet(targetAtlas: Atlas = Atlas.BLOCKS, location: (Int)->Identifier) = IconSet(targetAtlas, location).apply { this@ResourceHandler.resources.add(this) }
+    fun iconSet(targetAtlas: Atlas = Atlas.BLOCKS, location: (Int)-> Identifier) = IconSet(targetAtlas, location).apply { this@ResourceHandler.resources.add(this) }
     fun model(init: Model.()->Unit) = ModelHolder(init).apply { resources.add(this) }
     fun modelSet(num: Int, init: Model.(Int)->Unit) = ModelSet(num, init).apply { resources.add(this) }
     fun vectorSet(num: Int, init: (Int)-> Double3) = VectorSet(num, init).apply { resources.add(this) }
@@ -102,7 +102,7 @@ open class ResourceHandler(
 // ============================
 // Resource container classes
 // ============================
-class IconHolder(val location: ()->Identifier) : IStitchListener {
+class IconHolder(val location: ()-> Identifier) : IStitchListener {
     var iconRes: Identifier? = null
     var icon: Sprite? = null
     override fun onPreStitch(event: TextureStitchEvent.Pre) {
@@ -119,7 +119,7 @@ class ModelHolder(val init: Model.()->Unit): IConfigChangeListener {
     override fun onConfigChange() { model = Model().apply(init) }
 }
 
-class IconSet(val targetAtlas: Atlas, val location: (Int)->Identifier) : IStitchListener {
+class IconSet(val targetAtlas: Atlas, val location: (Int)-> Identifier) : IStitchListener {
     val resources = arrayOfNulls<Identifier>(16)
     val icons = arrayOfNulls<Sprite>(16)
     var num = 0

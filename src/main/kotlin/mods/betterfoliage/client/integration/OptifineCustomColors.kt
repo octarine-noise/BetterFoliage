@@ -1,10 +1,8 @@
 package mods.betterfoliage.client.integration
 
 import mods.betterfoliage.client.Client
-import mods.betterfoliage.loader.Refs
-import mods.octarinecore.ThreadLocalDelegate
+import mods.octarinecore.*
 import mods.octarinecore.client.render.CombinedContext
-import mods.octarinecore.common.Int3
 import mods.octarinecore.metaprog.allAvailable
 import mods.octarinecore.metaprog.reflectField
 import net.minecraft.block.BlockState
@@ -13,7 +11,6 @@ import net.minecraft.client.renderer.model.BakedQuad
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.util.Direction.UP
 import net.minecraft.util.math.BlockPos
-import net.minecraft.world.IBlockReader
 import org.apache.logging.log4j.Level
 
 /**
@@ -22,9 +19,7 @@ import org.apache.logging.log4j.Level
 @Suppress("UNCHECKED_CAST")
 object OptifineCustomColors {
 
-    val isColorAvailable = allAvailable(
-        Refs.CustomColors, Refs.getColorMultiplier
-    )
+    val isColorAvailable = allAvailable(CustomColors, CustomColors.getColorMultiplier)
 
     init {
         Client.log(Level.INFO, "Optifine custom color support is ${if (isColorAvailable) "enabled" else "disabled" }")
@@ -36,21 +31,19 @@ object OptifineCustomColors {
     fun getBlockColor(ctx: CombinedContext): Int {
         val ofColor = if (isColorAvailable && Minecraft.getInstance().gameSettings.reflectField<Boolean>("ofCustomColors") == true) {
             renderEnv.reset(ctx.state, ctx.pos)
-            Refs.getColorMultiplier.invokeStatic(fakeQuad, ctx.state, ctx.world, ctx.pos, renderEnv.wrapped) as? Int
+            CustomColors.getColorMultiplier.invokeStatic(fakeQuad, ctx.state, ctx.world, ctx.pos, renderEnv.wrapped) as? Int
         } else null
         return if (ofColor == null || ofColor == -1) ctx.lightingCtx.color else ofColor
     }
 }
 
 class OptifineRenderEnv {
-    val wrapped: Any = Refs.RenderEnv.element!!.getDeclaredConstructor(
-        Refs.BlockState.element, Refs.BlockPos.element
-    ).let {
+    val wrapped: Any = RenderEnv.element!!.getDeclaredConstructor(BlockState.element, BlockPos.element).let {
         it.isAccessible = true
         it.newInstance(null, null)
     }
 
     fun reset(state: BlockState, pos: BlockPos) {
-        Refs.RenderEnv_reset.invoke(wrapped, state, pos)
+        RenderEnv.reset.invoke(wrapped, state, pos)
     }
 }

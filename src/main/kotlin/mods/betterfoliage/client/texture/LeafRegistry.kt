@@ -3,16 +3,14 @@ package mods.betterfoliage.client.texture
 import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.BlockConfig
+import mods.betterfoliage.client.resource.Identifier
+import mods.octarinecore.HasLogger
 import mods.octarinecore.client.resource.*
 import mods.octarinecore.common.config.ConfigurableBlockMatcher
 import mods.octarinecore.common.config.ModelTextureList
 import net.minecraft.block.BlockState
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
-import net.minecraft.client.renderer.texture.AtlasTexture
-import net.minecraft.util.ResourceLocation
-import net.minecraftforge.client.event.TextureStitchEvent
-import org.apache.logging.log4j.Level
-import org.apache.logging.log4j.Logger
+import java.util.concurrent.CompletableFuture
 
 const val defaultLeafColor = 0
 
@@ -25,7 +23,7 @@ class LeafInfo(
     val leafType: String,
 
     /** Average color of the round leaf texture. */
-    val averageColor: Int = roundLeafTexture.averageColor ?: defaultLeafColor
+    val averageColor: Int = roundLeafTexture.averageColor
 ) {
     /** [IconSet] of the textures to use for leaf particles emitted from this block. */
     val particleTextures: IconSet get() = LeafParticleRegistry[leafType]
@@ -33,27 +31,27 @@ class LeafInfo(
 
 object LeafRegistry : ModelRenderRegistryRoot<LeafInfo>()
 
-object StandardLeafRegistry : ModelRenderRegistryConfigurable<LeafInfo>() {
+object AsyncLeafDiscovery : ConfigurableModelDiscovery<LeafInfo>() {
     override val logger = BetterFoliage.logDetail
     override val matchClasses: ConfigurableBlockMatcher get() = BlockConfig.leafBlocks
     override val modelTextures: List<ModelTextureList> get() = BlockConfig.leafModels.modelList
-    override fun processModel(state: BlockState, textures: List<String>) = StandardLeafKey(logger, textures[0])
-    init { BetterFoliage.modBus.register(this) }
+
+    override fun processModel(state: BlockState, textures: List<String>, atlas: AtlasFuture) = defaultRegisterLeaf(Identifier(textures[0]), atlas)
+
+    fun init() {
+        LeafRegistry.registries.add(this)
+        AsyncSpriteProviderManager.providers.add(this)
+    }
 }
 
-class StandardLeafKey(override val logger: Logger, val textureName: String) : ModelRenderKey<LeafInfo> {
-    lateinit var leafType: String
-    lateinit var generated: ResourceLocation
+fun HasLogger.defaultRegisterLeaf(sprite: Identifier, atlas: AtlasFuture): CompletableFuture<LeafInfo> {
+    val leafType = LeafParticleRegistry.typeMappings.getType(sprite) ?: "default"
+    val generated = Client.genLeaves.register(sprite, leafType)
+    val roundLeaf = atlas.sprite(generated)
 
-    override fun onPreStitch(event: TextureStitchEvent.Pre) {
-        val logName = "StandardLeafKey"
-        leafType = LeafParticleRegistry.typeMappings.getType(textureName) ?: "default"
-        generated = Client.genLeaves.register(ResourceLocation(textureName), leafType)
-        event.addSprite(generated)
-
-        logger.log(Level.DEBUG, "$logName: leaf texture   $textureName")
-        logger.log(Level.DEBUG, "$logName:      particle $leafType")
+    log(" leaf texture $sprite")
+    log("     particle $leafType")
+    return atlas.afterStitch {
+        LeafInfo(roundLeaf.get(), leafType)
     }
-
-    override fun resolveSprites(atlas: AtlasTexture) = LeafInfo(atlas[generated] ?: missingSprite, leafType)
 }

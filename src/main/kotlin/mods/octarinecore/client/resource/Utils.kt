@@ -20,6 +20,7 @@ import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.lang.Math.*
 import javax.imageio.ImageIO
+import kotlin.math.atan2
 
 /** Concise getter for the Minecraft resource manager. */
 val resourceManager: SimpleReloadableResourceManager
@@ -65,19 +66,15 @@ val BufferedImage.asStream: InputStream get() =
  * Only non-transparent pixels are considered. Averages are taken in the HSB color space (note: Hue is a circular average),
  * and the result transformed back to the RGB color space.
  */
-val TextureAtlasSprite.averageColor: Int? get() {
-//    val locationNoDirs = ResourceLocation(iconName).stripStart("blocks/")
-//    val locationWithDirs = ResourceLocation(locationNoDirs.namespace, "textures/blocks/%s.png".format(locationNoDirs.path))
-//    val image = resourceManager[locationWithDirs]?.loadImage() ?: return null
-
+val TextureAtlasSprite.averageColor: Int get() {
     var numOpaque = 0
     var sumHueX = 0.0
     var sumHueY = 0.0
     var sumSaturation = 0.0f
     var sumBrightness = 0.0f
-    for (x in 0..width - 1)
-        for (y in 0..height - 1) {
-            val pixel = getPixelRGBA(0, x, y);
+    for (x in 0 until width)
+        for (y in 0 until height) {
+            val pixel = getPixelRGBA(0, x, y)
             val alpha = (pixel shr 24) and 255
             val hsb = HSB.fromColor(pixel)
             if (alpha == 255) {
@@ -90,7 +87,7 @@ val TextureAtlasSprite.averageColor: Int? get() {
         }
 
     // circular average - transform sum vector to polar angle
-    val avgHue = (atan2(sumHueY.toDouble(), sumHueX.toDouble()) / PI2 + 0.5).toFloat()
+    val avgHue = (atan2(sumHueY, sumHueX) / PI2 + 0.5).toFloat()
     return HSB(avgHue, sumSaturation / numOpaque.toFloat(), sumBrightness / numOpaque.toFloat()).asColor
 }
 

@@ -8,15 +8,11 @@ import mods.betterfoliage.client.render.column.SimpleColumnInfo
 import mods.octarinecore.client.render.CombinedContext
 import mods.octarinecore.client.render.Quad
 import mods.octarinecore.client.render.lighting.QuadIconResolver
-import mods.octarinecore.client.render.lighting.LightingCtx
 import mods.octarinecore.client.resource.*
 import mods.octarinecore.common.rotate
 import mods.octarinecore.metaprog.ClassRef
 import mods.octarinecore.metaprog.allAvailable
-import net.minecraft.block.BlockState
 import net.minecraft.client.renderer.model.BlockModel
-import net.minecraft.client.renderer.model.IUnbakedModel
-import net.minecraft.client.renderer.model.ModelResourceLocation
 import net.minecraft.client.renderer.texture.AtlasTexture
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.util.Direction
@@ -24,29 +20,31 @@ import net.minecraft.util.Direction.*
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.fml.ModList
 import org.apache.logging.log4j.Level
-import org.apache.logging.log4j.Level.DEBUG
 import org.apache.logging.log4j.Logger
+import java.util.concurrent.CompletableFuture
 
 object IC2RubberIntegration {
 
-    val BlockRubWood = ClassRef("ic2.core.block.BlockRubWood")
+    val BlockRubWood = ClassRef<Any>("ic2.core.block.BlockRubWood")
 
     init {
         if (ModList.get().isLoaded("ic2") && allAvailable(BlockRubWood)) {
             Client.log(Level.INFO, "IC2 rubber support initialized")
-            LogRegistry.addRegistry(IC2LogSupport)
+            LogRegistry.registries.add(IC2LogDiscovery)
+            AsyncSpriteProviderManager.providers.add(IC2LogDiscovery)
         }
     }
 }
 
 object TechRebornRubberIntegration {
 
-    val BlockRubberLog = ClassRef("techreborn.blocks.BlockRubberLog")
+    val BlockRubberLog = ClassRef<Any>("techreborn.blocks.BlockRubberLog")
 
     init {
         if (ModList.get().isLoaded("techreborn") && allAvailable(BlockRubberLog)) {
             Client.log(Level.INFO, "TechReborn rubber support initialized")
-            LogRegistry.addRegistry(TechRebornLogSupport)
+            LogRegistry.registries.add(TechRebornLogDiscovery)
+            AsyncSpriteProviderManager.providers.add(TechRebornLogDiscovery)
         }
     }
 }
@@ -67,27 +65,16 @@ class RubberLogInfo(
             this.sideTextures[sideIdx]
         }
     }
-
-    class Key(override val logger: Logger, val axis: Axis?, val spotDir: Direction, val textures: List<String>): ModelRenderKey<ColumnTextureInfo> {
-        override fun resolveSprites(atlas: AtlasTexture) = RubberLogInfo(
-            axis,
-            spotDir,
-            atlas[textures[0]] ?: missingSprite,
-            atlas[textures[1]] ?: missingSprite,
-            atlas[textures[2]] ?: missingSprite,
-            textures.drop(3).map { atlas[it] ?: missingSprite }
-        )
-    }
 }
 
-object IC2LogSupport : ModelRenderRegistryBase<ColumnTextureInfo>() {
+object IC2LogDiscovery : ModelDiscovery<ColumnTextureInfo>() {
     override val logger = BetterFoliage.logDetail
 
-    override fun processModel(state: BlockState, modelLoc: ModelResourceLocation, models: List<Pair<IUnbakedModel, ResourceLocation>>): ModelRenderKey<ColumnTextureInfo>? {
+    override fun processModel(ctx: ModelDiscoveryContext, atlas: AtlasFuture): CompletableFuture<ColumnTextureInfo>? {
         // check for proper block class, existence of ModelBlock, and "state" blockstate property
-        if (!IC2RubberIntegration.BlockRubWood.isInstance(state.block)) return null
-        val blockLoc = models.firstOrNull() as Pair<BlockModel, ResourceLocation> ?: return null
-        val type = state.values.entries.find { it.key.getName() == "state" }?.value?.toString() ?: return null
+        if (!IC2RubberIntegration.BlockRubWood.isInstance(ctx.state.block)) return null
+        val blockLoc = ctx.models.firstOrNull() as Pair<BlockModel, ResourceLocation> ?: return null
+        val type = ctx.state.values.entries.find { it.key.getName() == "state" }?.value?.toString() ?: return null
 
         // logs with no rubber spot
         if (blockLoc.derivesFrom(ResourceLocation("block/cube_column"))) {
@@ -97,11 +84,15 @@ object IC2LogSupport : ModelRenderRegistryBase<ColumnTextureInfo>() {
                 "plain_z" -> Axis.Z
                 else -> null
             }
-            val textureNames = listOf("end", "end", "side").map { blockLoc.first.resolveTextureName(it) }
+            val textureNames = listOf("end", "side").map { blockLoc.first.resolveTextureName(it) }
             if (textureNames.any { it == "missingno" }) return null
-            logger.log(DEBUG, "IC2LogSupport: block state ${state.toString()}")
-            logger.log(DEBUG, "IC2LogSupport:             axis=$axis, end=${textureNames[0]}, side=${textureNames[2]}")
-            return SimpleColumnInfo.Key(logger, axis, textureNames)
+            log("IC2LogSupport: block state ${ctx.state.toString()}")
+            log("IC2LogSupport:             axis=$axis, end=${textureNames[0]}, side=${textureNames[1]}")
+            val endSprite = atlas.sprite(textureNames[0])
+            val sideSprite = atlas.sprite(textureNames[1])
+            return atlas.afterStitch {
+                SimpleColumnInfo(axis, endSprite.get(), endSprite.get(), listOf(sideSprite.get()))
+            }
         }
 
         // logs with rubber spot
@@ -114,32 +105,53 @@ object IC2LogSupport : ModelRenderRegistryBase<ColumnTextureInfo>() {
         }
         val textureNames = listOf("up", "down", "north", "south").map { blockLoc.first.resolveTextureName(it) }
         if (textureNames.any { it == "missingno" }) return null
-        logger.log(DEBUG, "IC2LogSupport: block state ${state.toString()}")
-        logger.log(DEBUG, "IC2LogSupport:             spotDir=$spotDir, up=${textureNames[0]}, down=${textureNames[1]}, side=${textureNames[2]}, spot=${textureNames[3]}")
-        return if (spotDir != null) RubberLogInfo.Key(logger, Axis.Y, spotDir, textureNames) else SimpleColumnInfo.Key(logger, Axis.Y, textureNames)
+        log("IC2LogSupport: block state ${ctx.state.toString()}")
+        log("IC2LogSupport:             spotDir=$spotDir, up=${textureNames[0]}, down=${textureNames[1]}, side=${textureNames[2]}, spot=${textureNames[3]}")
+        val upSprite = atlas.sprite(textureNames[0])
+        val downSprite = atlas.sprite(textureNames[1])
+        val sideSprite = atlas.sprite(textureNames[2])
+        val spotSprite = atlas.sprite(textureNames[3])
+        return if (spotDir != null) atlas.afterStitch {
+            RubberLogInfo(Axis.Y, spotDir, upSprite.get(), downSprite.get(), spotSprite.get(), listOf(sideSprite.get()))
+        } else atlas.afterStitch {
+            SimpleColumnInfo(Axis.Y, upSprite.get(), downSprite.get(), listOf(sideSprite.get()))
+        }
     }
 }
 
-object TechRebornLogSupport : ModelRenderRegistryBase<ColumnTextureInfo>() {
+object TechRebornLogDiscovery : ModelDiscovery<ColumnTextureInfo>() {
     override val logger = BetterFoliage.logDetail
 
-    override fun processModel(state: BlockState, modelLoc: ModelResourceLocation, models: List<Pair<IUnbakedModel, ResourceLocation>>): ModelRenderKey<ColumnTextureInfo>? {
+    override fun processModel(ctx: ModelDiscoveryContext, atlas: AtlasFuture): CompletableFuture<ColumnTextureInfo>? {
         // check for proper block class, existence of ModelBlock
-        if (!TechRebornRubberIntegration.BlockRubberLog.isInstance(state.block)) return null
-        val blockLoc = models.firstOrNull() as Pair<BlockModel, ResourceLocation> ?: return null
+        if (!TechRebornRubberIntegration.BlockRubberLog.isInstance(ctx.state.block)) return null
+        val blockLoc = ctx.models.map { it as? Pair<BlockModel, ResourceLocation> }.firstOrNull() ?: return null
 
-        val hasSap = state.values.entries.find { it.key.getName() == "hassap" }?.value as? Boolean ?: return null
-        val sapSide = state.values.entries.find { it.key.getName() == "sapside" }?.value as? Direction ?: return null
+        val hasSap = ctx.state.values.entries.find { it.key.getName() == "hassap" }?.value as? Boolean ?: return null
+        val sapSide = ctx.state.values.entries.find { it.key.getName() == "sapside" }?.value as? Direction ?: return null
 
-        logger.log(DEBUG, "$logName: block state $state")
+        log("$logName: block state ${ctx.state}")
         if (hasSap) {
-            val textureNames = listOf("end", "end", "sapside", "side").map { blockLoc.first.resolveTextureName(it) }
-            logger.log(DEBUG, "$logName:             spotDir=$sapSide, end=${textureNames[0]}, side=${textureNames[2]}, spot=${textureNames[3]}")
-            if (textureNames.all { it != "missingno" }) return RubberLogInfo.Key(logger, Axis.Y, sapSide, textureNames)
+            val textureNames = listOf("end", "side", "sapside").map { blockLoc.first.resolveTextureName(it) }
+            log("$logName:             spotDir=$sapSide, end=${textureNames[0]}, side=${textureNames[2]}, spot=${textureNames[3]}")
+            if (textureNames.all { it != "missingno" }) {
+                val endSprite = atlas.sprite(textureNames[0])
+                val sideSprite = atlas.sprite(textureNames[1])
+                val sapSprite = atlas.sprite(textureNames[2])
+                return atlas.afterStitch {
+                    RubberLogInfo(Axis.Y, sapSide, endSprite.get(), endSprite.get(), sapSprite.get(), listOf(sideSprite.get()))
+                }
+            }
         } else {
-            val textureNames = listOf("end", "end", "side").map { blockLoc.first.resolveTextureName(it) }
-            logger.log(DEBUG, "$logName:             end=${textureNames[0]}, side=${textureNames[2]}")
-            if (textureNames.all { it != "missingno" })return SimpleColumnInfo.Key(logger, Axis.Y, textureNames)
+            val textureNames = listOf("end", "side").map { blockLoc.first.resolveTextureName(it) }
+            log("$logName:             end=${textureNames[0]}, side=${textureNames[1]}")
+            if (textureNames.all { it != "missingno" }) {
+                val endSprite = atlas.sprite(textureNames[0])
+                val sideSprite = atlas.sprite(textureNames[1])
+                return atlas.afterStitch {
+                    SimpleColumnInfo(Axis.Y, endSprite.get(), endSprite.get(), listOf(sideSprite.get()))
+                }
+            }
         }
         return null
     }

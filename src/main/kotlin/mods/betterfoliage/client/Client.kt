@@ -12,6 +12,7 @@ import mods.betterfoliage.client.texture.*
 import mods.octarinecore.client.gui.textComponent
 import mods.octarinecore.client.render.RenderDecorator
 import mods.octarinecore.client.resource.CenteringTextureGenerator
+import mods.octarinecore.client.resource.AsyncSpriteProviderManager
 import mods.octarinecore.client.resource.IConfigChangeListener
 import net.minecraft.block.BlockState
 import net.minecraft.client.Minecraft
@@ -59,7 +60,6 @@ object Client {
         // init other singletons
         val singletons = listOf(
             BlockConfig,
-            StandardCactusRegistry,
             LeafParticleRegistry,
             ChunkOverlayManager,
             LeafWindTracker,
@@ -76,9 +76,10 @@ object Client {
         )
 
         // add basic block support instances as last
-        GrassRegistry.addRegistry(StandardGrassRegistry)
-        LeafRegistry.addRegistry(StandardLeafRegistry)
-        LogRegistry.addRegistry(StandardLogRegistry)
+        AsyncLeafDiscovery.init()
+        AsyncGrassDiscovery.init()
+        AsyncLogDiscovery.init()
+        AsyncCactusDiscovery.init()
 
         configListeners = listOf(renderers, singletons, integrations).flatten().filterIsInstance<IConfigChangeListener>()
         configListeners.forEach { it.onConfigChange() }

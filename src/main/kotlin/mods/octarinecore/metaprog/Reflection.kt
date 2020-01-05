@@ -5,6 +5,8 @@ import java.lang.reflect.Field
 import java.lang.reflect.Method
 import mods.octarinecore.metaprog.Namespace.*
 import mods.octarinecore.tryDefault
+import kotlin.reflect.KCallable
+import kotlin.reflect.KFunction
 
 /** Get a Java class with the given name. */
 fun getJavaClass(name: String) = tryDefault(null) { Class.forName(name) }
@@ -66,19 +68,19 @@ fun allAvailable(vararg codeElement: Resolvable<*>) = codeElement.all { it.eleme
  *
  * @param[name] MCP name of the class
  */
-open class ClassRef(val name: String) : Resolvable<Class<*>>() {
+open class ClassRef<T: Any?>(val name: String) : Resolvable<Class<T>>() {
 
     companion object {
         val int = ClassRefPrimitive("I", Int::class.java)
         val long = ClassRefPrimitive("J", Long::class.java)
         val float = ClassRefPrimitive("F", Float::class.java)
         val boolean = ClassRefPrimitive("Z", Boolean::class.java)
-        val void = ClassRefPrimitive("V", null)
+        val void = ClassRefPrimitive("V", Void::class.java)
     }
 
     open fun asmDescriptor(namespace: Namespace) = "L${name.replace(".", "/")};"
 
-    override fun resolve() = getJavaClass(name)
+    override fun resolve() = getJavaClass(name) as Class<T>?
 
     fun isInstance(obj: Any) = element?.isInstance(obj) ?: false
 }
@@ -89,17 +91,10 @@ open class ClassRef(val name: String) : Resolvable<Class<*>>() {
  * @param[name] ASM descriptor of this primitive type
  * @param[clazz] class of this primitive type
  */
-class ClassRefPrimitive(name: String, val clazz: Class<*>?) : ClassRef(name) {
+class ClassRefPrimitive<T>(name: String, val clazz: Class<T>?) : ClassRef<T>(name) {
     override fun asmDescriptor(namespace: Namespace) = name
     override fun resolve() = clazz
 }
-
-class ClassRefArray(name: String) : ClassRef(name) {
-    override fun asmDescriptor(namespace: Namespace) = "[" + super.asmDescriptor(namespace)
-    override fun resolve() = getJavaClass("[L$name;")
-}
-
-fun ClassRef.array() = ClassRefArray(name)
 
 /**
  * Reference to a method.
@@ -110,13 +105,13 @@ fun ClassRef.array() = ClassRefArray(name)
  * @param[returnType] reference to the return type
  * @param[returnType] references to the argument types
  */
-class MethodRef(val parentClass: ClassRef,
+class MethodRef<T: Any?>(val parentClass: ClassRef<*>,
                 val mcpName: String,
                 val srgName: String,
-                val returnType: ClassRef,
-                vararg val argTypes: ClassRef
+                val returnType: ClassRef<T>,
+                vararg val argTypes: ClassRef<*>
 ) : Resolvable<Method>() {
-    constructor(parentClass: ClassRef, mcpName: String, returnType: ClassRef, vararg argTypes: ClassRef) :
+    constructor(parentClass: ClassRef<*>, mcpName: String, returnType: ClassRef<T>, vararg argTypes: ClassRef<*>) :
     this(parentClass, mcpName, mcpName, returnType, *argTypes)
 
     fun name(namespace: Namespace) = when(namespace) { SRG -> srgName; MCP -> mcpName }
@@ -133,11 +128,10 @@ class MethodRef(val parentClass: ClassRef,
         }
 
     /** Invoke this method using reflection. */
-    fun invoke(receiver: Any, vararg args: Any?) = element?.invoke(receiver, *args)
+    operator fun invoke(receiver: Any, vararg args: Any?) = element?.invoke(receiver, *args) as T
 
     /** Invoke this static method using reflection. */
     fun invokeStatic(vararg args: Any) = element?.invoke(null, *args)
-
 }
 
 /**
@@ -148,30 +142,41 @@ class MethodRef(val parentClass: ClassRef,
  * @param[srgName] SRG name of the field
  * @param[type] reference to the field type
  */
-class FieldRef(val parentClass: ClassRef,
+class FieldRef<T>(val parentClass: ClassRef<*>,
                val mcpName: String,
                val srgName: String,
-               val type: ClassRef?
+               val type: ClassRef<T>
 ) : Resolvable<Field>() {
-    constructor(parentClass: ClassRef, mcpName: String, type: ClassRef?) : this(parentClass, mcpName, mcpName, type)
+    constructor(parentClass: ClassRef<*>, mcpName: String, type: ClassRef<T>) : this(parentClass, mcpName, mcpName, type)
 
     fun name(namespace: Namespace) = when(namespace) { SRG -> srgName; MCP -> mcpName }
-    fun asmDescriptor(namespace: Namespace) = type!!.asmDescriptor(namespace)
+    fun asmDescriptor(namespace: Namespace) = type.asmDescriptor(namespace)
 
     override fun resolve(): Field? =
         if (parentClass.element == null) null
         else {
-            listOf(srgName, mcpName).map { tryDefault(null) {
+            listOf(srgName, mcpName).mapNotNull { tryDefault(null) {
                 parentClass.element!!.getDeclaredField(it)
-            }}.filterNotNull().firstOrNull()
+            } }.firstOrNull()
             ?.apply{ isAccessible = true }
         }
 
     /** Get this field using reflection. */
-    fun get(receiver: Any?) = element?.get(receiver)
+    operator fun get(receiver: Any?) = element?.get(receiver) as T
 
     /** Get this static field using reflection. */
     fun getStatic() = get(null)
 
     fun set(receiver: Any?, obj: Any?) { element?.set(receiver, obj) }
+}
+
+
+fun Any.isInstance(cls: ClassRef<*>) = cls.isInstance(this)
+interface ReflectionCallable<T> {
+    operator fun invoke(vararg args: Any): T
+}
+inline operator fun <reified T> Any.get(field: FieldRef<T>) = field.get(this)
+inline operator fun <reified T> Any.set(field: FieldRef<T>, value: T) = field.set(this, value)
+inline operator fun <T> Any.get(methodRef: MethodRef<T>) = object : ReflectionCallable<T> {
+    override fun invoke(vararg args: Any) = methodRef.invoke(this@get, args)
 }

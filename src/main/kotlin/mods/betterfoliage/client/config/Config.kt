@@ -2,10 +2,8 @@ package mods.betterfoliage.client.config
 
 import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.client.integration.ShadersModIntegration
-import mods.octarinecore.client.resource.LoadModelDataEvent
 import mods.octarinecore.common.config.*
 import net.minecraft.util.ResourceLocation
-import net.minecraftforge.eventbus.api.SubscribeEvent
 
 private fun featureEnable() = boolean(true).lang("enabled")
 
@@ -165,12 +163,4 @@ object BlockConfig {
     init { BetterFoliage.modBus.register(this) }
     private fun blocks(cfgName: String) = ConfigurableBlockMatcher(BetterFoliage.logDetail, ResourceLocation(BetterFoliage.MOD_ID, cfgName)).apply { list.add(this) }
     private fun models(cfgName: String) = ModelTextureListConfiguration(BetterFoliage.logDetail, ResourceLocation(BetterFoliage.MOD_ID, cfgName)).apply { list.add(this) }
-
-    @SubscribeEvent
-    fun handleLoadModelData(event: LoadModelDataEvent) {
-        list.forEach { when(it) {
-            is ConfigurableBlockMatcher -> it.readDefaults()
-            is ModelTextureListConfiguration -> it.readDefaults()
-        } }
-    }
 }

@@ -3,9 +3,10 @@ package mods.betterfoliage.client.integration
 import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.BlockConfig
 import mods.betterfoliage.client.config.Config
-import mods.betterfoliage.loader.Refs
+import mods.octarinecore.SVertexBuilder
 import mods.octarinecore.client.render.CombinedContext
 import mods.octarinecore.metaprog.allAvailable
+import mods.octarinecore.metaprog.get
 import net.minecraft.block.BlockRenderType
 import net.minecraft.block.BlockRenderType.MODEL
 import net.minecraft.block.BlockState
@@ -20,7 +21,7 @@ import org.apache.logging.log4j.Level.INFO
  */
 object ShadersModIntegration {
 
-    @JvmStatic val isAvailable = allAvailable(Refs.sVertexBuilder, Refs.pushEntity_state, Refs.pushEntity_num, Refs.popEntity)
+    @JvmStatic val isAvailable = allAvailable(SVertexBuilder, SVertexBuilder.pushState, SVertexBuilder.pushNum, SVertexBuilder.pop)
 
     val grassDefaultBlockId = 31L
     val leavesDefaultBlockId = 18L
@@ -42,10 +43,10 @@ object ShadersModIntegration {
     /** Quads rendered inside this block will use the given block entity data in shader programs. */
     inline fun renderAs(blockId: Long, renderType: BlockRenderType, renderer: BufferBuilder, enabled: Boolean = true, func: ()->Unit) {
         if ((isAvailable && enabled)) {
-            val vertexBuilder = Refs.sVertexBuilder.get(renderer)!!
-            Refs.pushEntity_num.invoke(vertexBuilder, blockId)
+            val vertexBuilder = renderer[mods.octarinecore.BufferBuilder.sVertexBuilder]!!
+            SVertexBuilder.pushNum.invoke(vertexBuilder, blockId)
             func()
-            Refs.popEntity.invoke(vertexBuilder)
+            SVertexBuilder.pop.invoke(vertexBuilder)
         } else {
             func()
         }

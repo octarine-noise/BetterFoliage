@@ -6,12 +6,10 @@ import mods.betterfoliage.client.chunk.ChunkOverlayManager
 import mods.betterfoliage.client.config.BlockConfig
 import mods.betterfoliage.client.config.Config
 import mods.betterfoliage.client.render.*
-import mods.betterfoliage.loader.Refs
 import mods.octarinecore.ThreadLocalDelegate
 import mods.octarinecore.client.render.*
 import mods.octarinecore.client.render.lighting.DefaultLightingCtx
 import mods.octarinecore.client.render.lighting.LightingCtx
-import mods.octarinecore.client.resource.LoadModelDataEvent
 import mods.octarinecore.common.plus
 import mods.octarinecore.metaprog.allAvailable
 import net.minecraft.block.Block
@@ -34,9 +32,6 @@ import net.minecraft.world.IEnviromentBlockReader
 import net.minecraft.world.World
 import net.minecraftforge.client.model.data.IModelData
 import java.util.*
-
-var isAfterPostInit = false
-val isOptifinePresent = allAvailable(Refs.OptifineClassTransformer)
 
 fun getAmbientOcclusionLightValueOverride(original: Float, state: BlockState): Float {
     if (Config.enabled && Config.roundLogs.enabled && BlockConfig.logBlocks.matchesClass(state.block)) return Config.roundLogs.dimming.toFloat();
@@ -67,10 +62,6 @@ fun onRandomDisplayTick(block: Block, state: BlockState, world: World, pos: Bloc
         Math.random() < Config.fallingLeaves.chance) {
             EntityFallingLeavesFX(world, pos).addIfValid()
     }
-}
-
-fun onLoadModelDefinitions(bakery: Any) {
-    BetterFoliage.modBus.post(LoadModelDataEvent(bakery as ModelBakery))
 }
 
 fun getVoxelShapeOverride(state: BlockState, reader: IBlockReader, pos: BlockPos, dir: Direction): VoxelShape {

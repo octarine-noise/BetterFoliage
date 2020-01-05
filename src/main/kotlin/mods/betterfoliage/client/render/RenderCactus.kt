@@ -5,30 +5,39 @@ import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.Config
 import mods.betterfoliage.client.render.column.ColumnTextureInfo
 import mods.betterfoliage.client.render.column.SimpleColumnInfo
+import mods.betterfoliage.client.resource.Identifier
 import mods.octarinecore.client.render.*
 import mods.octarinecore.client.render.lighting.*
-import mods.octarinecore.client.resource.ModelRenderRegistryConfigurable
-import mods.octarinecore.common.Int3
+import mods.octarinecore.client.resource.*
 import mods.octarinecore.common.Rotation
 import mods.octarinecore.common.config.ModelTextureList
 import mods.octarinecore.common.config.SimpleBlockMatcher
 import net.minecraft.block.BlockState
 import net.minecraft.block.CactusBlock
-import net.minecraft.client.renderer.BlockRendererDispatcher
-import net.minecraft.client.renderer.BufferBuilder
-import net.minecraft.util.BlockRenderLayer
 import net.minecraft.util.Direction.*
 import net.minecraft.util.ResourceLocation
-import net.minecraftforge.client.model.data.IModelData
 import org.apache.logging.log4j.Level.DEBUG
-import java.util.*
+import java.util.concurrent.CompletableFuture
 
-object StandardCactusRegistry : ModelRenderRegistryConfigurable<ColumnTextureInfo>() {
+object AsyncCactusDiscovery : ConfigurableModelDiscovery<ColumnTextureInfo>() {
     override val logger = BetterFoliage.logDetail
     override val matchClasses = SimpleBlockMatcher(CactusBlock::class.java)
     override val modelTextures = listOf(ModelTextureList("block/cactus", "top", "bottom", "side"))
-    override fun processModel(state: BlockState, textures: List<String>) = SimpleColumnInfo.Key(logger, Axis.Y, textures)
-    init { BetterFoliage.modBus.register(this) }
+    override fun processModel(state: BlockState, textures: List<String>, atlas: AtlasFuture): CompletableFuture<ColumnTextureInfo>? {
+        val sprites = textures.map { atlas.sprite(Identifier(it)) }
+        return atlas.afterStitch {
+            SimpleColumnInfo(
+                Axis.Y,
+                sprites[0].get(),
+                sprites[1].get(),
+                sprites.drop(2).map { it.get() }
+            )
+        }
+    }
+
+    fun init() {
+        AsyncSpriteProviderManager.providers.add(this)
+    }
 }
 
 class RenderCactus : RenderDecorator(BetterFoliage.MOD_ID, BetterFoliage.modBus) {
@@ -73,12 +82,12 @@ class RenderCactus : RenderDecorator(BetterFoliage.MOD_ID, BetterFoliage.modBus)
 
     override fun isEligible(ctx: CombinedContext): Boolean =
         Config.enabled && Config.cactus.enabled &&
-        StandardCactusRegistry[ctx] != null
+        AsyncCactusDiscovery[ctx] != null
 
     override val onlyOnCutout get() = true
 
     override fun render(ctx: CombinedContext) {
-        val icons = StandardCactusRegistry[ctx]!!
+        val icons = AsyncCactusDiscovery[ctx]!!
 
         ctx.render(
             modelStem.model,

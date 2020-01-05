@@ -1,14 +1,9 @@
 package mods.betterfoliage.client.render.column
 
 import mods.octarinecore.client.render.lighting.QuadIconResolver
-import mods.octarinecore.client.resource.ModelRenderKey
-import mods.octarinecore.client.resource.get
-import mods.octarinecore.client.resource.missingSprite
 import mods.octarinecore.common.rotate
-import net.minecraft.client.renderer.texture.AtlasTexture
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.util.Direction.*
-import org.apache.logging.log4j.Logger
 
 interface ColumnTextureInfo {
     val axis: Axis?
@@ -33,14 +28,5 @@ open class SimpleColumnInfo(
         val worldFace = (if ((idx and 1) == 0) SOUTH else EAST).rotate(ctx.modelRotation)
         val sideIdx = if (sideTextures.size > 1) (ctx.semiRandom(1) + dirToIdx[worldFace.ordinal]) % sideTextures.size else 0
         sideTextures[sideIdx]
-    }
-
-    class Key(override val logger: Logger, val axis: Axis?, val textures: List<String>) : ModelRenderKey<ColumnTextureInfo> {
-        override fun resolveSprites(atlas: AtlasTexture) = SimpleColumnInfo(
-            axis,
-            atlas[textures[0]] ?: missingSprite,
-            atlas[textures[1]] ?: missingSprite,
-            textures.drop(2).map { atlas[it] ?: missingSprite }
-        )
     }
 }

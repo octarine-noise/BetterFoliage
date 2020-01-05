@@ -8,18 +8,17 @@ import mods.betterfoliage.client.render.column.AbstractRenderColumn
 import mods.betterfoliage.client.render.column.ColumnRenderLayer
 import mods.betterfoliage.client.render.column.ColumnTextureInfo
 import mods.betterfoliage.client.render.column.SimpleColumnInfo
-import mods.octarinecore.client.render.BlockCtx
+import mods.betterfoliage.client.resource.Identifier
 import mods.octarinecore.client.render.CombinedContext
-import mods.octarinecore.client.resource.ModelRenderRegistry
-import mods.octarinecore.client.resource.ModelRenderRegistryConfigurable
-import mods.octarinecore.client.resource.ModelRenderRegistryRoot
+import mods.octarinecore.client.resource.*
 import mods.octarinecore.common.config.ConfigurableBlockMatcher
 import mods.octarinecore.common.config.ModelTextureList
 import mods.octarinecore.tryDefault
 import net.minecraft.block.BlockState
 import net.minecraft.block.LogBlock
 import net.minecraft.util.Direction.Axis
-import net.minecraft.world.IEnviromentBlockReader
+import org.apache.logging.log4j.Level
+import java.util.concurrent.CompletableFuture
 
 class RenderLog : AbstractRenderColumn(BetterFoliage.MOD_ID, BetterFoliage.modBus) {
 
@@ -49,12 +48,24 @@ class RoundLogOverlayLayer : ColumnRenderLayer() {
 
 object LogRegistry : ModelRenderRegistryRoot<ColumnTextureInfo>()
 
-object StandardLogRegistry : ModelRenderRegistryConfigurable<ColumnTextureInfo>() {
+object AsyncLogDiscovery : ConfigurableModelDiscovery<ColumnTextureInfo>() {
     override val logger = BetterFoliage.logDetail
     override val matchClasses: ConfigurableBlockMatcher get() = BlockConfig.logBlocks
     override val modelTextures: List<ModelTextureList> get() = BlockConfig.logModels.modelList
-    override fun processModel(state: BlockState, textures: List<String>) = SimpleColumnInfo.Key(logger, getAxis(state), textures)
-    init { BetterFoliage.modBus.register(this) }
+
+    override fun processModel(state: BlockState, textures: List<String>, atlas: AtlasFuture): CompletableFuture<ColumnTextureInfo> {
+        val axis = getAxis(state)
+        logger.log(Level.DEBUG, "$logName:       axis $axis")
+        val spriteList = textures.map { atlas.sprite(Identifier(it)) }
+        return atlas.afterStitch {
+            SimpleColumnInfo(
+                axis,
+                spriteList[0].get(),
+                spriteList[1].get(),
+                spriteList.drop(2).map { it.get() }
+            )
+        }
+    }
 
     fun getAxis(state: BlockState): Axis? {
         val axis = tryDefault(null) { state.get(LogBlock.AXIS).toString() } ?:
@@ -65,5 +76,10 @@ object StandardLogRegistry : ModelRenderRegistryConfigurable<ColumnTextureInfo>(
             "z" -> Axis.Z
             else -> null
         }
+    }
+
+    fun init() {
+        LogRegistry.registries.add(this)
+        AsyncSpriteProviderManager.providers.add(this)
     }
 }

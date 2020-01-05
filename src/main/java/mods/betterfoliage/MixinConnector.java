@@ -1,6 +1,5 @@
 package mods.betterfoliage;
 
-import net.minecraftforge.fml.ModLoader;
 import org.spongepowered.asm.mixin.Mixins;
 import org.spongepowered.asm.mixin.connect.IMixinConnector;
 

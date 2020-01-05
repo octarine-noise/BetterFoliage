@@ -1,10 +1,9 @@
 package mods.betterfoliage.client.chunk
 
-import mods.betterfoliage.BetterFoliage
-import mods.betterfoliage.client.Client
-import mods.betterfoliage.loader.Refs
-import mods.octarinecore.client.render.BasicBlockCtx
+import mods.octarinecore.ChunkCacheOF
 import mods.octarinecore.client.render.BlockCtx
+import mods.octarinecore.metaprog.get
+import mods.octarinecore.metaprog.isInstance
 import net.minecraft.client.renderer.chunk.ChunkRenderCache
 import net.minecraft.client.world.ClientWorld
 import net.minecraft.util.math.BlockPos
@@ -16,13 +15,19 @@ import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.event.world.ChunkEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.eventbus.api.SubscribeEvent
-import org.apache.logging.log4j.Level
 import java.util.*
+import kotlin.collections.List
+import kotlin.collections.MutableMap
+import kotlin.collections.associateWith
+import kotlin.collections.forEach
+import kotlin.collections.mutableListOf
+import kotlin.collections.mutableMapOf
+import kotlin.collections.set
 
 val IEnviromentBlockReader.dimType: DimensionType get() = when {
     this is IWorldReader -> dimension.type
     this is ChunkRenderCache -> world.dimension.type
-    Refs.OptifineChunkCache.isInstance(this) -> (Refs.CCOFChunkCache.get(this) as ChunkRenderCache).world.dimension.type
+    this.isInstance(ChunkCacheOF) -> this[ChunkCacheOF.chunkCache].world.dimension.type
     else -> throw IllegalArgumentException("DimensionType of world with class ${this::class.qualifiedName} cannot be determined!")
 }
 
@@ -42,7 +47,6 @@ object ChunkOverlayManager {
     var tempCounter = 0
 
     init {
-        Client.log(Level.INFO, "Initializing client overlay manager")
         MinecraftForge.EVENT_BUS.register(this)
     }
 
@@ -84,13 +88,11 @@ object ChunkOverlayManager {
 
     @SubscribeEvent
     fun handleLoadWorld(event: WorldEvent.Load) = (event.world as? ClientWorld)?.let { world ->
-        BetterFoliage.log.debug("Unloaded world: id=${world.dimType.id} name=${world.dimType.registryName}")
         chunkData[world.dimType] = mutableMapOf()
     }
 
     @SubscribeEvent
     fun handleUnloadWorld(event: WorldEvent.Unload) = (event.world as? ClientWorld)?.let { world ->
-        BetterFoliage.log.debug("Unloaded world: id=${world.dimType.id} name=${world.dimType.registryName}")
         chunkData.remove(world.dimType)
     }
 
@@ -121,26 +123,3 @@ class ChunkOverlayData(layers: List<ChunkOverlayLayer<*>>) {
         val validYRange = 0 until 256
     }
 }
-
-/**
- * IWorldEventListener helper subclass
- * No-op for everything except notifyBlockUpdate()
- */
-/*
-interface IBlockUpdateListener : IWorldEventListener {
-    override fun playSoundToAllNearExcept(player: EntityPlayer?, soundIn: SoundEvent, category: SoundCategory, x: Double, y: Double, z: Double, volume: Float, pitch: Float) {}
-    override fun onEntityAdded(entityIn: Entity) {}
-    override fun broadcastSound(soundID: Int, pos: BlockPos, data: Int) {}
-    override fun playEvent(player: EntityPlayer?, type: Int, blockPosIn: BlockPos, data: Int) {}
-    override fun onEntityRemoved(entityIn: Entity) {}
-    override fun notifyLightSet(pos: BlockPos) {}
-    override fun spawnParticle(particleID: Int, ignoreRange: Boolean, xCoord: Double, yCoord: Double, zCoord: Double, xSpeed: Double, ySpeed: Double, zSpeed: Double, vararg parameters: Int) {}
-    override fun spawnParticle(id: Int, ignoreRange: Boolean, minimiseParticleLevel: Boolean, x: Double, y: Double, z: Double, xSpeed: Double, ySpeed: Double, zSpeed: Double, vararg parameters: Int) {}
-    override fun playRecord(soundIn: SoundEvent, pos: BlockPos) {}
-    override fun sendBlockBreakProgress(breakerId: Int, pos: BlockPos, progress: Int) {}
-    override fun markBlockRangeForRenderUpdate(x1: Int, y1: Int, z1: Int, x2: Int, y2: Int, z2: Int) {}
-    override fun addParticle(p0: IParticleData, p1: Boolean, p2: Double, p3: Double, p4: Double, p5: Double, p6: Double, p7: Double) {}
-    override fun addParticle(p0: IParticleData, p1: Boolean, p2: Boolean, p3: Double, p4: Double, p5: Double, p6: Double, p7: Double, p8: Double) {}
-}
-
- */

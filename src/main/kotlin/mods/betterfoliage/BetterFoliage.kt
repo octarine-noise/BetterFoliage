@@ -2,17 +2,12 @@ package mods.betterfoliage
 
 import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.Config
-import mods.betterfoliage.client.isAfterPostInit
 import mods.octarinecore.client.resource.GeneratorPack
 import net.alexwells.kottle.FMLKotlinModLoadingContext
 import net.minecraft.client.Minecraft
-import net.minecraftforge.eventbus.api.IEventBus
-import net.minecraftforge.eventbus.api.SubscribeEvent
 import net.minecraftforge.fml.ModLoadingContext
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.config.ModConfig
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent
 import org.apache.logging.log4j.Level.DEBUG
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.simple.SimpleLogger
@@ -23,7 +18,7 @@ import java.util.*
 
 @Mod(BetterFoliage.MOD_ID)
 object BetterFoliage {
-    const val MOD_ID = "betterfoliage"
+    const val MOD_ID = ""
     const val MOD_NAME = "Better Foliage"
 
     val modBus = FMLKotlinModLoadingContext.get().modEventBus

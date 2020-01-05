@@ -2,23 +2,21 @@ package mods.octarinecore.client.render
 
 import mods.betterfoliage.client.render.canRenderInCutout
 import mods.betterfoliage.client.render.isCutout
-import mods.betterfoliage.loader.Refs
+import mods.octarinecore.BufferBuilder
 import mods.octarinecore.client.render.lighting.*
 import mods.octarinecore.common.Double3
 import mods.octarinecore.common.Int3
 import mods.octarinecore.common.Rotation
 import mods.octarinecore.common.plus
+import mods.octarinecore.metaprog.get
+import mods.octarinecore.metaprog.set
 import net.minecraft.block.Blocks
-import net.minecraft.client.renderer.BlockRendererDispatcher
-import net.minecraft.client.renderer.BufferBuilder
 import net.minecraft.fluid.Fluids
-import net.minecraft.util.BlockRenderLayer
 import net.minecraft.util.Direction
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.IEnviromentBlockReader
 import net.minecraft.world.LightType
 import net.minecraft.world.biome.Biomes
-import java.util.*
 
 class CombinedContext(
     val blockCtx: BlockCtx, val renderCtx: RenderCtx, val lightingCtx: DefaultLightingCtx
@@ -64,7 +62,7 @@ class CombinedContext(
                 if (drawIcon != null) {
                     // let OptiFine know the texture we're using, so it can
                     // transform UV coordinates to quad-relative
-                    Refs.quadSprite.set(renderCtx!!.renderBuffer, drawIcon)
+                    renderCtx.renderBuffer[BufferBuilder.quadSprite] = drawIcon
 
                     quad.verts.forEachIndexed { vertIdx, vert ->
                         temp.init(vert).rotate(lightingCtx.modelRotation).translate(translation)

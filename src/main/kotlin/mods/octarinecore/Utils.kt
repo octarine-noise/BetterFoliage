@@ -2,11 +2,12 @@
 @file:Suppress("NOTHING_TO_INLINE")
 package mods.octarinecore
 
-import mods.betterfoliage.loader.Refs
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.ResourceLocation
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.*
+import org.apache.logging.log4j.Level
+import org.apache.logging.log4j.Logger
 import kotlin.reflect.KProperty
 import java.lang.Math.*
 
@@ -118,4 +119,11 @@ fun nextPowerOf2(x: Int): Int {
  */
 fun IWorldReader.getTileEntitySafe(pos: BlockPos): TileEntity? = tryDefault(null as TileEntity?) {
     if (isBlockLoaded(pos)) getTileEntity(pos) else null
+}
+
+interface HasLogger {
+    val logger: Logger
+    val logName: String get() = this::class.simpleName!!
+    fun log(msg: String) = log(Level.DEBUG, msg)
+    fun log(level: Level, msg: String) = logger.log(level, "[$logName] $msg")
 }

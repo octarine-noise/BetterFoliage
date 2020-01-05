@@ -1,4 +1,4 @@
-package mods.octarinecore.resource
+package mods.betterfoliage.client.resource
 
 import net.minecraft.client.renderer.model.ModelResourceLocation
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
