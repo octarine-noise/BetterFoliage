@@ -3,6 +3,7 @@ plugins {
     id("net.minecraftforge.gradle").version("3.0.157")
     id("org.spongepowered.mixin").version("0.7-SNAPSHOT")
 }
+apply(plugin = "org.spongepowered.mixin")
 
 repositories {
     maven("http://files.minecraftforge.net/maven")
@@ -14,16 +15,20 @@ dependencies {
     "minecraft"("net.minecraftforge:forge:${properties["mcVersion"]}-${properties["forgeVersion"]}")
 
     "implementation"("kottle:Kottle:${properties["kottleVersion"]}")
+
     "implementation"("org.spongepowered:mixin:0.8-SNAPSHOT")
+    annotationProcessor("org.spongepowered:mixin:0.8-SNAPSHOT")
 }
 
 sourceSets {
+    get("main").ext["refMap"] = "betterfoliage.refmap.json"
     get("main").resources.srcDir("src/forge/resources")
     get("main").java.srcDir("src/forge/java")
 }
 kotlin.sourceSets {
     get("main").kotlin.srcDir("src/forge/kotlin")
 }
+
 
 minecraft {
     mappings(properties["mappingsChannel"] as String, properties["mappingsVersion"] as String)
@@ -37,10 +42,6 @@ minecraft {
             source(sourceSets["main"])
         }
     }
-}
-
-mixin {
-    add(sourceSets["main"], "betterfoliage.refmap.json")
 }
 
 java {
