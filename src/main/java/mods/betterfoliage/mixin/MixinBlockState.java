@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
  */
 @Mixin(BlockState.class)
 @SuppressWarnings({"UnnecessaryQualifiedMemberReference", "deprecation"})
-public class BlockStateMixin {
+public class MixinBlockState {
     private static final String callFrom = "Lnet/minecraft/block/BlockState;func_215703_d(Lnet/minecraft/world/IBlockReader;Lnet/minecraft/util/math/BlockPos;)F";
     private static final String callTo = "Lnet/minecraft/block/Block;func_220080_a(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/IBlockReader;Lnet/minecraft/util/math/BlockPos;)F";
 

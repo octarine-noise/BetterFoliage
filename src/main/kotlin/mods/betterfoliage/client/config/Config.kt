@@ -16,11 +16,6 @@ object Config : DelegatingConfig(BetterFoliageMod.MOD_ID, BetterFoliageMod.MOD_I
     val enabled by boolean(true)
     val nVidia by boolean(false)
 
-    object shaders {
-        val leavesId by long(min = 1, max = 65535, default = ShadersModIntegration.leavesDefaultBlockId)
-        val grassId by long(min = 1, max = 65535, default = ShadersModIntegration.grassDefaultBlockId)
-    }
-
     object leaves : ConfigCategory() {
         val enabled by featureEnable()
         val snowEnabled by boolean(true)

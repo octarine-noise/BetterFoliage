@@ -3,6 +3,7 @@ package mods.octarinecore.client.render
 import mods.betterfoliage.client.render.canRenderInCutout
 import mods.betterfoliage.client.render.isCutout
 import mods.octarinecore.BufferBuilder
+import mods.octarinecore.BufferBuilder_setSprite
 import mods.octarinecore.client.render.lighting.*
 import mods.octarinecore.common.Double3
 import mods.octarinecore.common.Int3
@@ -62,7 +63,7 @@ class CombinedContext(
                 if (drawIcon != null) {
                     // let OptiFine know the texture we're using, so it can
                     // transform UV coordinates to quad-relative
-                    renderCtx.renderBuffer[BufferBuilder.quadSprite] = drawIcon
+                    BufferBuilder_setSprite.invoke(renderCtx.renderBuffer, drawIcon)
 
                     quad.verts.forEachIndexed { vertIdx, vert ->
                         temp.init(vert).rotate(lightingCtx.modelRotation).translate(translation)

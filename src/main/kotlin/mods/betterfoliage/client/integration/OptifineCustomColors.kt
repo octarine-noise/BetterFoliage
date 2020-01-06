@@ -1,7 +1,6 @@
 package mods.betterfoliage.client.integration
 
 import mods.betterfoliage.BetterFoliage
-import mods.betterfoliage.client.Client
 import mods.octarinecore.*
 import mods.octarinecore.client.render.CombinedContext
 import mods.octarinecore.metaprog.allAvailable

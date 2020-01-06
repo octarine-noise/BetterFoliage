@@ -61,4 +61,5 @@ tasks.getByName<Jar>("jar") {
         from(file("src/main/resources/META-INF/MANIFEST.MF"))
         attributes["Implementation-Version"] = project.version
     }
+    exclude("net")
 }

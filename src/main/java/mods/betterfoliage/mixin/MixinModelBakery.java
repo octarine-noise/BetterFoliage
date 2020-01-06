@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(ModelBakery.class)
-abstract public class ModelBakeryMixin {
+abstract public class MixinModelBakery {
 
     private static final String processLoading = "processLoading(Lnet/minecraft/profiler/IProfiler;)V";
     private static final String stitch = "Lnet/minecraft/client/renderer/texture/AtlasTexture;stitch(Lnet/minecraft/resources/IResourceManager;Ljava/lang/Iterable;Lnet/minecraft/profiler/IProfiler;)Lnet/minecraft/client/renderer/texture/AtlasTexture$SheetData;";

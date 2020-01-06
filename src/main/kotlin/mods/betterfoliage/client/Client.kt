@@ -3,10 +3,7 @@ package mods.betterfoliage.client
 import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.chunk.ChunkOverlayManager
 import mods.betterfoliage.client.config.BlockConfig
-import mods.betterfoliage.client.integration.ForestryIntegration
-import mods.betterfoliage.client.integration.IC2RubberIntegration
-import mods.betterfoliage.client.integration.OptifineCustomColors
-import mods.betterfoliage.client.integration.TechRebornRubberIntegration
+import mods.betterfoliage.client.integration.*
 import mods.betterfoliage.client.render.*
 import mods.betterfoliage.client.texture.AsyncGrassDiscovery
 import mods.betterfoliage.client.texture.AsyncLeafDiscovery
@@ -59,7 +56,7 @@ object Client {
 
         // init mod integrations
         val integrations = listOf(
-//            ShadersModIntegration,
+            ShadersModIntegration,
             OptifineCustomColors,
             ForestryIntegration,
             IC2RubberIntegration,

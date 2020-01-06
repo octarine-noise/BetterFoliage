@@ -7,12 +7,12 @@
   "mixins": [
   ],
   "client": [
-    "BlockMixin",
-    "BlockStateMixin",
-    "ChunkRenderMixin",
-    "ClientWorldMixin",
-    "ModelBakeryMixin",
-    "ParticleManagerMixin"
+    "MixinBlock",
+    "MixinBlockState",
+    "MixinChunkRender",
+    "MixinClientWorld",
+    "MixinModelBakery",
+    "MixinParticleManager"
   ],
   "server": [
   ],

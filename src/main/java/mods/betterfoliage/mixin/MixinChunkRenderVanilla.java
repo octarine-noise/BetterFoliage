@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(ChunkRender.class)
-public class ChunkRenderVanillaMixin {
+public class MixinChunkRenderVanilla {
 
     private static final String rebuildChunk = "rebuildChunk(FFFLnet/minecraft/client/renderer/chunk/ChunkRenderTask;)V";
     private static final String canRenderInLayer = "Lnet/minecraft/block/BlockState;canRenderInLayer(Lnet/minecraft/util/BlockRenderLayer;)Z";

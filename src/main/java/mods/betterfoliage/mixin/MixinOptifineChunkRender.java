@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.Slice;
 
 @Mixin(ChunkRender.class)
-public class ChunkRenderOptifineMixin {
+public class MixinOptifineChunkRender {
 
     private static final String rebuildChunk = "rebuildChunk(FFFLnet/minecraft/client/renderer/chunk/ChunkRenderTask;)V";
     private static final String invokeReflector = "Lnet/optifine/reflect/Reflector;callBoolean(Ljava/lang/Object;Lnet/optifine/reflect/ReflectorMethod;[Ljava/lang/Object;)Z";

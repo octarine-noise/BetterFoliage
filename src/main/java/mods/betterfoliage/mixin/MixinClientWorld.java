@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import java.util.Random;
 
 @Mixin(ClientWorld.class)
-public class ClientWorldMixin {
+public class MixinClientWorld {
 
     private static final String worldAnimateTick = "Lnet/minecraft/client/world/ClientWorld;animateTick(IIIILjava/util/Random;ZLnet/minecraft/util/math/BlockPos$MutableBlockPos;)V";
     private static final String blockAnimateTick = "Lnet/minecraft/block/Block;animateTick(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Ljava/util/Random;)V";

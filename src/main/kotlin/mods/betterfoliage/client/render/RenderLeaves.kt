@@ -70,7 +70,7 @@ class RenderLeaves : RenderDecorator(BetterFoliageMod.MOD_ID, BetterFoliageMod.b
             if (isSnowed && Config.leaves.snowEnabled) ctx.render(
                 leavesModel.model,
                 translation = ctx.blockCenter + perturbs[rand[0]],
-                icon = { _, _, _ -> snowedIcon[rand[1]]!! },
+                icon = { _, _, _ -> snowedIcon[rand[1]] },
                 postProcess = whitewash
             )
         }
