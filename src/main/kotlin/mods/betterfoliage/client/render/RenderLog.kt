@@ -1,6 +1,7 @@
 package mods.betterfoliage.client.render
 
 import mods.betterfoliage.BetterFoliage
+import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.chunk.ChunkOverlayManager
 import mods.betterfoliage.client.config.BlockConfig
 import mods.betterfoliage.client.config.Config
@@ -20,7 +21,7 @@ import net.minecraft.util.Direction.Axis
 import org.apache.logging.log4j.Level
 import java.util.concurrent.CompletableFuture
 
-class RenderLog : AbstractRenderColumn(BetterFoliage.MOD_ID, BetterFoliage.modBus) {
+class RenderLog : AbstractRenderColumn(BetterFoliageMod.MOD_ID, BetterFoliageMod.bus) {
 
     override val renderOnCutout: Boolean get() = false
 
@@ -57,7 +58,7 @@ object AsyncLogDiscovery : ConfigurableModelDiscovery<ColumnTextureInfo>() {
         val axis = getAxis(state)
         logger.log(Level.DEBUG, "$logName:       axis $axis")
         val spriteList = textures.map { atlas.sprite(Identifier(it)) }
-        return atlas.afterStitch {
+        return atlas.mapAfter {
             SimpleColumnInfo(
                 axis,
                 spriteList[0].get(),
@@ -80,6 +81,6 @@ object AsyncLogDiscovery : ConfigurableModelDiscovery<ColumnTextureInfo>() {
 
     fun init() {
         LogRegistry.registries.add(this)
-        AsyncSpriteProviderManager.providers.add(this)
+        BetterFoliage.blockSprites.providers.add(this)
     }
 }

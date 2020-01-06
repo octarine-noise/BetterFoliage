@@ -1,23 +1,28 @@
 package mods.betterfoliage.client.render
 
 import mods.betterfoliage.BetterFoliage
+import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.Config
 import mods.betterfoliage.client.integration.ShadersModIntegration
+import mods.betterfoliage.client.resource.Identifier
 import mods.octarinecore.client.render.CombinedContext
 import mods.octarinecore.client.render.RenderDecorator
 import mods.octarinecore.client.render.lighting.FlatOffsetNoColor
+import mods.octarinecore.client.resource.CenteredSprite
 import mods.octarinecore.random
 import net.minecraft.block.material.Material
 import net.minecraft.tags.BlockTags
 import net.minecraft.util.Direction.UP
-import net.minecraft.util.ResourceLocation
 import org.apache.logging.log4j.Level.DEBUG
 
-class RenderReeds : RenderDecorator(BetterFoliage.MOD_ID, BetterFoliage.modBus) {
+class RenderReeds : RenderDecorator(BetterFoliageMod.MOD_ID, BetterFoliageMod.bus) {
 
     val noise = simplexNoise()
-    val reedIcons = iconSet { idx -> Client.genReeds.registerResource(ResourceLocation(BetterFoliage.MOD_ID, "blocks/better_reed_$idx")) }
+    val reedIcons = spriteSetTransformed(
+        check = { idx -> Identifier(BetterFoliageMod.MOD_ID, "blocks/better_reed_$idx")},
+        register = { CenteredSprite(it).register(BetterFoliage.asyncPack) }
+    )
     val reedModels = modelSet(64) { modelIdx ->
         val height = random(Config.reed.heightMin, Config.reed.heightMax)
         val waterline = 0.875f
@@ -34,10 +39,6 @@ class RenderReeds : RenderDecorator(BetterFoliage.MOD_ID, BetterFoliage.modBus) 
             it.clampUV(minU = -0.25, maxU = 0.25)
             .toCross(UP) { it.move(xzDisk(modelIdx) * Config.reed.hOffset) }.addAll()
         }
-    }
-
-    override fun afterPreStitch() {
-        Client.log(DEBUG, "Registered ${reedIcons.num} reed textures")
     }
 
     override fun isEligible(ctx: CombinedContext) =
@@ -59,7 +60,7 @@ class RenderReeds : RenderDecorator(BetterFoliage.MOD_ID, BetterFoliage.modBus) 
             ctx.render(
                 reedModels[ctx.semiRandom(0)],
                 forceFlat = true,
-                icon = { _, _, _ -> reedIcons[iconVar]!! }
+                icon = { _, _, _ -> reedIcons[iconVar] }
             )
         }
     }

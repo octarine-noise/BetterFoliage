@@ -1,23 +1,17 @@
 package mods.octarinecore.client.resource
 
-import net.minecraft.util.ResourceLocation
-import net.minecraftforge.resource.VanillaResourceType
+import mods.betterfoliage.client.resource.Identifier
+import mods.betterfoliage.client.texture.loadSprite
+import net.minecraft.resources.IResourceManager
 import java.awt.image.BufferedImage
-import java.io.InputStream
-import java.lang.Math.*
+import java.lang.Math.max
 
-class CenteringTextureGenerator(
-    domain: String,
-    val aspectWidth: Int,
-    val aspectHeight: Int
-) : GeneratorBase<ResourceLocation>(domain, VanillaResourceType.TEXTURES) {
+data class CenteredSprite(val sprite: Identifier, val atlas: Atlas = Atlas.BLOCKS, val aspectHeight: Int = 1, val aspectWidth: Int = 1) {
 
-    override val locationMapper = Atlas.BLOCKS::unwrap
+    fun register(pack: GeneratedBlockTexturePack) = pack.register(this, this::draw)
 
-    override fun exists(key: ResourceLocation) = resourceManager.hasResource(Atlas.BLOCKS.wrap(key))
-
-    override fun get(key: ResourceLocation): InputStream? {
-        val baseTexture = resourceManager[Atlas.BLOCKS.wrap(key)]?.loadImage() ?: return null
+    fun draw(resourceManager: IResourceManager): ByteArray {
+        val baseTexture = resourceManager.loadSprite(atlas.wrap(sprite))
 
         val frameWidth = baseTexture.width
         val frameHeight = baseTexture.width * aspectHeight / aspectWidth
@@ -28,7 +22,7 @@ class CenteringTextureGenerator(
         val graphics = resultTexture.createGraphics()
 
         // iterate all frames
-        for (frame in 0 .. frames - 1) {
+        for (frame in 0 until frames) {
             val baseFrame = baseTexture.getSubimage(0, size * frame, frameWidth, frameHeight)
             val resultFrame = BufferedImage(size, size, BufferedImage.TYPE_4BYTE_ABGR)
 
@@ -38,6 +32,6 @@ class CenteringTextureGenerator(
             graphics.drawImage(resultFrame, 0, size * frame, null)
         }
 
-        return resultTexture.asStream
+        return resultTexture.bytes
     }
 }

@@ -1,42 +1,57 @@
 package mods.betterfoliage.client.texture
 
 import mods.betterfoliage.BetterFoliage
+import mods.betterfoliage.BetterFoliageMod
+import mods.betterfoliage.client.resource.Identifier
+import mods.betterfoliage.client.resource.Sprite
 import mods.octarinecore.client.resource.*
 import mods.octarinecore.stripStart
 import mods.octarinecore.client.resource.Atlas
+import mods.octarinecore.common.sinkAsync
+import net.minecraft.client.particle.ParticleManager
+import net.minecraft.resources.IResourceManager
 import net.minecraft.util.ResourceLocation
-import net.minecraftforge.client.event.TextureStitchEvent
-import net.minecraftforge.eventbus.api.SubscribeEvent
+import java.util.concurrent.CompletableFuture
 
-object LeafParticleRegistry {
+class FixedSpriteSet(val sprites: List<Sprite>) : SpriteSet {
+    override val num = sprites.size
+    override fun get(idx: Int) = sprites[idx % num]
+}
+
+object LeafParticleRegistry : AsyncSpriteProvider<ParticleManager> {
     val targetAtlas = Atlas.PARTICLES
     val typeMappings = TextureMatcher()
-    val particles = hashMapOf<String, IconSet>()
+    val particles = hashMapOf<String, SpriteSet>()
 
     operator fun get(type: String) = particles[type] ?: particles["default"]!!
 
-    init { BetterFoliage.modBus.register(this) }
-
-    @SubscribeEvent
-    fun handlePreStitch(event: TextureStitchEvent.Pre) {
-        if (!targetAtlas.matches(event)) return
-
+    override fun setup(manager: IResourceManager, particleF: CompletableFuture<ParticleManager>, atlasFuture: AtlasFuture): StitchPhases {
         particles.clear()
-        typeMappings.loadMappings(ResourceLocation(BetterFoliage.MOD_ID, "leaf_texture_mappings.cfg"))
+        val futures = mutableMapOf<String, List<CompletableFuture<Sprite>>>()
 
-        val allTypes = (typeMappings.mappings.map { it.type } + "default").distinct()
-        allTypes.forEach { leafType ->
-            val particleSet = IconSet(Atlas.PARTICLES) {
-                idx -> ResourceLocation(BetterFoliage.MOD_ID, "falling_leaf_${leafType}_$idx")
-            }.apply { onPreStitch(event) }
-            if (leafType == "default" || particleSet.num > 0) particles[leafType] = particleSet
-        }
+        return StitchPhases(
+            discovery = particleF.sinkAsync {
+                typeMappings.loadMappings(Identifier(BetterFoliageMod.MOD_ID, "leaf_texture_mappings.cfg"))
+                (typeMappings.mappings.map { it.type } + "default").distinct().forEach { leafType ->
+                    val ids = (0 until 16).map { idx -> Identifier(BetterFoliageMod.MOD_ID, "falling_leaf_${leafType}_$idx") }
+                    val wids = ids.map { Atlas.PARTICLES.wrap(it) }
+                    futures[leafType] = (0 until 16).map { idx -> Identifier(BetterFoliageMod.MOD_ID, "falling_leaf_${leafType}_$idx") }
+                        .filter { manager.hasResource(Atlas.PARTICLES.wrap(it)) }
+                        .map { atlasFuture.sprite(it) }
+                }
+            },
+            cleanup = atlasFuture.runAfter {
+                futures.forEach { leafType, spriteFutures ->
+                    val sprites = spriteFutures.filter { !it.isCompletedExceptionally }.map { it.get() }
+                    if (sprites.isNotEmpty()) particles[leafType] = FixedSpriteSet(sprites)
+                }
+                if (particles["default"] == null) particles["default"] = FixedSpriteSet(listOf(atlasFuture.missing.get()!!))
+            }
+        )
     }
 
-    @SubscribeEvent
-    fun handlePostStitch(event: TextureStitchEvent.Post) {
-        if (!targetAtlas.matches(event)) return
-        particles.forEach { (_, particleSet) -> particleSet.onPostStitch(event.map) }
+    fun init() {
+        BetterFoliage.particleSprites.providers.add(this)
     }
 }
 

@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(ChunkRender.class)
 public class ChunkRenderVanillaMixin {
 
-    private static final String rebuildChunk = "Lnet/minecraft/client/renderer/chunk/ChunkRender;rebuildChunk(FFFLnet/minecraft/client/renderer/chunk/ChunkRenderTask;)V";
+    private static final String rebuildChunk = "rebuildChunk(FFFLnet/minecraft/client/renderer/chunk/ChunkRenderTask;)V";
     private static final String canRenderInLayer = "Lnet/minecraft/block/BlockState;canRenderInLayer(Lnet/minecraft/util/BlockRenderLayer;)Z";
 
     @Redirect(method = rebuildChunk, at = @At(value = "INVOKE", target = canRenderInLayer))

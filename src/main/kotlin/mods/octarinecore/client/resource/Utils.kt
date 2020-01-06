@@ -59,7 +59,8 @@ operator fun BufferedImage.set(x: Int, y: Int, value: Int) = this.setRGB(x, y, v
 /** Get an [InputStream] to an image object in PNG format. */
 val BufferedImage.asStream: InputStream get() =
     ByteArrayInputStream(ByteArrayOutputStream().let { ImageIO.write(this, "PNG", it); it.toByteArray() })
-
+val BufferedImage.bytes: ByteArray get() =
+    ByteArrayOutputStream().let { ImageIO.write(this, "PNG", it); it.toByteArray() }
 /**
  * Calculate the average color of a texture.
  *

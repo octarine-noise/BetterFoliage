@@ -1,7 +1,7 @@
 package mods.betterfoliage.client.render
 
 import mods.betterfoliage.BetterFoliage
-import mods.betterfoliage.client.Client
+import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.config.Config
 import mods.betterfoliage.client.render.column.ColumnTextureInfo
 import mods.betterfoliage.client.render.column.SimpleColumnInfo
@@ -15,7 +15,6 @@ import mods.octarinecore.common.config.SimpleBlockMatcher
 import net.minecraft.block.BlockState
 import net.minecraft.block.CactusBlock
 import net.minecraft.util.Direction.*
-import net.minecraft.util.ResourceLocation
 import org.apache.logging.log4j.Level.DEBUG
 import java.util.concurrent.CompletableFuture
 
@@ -25,7 +24,7 @@ object AsyncCactusDiscovery : ConfigurableModelDiscovery<ColumnTextureInfo>() {
     override val modelTextures = listOf(ModelTextureList("block/cactus", "top", "bottom", "side"))
     override fun processModel(state: BlockState, textures: List<String>, atlas: AtlasFuture): CompletableFuture<ColumnTextureInfo>? {
         val sprites = textures.map { atlas.sprite(Identifier(it)) }
-        return atlas.afterStitch {
+        return atlas.mapAfter {
             SimpleColumnInfo(
                 Axis.Y,
                 sprites[0].get(),
@@ -36,17 +35,17 @@ object AsyncCactusDiscovery : ConfigurableModelDiscovery<ColumnTextureInfo>() {
     }
 
     fun init() {
-        AsyncSpriteProviderManager.providers.add(this)
+        BetterFoliage.blockSprites.providers.add(this)
     }
 }
 
-class RenderCactus : RenderDecorator(BetterFoliage.MOD_ID, BetterFoliage.modBus) {
+class RenderCactus : RenderDecorator(BetterFoliageMod.MOD_ID, BetterFoliageMod.bus) {
 
     val cactusStemRadius = 0.4375
     val cactusArmRotation = listOf(NORTH, SOUTH, EAST, WEST).map { Rotation.rot90[it.ordinal] }
 
-    val iconCross = iconStatic(ResourceLocation(BetterFoliage.MOD_ID, "blocks/better_cactus"))
-    val iconArm = iconSet { idx -> ResourceLocation(BetterFoliage.MOD_ID, "blocks/better_cactus_arm_$idx") }
+    val iconCross by sprite(Identifier(BetterFoliageMod.MOD_ID, "blocks/better_cactus"))
+    val iconArm = spriteSet { idx -> Identifier(BetterFoliageMod.MOD_ID, "blocks/better_cactus_arm_$idx") }
 
     val modelStem = model {
         horizontalRectangle(x1 = -cactusStemRadius, x2 = cactusStemRadius, z1 = -cactusStemRadius, z2 = cactusStemRadius, y = 0.5)
@@ -76,10 +75,6 @@ class RenderCactus : RenderDecorator(BetterFoliage.MOD_ID, BetterFoliage.modBus)
         .toCross(UP) { it.move(xzDisk(modelIdx) * Config.cactus.hOffset) }.addAll()
     }
 
-    override fun afterPreStitch() {
-        Client.log(DEBUG, "Registered ${iconArm.num} cactus arm textures")
-    }
-
     override fun isEligible(ctx: CombinedContext): Boolean =
         Config.enabled && Config.cactus.enabled &&
         AsyncCactusDiscovery[ctx] != null
@@ -97,13 +92,13 @@ class RenderCactus : RenderDecorator(BetterFoliage.MOD_ID, BetterFoliage.modBus)
         )
         ctx.render(
             modelCross[ctx.semiRandom(0)],
-            icon = { _, _, _ -> iconCross.icon!!}
+            icon = { _, _, _ -> iconCross }
         )
 
         ctx.render(
             modelArm[ctx.semiRandom(1)],
             cactusArmRotation[ctx.semiRandom(2) % 4],
-            icon = { _, _, _ -> iconArm[ctx.semiRandom(3)]!!}
+            icon = { _, _, _ -> iconArm[ctx.semiRandom(3)] }
         )
     }
 }

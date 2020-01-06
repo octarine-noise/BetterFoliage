@@ -11,7 +11,8 @@
     "BlockStateMixin",
     "ChunkRenderMixin",
     "ClientWorldMixin",
-    "ModelBakeryMixin"
+    "ModelBakeryMixin",
+    "ParticleManagerMixin"
   ],
   "server": [
   ],

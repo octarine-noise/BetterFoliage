@@ -1,5 +1,6 @@
 package mods.betterfoliage.client.integration
 
+import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.BlockConfig
 import mods.betterfoliage.client.config.Config
@@ -37,7 +38,7 @@ object ShadersModIntegration {
     }
 
     init {
-        Client.log(INFO, "ShadersMod integration is ${if (isAvailable) "enabled" else "disabled" }")
+        BetterFoliage.log(INFO, "ShadersMod integration is ${if (isAvailable) "enabled" else "disabled" }")
     }
 
     /** Quads rendered inside this block will use the given block entity data in shader programs. */
@@ -59,9 +60,9 @@ object ShadersModIntegration {
 
     /** Quads rendered inside this block will behave as tallgrass blocks in shader programs. */
     inline fun grass(ctx: CombinedContext, enabled: Boolean = true, func: ()->Unit) =
-        renderAs(Config.shaders.grassId, MODEL, ctx.renderCtx!!.renderBuffer, enabled, func)
+        renderAs(Config.shaders.grassId, MODEL, ctx.renderCtx.renderBuffer, enabled, func)
 
     /** Quads rendered inside this block will behave as leaf blocks in shader programs. */
     inline fun leaves(ctx: CombinedContext, enabled: Boolean = true, func: ()->Unit) =
-        renderAs(Config.shaders.leavesId, MODEL, ctx.renderCtx!!.renderBuffer, enabled, func)
+        renderAs(Config.shaders.leavesId, MODEL, ctx.renderCtx.renderBuffer, enabled, func)
 }

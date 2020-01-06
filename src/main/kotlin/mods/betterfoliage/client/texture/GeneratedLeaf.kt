@@ -1,47 +1,38 @@
 package mods.betterfoliage.client.texture
 
-import mods.betterfoliage.BetterFoliage
+import mods.betterfoliage.BetterFoliageMod
 import mods.octarinecore.client.resource.*
-import mods.octarinecore.client.resource.Atlas
 import net.minecraft.resources.IResource
+import net.minecraft.resources.IResourceManager
 import net.minecraft.util.ResourceLocation
-import net.minecraftforge.resource.VanillaResourceType.TEXTURES
 import java.awt.image.BufferedImage
-import java.io.InputStream
 
 /**
  * Generate round leaf textures from leaf block textures.
  * The base texture is tiled 2x2, then parts of it are made transparent by applying a mask to the alpha channel.
  *
- * Generator parameter _type_: Leaf type (configurable by user). Different leaf types may have their own alpha mask.
+ * Different leaf types may have their own alpha mask.
  *
  * @param[domain] Resource domain of generator
  */
-class LeafGenerator(domain: String) : GeneratorBase<LeafGenerator.Key>(domain, TEXTURES) {
+data class GeneratedLeaf(val sprite: ResourceLocation, val leafType: String, val atlas: Atlas = Atlas.BLOCKS) {
 
-    override val locationMapper = Atlas.BLOCKS::unwrap
+    fun register(pack: GeneratedBlockTexturePack) = pack.register(this, this::draw)
 
-    fun register(texture: ResourceLocation, leafType: String) = registerResource(Key(texture, leafType))
+    fun draw(resourceManager: IResourceManager): ByteArray {
+        val baseTexture = resourceManager.loadSprite(atlas.wrap(sprite))
 
-    override fun exists(key: Key) = resourceManager.hasResource(Atlas.BLOCKS.wrap(key.texture))
-
-    override fun get(key: Key): InputStream? {
-
-//        val handDrawnLoc = Atlas.BLOCKS.wrap(key.texture)
-//        resourceManager[handDrawnLoc]?.loadImage()?.let { return it.asStream }
-
-        val baseTexture = resourceManager[Atlas.BLOCKS.wrap(key.texture)]?.loadImage() ?: return null
         val size = baseTexture.width
         val frames = baseTexture.height / size
 
-        val maskTexture = (getLeafMask(key.leafType, size * 2) ?: getLeafMask("default", size * 2))?.loadImage()
+        val maskTexture = (getLeafMask(leafType, size * 2) ?: getLeafMask("default", size * 2))?.loadImage()
         fun scale(i: Int) = i * maskTexture!!.width / (size * 2)
 
         val leafTexture = BufferedImage(size * 2, size * 2 * frames, BufferedImage.TYPE_4BYTE_ABGR)
         val graphics = leafTexture.createGraphics()
 
         // iterate all frames
-        for (frame in 0 .. frames - 1) {
+        for (frame in 0 until frames) {
             val baseFrame = baseTexture.getSubimage(0, size * frame, size, size)
             val leafFrame = BufferedImage(size * 2, size * 2, BufferedImage.TYPE_4BYTE_ABGR)
 
@@ -55,7 +46,7 @@ class LeafGenerator(domain: String) : GeneratorBase<LeafGenerator.Key>(domain, T
 
             // overlay alpha mask
             if (maskTexture != null) {
-                for (x in 0 .. size * 2 - 1) for (y in 0 .. size * 2 - 1) {
+                for (x in 0 until size * 2) for (y in 0 until size * 2) {
                     val basePixel = leafFrame[x, y].toLong() and 0xFFFFFFFFL
                     val maskPixel = maskTexture[scale(x), scale(y)].toLong() and 0xFF000000L or 0xFFFFFFL
                     leafFrame[x, y] = (basePixel and maskPixel).toInt()
@@ -66,7 +57,7 @@ class LeafGenerator(domain: String) : GeneratorBase<LeafGenerator.Key>(domain, T
             graphics.drawImage(leafFrame, 0, size * frame * 2, null)
         }
 
-        return leafTexture.asStream
+        return leafTexture.bytes
     }
 
     /**
@@ -76,7 +67,7 @@ class LeafGenerator(domain: String) : GeneratorBase<LeafGenerator.Key>(domain, T
      * @param[maxSize] Preferred mask size.
      */
     fun getLeafMask(type: String, maxSize: Int) = getMultisizeTexture(maxSize) { size ->
-        ResourceLocation(BetterFoliage.MOD_ID, "textures/blocks/leafmask_${size}_${type}.png")
+        ResourceLocation(BetterFoliageMod.MOD_ID, "textures/blocks/leafmask_${size}_${type}.png")
     }
 
     /**
@@ -92,6 +83,4 @@ class LeafGenerator(domain: String) : GeneratorBase<LeafGenerator.Key>(domain, T
         while(size > 2) { sizes.add(size); size /= 2 }
         return sizes.map { resourceManager[maskPath(it)] }.filterNotNull().firstOrNull()
     }
-
-    data class Key(val texture: ResourceLocation, val leafType: String)
 }

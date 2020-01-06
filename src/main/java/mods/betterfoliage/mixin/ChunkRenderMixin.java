@@ -18,7 +18,7 @@ import java.util.Random;
 @Mixin(ChunkRender.class)
 public class ChunkRenderMixin {
 
-    private static final String rebuildChunk = "Lnet/minecraft/client/renderer/chunk/ChunkRender;rebuildChunk(FFFLnet/minecraft/client/renderer/chunk/ChunkRenderTask;)V";
+    private static final String rebuildChunk = "rebuildChunk(FFFLnet/minecraft/client/renderer/chunk/ChunkRenderTask;)V";
     private static final String renderBlock = "Lnet/minecraft/client/renderer/BlockRendererDispatcher;renderBlock(Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/world/IEnviromentBlockReader;Lnet/minecraft/client/renderer/BufferBuilder;Ljava/util/Random;Lnet/minecraftforge/client/model/data/IModelData;)Z";
 
     @Redirect(method = rebuildChunk, at = @At(value = "INVOKE", target = renderBlock))

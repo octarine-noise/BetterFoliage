@@ -1,14 +1,17 @@
 package mods.betterfoliage.client.config
 
 import mods.betterfoliage.BetterFoliage
+import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.integration.ShadersModIntegration
 import mods.octarinecore.common.config.*
 import net.minecraft.util.ResourceLocation
+import net.minecraftforge.eventbus.api.SubscribeEvent
+import net.minecraftforge.fml.config.ModConfig
 
 private fun featureEnable() = boolean(true).lang("enabled")
 
 // Config singleton
-object Config : DelegatingConfig(BetterFoliage.MOD_ID, BetterFoliage.MOD_ID) {
+object Config : DelegatingConfig(BetterFoliageMod.MOD_ID, BetterFoliageMod.MOD_ID) {
 
     val enabled by boolean(true)
     val nVidia by boolean(false)
@@ -160,7 +163,15 @@ object BlockConfig {
     val cactus = blocks("cactus_default.cfg")
     val netherrack = blocks("netherrack_blocks_default.cfg")
 
-    init { BetterFoliage.modBus.register(this) }
-    private fun blocks(cfgName: String) = ConfigurableBlockMatcher(BetterFoliage.logDetail, ResourceLocation(BetterFoliage.MOD_ID, cfgName)).apply { list.add(this) }
-    private fun models(cfgName: String) = ModelTextureListConfiguration(BetterFoliage.logDetail, ResourceLocation(BetterFoliage.MOD_ID, cfgName)).apply { list.add(this) }
+    init { BetterFoliageMod.bus.register(this) }
+    private fun blocks(cfgName: String) = ConfigurableBlockMatcher(BetterFoliage.logDetail, ResourceLocation(BetterFoliageMod.MOD_ID, cfgName)).apply { list.add(this) }
+    private fun models(cfgName: String) = ModelTextureListConfiguration(BetterFoliage.logDetail, ResourceLocation(BetterFoliageMod.MOD_ID, cfgName)).apply { list.add(this) }
+
+    @SubscribeEvent
+    fun onConfig(event: ModConfig.ModConfigEvent) {
+        list.forEach { when(it) {
+            is ConfigurableBlockMatcher -> it.readDefaults()
+            is ModelTextureListConfiguration -> it.readDefaults()
+        } }
+    }
 }

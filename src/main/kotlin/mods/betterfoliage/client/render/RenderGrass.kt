@@ -1,10 +1,13 @@
 package mods.betterfoliage.client.render
 
 import mods.betterfoliage.BetterFoliage
+import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.Config
 import mods.betterfoliage.client.integration.OptifineCustomColors
 import mods.betterfoliage.client.integration.ShadersModIntegration
+import mods.betterfoliage.client.resource.Identifier
+import mods.betterfoliage.client.texture.GeneratedGrass
 import mods.betterfoliage.client.texture.GrassRegistry
 import mods.octarinecore.client.render.CombinedContext
 import mods.octarinecore.client.render.Model
@@ -18,10 +21,9 @@ import mods.octarinecore.common.allDirections
 import mods.octarinecore.random
 import net.minecraft.tags.BlockTags
 import net.minecraft.util.Direction.*
-import net.minecraft.util.ResourceLocation
 import org.apache.logging.log4j.Level.DEBUG
 
-class RenderGrass : RenderDecorator(BetterFoliage.MOD_ID, BetterFoliage.modBus) {
+class RenderGrass : RenderDecorator(BetterFoliageMod.MOD_ID, BetterFoliageMod.bus) {
 
     companion object {
         @JvmStatic fun grassTopQuads(heightMin: Double, heightMax: Double): Model.(Int)->Unit = { modelIdx ->
@@ -36,17 +38,12 @@ class RenderGrass : RenderDecorator(BetterFoliage.MOD_ID, BetterFoliage.modBus) 
 
     val noise = simplexNoise()
 
-    val normalIcons = iconSet { idx -> ResourceLocation(BetterFoliage.MOD_ID, "blocks/better_grass_long_$idx") }
-    val snowedIcons = iconSet { idx -> ResourceLocation(BetterFoliage.MOD_ID, "blocks/better_grass_snowed_$idx") }
-    val normalGenIcon = iconStatic { Client.genGrass.register(texture = "minecraft:blocks/tallgrass", isSnowed = false) }
-    val snowedGenIcon = iconStatic { Client.genGrass.register(texture = "minecraft:blocks/tallgrass", isSnowed = true) }
+    val normalIcons = spriteSet { idx -> Identifier(BetterFoliageMod.MOD_ID, "blocks/better_grass_long_$idx") }
+    val snowedIcons = spriteSet { idx -> Identifier(BetterFoliageMod.MOD_ID, "blocks/better_grass_snowed_$idx") }
+    val normalGenIcon by sprite { GeneratedGrass(sprite = "minecraft:blocks/tallgrass", isSnowed = false).register(BetterFoliage.asyncPack) }
+    val snowedGenIcon by sprite { GeneratedGrass(sprite = "minecraft:blocks/tallgrass", isSnowed = true).register(BetterFoliage.asyncPack) }
 
     val grassModels = modelSet(64) { idx -> grassTopQuads(Config.shortGrass.heightMin, Config.shortGrass.heightMax)(idx) }
-
-    override fun afterPreStitch() {
-        Client.log(DEBUG, "Registered ${normalIcons.num} grass textures")
-        Client.log(DEBUG, "Registered ${snowedIcons.num} snowed grass textures")
-    }
 
     override fun isEligible(ctx: CombinedContext) =
         Config.enabled &&
@@ -97,7 +94,7 @@ class RenderGrass : RenderDecorator(BetterFoliage.MOD_ID, BetterFoliage.modBus) 
             ctx.render(
                 grassModels[rand[0]],
                 translation = ctx.blockCenter + (if (isSnowed) snowOffset else Double3.zero),
-                icon = { _, qi, _ -> if (Config.shortGrass.useGenerated) iconGen.icon!! else iconset[rand[qi and 1]]!! },
+                icon = { _, qi, _ -> if (Config.shortGrass.useGenerated) iconGen else iconset[rand[qi and 1]] },
                 postProcess = { _, _, _, _, _ -> if (isSnowed) setGrey(1.0f) else multiplyColor(grass.overrideColor ?: blockColor) }
             )
         }

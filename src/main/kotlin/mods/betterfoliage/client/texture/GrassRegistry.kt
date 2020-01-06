@@ -41,11 +41,11 @@ object AsyncGrassDiscovery : ConfigurableModelDiscovery<GrassInfo>() {
         val textureName = textures[0]
         val spriteF = atlas.sprite(Identifier(textureName))
         logger.log(Level.DEBUG, "$logName:       texture $textureName")
-        return atlas.afterStitch {
+        return atlas.mapAfter {
             val sprite = spriteF.get()
             logger.log(Level.DEBUG, "$logName: block state $state")
             logger.log(Level.DEBUG, "$logName:       texture $textureName")
-            val hsb = HSB.fromColor(sprite.averageColor ?: defaultGrassColor)
+            val hsb = HSB.fromColor(sprite.averageColor)
             val overrideColor = if (hsb.saturation >= Config.shortGrass.saturationThreshold) {
                 logger.log(Level.DEBUG, "$logName:         brightness ${hsb.brightness}")
                 logger.log(Level.DEBUG, "$logName:         saturation ${hsb.saturation} >= ${Config.shortGrass.saturationThreshold}, using texture color")
@@ -60,6 +60,6 @@ object AsyncGrassDiscovery : ConfigurableModelDiscovery<GrassInfo>() {
 
     fun init() {
         GrassRegistry.registries.add(this)
-        AsyncSpriteProviderManager.providers.add(this)
+        BetterFoliage.blockSprites.providers.add(this)
     }
 }

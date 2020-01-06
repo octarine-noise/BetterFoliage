@@ -1,5 +1,6 @@
 package mods.betterfoliage.client.render.column
 
+import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.chunk.ChunkOverlayManager
 import mods.betterfoliage.client.integration.ShadersModIntegration.renderAs
@@ -97,7 +98,7 @@ abstract class AbstractRenderColumn(modId: String, modBus: IEventBus) : RenderDe
             ColumnLayerData.SkipRender -> return
             ColumnLayerData.NormalRender -> return ctx.render()
             ColumnLayerData.ResolveError, null -> {
-                Client.logRenderError(ctx.state, ctx.pos)
+                BetterFoliage.logRenderError(ctx.state, ctx.pos)
                 return ctx.render()
             }
         }

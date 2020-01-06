@@ -18,6 +18,7 @@ import mods.octarinecore.metaprog.ClassRef.Companion.boolean
 import net.minecraft.block.BlockState
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.model.ModelBakery
+import net.minecraft.resources.IResourceManager
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.IBlockReader
 import net.minecraftforge.fml.ModList
@@ -57,7 +58,7 @@ object ForestryIntegration {
     }
 }
 
-object ForestryLeafDiscovery : HasLogger, AsyncSpriteProvider, ModelRenderRegistry<LeafInfo> {
+object ForestryLeafDiscovery : HasLogger, AsyncSpriteProvider<ModelBakery>, ModelRenderRegistry<LeafInfo> {
     override val logger = BetterFoliage.logDetail
     var idToValue = emptyMap<Identifier, LeafInfo>()
 
@@ -79,11 +80,11 @@ object ForestryLeafDiscovery : HasLogger, AsyncSpriteProvider, ModelRenderRegist
         return idToValue[textureLoc]
     }
 
-    override fun setup(bakeryFuture: CompletableFuture<ModelBakery>, atlasFuture: AtlasFuture): StitchPhases {
+    override fun setup(manager: IResourceManager, bakeryF: CompletableFuture<ModelBakery>, atlasFuture: AtlasFuture): StitchPhases {
         val futures = mutableMapOf<Identifier, CompletableFuture<LeafInfo>>()
 
         return StitchPhases(
-            discovery = bakeryFuture.thenRunAsync {
+            discovery = bakeryF.thenRunAsync {
                 val allLeaves = TextureLeaves_leafTextures.getStatic()
                 allLeaves.entries.forEach { (type, leaves) ->
                     log("base leaf type $type")
@@ -96,7 +97,7 @@ object ForestryLeafDiscovery : HasLogger, AsyncSpriteProvider, ModelRenderRegist
                     }
                 }
             },
-            cleanup = atlasFuture.sheet.thenRunAsync {
+            cleanup = atlasFuture.runAfter {
                 idToValue = futures.mapValues { it.value.get() }
             }
         )
@@ -124,7 +125,7 @@ object ForestryLogDiscovery : ModelDiscovery<ColumnTextureInfo>() {
 
             val heartSprite = atlas.sprite(heart)
             val barkSprite = atlas.sprite(bark)
-            return atlas.afterStitch {
+            return atlas.mapAfter {
                 SimpleColumnInfo(AsyncLogDiscovery.getAxis(ctx.state), heartSprite.get(), heartSprite.get(), listOf(barkSprite.get()))
             }
         }

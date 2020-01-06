@@ -1,20 +1,21 @@
 package mods.betterfoliage.client.render
 
 import mods.betterfoliage.BetterFoliage
+import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.BlockConfig
 import mods.betterfoliage.client.config.Config
 import mods.betterfoliage.client.integration.ShadersModIntegration
+import mods.betterfoliage.client.resource.Identifier
 import mods.octarinecore.client.render.CombinedContext
 import mods.octarinecore.client.render.RenderDecorator
 import mods.octarinecore.client.render.lighting.FlatOffsetNoColor
 import mods.octarinecore.common.Int3
 import net.minecraft.util.Direction.DOWN
 import net.minecraft.util.Direction.UP
-import net.minecraft.util.ResourceLocation
 import org.apache.logging.log4j.Level.DEBUG
 
-class RenderLilypad : RenderDecorator(BetterFoliage.MOD_ID, BetterFoliage.modBus) {
+class RenderLilypad : RenderDecorator(BetterFoliageMod.MOD_ID, BetterFoliageMod.bus) {
 
     val rootModel = model {
         verticalRectangle(x1 = -0.5, z1 = 0.5, x2 = 0.5, z2 = -0.5, yBottom = -1.5, yTop = -0.5)
@@ -27,14 +28,9 @@ class RenderLilypad : RenderDecorator(BetterFoliage.MOD_ID, BetterFoliage.modBus
         .setFlatShader(FlatOffsetNoColor(Int3.zero))
         .toCross(UP).addAll()
     }
-    val rootIcon = iconSet { idx -> ResourceLocation(BetterFoliage.MOD_ID, "blocks/better_lilypad_roots_$idx") }
-    val flowerIcon = iconSet { idx -> ResourceLocation(BetterFoliage.MOD_ID, "blocks/better_lilypad_flower_$idx") }
+    val rootIcon = spriteSet { idx -> Identifier(BetterFoliageMod.MOD_ID, "blocks/better_lilypad_roots_$idx") }
+    val flowerIcon = spriteSet { idx -> Identifier(BetterFoliageMod.MOD_ID, "blocks/better_lilypad_flower_$idx") }
     val perturbs = vectorSet(64) { modelIdx -> xzDisk(modelIdx) * Config.lilypad.hOffset }
-
-    override fun afterPreStitch() {
-        Client.log(DEBUG, "Registered ${rootIcon.num} lilypad root textures")
-        Client.log(DEBUG, "Registered ${flowerIcon.num} lilypad flower textures")
-    }
 
     override fun isEligible(ctx: CombinedContext): Boolean =
         Config.enabled && Config.lilypad.enabled &&
@@ -49,7 +45,7 @@ class RenderLilypad : RenderDecorator(BetterFoliage.MOD_ID, BetterFoliage.modBus
                 rootModel.model,
                 translation = ctx.blockCenter.add(perturbs[rand[2]]),
                 forceFlat = true,
-                icon = { ctx, qi, q -> rootIcon[rand[qi and 1]]!! }
+                icon = { ctx, qi, q -> rootIcon[rand[qi and 1]] }
             )
         }
 
@@ -57,7 +53,7 @@ class RenderLilypad : RenderDecorator(BetterFoliage.MOD_ID, BetterFoliage.modBus
             flowerModel.model,
             translation = ctx.blockCenter.add(perturbs[rand[4]]),
             forceFlat = true,
-            icon = { _, _, _ -> flowerIcon[rand[0]]!! }
+            icon = { _, _, _ -> flowerIcon[rand[0]] }
         )
     }
 }

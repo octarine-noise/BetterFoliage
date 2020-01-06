@@ -1,5 +1,6 @@
 package mods.betterfoliage.client.integration
 
+import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.client.Client
 import mods.octarinecore.*
 import mods.octarinecore.client.render.CombinedContext
@@ -22,7 +23,7 @@ object OptifineCustomColors {
     val isColorAvailable = allAvailable(CustomColors, CustomColors.getColorMultiplier)
 
     init {
-        Client.log(Level.INFO, "Optifine custom color support is ${if (isColorAvailable) "enabled" else "disabled" }")
+        BetterFoliage.log(Level.INFO, "Optifine custom color support is ${if (isColorAvailable) "enabled" else "disabled" }")
     }
 
     val renderEnv by ThreadLocalDelegate { OptifineRenderEnv() }

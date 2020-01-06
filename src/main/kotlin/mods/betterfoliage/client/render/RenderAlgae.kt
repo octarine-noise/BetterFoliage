@@ -1,6 +1,7 @@
 package mods.betterfoliage.client.render
 
 import mods.betterfoliage.BetterFoliage
+import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.Config
 import mods.betterfoliage.client.integration.ShadersModIntegration
@@ -12,16 +13,12 @@ import net.minecraft.util.ResourceLocation
 import net.minecraft.world.biome.Biome
 import org.apache.logging.log4j.Level.DEBUG
 
-class RenderAlgae : RenderDecorator(BetterFoliage.MOD_ID, BetterFoliage.modBus) {
+class RenderAlgae : RenderDecorator(BetterFoliageMod.MOD_ID, BetterFoliageMod.bus) {
 
     val noise = simplexNoise()
 
-    val algaeIcons = iconSet { idx -> ResourceLocation(BetterFoliage.MOD_ID, "blocks/better_algae_$idx") }
+    val algaeIcons = spriteSet { idx -> ResourceLocation(BetterFoliageMod.MOD_ID, "blocks/better_algae_$idx") }
     val algaeModels = modelSet(64) { idx -> RenderGrass.grassTopQuads(Config.algae.heightMin, Config.algae.heightMax)(idx) }
-
-    override fun afterPreStitch() {
-        Client.log(DEBUG, "Registered ${algaeIcons.num} algae textures")
-    }
 
     override fun isEligible(ctx: CombinedContext) =
         Config.enabled && Config.algae.enabled &&
@@ -38,7 +35,7 @@ class RenderAlgae : RenderDecorator(BetterFoliage.MOD_ID, BetterFoliage.modBus) 
         ShadersModIntegration.grass(ctx, Config.algae.shaderWind) {
             ctx.render(
                 algaeModels[rand[2]],
-                icon = { _, qi, _ -> algaeIcons[rand[qi and 1]]!! }
+                icon = { _, qi, _ -> algaeIcons[rand[qi and 1]] }
             )
         }
     }

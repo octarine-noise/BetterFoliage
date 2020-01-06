@@ -5,17 +5,18 @@ import mods.betterfoliage.client.resource.ModelIdentifier
 import mods.octarinecore.HasLogger
 import mods.octarinecore.client.render.BlockCtx
 import mods.octarinecore.common.Int3
-import mods.octarinecore.common.config.ConfigurableBlockMatcher
 import mods.octarinecore.common.config.IBlockMatcher
 import mods.octarinecore.common.config.ModelTextureList
 import mods.octarinecore.common.plus
 import mods.octarinecore.findFirst
+import mods.octarinecore.common.sinkAsync
 import net.minecraft.block.BlockState
 import net.minecraft.client.renderer.BlockModelShapes
 import net.minecraft.client.renderer.model.BlockModel
 import net.minecraft.client.renderer.model.IUnbakedModel
 import net.minecraft.client.renderer.model.ModelBakery
 import net.minecraft.client.renderer.model.VariantList
+import net.minecraft.resources.IResourceManager
 import net.minecraft.util.ResourceLocation
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.IBlockReader
@@ -33,6 +34,9 @@ abstract class ModelRenderRegistryRoot<T> : ModelRenderRegistry<T> {
     override fun get(state: BlockState, world: IBlockReader, pos: BlockPos) = registries.findFirst { it[state, world, pos] }
 }
 
+/**
+ * Information about a single BlockState and all the IUnbakedModel it could render as.
+ */
 class ModelDiscoveryContext(
     bakery: ModelBakery,
     val state: BlockState,
@@ -48,7 +52,7 @@ class ModelDiscoveryContext(
     }
 }
 
-abstract class ModelDiscovery<T> : HasLogger, AsyncSpriteProvider, ModelRenderRegistry<T> {
+abstract class ModelDiscovery<T> : HasLogger, AsyncSpriteProvider<ModelBakery>, ModelRenderRegistry<T> {
 
     var modelData: Map<BlockState, T> = emptyMap()
         protected set
@@ -57,22 +61,22 @@ abstract class ModelDiscovery<T> : HasLogger, AsyncSpriteProvider, ModelRenderRe
 
     abstract fun processModel(ctx: ModelDiscoveryContext, atlas: AtlasFuture): CompletableFuture<T>?
 
-    override fun setup(bakeryFuture: CompletableFuture<ModelBakery>, atlasFuture: AtlasFuture): StitchPhases {
+    override fun setup(manager: IResourceManager, bakeryF: CompletableFuture<ModelBakery>, atlas: AtlasFuture): StitchPhases {
         val modelDataTemp = mutableMapOf<BlockState, CompletableFuture<T>>()
 
         return StitchPhases(
-            discovery = bakeryFuture.thenRunAsync { bakery ->
+            discovery = bakeryF.sinkAsync { bakery ->
                 var errors = 0
                 bakery.iterateModels { ctx ->
                     try {
-                        processModel(ctx, atlasFuture)?.let { modelDataTemp[ctx.state] = it }
+                        processModel(ctx, atlas)?.let { modelDataTemp[ctx.state] = it }
                     } catch (e: Exception) {
                         errors++
                     }
                 }
                 log("${modelDataTemp.size} BlockStates discovered, $errors errors")
             },
-            cleanup = atlasFuture.sheet.thenRunAsync { sheetData ->
+            cleanup = atlas.runAfter {
                 modelData = modelDataTemp.filterValues { !it.isCompletedExceptionally }.mapValues { it.value.get() }
                 val errors = modelDataTemp.values.filter { it.isCompletedExceptionally }.size
                 log("${modelData.size} BlockStates loaded, $errors errors")
@@ -125,8 +129,4 @@ abstract class ConfigurableModelDiscovery<T> : ModelDiscovery<T>() {
         return null
     }
 
-    override fun setup(bakeryFuture: CompletableFuture<ModelBakery>, atlasFuture: AtlasFuture): StitchPhases {
-        (matchClasses as? ConfigurableBlockMatcher)?.readDefaults()
-        return super.setup(bakeryFuture, atlasFuture)
-    }
 }

@@ -1,7 +1,6 @@
 @file:JvmName("Hooks")
 package mods.betterfoliage.client
 
-import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.client.chunk.ChunkOverlayManager
 import mods.betterfoliage.client.config.BlockConfig
 import mods.betterfoliage.client.config.Config
@@ -9,16 +8,13 @@ import mods.betterfoliage.client.render.*
 import mods.octarinecore.ThreadLocalDelegate
 import mods.octarinecore.client.render.*
 import mods.octarinecore.client.render.lighting.DefaultLightingCtx
-import mods.octarinecore.client.render.lighting.LightingCtx
 import mods.octarinecore.common.plus
-import mods.octarinecore.metaprog.allAvailable
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.BlockRendererDispatcher
 import net.minecraft.client.renderer.BufferBuilder
-import net.minecraft.client.renderer.model.ModelBakery
 import net.minecraft.client.world.ClientWorld
 import net.minecraft.util.BlockRenderLayer
 import net.minecraft.util.BlockRenderLayer.CUTOUT

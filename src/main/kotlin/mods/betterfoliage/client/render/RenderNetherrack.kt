@@ -1,27 +1,21 @@
 package mods.betterfoliage.client.render
 
 import mods.betterfoliage.BetterFoliage
+import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.BlockConfig
 import mods.betterfoliage.client.config.Config
+import mods.betterfoliage.client.resource.Identifier
 import mods.octarinecore.client.render.*
 import mods.octarinecore.client.render.lighting.*
-import mods.octarinecore.common.Int3
-import mods.octarinecore.common.Rotation
 import mods.octarinecore.random
-import net.minecraft.client.renderer.BlockRendererDispatcher
-import net.minecraft.client.renderer.BufferBuilder
-import net.minecraft.util.BlockRenderLayer
 import net.minecraft.util.Direction.Axis
 import net.minecraft.util.Direction.*
-import net.minecraft.util.ResourceLocation
-import net.minecraftforge.client.model.data.IModelData
 import org.apache.logging.log4j.Level.DEBUG
-import java.util.*
 
-class RenderNetherrack : RenderDecorator(BetterFoliage.MOD_ID, BetterFoliage.modBus) {
+class RenderNetherrack : RenderDecorator(BetterFoliageMod.MOD_ID, BetterFoliageMod.bus) {
 
-    val netherrackIcon = iconSet { idx -> ResourceLocation(BetterFoliage.MOD_ID, "blocks/better_netherrack_$idx") }
+    val netherrackIcon = spriteSet { idx -> Identifier(BetterFoliageMod.MOD_ID, "blocks/better_netherrack_$idx") }
     val netherrackModel = modelSet(64) { modelIdx ->
         verticalRectangle(x1 = -0.5, z1 = 0.5, x2 = 0.5, z2 = -0.5, yTop = -0.5,
         yBottom = -0.5 - random(Config.netherrack.heightMin, Config.netherrack.heightMax))
@@ -29,10 +23,6 @@ class RenderNetherrack : RenderDecorator(BetterFoliage.MOD_ID, BetterFoliage.mod
         .setFlatShader(faceOrientedAuto(overrideFace = DOWN, corner = cornerFlat))
         .toCross(UP) { it.move(xzDisk(modelIdx) * Config.shortGrass.hOffset) }.addAll()
 
-    }
-
-    override fun afterPreStitch() {
-        Client.log(DEBUG, "Registered ${netherrackIcon.num} netherrack textures")
     }
 
     override fun isEligible(ctx: CombinedContext): Boolean {
@@ -48,7 +38,7 @@ class RenderNetherrack : RenderDecorator(BetterFoliage.MOD_ID, BetterFoliage.mod
         val rand = ctx.semiRandomArray(2)
         ctx.render(
             netherrackModel[rand[0]],
-            icon = { _, qi, _ -> netherrackIcon[rand[qi and 1]]!! }
+            icon = { _, qi, _ -> netherrackIcon[rand[qi and 1]] }
         )
     }
 }

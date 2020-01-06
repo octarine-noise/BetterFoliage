@@ -1,13 +1,16 @@
 package mods.octarinecore.client.resource
 
+import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.client.resource.Identifier
 import mods.betterfoliage.client.resource.Sprite
 import mods.octarinecore.client.render.Model
 import mods.octarinecore.common.Double3
 import mods.octarinecore.common.Int3
+import mods.octarinecore.common.completedVoid
+import mods.octarinecore.common.sink
 import mods.octarinecore.stripEnd
 import mods.octarinecore.stripStart
-import net.minecraft.client.renderer.texture.AtlasTexture
+import net.minecraft.resources.IResourceManager
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.MathHelper
 import net.minecraft.world.IWorld
@@ -18,6 +21,9 @@ import net.minecraftforge.eventbus.api.IEventBus
 import net.minecraftforge.eventbus.api.SubscribeEvent
 import net.minecraftforge.fml.config.ModConfig
 import java.util.*
+import java.util.concurrent.CompletableFuture
+import kotlin.properties.ReadOnlyProperty
+import kotlin.reflect.KProperty
 
 enum class Atlas(val basePath: String) {
     BLOCKS("textures"),
@@ -31,10 +37,6 @@ enum class Atlas(val basePath: String) {
 // ============================
 // Resource types
 // ============================
-interface IStitchListener {
-    fun onPreStitch(event: TextureStitchEvent.Pre)
-    fun onPostStitch(atlas: AtlasTexture)
-}
 interface IConfigChangeListener { fun onConfigChange() }
 interface IWorldLoadListener { fun onWorldLoad(world: IWorld) }
 
@@ -52,9 +54,6 @@ open class ResourceHandler(
 ) {
 
     val resources = mutableListOf<Any>()
-    open fun afterPreStitch() {}
-    open fun afterPostStitch() {}
-
     // ============================
     // Self-registration
     // ============================
@@ -63,10 +62,11 @@ open class ResourceHandler(
     // ============================
     // Resource declarations
     // ============================
-    fun iconStatic(location: ()-> Identifier) = IconHolder(location).apply { resources.add(this) }
-    fun iconStatic(location: Identifier) = iconStatic { location }
-    fun iconStatic(domain: String, path: String) = iconStatic(Identifier(domain, path))
-    fun iconSet(targetAtlas: Atlas = Atlas.BLOCKS, location: (Int)-> Identifier) = IconSet(targetAtlas, location).apply { this@ResourceHandler.resources.add(this) }
+    fun sprite(id: Identifier) = sprite { id }
+    fun sprite(idFunc: ()->Identifier) = AsyncSpriteDelegate(idFunc).apply { BetterFoliage.getSpriteManager(targetAtlas).providers.add(this) }
+    fun spriteSet(idFunc: (Int)->Identifier) = AsyncSpriteSet(idFunc).apply { BetterFoliage.getSpriteManager(targetAtlas).providers.add(this) }
+    fun spriteSetTransformed(check: (Int)->Identifier, register: (Identifier)->Identifier) =
+        AsyncSpriteSet(check, register).apply { BetterFoliage.getSpriteManager(targetAtlas).providers.add(this) }
     fun model(init: Model.()->Unit) = ModelHolder(init).apply { resources.add(this) }
     fun modelSet(num: Int, init: Model.(Int)->Unit) = ModelSet(num, init).apply { resources.add(this) }
     fun vectorSet(num: Int, init: (Int)-> Double3) = VectorSet(num, init).apply { resources.add(this) }
@@ -75,20 +75,6 @@ open class ResourceHandler(
     // ============================
     // Event registration
     // ============================
-    @SubscribeEvent
-    fun onPreStitch(event: TextureStitchEvent.Pre) {
-        if (!targetAtlas.matches(event)) return
-        resources.forEach { (it as? IStitchListener)?.onPreStitch(event) }
-        afterPreStitch()
-    }
-
-    @SubscribeEvent
-    fun onPostStitch(event: TextureStitchEvent.Post) {
-        if (!targetAtlas.matches(event)) return
-        resources.forEach { (it as? IStitchListener)?.onPostStitch(event.map) }
-        afterPostStitch()
-    }
-
     @SubscribeEvent
     fun handleModConfigChange(event: ModConfig.ModConfigEvent) {
         resources.forEach { (it as? IConfigChangeListener)?.onConfigChange() }
@@ -102,42 +88,54 @@ open class ResourceHandler(
 // ============================
 // Resource container classes
 // ============================
-class IconHolder(val location: ()-> Identifier) : IStitchListener {
-    var iconRes: Identifier? = null
-    var icon: Sprite? = null
-    override fun onPreStitch(event: TextureStitchEvent.Pre) {
-        iconRes = location()
-        event.addSprite(iconRes)
+class AsyncSpriteDelegate(val idFunc: ()->Identifier) : ReadOnlyProperty<Any, Sprite>, AsyncSpriteProvider<Any> {
+    protected lateinit var value: Sprite
+    override fun getValue(thisRef: Any, property: KProperty<*>) = value
+
+    override fun setup(manager: IResourceManager, sourceF: CompletableFuture<Any>, atlas: AtlasFuture): StitchPhases {
+        sourceF.thenRun {
+            val sprite = atlas.sprite(idFunc())
+            atlas.runAfter {
+                sprite.handle { sprite, error -> value = sprite ?: atlas.missing.get()!! }
+            }
+        }
+        return StitchPhases(completedVoid(), completedVoid())
     }
-    override fun onPostStitch(atlas: AtlasTexture) {
-        icon = atlas[iconRes!!]
+}
+
+interface SpriteSet {
+    val num: Int
+    operator fun get(idx: Int): Sprite
+}
+
+class AsyncSpriteSet(val idFunc: (Int)->Identifier, val transform: (Identifier)->Identifier = { it }) : AsyncSpriteProvider<Any> {
+    var num = 0
+        protected set
+    protected var sprites: List<Sprite> = emptyList()
+
+    override fun setup(manager: IResourceManager, sourceF: CompletableFuture<Any>, atlas: AtlasFuture): StitchPhases {
+        var list: List<CompletableFuture<Sprite>> = emptyList()
+
+        return StitchPhases(
+            discovery = sourceF.sink {
+                list = (0 until 16).map { idFunc(it) }
+                    .filter { manager.hasResource( Atlas.BLOCKS.wrap(it)) }
+                    .map { transform(it) }
+                    .map { atlas.sprite(it) }
+            },
+            cleanup = atlas.runAfter {
+                sprites = list.filter { !it.isCompletedExceptionally }.map { it.get() }
+                if (sprites.isEmpty()) sprites = listOf(atlas.missing.get()!!)
+                num = sprites.size
+            }
+        )
     }
+    operator fun get(idx: Int) = sprites[idx % num]
 }
 
 class ModelHolder(val init: Model.()->Unit): IConfigChangeListener {
     var model: Model = Model()
     override fun onConfigChange() { model = Model().apply(init) }
-}
-
-class IconSet(val targetAtlas: Atlas, val location: (Int)-> Identifier) : IStitchListener {
-    val resources = arrayOfNulls<Identifier>(16)
-    val icons = arrayOfNulls<Sprite>(16)
-    var num = 0
-
-    override fun onPreStitch(event: TextureStitchEvent.Pre) {
-        num = 0
-        (0..15).forEach { idx ->
-            icons[idx] = null
-            val loc = location(idx)
-            if (resourceManager[targetAtlas.wrap(loc)] != null) resources[num++] = loc.apply { event.addSprite(this) }
-        }
-    }
-
-    override fun onPostStitch(atlas: AtlasTexture) {
-        (0 until num).forEach { idx -> icons[idx] = atlas[resources[idx]!!] }
-    }
-
-    operator fun get(idx: Int) = if (num == 0) null else icons[idx % num]
 }
 
 class ModelSet(val num: Int, val init: Model.(Int)->Unit): IConfigChangeListener {

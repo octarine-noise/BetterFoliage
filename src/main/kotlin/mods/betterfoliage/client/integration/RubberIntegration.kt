@@ -1,7 +1,6 @@
 package mods.betterfoliage.client.integration
 
 import mods.betterfoliage.BetterFoliage
-import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.render.LogRegistry
 import mods.betterfoliage.client.render.column.ColumnTextureInfo
 import mods.betterfoliage.client.render.column.SimpleColumnInfo
@@ -13,14 +12,12 @@ import mods.octarinecore.common.rotate
 import mods.octarinecore.metaprog.ClassRef
 import mods.octarinecore.metaprog.allAvailable
 import net.minecraft.client.renderer.model.BlockModel
-import net.minecraft.client.renderer.texture.AtlasTexture
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.util.Direction
 import net.minecraft.util.Direction.*
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.fml.ModList
 import org.apache.logging.log4j.Level
-import org.apache.logging.log4j.Logger
 import java.util.concurrent.CompletableFuture
 
 object IC2RubberIntegration {
@@ -29,9 +26,9 @@ object IC2RubberIntegration {
 
     init {
         if (ModList.get().isLoaded("ic2") && allAvailable(BlockRubWood)) {
-            Client.log(Level.INFO, "IC2 rubber support initialized")
+            BetterFoliage.log(Level.INFO, "IC2 rubber support initialized")
             LogRegistry.registries.add(IC2LogDiscovery)
-            AsyncSpriteProviderManager.providers.add(IC2LogDiscovery)
+            BetterFoliage.blockSprites.providers.add(IC2LogDiscovery)
         }
     }
 }
@@ -42,9 +39,9 @@ object TechRebornRubberIntegration {
 
     init {
         if (ModList.get().isLoaded("techreborn") && allAvailable(BlockRubberLog)) {
-            Client.log(Level.INFO, "TechReborn rubber support initialized")
+            BetterFoliage.log(Level.INFO, "TechReborn rubber support initialized")
             LogRegistry.registries.add(TechRebornLogDiscovery)
-            AsyncSpriteProviderManager.providers.add(TechRebornLogDiscovery)
+            BetterFoliage.blockSprites.providers.add(TechRebornLogDiscovery)
         }
     }
 }
@@ -90,7 +87,7 @@ object IC2LogDiscovery : ModelDiscovery<ColumnTextureInfo>() {
             log("IC2LogSupport:             axis=$axis, end=${textureNames[0]}, side=${textureNames[1]}")
             val endSprite = atlas.sprite(textureNames[0])
             val sideSprite = atlas.sprite(textureNames[1])
-            return atlas.afterStitch {
+            return atlas.mapAfter {
                 SimpleColumnInfo(axis, endSprite.get(), endSprite.get(), listOf(sideSprite.get()))
             }
         }
@@ -111,9 +108,9 @@ object IC2LogDiscovery : ModelDiscovery<ColumnTextureInfo>() {
         val downSprite = atlas.sprite(textureNames[1])
         val sideSprite = atlas.sprite(textureNames[2])
         val spotSprite = atlas.sprite(textureNames[3])
-        return if (spotDir != null) atlas.afterStitch {
+        return if (spotDir != null) atlas.mapAfter {
             RubberLogInfo(Axis.Y, spotDir, upSprite.get(), downSprite.get(), spotSprite.get(), listOf(sideSprite.get()))
-        } else atlas.afterStitch {
+        } else atlas.mapAfter {
             SimpleColumnInfo(Axis.Y, upSprite.get(), downSprite.get(), listOf(sideSprite.get()))
         }
     }
@@ -138,7 +135,7 @@ object TechRebornLogDiscovery : ModelDiscovery<ColumnTextureInfo>() {
                 val endSprite = atlas.sprite(textureNames[0])
                 val sideSprite = atlas.sprite(textureNames[1])
                 val sapSprite = atlas.sprite(textureNames[2])
-                return atlas.afterStitch {
+                return atlas.mapAfter {
                     RubberLogInfo(Axis.Y, sapSide, endSprite.get(), endSprite.get(), sapSprite.get(), listOf(sideSprite.get()))
                 }
             }
@@ -148,7 +145,7 @@ object TechRebornLogDiscovery : ModelDiscovery<ColumnTextureInfo>() {
             if (textureNames.all { it != "missingno" }) {
                 val endSprite = atlas.sprite(textureNames[0])
                 val sideSprite = atlas.sprite(textureNames[1])
-                return atlas.afterStitch {
+                return atlas.mapAfter {
                     SimpleColumnInfo(Axis.Y, endSprite.get(), endSprite.get(), listOf(sideSprite.get()))
                 }
             }

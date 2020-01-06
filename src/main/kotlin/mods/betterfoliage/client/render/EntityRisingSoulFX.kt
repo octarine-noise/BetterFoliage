@@ -1,8 +1,10 @@
 package mods.betterfoliage.client.render
 
 import mods.betterfoliage.BetterFoliage
+import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.Config
+import mods.betterfoliage.client.resource.Identifier
 import mods.octarinecore.client.render.AbstractEntityFX
 import mods.octarinecore.client.resource.Atlas
 import mods.octarinecore.client.resource.ResourceHandler
@@ -59,17 +61,13 @@ AbstractEntityFX(world, pos.x.toDouble() + 0.5, pos.y.toDouble() + 1.0, pos.z.to
                 prevPos = previous,
                 size = scale,
                 alpha = alpha,
-                icon = RisingSoulTextures.trackIcon.icon!!
+                icon = RisingSoulTextures.trackIcon
             )
         }
     }
 }
 
-object RisingSoulTextures : ResourceHandler(BetterFoliage.MOD_ID, BetterFoliage.modBus, targetAtlas = Atlas.PARTICLES) {
-    val headIcons = iconSet { idx -> ResourceLocation(BetterFoliage.MOD_ID, "rising_soul_$idx") }
-    val trackIcon = iconStatic(BetterFoliage.MOD_ID, "soul_track")
-
-    override fun afterPreStitch() {
-        Client.log(DEBUG, "Registered ${headIcons.num} soul particle textures")
-    }
+object RisingSoulTextures : ResourceHandler(BetterFoliageMod.MOD_ID, BetterFoliageMod.bus, targetAtlas = Atlas.PARTICLES) {
+    val headIcons = spriteSet { idx -> ResourceLocation(BetterFoliageMod.MOD_ID, "rising_soul_$idx") }
+    val trackIcon by sprite(Identifier(BetterFoliageMod.MOD_ID, "soul_track"))
 }

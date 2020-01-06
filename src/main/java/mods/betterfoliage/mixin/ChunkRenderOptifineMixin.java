@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.Slice;
 @Mixin(ChunkRender.class)
 public class ChunkRenderOptifineMixin {
 
-    private static final String rebuildChunk = "Lnet/minecraft/client/renderer/chunk/ChunkRender;rebuildChunk(FFFLnet/minecraft/client/renderer/chunk/ChunkRenderTask;)V";
+    private static final String rebuildChunk = "rebuildChunk(FFFLnet/minecraft/client/renderer/chunk/ChunkRenderTask;)V";
     private static final String invokeReflector = "Lnet/optifine/reflect/Reflector;callBoolean(Ljava/lang/Object;Lnet/optifine/reflect/ReflectorMethod;[Ljava/lang/Object;)Z";
     private static final String forgeBlockCanRender = "Lnet/minecraft/client/renderer/chunk/ChunkRender;FORGE_BLOCK_CAN_RENDER_IN_LAYER:Z";
 

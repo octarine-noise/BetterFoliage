@@ -1,7 +1,6 @@
 package mods.betterfoliage.client.texture
 
 import mods.betterfoliage.BetterFoliage
-import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.BlockConfig
 import mods.betterfoliage.client.resource.Identifier
 import mods.octarinecore.HasLogger
@@ -26,7 +25,7 @@ class LeafInfo(
     val averageColor: Int = roundLeafTexture.averageColor
 ) {
     /** [IconSet] of the textures to use for leaf particles emitted from this block. */
-    val particleTextures: IconSet get() = LeafParticleRegistry[leafType]
+    val particleTextures: SpriteSet get() = LeafParticleRegistry[leafType]
 }
 
 object LeafRegistry : ModelRenderRegistryRoot<LeafInfo>()
@@ -40,18 +39,18 @@ object AsyncLeafDiscovery : ConfigurableModelDiscovery<LeafInfo>() {
 
     fun init() {
         LeafRegistry.registries.add(this)
-        AsyncSpriteProviderManager.providers.add(this)
+        BetterFoliage.blockSprites.providers.add(this)
     }
 }
 
 fun HasLogger.defaultRegisterLeaf(sprite: Identifier, atlas: AtlasFuture): CompletableFuture<LeafInfo> {
     val leafType = LeafParticleRegistry.typeMappings.getType(sprite) ?: "default"
-    val generated = Client.genLeaves.register(sprite, leafType)
+    val generated = GeneratedLeaf(sprite, leafType).register(BetterFoliage.asyncPack)
     val roundLeaf = atlas.sprite(generated)
 
     log(" leaf texture $sprite")
     log("     particle $leafType")
-    return atlas.afterStitch {
+    return atlas.mapAfter {
         LeafInfo(roundLeaf.get(), leafType)
     }
 }

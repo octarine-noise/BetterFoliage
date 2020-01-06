@@ -1,11 +1,9 @@
 package mods.betterfoliage.client.texture
 
+import mods.betterfoliage.client.resource.Identifier
 import mods.octarinecore.client.resource.*
-import mods.octarinecore.client.resource.Atlas
-import net.minecraft.util.ResourceLocation
-import net.minecraftforge.resource.VanillaResourceType.TEXTURES
+import net.minecraft.resources.IResourceManager
 import java.awt.image.BufferedImage
-import java.io.InputStream
 
 /**
  * Generate Short Grass textures from [Blocks.tallgrass] block textures.
@@ -13,16 +11,13 @@ import java.io.InputStream
  *
  * @param[domain] Resource domain of generator
  */
-class GrassGenerator(domain: String) : GeneratorBase<GrassGenerator.Key>(domain, TEXTURES) {
+data class GeneratedGrass(val sprite: Identifier, val isSnowed: Boolean, val atlas: Atlas = Atlas.BLOCKS) {
+    constructor(sprite: String, isSnowed: Boolean) : this(Identifier(sprite), isSnowed)
 
-    override val locationMapper = Atlas.BLOCKS::unwrap
+    fun register(pack: GeneratedBlockTexturePack) = pack.register(this, this::draw)
 
-    fun register(texture: String, isSnowed: Boolean) = registerResource(Key(ResourceLocation(texture), isSnowed))
-
-    override fun exists(key: Key) = resourceManager.hasResource(Atlas.BLOCKS.wrap(key.texture))
-
-    override fun get(key: Key): InputStream? {
-        val baseTexture = resourceManager[Atlas.BLOCKS.wrap(key.texture)]?.loadImage() ?: return null
+    fun draw(resourceManager: IResourceManager): ByteArray {
+        val baseTexture = resourceManager.loadSprite(atlas.wrap(sprite))
 
         val result = BufferedImage(baseTexture.width, baseTexture.height, BufferedImage.TYPE_4BYTE_ABGR)
         val graphics = result.createGraphics()
@@ -31,7 +26,7 @@ class GrassGenerator(domain: String) : GeneratorBase<GrassGenerator.Key>(domain,
         val frames = baseTexture.height / size
 
         // iterate all frames
-        for (frame in 0 .. frames - 1) {
+        for (frame in 0 until frames) {
             val baseFrame = baseTexture.getSubimage(0, size * frame, size, size)
             val grassFrame = BufferedImage(size, size, BufferedImage.TYPE_4BYTE_ABGR)
 
@@ -45,14 +40,11 @@ class GrassGenerator(domain: String) : GeneratorBase<GrassGenerator.Key>(domain,
         }
 
         // blend with white if snowed
-        if (key.isSnowed) {
+        if (isSnowed) {
             for (x in 0..result.width - 1) for (y in 0..result.height - 1) {
                 result[x, y] = blendRGB(result[x, y], 16777215, 2, 3)
             }
         }
-
-        return result.asStream
+        return result.bytes
     }
-
-    data class Key(val texture: ResourceLocation, val isSnowed: Boolean)
 }

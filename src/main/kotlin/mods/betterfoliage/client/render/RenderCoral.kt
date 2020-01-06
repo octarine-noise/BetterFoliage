@@ -1,34 +1,27 @@
 package mods.betterfoliage.client.render
 
 import mods.betterfoliage.BetterFoliage
+import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.BlockConfig
 import mods.betterfoliage.client.config.Config
 import mods.octarinecore.client.render.*
 import mods.octarinecore.client.render.lighting.*
-import mods.octarinecore.common.Int3
-import mods.octarinecore.common.allDirOffsets
 import mods.octarinecore.common.allDirections
-import mods.octarinecore.common.offset
 import mods.octarinecore.random
 import net.minecraft.block.material.Material
-import net.minecraft.client.renderer.BlockRendererDispatcher
-import net.minecraft.client.renderer.BufferBuilder
-import net.minecraft.util.BlockRenderLayer
 import net.minecraft.util.Direction.Axis
 import net.minecraft.util.Direction.UP
 import net.minecraft.util.ResourceLocation
 import net.minecraft.world.biome.Biome
-import net.minecraftforge.client.model.data.IModelData
 import org.apache.logging.log4j.Level.DEBUG
-import java.util.*
 
-class RenderCoral : RenderDecorator(BetterFoliage.MOD_ID, BetterFoliage.modBus) {
+class RenderCoral : RenderDecorator(BetterFoliageMod.MOD_ID, BetterFoliageMod.bus) {
 
     val noise = simplexNoise()
 
-    val coralIcons = iconSet { idx -> ResourceLocation(BetterFoliage.MOD_ID, "blocks/better_coral_$idx") }
-    val crustIcons = iconSet { idx -> ResourceLocation(BetterFoliage.MOD_ID, "blocks/better_crust_$idx") }
+    val coralIcons = spriteSet { idx -> ResourceLocation(BetterFoliageMod.MOD_ID, "blocks/better_coral_$idx") }
+    val crustIcons = spriteSet { idx -> ResourceLocation(BetterFoliageMod.MOD_ID, "blocks/better_crust_$idx") }
     val coralModels = modelSet(64) { modelIdx ->
         verticalRectangle(x1 = -0.5, z1 = 0.5, x2 = 0.5, z2 = -0.5, yBottom = 0.0, yTop = 1.0)
         .scale(Config.coral.size).move(0.5 to UP)
@@ -42,11 +35,6 @@ class RenderCoral : RenderDecorator(BetterFoliage.MOD_ID, BetterFoliage.modBus) 
             it.setAoShader(faceOrientedAuto(overrideFace = UP, corner = cornerAo(Axis.Y)))
             .setFlatShader(faceOrientedAuto(overrideFace = UP, corner = cornerFlat))
         }
-    }
-
-    override fun afterPreStitch() {
-        Client.log(DEBUG, "Registered ${coralIcons.num} coral textures")
-        Client.log(DEBUG, "Registered ${crustIcons.num} coral crust textures")
     }
 
     override fun isEligible(ctx: CombinedContext) =
@@ -67,7 +55,7 @@ class RenderCoral : RenderDecorator(BetterFoliage.MOD_ID, BetterFoliage.modBus) 
                 ctx.render(
                     coralModels[variation++],
                     rotationFromUp[idx],
-                    icon = { _, qi, _ -> if (qi == 4) crustIcons[variation]!! else coralIcons[variation + (qi and 1)]!!}
+                    icon = { _, qi, _ -> if (qi == 4) crustIcons[variation] else coralIcons[variation + (qi and 1)] }
                 )
             }
         }

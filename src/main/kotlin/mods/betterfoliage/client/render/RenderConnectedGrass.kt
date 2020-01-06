@@ -1,6 +1,6 @@
 package mods.betterfoliage.client.render
 
-import mods.betterfoliage.BetterFoliage
+import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.config.Config
 import mods.betterfoliage.client.texture.GrassRegistry
 import mods.octarinecore.client.render.CombinedContext
@@ -10,7 +10,7 @@ import mods.octarinecore.common.horizontalDirections
 import mods.octarinecore.common.offset
 import net.minecraft.tags.BlockTags
 
-class RenderConnectedGrass : RenderDecorator(BetterFoliage.MOD_ID, BetterFoliage.modBus) {
+class RenderConnectedGrass : RenderDecorator(BetterFoliageMod.MOD_ID, BetterFoliageMod.bus) {
     override fun isEligible(ctx: CombinedContext) =
         Config.enabled && Config.connectedGrass.enabled &&
         BlockTags.DIRT_LIKE.contains(ctx.state.block) &&
@@ -27,7 +27,7 @@ class RenderConnectedGrass : RenderDecorator(BetterFoliage.MOD_ID, BetterFoliage
     }
 }
 
-class RenderConnectedGrassLog : RenderDecorator(BetterFoliage.MOD_ID, BetterFoliage.modBus) {
+class RenderConnectedGrassLog : RenderDecorator(BetterFoliageMod.MOD_ID, BetterFoliageMod.bus) {
 
     override fun isEligible(ctx: CombinedContext) =
         Config.enabled && Config.roundLogs.enabled && Config.roundLogs.connectGrass &&
