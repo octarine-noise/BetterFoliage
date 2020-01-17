@@ -10,7 +10,6 @@ import mods.octarinecore.client.resource.Atlas
 import mods.octarinecore.common.sinkAsync
 import net.minecraft.client.particle.ParticleManager
 import net.minecraft.resources.IResourceManager
-import net.minecraft.util.ResourceLocation
 import java.util.concurrent.CompletableFuture
 
 class FixedSpriteSet(val sprites: List<Sprite>) : SpriteSet {
@@ -58,7 +57,7 @@ object LeafParticleRegistry : AsyncSpriteProvider<ParticleManager> {
 class TextureMatcher {
 
     data class Mapping(val domain: String?, val path: String, val type: String) {
-        fun matches(iconLocation: ResourceLocation): Boolean {
+        fun matches(iconLocation: Identifier): Boolean {
             return (domain == null || domain == iconLocation.namespace) &&
                 iconLocation.path.stripStart("blocks/").contains(path, ignoreCase = true)
         }
@@ -66,10 +65,10 @@ class TextureMatcher {
 
     val mappings: MutableList<Mapping> = mutableListOf()
 
-    fun getType(resource: ResourceLocation) = mappings.filter { it.matches(resource) }.map { it.type }.firstOrNull()
-    fun getType(iconName: String) = ResourceLocation(iconName).let { getType(it) }
+    fun getType(resource: Identifier) = mappings.filter { it.matches(resource) }.map { it.type }.firstOrNull()
+    fun getType(iconName: String) = Identifier(iconName).let { getType(it) }
 
-    fun loadMappings(mappingLocation: ResourceLocation) {
+    fun loadMappings(mappingLocation: Identifier) {
         mappings.clear()
         resourceManager[mappingLocation]?.getLines()?.let { lines ->
             lines.filter { !it.startsWith("//") }.filter { !it.isEmpty() }.forEach { line ->

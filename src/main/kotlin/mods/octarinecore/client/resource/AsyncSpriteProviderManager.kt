@@ -34,22 +34,30 @@ class AsnycSpriteProviderManager<SOURCE: Any>(val profilerSection: String) {
         fun complete(sheet: AtlasTexture.SheetData) = onComplete(sheet)
     }
 
+    var currentAtlas: AtlasFuture? = null
+    var currentPhases: List<StitchPhases> = emptyList()
+
     @Suppress("UNCHECKED_CAST")
-    fun prepare(sourceObj: Any, atlas: AtlasTexture, manager: IResourceManager, idList: Iterable<Identifier>, profiler: IProfiler): StitchWrapper {
+    fun prepare(sourceObj: Any, manager: IResourceManager, idList: Iterable<Identifier>, profiler: IProfiler): Set<Identifier> {
         profiler.startSection(profilerSection)
 
         val source = CompletableFuture<SOURCE>()
-        val atlasFuture = AtlasFuture(idList)
+        currentAtlas = AtlasFuture(idList)
 
-        val phases = providers.map { it.setup(manager, source, atlasFuture) }
+        currentPhases = providers.map { it.setup(manager, source, currentAtlas!!) }
         source.complete(sourceObj as SOURCE)
-        phases.forEach { it.discovery.get() }
+        currentPhases.forEach { it.discovery.get() }
 
-        return StitchWrapper(atlasFuture.idSet) { sheet ->
-            atlasFuture.complete(sheet)
-            phases.forEach { it.cleanup.get() }
-            profiler.endSection()
-        }
+        return currentAtlas!!.idSet
+    }
+
+    fun finish(sheetData: AtlasTexture.SheetData, profiler: IProfiler): AtlasTexture.SheetData {
+        currentAtlas!!.complete(sheetData)
+        currentPhases.forEach { it.cleanup.get() }
+        currentAtlas = null
+        currentPhases = emptyList()
+        profiler.endSection()
+        return sheetData
     }
 }
 

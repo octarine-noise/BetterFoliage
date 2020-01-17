@@ -10,6 +10,7 @@ import mods.octarinecore.client.render.lighting.*
 import mods.octarinecore.common.allDirections
 import mods.octarinecore.random
 import net.minecraft.block.material.Material
+import net.minecraft.tags.BlockTags
 import net.minecraft.util.Direction.Axis
 import net.minecraft.util.Direction.UP
 import net.minecraft.util.ResourceLocation
@@ -41,7 +42,7 @@ class RenderCoral : RenderDecorator(BetterFoliageMod.MOD_ID, BetterFoliageMod.bu
         Config.enabled && Config.coral.enabled &&
         (ctx.state(up2).material == Material.WATER || Config.coral.shallowWater) &&
         ctx.state(up1).material == Material.WATER &&
-        BlockConfig.sand.matchesClass(ctx.state.block) &&
+        BlockTags.SAND.contains(ctx.state.block) &&
         ctx.biome.category.let { it == Biome.Category.OCEAN || it == Biome.Category.BEACH } &&
         noise[ctx.pos] < Config.coral.population
 

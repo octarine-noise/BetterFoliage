@@ -64,9 +64,9 @@ open class ResourceHandler(
     // ============================
     fun sprite(id: Identifier) = sprite { id }
     fun sprite(idFunc: ()->Identifier) = AsyncSpriteDelegate(idFunc).apply { BetterFoliage.getSpriteManager(targetAtlas).providers.add(this) }
-    fun spriteSet(idFunc: (Int)->Identifier) = AsyncSpriteSet(idFunc).apply { BetterFoliage.getSpriteManager(targetAtlas).providers.add(this) }
+    fun spriteSet(idFunc: (Int)->Identifier) = AsyncSpriteSet(targetAtlas, idFunc).apply { BetterFoliage.getSpriteManager(targetAtlas).providers.add(this) }
     fun spriteSetTransformed(check: (Int)->Identifier, register: (Identifier)->Identifier) =
-        AsyncSpriteSet(check, register).apply { BetterFoliage.getSpriteManager(targetAtlas).providers.add(this) }
+        AsyncSpriteSet(targetAtlas, check, register).apply { BetterFoliage.getSpriteManager(targetAtlas).providers.add(this) }
     fun model(init: Model.()->Unit) = ModelHolder(init).apply { resources.add(this) }
     fun modelSet(num: Int, init: Model.(Int)->Unit) = ModelSet(num, init).apply { resources.add(this) }
     fun vectorSet(num: Int, init: (Int)-> Double3) = VectorSet(num, init).apply { resources.add(this) }
@@ -108,7 +108,7 @@ interface SpriteSet {
     operator fun get(idx: Int): Sprite
 }
 
-class AsyncSpriteSet(val idFunc: (Int)->Identifier, val transform: (Identifier)->Identifier = { it }) : AsyncSpriteProvider<Any> {
+class AsyncSpriteSet(val targetAtlas: Atlas = Atlas.BLOCKS, val idFunc: (Int)->Identifier, val transform: (Identifier)->Identifier = { it }) : AsyncSpriteProvider<Any> {
     var num = 0
         protected set
     protected var sprites: List<Sprite> = emptyList()
@@ -119,7 +119,7 @@ class AsyncSpriteSet(val idFunc: (Int)->Identifier, val transform: (Identifier)-
         return StitchPhases(
             discovery = sourceF.sink {
                 list = (0 until 16).map { idFunc(it) }
-                    .filter { manager.hasResource( Atlas.BLOCKS.wrap(it)) }
+                    .filter { manager.hasResource( targetAtlas.wrap(it)) }
                     .map { transform(it) }
                     .map { atlas.sprite(it) }
             },

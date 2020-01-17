@@ -57,10 +57,10 @@ object Client {
         // init mod integrations
         val integrations = listOf(
             ShadersModIntegration,
-            OptifineCustomColors,
-            ForestryIntegration,
-            IC2RubberIntegration,
-            TechRebornRubberIntegration
+            OptifineCustomColors
+//            ForestryIntegration,
+//            IC2RubberIntegration,
+//            TechRebornRubberIntegration
         )
 
         LeafParticleRegistry.init()

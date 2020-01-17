@@ -120,7 +120,7 @@ object Config : DelegatingConfig(BetterFoliageMod.MOD_ID, BetterFoliageMod.MOD_I
         val windStrength by double(min=0.1, max=2.0, default=0.5)
         val stormStrength by double(min=0.1, max=2.0, default=0.8)
         val size by double(min=0.25, max=1.5, default=0.75).lang("size")
-        val chance by double(min=0.001, max=1.0, default=0.05)
+        val chance by double(min=0.001, max=1.0, default=0.02)
         val perturb by double(min=0.01, max=1.0, default=0.25)
         val lifetime by double(min=1.0, max=15.0, default=5.0)
         val opacityHack by boolean(true)
@@ -153,10 +153,7 @@ object BlockConfig {
     val crops = blocks("crop_default.cfg")
     val logBlocks = blocks("log_blocks_default.cfg")
     val logModels = models("log_models_default.cfg")
-    val sand = blocks("sand_default.cfg")
     val lilypad = blocks("lilypad_default.cfg")
-    val cactus = blocks("cactus_default.cfg")
-    val netherrack = blocks("netherrack_blocks_default.cfg")
 
     init { BetterFoliageMod.bus.register(this) }
     private fun blocks(cfgName: String) = ConfigurableBlockMatcher(BetterFoliage.logDetail, ResourceLocation(BetterFoliageMod.MOD_ID, cfgName)).apply { list.add(this) }

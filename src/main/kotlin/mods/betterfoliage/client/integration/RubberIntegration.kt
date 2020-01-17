@@ -4,6 +4,7 @@ import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.client.render.LogRegistry
 import mods.betterfoliage.client.render.column.ColumnTextureInfo
 import mods.betterfoliage.client.render.column.SimpleColumnInfo
+import mods.betterfoliage.client.resource.Sprite
 import mods.octarinecore.client.render.CombinedContext
 import mods.octarinecore.client.render.Quad
 import mods.octarinecore.client.render.lighting.QuadIconResolver
@@ -12,7 +13,6 @@ import mods.octarinecore.common.rotate
 import mods.octarinecore.metaprog.ClassRef
 import mods.octarinecore.metaprog.allAvailable
 import net.minecraft.client.renderer.model.BlockModel
-import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.util.Direction
 import net.minecraft.util.Direction.*
 import net.minecraft.util.ResourceLocation
@@ -20,19 +20,23 @@ import net.minecraftforge.fml.ModList
 import org.apache.logging.log4j.Level
 import java.util.concurrent.CompletableFuture
 
+
 object IC2RubberIntegration {
 
     val BlockRubWood = ClassRef<Any>("ic2.core.block.BlockRubWood")
 
     init {
         if (ModList.get().isLoaded("ic2") && allAvailable(BlockRubWood)) {
-            BetterFoliage.log(Level.INFO, "IC2 rubber support initialized")
-            LogRegistry.registries.add(IC2LogDiscovery)
-            BetterFoliage.blockSprites.providers.add(IC2LogDiscovery)
+            // keep it inactive for now until IC2 updates
+//            BetterFoliage.log(Level.INFO, "IC2 rubber support initialized")
+//            LogRegistry.registries.add(IC2LogDiscovery)
+//            BetterFoliage.blockSprites.providers.add(IC2LogDiscovery)
         }
     }
 }
 
+// Probably unneeded, as TechReborn went Fabric-only
+/*
 object TechRebornRubberIntegration {
 
     val BlockRubberLog = ClassRef<Any>("techreborn.blocks.BlockRubberLog")
@@ -45,14 +49,15 @@ object TechRebornRubberIntegration {
         }
     }
 }
+ */
 
 class RubberLogInfo(
     axis: Axis?,
     val spotDir: Direction,
-    topTexture: TextureAtlasSprite,
-    bottomTexture: TextureAtlasSprite,
-    val spotTexture: TextureAtlasSprite,
-    sideTextures: List<TextureAtlasSprite>
+    topTexture: Sprite,
+    bottomTexture: Sprite,
+    val spotTexture: Sprite,
+    sideTextures: List<Sprite>
 ) : SimpleColumnInfo(axis, topTexture, bottomTexture, sideTextures) {
 
     override val side: QuadIconResolver = { ctx: CombinedContext, idx: Int, quad: Quad ->
@@ -116,6 +121,7 @@ object IC2LogDiscovery : ModelDiscovery<ColumnTextureInfo>() {
     }
 }
 
+/*
 object TechRebornLogDiscovery : ModelDiscovery<ColumnTextureInfo>() {
     override val logger = BetterFoliage.logDetail
 
@@ -153,3 +159,4 @@ object TechRebornLogDiscovery : ModelDiscovery<ColumnTextureInfo>() {
         return null
     }
 }
+ */

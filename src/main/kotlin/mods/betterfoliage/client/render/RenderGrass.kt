@@ -40,8 +40,8 @@ class RenderGrass : RenderDecorator(BetterFoliageMod.MOD_ID, BetterFoliageMod.bu
 
     val normalIcons = spriteSet { idx -> Identifier(BetterFoliageMod.MOD_ID, "blocks/better_grass_long_$idx") }
     val snowedIcons = spriteSet { idx -> Identifier(BetterFoliageMod.MOD_ID, "blocks/better_grass_snowed_$idx") }
-    val normalGenIcon by sprite { GeneratedGrass(sprite = "minecraft:blocks/tallgrass", isSnowed = false).register(BetterFoliage.asyncPack) }
-    val snowedGenIcon by sprite { GeneratedGrass(sprite = "minecraft:blocks/tallgrass", isSnowed = true).register(BetterFoliage.asyncPack) }
+    val normalGenIcon by sprite { GeneratedGrass(sprite = "minecraft:blocks/tall_grass_top", isSnowed = false).register(BetterFoliage.asyncPack) }
+    val snowedGenIcon by sprite { GeneratedGrass(sprite = "minecraft:blocks/tall_grass_top", isSnowed = true).register(BetterFoliage.asyncPack) }
 
     val grassModels = modelSet(64) { idx -> grassTopQuads(Config.shortGrass.heightMin, Config.shortGrass.heightMax)(idx) }
 

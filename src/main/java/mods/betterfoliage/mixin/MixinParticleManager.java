@@ -21,9 +21,13 @@ public class MixinParticleManager {
     @SuppressWarnings("UnresolvedMixinReference")
     @Redirect(method = "*", at = @At(value = "INVOKE", target = stitch))
     AtlasTexture.SheetData onStitchModelTextures(AtlasTexture atlas, IResourceManager manager, Iterable<ResourceLocation> idList, IProfiler profiler) {
-        AsnycSpriteProviderManager.StitchWrapper wrapper = BetterFoliage.INSTANCE.getParticleSprites().prepare(this, atlas, manager, idList, profiler);
-        AtlasTexture.SheetData sheet = atlas.stitch(manager, wrapper.getIdList(), profiler);
-        wrapper.complete(sheet);
-        return sheet;
+        return BetterFoliage.INSTANCE.getParticleSprites().finish(
+            atlas.stitch(
+                manager,
+                BetterFoliage.INSTANCE.getParticleSprites().prepare(this, manager, idList, profiler),
+                profiler
+            ), profiler
+        );
     }
+
 }

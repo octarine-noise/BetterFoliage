@@ -54,6 +54,7 @@ val ILeafSpriteProvider_getSprite = MethodRef(ILeafSpriteProvider, "getSprite", 
 object ForestryIntegration {
     init {
         if (ModList.get().isLoaded("forestry") && allAvailable(TileLeaves_getLeaveSprite, IAlleleTreeSpecies_getLeafSpriteProvider, ILeafSpriteProvider_getSprite)) {
+            // Just keep it inactive for now until Forestry updates
         }
     }
 }

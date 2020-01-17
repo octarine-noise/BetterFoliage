@@ -26,7 +26,7 @@ object ShadersModIntegration {
     @JvmStatic val isAvailable = allAvailable(SVertexBuilder, SVertexBuilder.pushState, SVertexBuilder.pushNum, SVertexBuilder.pop)
 
     val defaultLeaves = Blocks.OAK_LEAVES.defaultState
-    val defaultGrass = Blocks.TALL_GRASS.defaultState
+    val defaultGrass = Blocks.GRASS.defaultState
 
     /**
      * Called from transformed ShadersMod code.

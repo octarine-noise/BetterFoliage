@@ -9,6 +9,7 @@ import mods.betterfoliage.client.resource.Identifier
 import mods.octarinecore.client.render.*
 import mods.octarinecore.client.render.lighting.*
 import mods.octarinecore.random
+import net.minecraft.block.Blocks
 import net.minecraft.util.Direction.Axis
 import net.minecraft.util.Direction.*
 import org.apache.logging.log4j.Level.DEBUG
@@ -25,10 +26,8 @@ class RenderNetherrack : RenderDecorator(BetterFoliageMod.MOD_ID, BetterFoliageM
 
     }
 
-    override fun isEligible(ctx: CombinedContext): Boolean {
-        if (!Config.enabled || !Config.netherrack.enabled) return false
-        return BlockConfig.netherrack.matchesClass(ctx.state.block)
-    }
+    override fun isEligible(ctx: CombinedContext) =
+        Config.enabled && Config.netherrack.enabled && ctx.state.block == Blocks.NETHERRACK
 
     override fun render(ctx: CombinedContext) {
         ctx.render()
