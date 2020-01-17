@@ -15,20 +15,13 @@ dependencies {
     "minecraft"("net.minecraftforge:forge:${properties["mcVersion"]}-${properties["forgeVersion"]}")
 
     "implementation"("kottle:Kottle:${properties["kottleVersion"]}")
-
     "implementation"("org.spongepowered:mixin:0.8-SNAPSHOT")
-    annotationProcessor("org.spongepowered:mixin:0.8-SNAPSHOT")
 }
 
+configurations["annotationProcessor"].extendsFrom(configurations["implementation"])
 sourceSets {
     get("main").ext["refMap"] = "betterfoliage.refmap.json"
-    get("main").resources.srcDir("src/forge/resources")
-    get("main").java.srcDir("src/forge/java")
 }
-kotlin.sourceSets {
-    get("main").kotlin.srcDir("src/forge/kotlin")
-}
-
 
 minecraft {
     mappings(properties["mappingsChannel"] as String, properties["mappingsVersion"] as String)
@@ -62,4 +55,5 @@ tasks.getByName<Jar>("jar") {
         attributes["Implementation-Version"] = project.version
     }
     exclude("net")
+    filesMatching("META-INF/mods.toml") { expand(project.properties) }
 }
