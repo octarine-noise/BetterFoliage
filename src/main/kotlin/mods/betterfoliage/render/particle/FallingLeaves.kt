@@ -1,0 +1,112 @@
+package mods.betterfoliage.render.particle
+
+import mods.betterfoliage.BetterFoliage
+import mods.betterfoliage.ClientWorldLoadCallback
+import mods.betterfoliage.render.AbstractParticle
+import mods.betterfoliage.render.block.vanilla.LeafKey
+import mods.betterfoliage.util.*
+import net.fabricmc.fabric.api.event.world.WorldTickCallback
+import net.minecraft.client.MinecraftClient
+import net.minecraft.client.render.BufferBuilder
+import net.minecraft.client.world.ClientWorld
+import net.minecraft.util.math.BlockPos
+import net.minecraft.util.math.MathHelper
+import net.minecraft.world.World
+import java.util.*
+import kotlin.math.abs
+import kotlin.math.cos
+import kotlin.math.sin
+
+class FallingLeafParticle(
+    world: World, pos: BlockPos, leafKey: LeafKey
+) : AbstractParticle(
+    world, pos.x.toDouble() + 0.5, pos.y.toDouble(), pos.z.toDouble() + 0.5
+) {
+
+    companion object {
+        @JvmStatic val biomeBrightnessMultiplier = 0.5f
+    }
+
+    var rotationSpeed = randomF(min = PI2 / 80.0, max = PI2 / 50.0)
+    var rotPositive = true
+    val isMirrored = randomB()
+    var wasCollided = false
+
+    init {
+        angle = randomF(max = PI2)
+        maxAge = MathHelper.floor(randomD(0.6, 1.0) * BetterFoliage.config.fallingLeaves.lifetime * 20.0)
+        velocityY = -BetterFoliage.config.fallingLeaves.speed
+
+        scale = BetterFoliage.config.fallingLeaves.size.toFloat() * 0.1f
+
+        val state = world.getBlockState(pos)
+        val blockColor = MinecraftClient.getInstance().blockColorMap.getColorMultiplier(state, world, pos, 0)
+        sprite = LeafParticleRegistry[leafKey.leafType][randomI(max = 1024)]
+        setParticleColor(leafKey.overrideColor, blockColor)
+    }
+
+    override val isValid: Boolean get() = (sprite != null)
+
+    override fun update() {
+        if (randomF() > 0.95f) rotPositive = !rotPositive
+//        if (age > maxAge - 20) colorAlpha = 0.05f * (maxAge - age)
+
+        if (onGround || wasCollided) {
+            velocity.setTo(0.0, 0.0, 0.0)
+            if (!wasCollided) {
+                age = age.coerceAtLeast(maxAge - 20)
+                wasCollided = true
+            }
+        } else {
+            val cosRotation = cos(angle).toDouble(); val sinRotation = sin(angle).toDouble()
+            velocity.setTo(cosRotation, 0.0, sinRotation).mul(BetterFoliage.config.fallingLeaves.perturb)
+                    .add(LeafWindTracker.current).add(0.0, -1.0, 0.0).mul(BetterFoliage.config.fallingLeaves.speed)
+            angle += if (rotPositive) rotationSpeed else -rotationSpeed
+        }
+    }
+
+    override fun render(worldRenderer: BufferBuilder, partialTickTime: Float) {
+        val tickAngle = angle + partialTickTime * (if (rotPositive) rotationSpeed else -rotationSpeed)
+        renderParticleQuad(worldRenderer, partialTickTime, rotation = tickAngle.toDouble(), isMirrored = isMirrored)
+    }
+
+    fun setParticleColor(overrideColor: Int?, blockColor: Int) {
+        val color =  overrideColor ?: blockColor
+        setColor(color)
+    }
+}
+
+object LeafWindTracker : WorldTickCallback, ClientWorldLoadCallback {
+    val random = Random()
+    val target = Double3.zero
+    val current = Double3.zero
+    var nextChange: Long = 0
+
+    fun changeWindTarget(world: World) {
+        nextChange = world.time + 120 + random.nextInt(80)
+        val direction = PI2 * random.nextDouble()
+        val speed = abs(random.nextGaussian()) * BetterFoliage.config.fallingLeaves.windStrength +
+            (if (!world.isRaining) 0.0 else abs(random.nextGaussian()) * BetterFoliage.config.fallingLeaves.stormStrength)
+        target.setTo(cos(direction) * speed, 0.0, sin(direction) * speed)
+    }
+
+    override fun tick(world: World) {
+        if (world.isClient) {
+            // change target wind speed
+            if (world.time >= nextChange) changeWindTarget(world)
+
+            // change current wind speed
+            val changeRate = if (world.isRaining) 0.015 else 0.005
+            current.add(
+                (target.x - current.x).minmax(-changeRate, changeRate),
+                0.0,
+                (target.z - current.z).minmax(-changeRate, changeRate)
+            )
+        }
+    }
+
+    override fun loadWorld(world: ClientWorld) {
+        changeWindTarget(world)
+    }
+}
+

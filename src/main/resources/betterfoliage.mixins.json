@@ -1,0 +1,23 @@
+{
+  "required": true,
+  "package": "mods.betterfoliage.mixin",
+  "refmap": "betterfoliage-refmap.json",
+  "compatibilityLevel": "JAVA_8",
+  "minVersion": "0.8-SNAPSHOT",
+  "mixins": [
+  ],
+  "client": [
+    "MixinBlock",
+    "MixinBlockState",
+    "MixinBlockModels",
+    "MixinClientWorld",
+    "MixinClientChunkManager",
+    "MixinClientChunkManagerChunkMap",
+    "MixinModelLoader"
+  ],
+  "server": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

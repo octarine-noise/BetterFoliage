@@ -1,23 +1,48 @@
+import net.fabricmc.loom.task.RemapJarTask
+import org.ajoberstar.grgit.Grgit
+
 plugins {
-    kotlin("jvm").version("1.3.61")
-    id("net.minecraftforge.gradle").version("3.0.157")
-    id("org.spongepowered.mixin").version("0.7-SNAPSHOT")
+    kotlin("jvm").version("1.3.60")
+    id("fabric-loom").version("0.2.6-SNAPSHOT")
+    id("org.ajoberstar.grgit").version("3.1.1")
 }
-apply(plugin = "org.spongepowered.mixin")
+apply(plugin = "org.ajoberstar.grgit")
 
 repositories {
-    maven("http://files.minecraftforge.net/maven")
-    maven("https://repo.spongepowered.org/maven")
+    maven("http://maven.fabricmc.net/")
     maven("https://minecraft.curseforge.com/api/maven")
+    maven("http://maven.sargunv.s3-website-us-west-2.amazonaws.com/")
+    maven("http://maven.modmuss50.me/")
+    maven("https://grondag-repo.appspot.com").credentials { username = "guest"; password = "" }
+    maven("https://jitpack.io")
 }
+val gitHash = (project.ext.get("grgit") as Grgit).head().abbreviatedId
+
+val semVer = "${project.version}+$gitHash"
+
+val jarName = "BetterFoliage-$semVer-Fabric-${properties["mcVersion"]}"
+print("VERSION: $jarName")
 
 dependencies {
-    "minecraft"("net.minecraftforge:forge:${properties["mcVersion"]}-${properties["forgeVersion"]}")
+    "minecraft"("com.mojang:minecraft:${properties["mcVersion"]}")
+    "mappings"("net.fabricmc:yarn:${properties["yarnMappings"]}:v2")
 
-    "implementation"("kottle:Kottle:${properties["kottleVersion"]}")
+    "modImplementation"("net.fabricmc:fabric-loader:${properties["loaderVersion"]}")
+    "modImplementation"("net.fabricmc.fabric-api:fabric-api:${properties["fabricVersion"]}")
+    "modImplementation"("net.fabricmc:fabric-language-kotlin:${properties["fabricKotlinVersion"]}")
 
-    "implementation"("org.spongepowered:mixin:0.8-SNAPSHOT")
-    annotationProcessor("org.spongepowered:mixin:0.8-SNAPSHOT")
+    listOf("modImplementation", "include").map { configuration ->
+        configuration("me.shedaniel.cloth:config-2:${project.properties["clothConfigVersion"]}")
+        configuration("io.github.prospector:modmenu:${project.properties["modMenuVersion"]}")
+        configuration("me.zeroeightsix:fiber:0.8.0-2")
+    }
+
+    // Canvas Renderer
+//    "modImplementation"("grondag:canvas:0.7.+")
+
+    // Optifabric
+    "modImplementation"("com.github.modmuss50:OptiFabric:df03dc2c22")
+    "implementation"("org.zeroturnaround:zt-zip:1.13")
 }
 
 sourceSets {
@@ -29,37 +54,24 @@ kotlin.sourceSets {
     get("main").kotlin.srcDir("src/forge/kotlin")
 }
 
-
-minecraft {
-    mappings(properties["mappingsChannel"] as String, properties["mappingsVersion"] as String)
-    accessTransformer(file("src/main/resources/META-INF/accesstransformer.cfg"))
-
-    runs.create("client") {
-        workingDirectory(file("run"))
-        properties["forge.logging.markers"] = "CORE"
-        properties["forge.logging.console.level"] = "debug"
-        mods.create("betterfoliage") {
-            source(sourceSets["main"])
-        }
-    }
-}
-
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
 }
 
 kotlin {
+    target.platformType
     target.compilations.configureEach {
+        kotlinOptions.jvmTarget = "1.8"
         kotlinOptions.freeCompilerArgs += listOf("-Xno-param-assertions", "-Xno-call-assertions")
     }
 }
 
-tasks.getByName<Jar>("jar") {
-    archiveName = "BetterFoliage-${project.version}-Forge-${properties["mcVersion"]}.jar"
-    manifest {
-        from(file("src/main/resources/META-INF/MANIFEST.MF"))
-        attributes["Implementation-Version"] = project.version
-    }
+tasks.getByName<ProcessResources>("processResources") {
+    filesMatching("fabric.mod.json") { expand(mutableMapOf("version" to semVer)) }
+}
+
+tasks.getByName<RemapJarTask>("remapJar") {
+    archiveName = "$jarName.jar"
     exclude("net")
 }

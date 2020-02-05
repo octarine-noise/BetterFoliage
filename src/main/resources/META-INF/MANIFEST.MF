@@ -1,6 +1,2 @@
 Manifest-Version: 1.0
-Specification-Title: BetterFoliage
-Implementation-Title: BetterFoliage
-Specification-Vendor: octarine-noise
-Implementation-Vendor: octarine-noise
-MixinConnector: mods.betterfoliage.MixinConnector
+Implementation-Title: betterfoliage

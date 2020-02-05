@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+
+  "id": "betterfoliage",
+  "version": "${version}",
+  "name": "Better Foliage",
+  "description": "Leafier leaves and grassier grass.",
+  "license": "MIT",
+  "authors": ["octarine-noise"],
+  "contributors": ["Meringue"],
+  "icon": "assets/betterfoliage/icon.png",
+  "contact": {
+    "homepage": "https://www.curseforge.com/minecraft/mc-mods/better-foliage",
+    "issues": "https://github.com/octarine-noise/BetterFoliage/issues"
+  },
+
+  "environment": "client",
+  "custom": {
+    "modmenu:clientsideOnly": true
+  },
+
+  "entrypoints": {
+    "client": [
+      {
+        "adapter": "kotlin",
+        "value": "mods.betterfoliage.BetterFoliage"
+      }
+    ],
+    "modmenu": [
+      {
+        "adapter": "kotlin",
+        "value": "mods.betterfoliage.BetterFoliage"
+      }
+    ]
+  },
+
+  "mixins": [
+    "betterfoliage.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=0.7.3",
+    "fabric": "*",
+    "fabric-language-kotlin": "*",
+    "minecraft": "1.14.4"
+  }
+}

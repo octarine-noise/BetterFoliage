@@ -1,10 +1,10 @@
 package mods.betterfoliage.mixin;
 
-import mods.betterfoliage.client.Hooks;
+import mods.betterfoliage.Hooks;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockReader;
+import net.minecraft.world.BlockView;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -17,11 +17,11 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(BlockState.class)
 @SuppressWarnings({"UnnecessaryQualifiedMemberReference", "deprecation"})
 public class MixinBlockState {
-    private static final String callFrom = "Lnet/minecraft/block/BlockState;func_215703_d(Lnet/minecraft/world/IBlockReader;Lnet/minecraft/util/math/BlockPos;)F";
-    private static final String callTo = "Lnet/minecraft/block/Block;func_220080_a(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/IBlockReader;Lnet/minecraft/util/math/BlockPos;)F";
+    private static final String callFrom = "Lnet/minecraft/block/BlockState;getAmbientOcclusionLightLevel(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;)F";
+    private static final String callTo = "Lnet/minecraft/block/Block;getAmbientOcclusionLightLevel(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;)F";
 
     @Redirect(method = callFrom, at = @At(value = "INVOKE", target = callTo))
-    float getAmbientOcclusionValue(Block block, BlockState state, IBlockReader reader, BlockPos pos) {
-        return Hooks.getAmbientOcclusionLightValueOverride(block.func_220080_a(state, reader, pos), state);
+    float getAmbientOcclusionValue(Block block, BlockState state, BlockView reader, BlockPos pos) {
+        return Hooks.getAmbientOcclusionLightValueOverride(block.getAmbientOcclusionLightLevel(state, reader, pos), state);
     }
 }

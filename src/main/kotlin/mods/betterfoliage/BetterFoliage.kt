@@ -1,20 +1,25 @@
 package mods.betterfoliage
 
-import mods.betterfoliage.client.Client
-import mods.betterfoliage.client.render.RisingSoulTextures
-import mods.octarinecore.client.gui.textComponent
-import mods.octarinecore.client.resource.AsnycSpriteProviderManager
-import mods.octarinecore.client.resource.AsyncSpriteProvider
-import mods.octarinecore.client.resource.Atlas
-import mods.octarinecore.client.resource.GeneratedBlockTexturePack
-import net.minecraft.block.BlockState
-import net.minecraft.client.Minecraft
-import net.minecraft.client.particle.ParticleManager
-import net.minecraft.client.renderer.model.ModelBakery
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.text.TextFormatting
-import net.minecraft.util.text.TranslationTextComponent
-import net.minecraftforge.registries.ForgeRegistries
+import io.github.prospector.modmenu.api.ModMenuApi
+import me.shedaniel.clothconfig2.api.ConfigBuilder
+import me.zeroeightsix.fiber.JanksonSettings
+import mods.betterfoliage.chunk.ChunkOverlayManager
+import mods.betterfoliage.config.BlockConfig
+import mods.betterfoliage.config.MainConfig
+import mods.betterfoliage.render.block.vanilla.*
+import mods.betterfoliage.render.particle.LeafParticleRegistry
+import mods.betterfoliage.render.particle.RisingSoulParticle
+import mods.betterfoliage.resource.discovery.BakedModelReplacer
+import mods.betterfoliage.resource.generated.GeneratedBlockTexturePack
+import net.fabricmc.api.ClientModInitializer
+import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper
+import net.fabricmc.loader.api.FabricLoader
+import net.minecraft.client.MinecraftClient
+import net.minecraft.client.gui.screen.Screen
+import net.minecraft.client.resource.language.I18n
+import net.minecraft.resource.ResourceType
+import net.minecraft.util.Identifier
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.simple.SimpleLogger
@@ -22,9 +27,13 @@ import org.apache.logging.log4j.util.PropertiesUtil
 import java.io.File
 import java.io.PrintStream
 import java.util.*
+import java.util.function.Function
 
-object BetterFoliage {
-    var log = LogManager.getLogger("BetterFoliage")
+object BetterFoliage : ClientModInitializer, ModMenuApi {
+    const val MOD_ID = "betterfoliage"
+    override fun getModId() = MOD_ID
+
+    var logger = LogManager.getLogger()
     var logDetail = SimpleLogger(
         "BetterFoliage",
         Level.DEBUG,
@@ -32,45 +41,68 @@ object BetterFoliage {
         "yyyy-MM-dd HH:mm:ss",
         null,
         PropertiesUtil(Properties()),
-        PrintStream(File("logs/betterfoliage.log").apply {
+        PrintStream(File(FabricLoader.getInstance().gameDirectory, "logs/betterfoliage.log").apply {
             parentFile.mkdirs()
             if (!exists()) createNewFile()
         })
     )
 
-    val blockSprites = AsnycSpriteProviderManager<ModelBakery>("bf-blocks-extra")
-    val particleSprites = AsnycSpriteProviderManager<ParticleManager>("bf-particles-extra")
-    val asyncPack = GeneratedBlockTexturePack("bf_gen", "Better Foliage generated assets", logDetail)
+    val configFile get() = File(FabricLoader.getInstance().configDirectory, "BetterFoliage.json")
 
-    fun getSpriteManager(atlas: Atlas) = when(atlas) {
-        Atlas.BLOCKS -> blockSprites
-        Atlas.PARTICLES -> particleSprites
-    } as AsnycSpriteProviderManager<Any>
-
-    init {
-        blockSprites.providers.add(asyncPack)
+    val config = MainConfig().apply {
+        if (configFile.exists()) JanksonSettings().deserialize(fiberNode, configFile.inputStream())
+        else JanksonSettings().serialize(fiberNode, configFile.outputStream(), false)
     }
 
-    fun log(level: Level, msg: String) {
-        log.log(level, "[BetterFoliage] $msg")
-        logDetail.log(level, msg)
+    val blockConfig = BlockConfig()
+    override fun getConfigScreenFactory() = Function { screen: Screen ->
+        val builder = ConfigBuilder.create()
+            .setParentScreen(screen)
+            .setTitle(I18n.translate("betterfoliage.title"))
+        config.createClothNode(listOf("betterfoliage")).value.forEach { rootOption ->
+            builder.getOrCreateCategory("main").addEntry(rootOption)
+        }
+        builder.savingRunnable = Runnable {
+            JanksonSettings().serialize(config.fiberNode, configFile.outputStream(), false)
+            modelReplacer.invalidate()
+        }
+        builder.build()
     }
 
-    fun logDetail(msg: String) {
-        logDetail.log(Level.DEBUG, msg)
+    val generatedPack = GeneratedBlockTexturePack(Identifier(MOD_ID, "generated"), "betterfoliage-generated", "Better Foliage", "Generated leaf textures", logDetail)
+    val modelReplacer = BakedModelReplacer()
+
+    override fun onInitializeClient() {
+        // Register generated resource pack
+        ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(generatedPack)
+        MinecraftClient.getInstance().resourcePackContainerManager.addCreator(generatedPack.finder)
+
+        // Add standard block support
+        modelReplacer.discoverers.add(StandardLeafDiscovery)
+        modelReplacer.discoverers.add(StandardGrassDiscovery)
+        modelReplacer.discoverers.add(StandardLogDiscovery)
+        modelReplacer.discoverers.add(StandardCactusDiscovery)
+        modelReplacer.discoverers.add(LilyPadDiscovery)
+        modelReplacer.discoverers.add(DirtDiscovery)
+        modelReplacer.discoverers.add(SandDiscovery)
+        modelReplacer.discoverers.add(MyceliumDiscovery)
+        modelReplacer.discoverers.add(NetherrackDiscovery)
+
+        // Init overlay layers
+        ChunkOverlayManager.layers.add(RoundLogOverlayLayer)
+
+        // Init singletons
+        LeafParticleRegistry
+        NormalLeavesModel.Companion
+        GrassBlockModel.Companion
+        RoundLogModel.Companion
+        CactusModel.Companion
+        LilypadModel.Companion
+        DirtModel.Companion
+        SandModel.Companion
+        MyceliumModel.Companion
+        NetherrackModel.Companion
+        RisingSoulParticle.Companion
     }
 
-    fun logRenderError(state: BlockState, location: BlockPos) {
-        if (state in Client.suppressRenderErrors) return
-        Client.suppressRenderErrors.add(state)
-
-        val blockName = ForgeRegistries.BLOCKS.getKey(state.block).toString()
-        val blockLoc = "${location.x},${location.y},${location.z}"
-        Minecraft.getInstance().ingameGUI.chatGUI.printChatMessage(TranslationTextComponent(
-            "betterfoliage.rendererror",
-            textComponent(blockName, TextFormatting.GOLD),
-            textComponent(blockLoc, TextFormatting.GOLD)
-        ))
-        logDetail("Error rendering block $state at $blockLoc")
-    }
 }
