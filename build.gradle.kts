@@ -31,10 +31,10 @@ dependencies {
     "modImplementation"("net.fabricmc.fabric-api:fabric-api:${properties["fabricVersion"]}")
     "modImplementation"("net.fabricmc:fabric-language-kotlin:${properties["fabricKotlinVersion"]}")
 
-    listOf("modImplementation", "include").map { configuration ->
-        configuration("me.shedaniel.cloth:config-2:${project.properties["clothConfigVersion"]}")
-        configuration("io.github.prospector:modmenu:${project.properties["modMenuVersion"]}")
-        configuration("me.zeroeightsix:fiber:0.8.0-2")
+    "modImplementation"("io.github.prospector:modmenu:${properties["modMenuVersion"]}")
+    listOf("modImplementation", "include").forEach { configuration ->
+        configuration("me.shedaniel.cloth:config-2:${properties["clothConfigVersion"]}")
+        configuration("me.zeroeightsix:fiber:${properties["fiberVersion"]}")
     }
 
     // Canvas Renderer

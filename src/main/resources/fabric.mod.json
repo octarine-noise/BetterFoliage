@@ -29,7 +29,7 @@
     "modmenu": [
       {
         "adapter": "kotlin",
-        "value": "mods.betterfoliage.BetterFoliage"
+        "value": "mods.betterfoliage.integration.ModMenu"
       }
     ]
   },
