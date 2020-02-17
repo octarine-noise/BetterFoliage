@@ -34,6 +34,9 @@ interface ClientWorldLoadCallback {
     }
 }
 
+/**
+ * Event fired after [BlockModels.reload] finishes.
+ */
 interface BlockModelsReloadCallback {
     fun reloadBlockModels(blockModels: BlockModels)
 

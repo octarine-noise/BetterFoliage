@@ -33,7 +33,7 @@ val aoWinding = allDirections.map { when(it) {
     SOUTH -> (UP to WEST).ccwWinding()
     WEST -> (SOUTH to UP).ccwWinding()
     EAST -> (SOUTH to DOWN).ccwWinding()
-} }
+} }.toTypedArray()
 
 /**
  * Indexing for undirected box corners (component order does not matter).

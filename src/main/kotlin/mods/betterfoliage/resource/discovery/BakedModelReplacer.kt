@@ -25,17 +25,10 @@ import java.util.function.Supplier
 // net.minecraft.client.render.block.BlockModels.models
 val BlockModels_models = YarnHelper.requiredField<Map<BlockState, BakedModel>>("net.minecraft.class_773", "field_4162", "Ljava/util/Map;")
 
-/** Threadsafe collector for sprite IDs */
-class SpriteCollectorSync {
-    val idSet = Collections.synchronizedSet(mutableSetOf<Identifier>())
-    fun add(id: Identifier) = id.apply { idSet.add(this) }
-    fun dump(target: ClientSpriteRegistryCallback.Registry) { idSet.forEach { target.register(it) } }
-}
-
 class BakedModelReplacer : ModelLoadingCallback, ClientSpriteRegistryCallback, BlockModelsReloadCallback, Invalidator, HasLogger {
     override val logger get() = BetterFoliage.logDetail
 
-    val discoverers = mutableListOf<ModelDiscoveryBase>()
+    val discoverers = mutableListOf<ModelDiscovery>()
     override val callbacks = mutableListOf<WeakReference<()->Unit>>()
 
     protected var keys = emptyMap<BlockState, BlockRenderKey>()
@@ -46,6 +39,7 @@ class BakedModelReplacer : ModelLoadingCallback, ClientSpriteRegistryCallback, B
     var currentLoader: ModelLoader? = null
 
     override fun beginLoadModels(loader: ModelLoader, manager: ResourceManager) {
+        // Step 1: get a hold of the ModelLoader instance when model reloading starts
         currentLoader = loader
         log("reloading block discovery configuration")
         BetterFoliage.blockConfig.reloadConfig(manager)
@@ -53,6 +47,7 @@ class BakedModelReplacer : ModelLoadingCallback, ClientSpriteRegistryCallback, B
     }
 
     override fun registerSprites(atlasTexture: SpriteAtlasTexture, registry: ClientSpriteRegistryCallback.Registry) {
+        // Step 2: ModelLoader is finished with the unbaked models by now, we can inspect them
         log("discovering blocks")
         val idSet = Collections.synchronizedSet(mutableSetOf<Identifier>())
         val allKeys = discoverers.map {
@@ -77,6 +72,7 @@ class BakedModelReplacer : ModelLoadingCallback, ClientSpriteRegistryCallback, B
     }
 
     override fun reloadBlockModels(blockModels: BlockModels) {
+        // Step 3: replace the baked models with our own
         log("block model baking finished")
         val modelMap = blockModels[BlockModels_models] as MutableMap<BlockState, BakedModel>
         keys.forEach { (state, key) ->

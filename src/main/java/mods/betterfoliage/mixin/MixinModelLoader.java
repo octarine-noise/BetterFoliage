@@ -20,8 +20,9 @@ public class MixinModelLoader {
 
     @Inject(at = @At("HEAD"), method = "addModel")
     private void addModelHook(ModelIdentifier id, CallbackInfo info) {
+        // use the same trick fabric-api does to get around the no-mixins-in-constructors policy
         if (id == MISSING) {
-            ModelLoadingCallback.EVENT.invoker().beginLoadModels((ModelLoader) (Object)this, resourceManager);
+            ModelLoadingCallback.EVENT.invoker().beginLoadModels((ModelLoader) (Object) this, resourceManager);
         }
     }
 }
