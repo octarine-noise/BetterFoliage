@@ -65,6 +65,7 @@ object BetterFoliage : ClientModInitializer, ModMenuApi {
         builder.savingRunnable = Runnable {
             JanksonSettings().serialize(config.fiberNode, configFile.outputStream(), false)
             modelReplacer.invalidate()
+            MinecraftClient.getInstance().worldRenderer.reload()
         }
         builder.build()
     }
