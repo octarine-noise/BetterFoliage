@@ -118,7 +118,7 @@ interface IBlockUpdateListener : IWorldEventListener {
     override fun notifyLightSet(pos: BlockPos) {}
     override fun spawnParticle(particleID: Int, ignoreRange: Boolean, xCoord: Double, yCoord: Double, zCoord: Double, xSpeed: Double, ySpeed: Double, zSpeed: Double, vararg parameters: Int) {}
     override fun spawnParticle(id: Int, ignoreRange: Boolean, minimiseParticleLevel: Boolean, x: Double, y: Double, z: Double, xSpeed: Double, ySpeed: Double, zSpeed: Double, vararg parameters: Int) {}
-    override fun playRecord(soundIn: SoundEvent, pos: BlockPos) {}
+    override fun playRecord(soundIn: SoundEvent?, pos: BlockPos) {}
     override fun sendBlockBreakProgress(breakerId: Int, pos: BlockPos, progress: Int) {}
     override fun markBlockRangeForRenderUpdate(x1: Int, y1: Int, z1: Int, x2: Int, y2: Int, z2: Int) {}
 }
