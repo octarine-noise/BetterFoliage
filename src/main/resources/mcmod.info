@@ -2,7 +2,7 @@
   "modid": "betterfoliage",
   "name": "Better Foliage",
   "version": "$version",
-  "mcversion": "$mcversion",
+  "mcversion": "$mcVersion",
   "description": "Leafier leaves and grassier grass",
   "authorList" : ["octarine-noise (code)", "Meringue (textures)"]
 }]

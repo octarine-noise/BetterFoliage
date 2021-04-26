@@ -56,4 +56,5 @@ tasks.getByName<Jar>("jar") {
     }
     exclude("net")
     filesMatching("META-INF/mods.toml") { expand(project.properties) }
+    filesMatching("mcmod.info") { expand(project.properties) }
 }
