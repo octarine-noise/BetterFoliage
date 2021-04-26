@@ -77,7 +77,7 @@ fun renderWorldBlock(dispatcher: BlockRendererDispatcher,
 ): Boolean {
     // build context
     val blockCtx = CachedBlockCtx(reader, pos)
-    val renderCtx = RenderCtx(dispatcher, buffer, layer, random)
+    val renderCtx = RenderCtx(dispatcher, buffer, layer, random, modelData)
     lightingCtx.reset(blockCtx)
     val combinedCtx = CombinedContext(blockCtx, renderCtx, lightingCtx)
 

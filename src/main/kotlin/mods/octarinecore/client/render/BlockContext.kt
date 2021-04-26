@@ -13,6 +13,7 @@ import net.minecraft.world.IBlockReader
 import net.minecraft.world.IEnviromentBlockReader
 import net.minecraft.world.World
 import net.minecraft.world.biome.Biome
+import net.minecraftforge.client.model.data.IModelData
 import java.util.*
 
 /**
@@ -64,8 +65,9 @@ data class RenderCtx(
     val dispatcher: BlockRendererDispatcher,
     val renderBuffer: BufferBuilder,
     val layer: BlockRenderLayer,
-    val random: Random
+    val random: Random,
+    val modelData: IModelData
 ) {
-    fun render(worldBlock: BlockCtx) = dispatcher.renderBlock(worldBlock.state, worldBlock.pos, worldBlock.world, renderBuffer, random, null)
+    fun render(worldBlock: BlockCtx) = dispatcher.renderBlock(worldBlock.state, worldBlock.pos, worldBlock.world, renderBuffer, random, modelData)
 }
 
