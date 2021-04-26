@@ -2,8 +2,6 @@ package mods.betterfoliage.client.integration
 
 import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.client.config.BlockConfig
-import mods.betterfoliage.client.config.Config
-import mods.betterfoliage.client.texture.GrassRegistry
 import mods.betterfoliage.client.texture.LeafRegistry
 import mods.octarinecore.*
 import mods.octarinecore.client.render.CombinedContext
@@ -13,7 +11,6 @@ import net.minecraft.block.BlockRenderType
 import net.minecraft.block.BlockRenderType.MODEL
 import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
-import net.minecraft.client.renderer.BufferBuilder
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.IEnviromentBlockReader
 import org.apache.logging.log4j.Level.INFO
@@ -23,7 +20,7 @@ import org.apache.logging.log4j.Level.INFO
  */
 object ShadersModIntegration {
 
-    @JvmStatic val isAvailable = allAvailable(SVertexBuilder, SVertexBuilder.pushState, SVertexBuilder.pushNum, SVertexBuilder.pop)
+    @JvmStatic val isAvailable = allAvailable(SVertexBuilder, SVertexBuilder.pushState, SVertexBuilder.popState, BlockAliases.getAliasBlockId)
 
     val defaultLeaves = Blocks.OAK_LEAVES.defaultState
     val defaultGrass = Blocks.GRASS.defaultState
@@ -49,10 +46,11 @@ object ShadersModIntegration {
     inline fun renderAs(ctx: CombinedContext, state: BlockState, renderType: BlockRenderType, enabled: Boolean = true, func: ()->Unit) {
         if (isAvailable && enabled) {
             val buffer = ctx.renderCtx.renderBuffer
+            val aliasBlockId = BlockAliases.getAliasBlockId.invokeStatic(state)
             val sVertexBuilder = buffer[BufferBuilder_sVertexBuilder]
-            SVertexBuilder.pushState.invoke(sVertexBuilder, ctx.state, ctx.pos, ctx.world, buffer)
+            SVertexBuilder.pushState.invoke(sVertexBuilder, aliasBlockId)
             func()
-            SVertexBuilder.pop.invoke(sVertexBuilder)
+            SVertexBuilder.popState.invoke(sVertexBuilder)
         } else {
             func()
         }

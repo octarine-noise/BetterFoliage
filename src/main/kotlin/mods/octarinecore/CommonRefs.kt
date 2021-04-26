@@ -60,9 +60,12 @@ object CustomColors : ClassRef<Any>("net.optifine.CustomColors") {
 
 // Optifine shaders
 object SVertexBuilder : ClassRef<Any>("net.optifine.shaders.SVertexBuilder") {
-    val pushState = MethodRef(this, "pushEntity", void, BlockState, BlockPos, IEnvironmentBlockReader, BufferBuilder)
-    val pushNum = MethodRef(this, "pushEntity", void, long)
-    val pop = MethodRef(this, "popEntity", void)
+    val pushState = MethodRef(this, "pushEntity", void, long)
+    val popState = MethodRef(this, "popEntity", void)
+}
+
+object BlockAliases : ClassRef<Any>("net.optifine.shaders.BlockAliases") {
+    val getAliasBlockId = MethodRef(this, "getAliasBlockId", int, BlockState)
 }
 
 
