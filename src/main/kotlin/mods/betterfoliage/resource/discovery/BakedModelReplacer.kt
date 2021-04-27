@@ -16,6 +16,9 @@ import net.minecraft.client.render.model.ModelLoader
 import net.minecraft.client.texture.SpriteAtlasTexture
 import net.minecraft.resource.ResourceManager
 import net.minecraft.util.Identifier
+import org.apache.logging.log4j.Level
+import org.apache.logging.log4j.Level.DEBUG
+import org.apache.logging.log4j.Level.WARN
 import java.lang.ref.WeakReference
 import java.util.*
 import java.util.concurrent.CompletableFuture
@@ -63,7 +66,7 @@ class BakedModelReplacer : ModelLoadingCallback, ClientSpriteRegistryCallback, B
             keys.entries.forEach { (state, key) ->
                 val oldKey = result[state]
                 if (oldKey != null) log("Replacing $oldKey with $key for state $state")
-                else log("Adding replacement $key for state $state")
+                else log(DEBUG, "Adding replacement $key for state $state")
                 result[state] = key
             }
         }
@@ -77,14 +80,14 @@ class BakedModelReplacer : ModelLoadingCallback, ClientSpriteRegistryCallback, B
         val modelMap = blockModels[BlockModels_models] as MutableMap<BlockState, BakedModel>
         keys.forEach { (state, key) ->
             val oldModel = modelMap[state]
-            if (oldModel == null) log("Cannot find model for state $state, ignoring")
+            if (oldModel == null) log(WARN, "Cannot find model for state $state, ignoring")
             else {
                 try {
                     val newModel = key.replace(oldModel, state)
                     modelMap[state] = newModel
-                    log("Replaced model for state $state with $key")
+                    log(DEBUG, "Replaced model for state $state with $key")
                 } catch (e: Exception) {
-                    log("Error creating model for state $state with $key", e)
+                    log(WARN, "Error creating model for state $state with $key", e)
                 }
             }
         }
