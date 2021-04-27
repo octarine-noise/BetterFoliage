@@ -16,18 +16,27 @@ fun <T> Any.reflectField(name: String) = getFieldRecursive(this::class.java, nam
     it.get(this) as T
 }
 
+/** Get the field on the class with the given name.
+ * Does not handle overloads, suitable only for unique field names (like Yarn intermediate names)
+ * */
 fun getFieldRecursive(cls: Class<*>, name: String): Field = try {
     cls.getDeclaredField(name)
 } catch (e: NoSuchFieldException) {
     cls.superclass?.let { getFieldRecursive(it, name) } ?: throw e
 }
 
+/** Get the method on the class with the given name.
+ * Does not handle overloads, suitable only for unique field names (like Yarn intermediate names)
+ * */
 fun getMethodRecursive(cls: Class<*>, name: String): Method = try {
     cls.declaredMethods.find { it.name == name } ?: throw NoSuchMethodException()
 } catch (e: NoSuchMethodException) {
     cls.superclass?.let { getMethodRecursive(it, name) } ?: throw e
 }
 
+fun getAllMethods(className: String, methodName: String): List<Method> =
+    tryDefault(null) { Class.forName(className) }?.declaredMethods?.filter { it.name == methodName }
+        ?: emptyList()
 
 interface FieldRef<T> {
     val field: Field?
@@ -66,7 +75,7 @@ object YarnHelper {
             try {
                 val classMapped = resolver.mapClassName(INTERMEDIARY, className)
                 val fieldMapped = resolver.mapFieldName(INTERMEDIARY, className, fieldName, descriptor)
-                Class.forName(classMapped)?.let { cls -> getFieldRecursive(cls, fieldMapped).apply { isAccessible = true } }
+                Class.forName(classMapped).let { cls -> getFieldRecursive(cls, fieldMapped).apply { isAccessible = true } }
             } catch (e: Exception) {
                 logger.log(
                     if (optional) Level.DEBUG else Level.ERROR,
@@ -82,7 +91,7 @@ object YarnHelper {
             try {
                 val classMapped = resolver.mapClassName(INTERMEDIARY, className)
                 val methodMapped = resolver.mapMethodName(INTERMEDIARY, className, methodName, descriptor)
-                Class.forName(classMapped)?.let { cls -> getMethodRecursive(cls, methodMapped).apply { isAccessible = true } }
+                Class.forName(classMapped).let { cls -> getMethodRecursive(cls, methodMapped).apply { isAccessible = true } }
             } catch (e: Exception) {
                 logger.log(
                     if (optional) Level.DEBUG else Level.ERROR,

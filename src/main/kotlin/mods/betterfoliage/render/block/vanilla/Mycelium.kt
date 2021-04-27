@@ -1,6 +1,7 @@
 package mods.betterfoliage.render.block.vanilla
 
 import mods.betterfoliage.BetterFoliage
+import mods.betterfoliage.render.ShadersModIntegration
 import mods.betterfoliage.render.lighting.withLighting
 import mods.betterfoliage.render.lighting.grassTuftLighting
 import mods.betterfoliage.util.Atlas
@@ -45,8 +46,10 @@ class MyceliumModel(wrapped: BakedModel) : WrappedBakedModel(wrapped) {
             BetterFoliage.config.shortGrass.let { it.myceliumEnabled && random.nextInt(64) < it.population } &&
             blockView.getBlockState(pos + UP.offset).isAir
         ) {
-            context.withLighting(tuftLighting) {
-                it.accept(myceliumTuftModels[random])
+            ShadersModIntegration.grass(context, BetterFoliage.config.shortGrass.shaderWind) {
+                context.withLighting(tuftLighting) {
+                    it.accept(myceliumTuftModels[random])
+                }
             }
         }
     }

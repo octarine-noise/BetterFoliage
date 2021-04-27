@@ -3,6 +3,7 @@ package mods.betterfoliage.render.block.vanilla
 import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.chunk.BasicBlockCtx
 import mods.betterfoliage.render.SNOW_MATERIALS
+import mods.betterfoliage.render.ShadersModIntegration
 import mods.betterfoliage.render.lighting.withLighting
 import mods.betterfoliage.render.lighting.grassTuftLighting
 import mods.betterfoliage.util.Atlas
@@ -78,8 +79,10 @@ class GrassBlockModel(val key: Key, wrapped: BakedModel) : WrappedBakedModel(wra
         }
 
         if (BetterFoliage.config.shortGrass.enabled(random) && !ctx.isNeighborSolid(UP)) {
-            context.withLighting(tuftLighting) {
-                it.accept(if (isSnowed) tuftSnowed[random] else tuftNormal[random])
+            ShadersModIntegration.grass(context, BetterFoliage.config.shortGrass.shaderWind) {
+                context.withLighting(tuftLighting) {
+                    it.accept(if (isSnowed) tuftSnowed[random] else tuftNormal[random])
+                }
             }
         }
     }

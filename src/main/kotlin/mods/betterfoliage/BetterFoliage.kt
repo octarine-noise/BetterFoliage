@@ -4,6 +4,7 @@ import me.zeroeightsix.fiber.JanksonSettings
 import mods.betterfoliage.chunk.ChunkOverlayManager
 import mods.betterfoliage.config.BlockConfig
 import mods.betterfoliage.config.MainConfig
+import mods.betterfoliage.render.ShadersModIntegration
 import mods.betterfoliage.render.block.vanilla.*
 import mods.betterfoliage.render.particle.LeafParticleRegistry
 import mods.betterfoliage.render.particle.RisingSoulParticle
@@ -83,6 +84,7 @@ object BetterFoliage : ClientModInitializer {
         MyceliumModel.Companion
         NetherrackModel.Companion
         RisingSoulParticle.Companion
+        ShadersModIntegration
     }
 
 }

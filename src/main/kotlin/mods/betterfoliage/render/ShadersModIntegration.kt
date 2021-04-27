@@ -1,64 +1,54 @@
 package mods.betterfoliage.render
 
 import mods.betterfoliage.BetterFoliage
-import mods.betterfoliage.util.get
-import net.minecraft.block.BlockRenderType
-import net.minecraft.block.BlockRenderType.MODEL
+import mods.betterfoliage.render.lighting.getBufferBuilder
+import mods.betterfoliage.util.getAllMethods
+import net.fabricmc.fabric.api.renderer.v1.render.RenderContext
+import net.minecraft.block.BlockRenderLayer
+import net.minecraft.block.BlockRenderLayer.CUTOUT_MIPPED
 import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
-import net.minecraft.util.math.BlockPos
-import net.minecraft.world.ExtendedBlockView
-import org.apache.logging.log4j.Level.INFO
+import net.minecraft.client.render.BufferBuilder
 
 /**
  * Integration for ShadersMod.
  */
-/*
 object ShadersModIntegration {
 
-    @JvmStatic val isAvailable = allAvailable(SVertexBuilder, SVertexBuilder.pushState, SVertexBuilder.pushNum, SVertexBuilder.pop)
+    val BufferBuilder_SVertexBuilder = BufferBuilder::class.java.fields.find { it.name == "sVertexBuilder" }
+    val SVertexBuilder_pushState = getAllMethods("net.optifine.shaders.SVertexBuilder", "pushEntity").find { it.parameterCount == 1 }
+    val SVertexBuilder_popState = getAllMethods("net.optifine.shaders.SVertexBuilder", "popEntity").find { it.parameterCount == 0 }
+    val BlockAliases_getAliasBlockId = getAllMethods("net.optifine.shaders.BlockAliases", "getAliasBlockId").firstOrNull()
+
+    @JvmStatic val isAvailable =
+        listOf(BufferBuilder_SVertexBuilder).all { it != null } &&
+        listOf(SVertexBuilder_pushState, SVertexBuilder_popState, BlockAliases_getAliasBlockId).all { it != null }
 
     val defaultLeaves = Blocks.OAK_LEAVES.defaultState
     val defaultGrass = Blocks.TALL_GRASS.defaultState
 
-    /**
-     * Called from transformed ShadersMod code.
-     * @see mods.betterfoliage.loader.BetterFoliageTransformer
-     */
-    @JvmStatic fun getBlockStateOverride(state: BlockState, world: ExtendedBlockView, pos: BlockPos): BlockState {
-//        if (LeafRegistry[state, world, pos] != null) return defaultLeaves
-        if (BetterFoliage.blockConfig.crops.matchesClass(state.block)) return defaultGrass
-        return state
-    }
-
     init {
-        BetterFoliage.log(INFO, "ShadersMod integration is ${if (isAvailable) "enabled" else "disabled" }")
+        BetterFoliage.logger.info("[BetterFoliage] ShadersMod integration is ${if (isAvailable) "enabled" else "disabled" }")
     }
-
-    inline fun renderAs(ctx: CombinedContext, renderType: BlockRenderType, enabled: Boolean = true, func: ()->Unit) =
-        renderAs(ctx, ctx.state, renderType, enabled, func)
 
     /** Quads rendered inside this block will use the given block entity data in shader programs. */
-    inline fun renderAs(ctx: CombinedContext, state: BlockState, renderType: BlockRenderType, enabled: Boolean = true, func: ()->Unit) {
+    inline fun renderAs(ctx: RenderContext, state: BlockState, layer: BlockRenderLayer, enabled: Boolean = true, func: ()->Unit) {
         if (isAvailable && enabled) {
-            val buffer = ctx.renderCtx.renderBuffer
-            val sVertexBuilder = buffer[BufferBuilder_sVertexBuilder]
-            SVertexBuilder.pushState.invoke(sVertexBuilder!!, ctx.state, ctx.pos, ctx.world, buffer)
+            val sVertexBuilder = BufferBuilder_SVertexBuilder!!.get(ctx.getBufferBuilder(layer))
+            val aliasBlockId = BlockAliases_getAliasBlockId!!.invoke(null, state)
+            SVertexBuilder_pushState!!.invoke(sVertexBuilder, aliasBlockId)
             func()
-            SVertexBuilder.pop.invoke(sVertexBuilder)
+            SVertexBuilder_popState!!.invoke(sVertexBuilder)
         } else {
             func()
         }
     }
 
     /** Quads rendered inside this block will behave as tallgrass blocks in shader programs. */
-    inline fun grass(ctx: CombinedContext, enabled: Boolean = true, func: ()->Unit) =
-        renderAs(ctx, defaultGrass, MODEL, enabled, func)
+    inline fun grass(ctx: RenderContext, enabled: Boolean = true, func: ()->Unit) =
+        renderAs(ctx, defaultGrass, CUTOUT_MIPPED, enabled, func)
 
     /** Quads rendered inside this block will behave as leaf blocks in shader programs. */
-    inline fun leaves(ctx: CombinedContext, enabled: Boolean = true, func: ()->Unit) =
-        renderAs(ctx, defaultLeaves, MODEL, enabled, func)
+    inline fun leaves(ctx: RenderContext, enabled: Boolean = true, func: ()->Unit) =
+        renderAs(ctx, defaultLeaves, CUTOUT_MIPPED, enabled, func)
 }
-
-
- */

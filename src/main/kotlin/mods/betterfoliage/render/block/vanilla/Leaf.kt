@@ -1,8 +1,11 @@
 package mods.betterfoliage.render.block.vanilla
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectFunction
 import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.chunk.BasicBlockCtx
 import mods.betterfoliage.render.SNOW_MATERIALS
+import mods.betterfoliage.render.ShadersModIntegration
+import mods.betterfoliage.render.lighting.getBufferBuilder
 import mods.betterfoliage.render.lighting.withLighting
 import mods.betterfoliage.render.lighting.roundLeafLighting
 import mods.betterfoliage.render.particle.LeafParticleRegistry
@@ -13,6 +16,11 @@ import mods.betterfoliage.resource.model.*
 import mods.betterfoliage.util.*
 import net.fabricmc.fabric.api.renderer.v1.model.FabricBakedModel
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext
+import net.fabricmc.fabric.impl.client.indigo.renderer.accessor.AccessBufferBuilder
+import net.fabricmc.fabric.impl.client.indigo.renderer.render.BlockRenderInfo
+import net.fabricmc.fabric.impl.client.indigo.renderer.render.TerrainMeshConsumer
+import net.fabricmc.fabric.impl.client.indigo.renderer.render.TerrainRenderContext
+import net.minecraft.block.BlockRenderLayer
 import net.minecraft.block.BlockRenderLayer.CUTOUT_MIPPED
 import net.minecraft.block.BlockState
 import net.minecraft.client.render.model.BakedModel
@@ -77,17 +85,19 @@ class NormalLeavesModel(val key: Key, wrapped: BakedModel) : WrappedBakedModel(w
     val leafLighting = roundLeafLighting()
 
     override fun emitBlockQuads(blockView: ExtendedBlockView, state: BlockState, pos: BlockPos, randomSupplier: Supplier<Random>, context: RenderContext) {
-        super.emitBlockQuads(blockView, state, pos, randomSupplier, context)
-        if (!BetterFoliage.config.enabled || !BetterFoliage.config.leaves.enabled) return
+        ShadersModIntegration.leaves(context, BetterFoliage.config.leaves.shaderWind) {
+            super.emitBlockQuads(blockView, state, pos, randomSupplier, context)
+            if (!BetterFoliage.config.enabled || !BetterFoliage.config.leaves.enabled) return
 
-        val ctx = BasicBlockCtx(blockView, pos)
-        val stateAbove = ctx.state(UP)
-        val isSnowed = stateAbove.material in SNOW_MATERIALS
+            val ctx = BasicBlockCtx(blockView, pos)
+            val stateAbove = ctx.state(UP)
+            val isSnowed = stateAbove.material in SNOW_MATERIALS
 
-        val random = randomSupplier.get()
-        context.withLighting(leafLighting) {
-            it.accept(leafNormal[random])
-            if (isSnowed) it.accept(leafSnowed[random])
+            val random = randomSupplier.get()
+            context.withLighting(leafLighting) {
+                it.accept(leafNormal[random])
+                if (isSnowed) it.accept(leafSnowed[random])
+            }
         }
     }
 

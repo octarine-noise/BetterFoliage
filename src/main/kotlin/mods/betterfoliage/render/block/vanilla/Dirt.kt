@@ -4,6 +4,7 @@ import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.chunk.BasicBlockCtx
 import mods.betterfoliage.render.DIRT_BLOCKS
 import mods.betterfoliage.render.SALTWATER_BIOMES
+import mods.betterfoliage.render.ShadersModIntegration
 import mods.betterfoliage.render.lighting.withLighting
 import mods.betterfoliage.render.lighting.grassTuftLighting
 import mods.betterfoliage.render.lighting.reedLighting
@@ -66,12 +67,16 @@ class DirtModel(wrapped: BakedModel) : WrappedBakedModel(wrapped) {
 
         val random = randomSupplier.get()
         if (BetterFoliage.config.algae.enabled(random) && isDeepWater) {
-            context.withLighting(algaeLighting) {
-                it.accept(algaeModels[random])
+            ShadersModIntegration.grass(context, BetterFoliage.config.algae.shaderWind) {
+                context.withLighting(algaeLighting) {
+                    it.accept(algaeModels[random])
+                }
             }
         } else if (BetterFoliage.config.reed.enabled(random) && isShallowWater && !isSaltWater) {
-            context.withLighting(reedLighting) {
-                it.accept(reedModels[random])
+            ShadersModIntegration.grass(context, BetterFoliage.config.reed.shaderWind) {
+                context.withLighting(reedLighting) {
+                    it.accept(reedModels[random])
+                }
             }
         }
     }

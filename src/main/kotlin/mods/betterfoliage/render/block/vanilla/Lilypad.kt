@@ -1,6 +1,7 @@
 package mods.betterfoliage.render.block.vanilla
 
 import mods.betterfoliage.BetterFoliage
+import mods.betterfoliage.render.ShadersModIntegration
 import mods.betterfoliage.util.Atlas
 import mods.betterfoliage.resource.discovery.BlockRenderKey
 import mods.betterfoliage.resource.discovery.ModelDiscoveryBase
@@ -39,7 +40,9 @@ class LilypadModel(wrapped: BakedModel) : WrappedBakedModel(wrapped) {
         if (!BetterFoliage.config.enabled || !BetterFoliage.config.lilypad.enabled) return
 
         val random = randomSupplier.get()
-        context.meshConsumer().accept(lilypadRootModels[random])
+        ShadersModIntegration.grass(context, BetterFoliage.config.lilypad.shaderWind) {
+            context.meshConsumer().accept(lilypadRootModels[random])
+        }
         if (random.nextInt(64) < BetterFoliage.config.lilypad.population) {
             context.meshConsumer().accept(lilypadFlowerModels[random])
         }

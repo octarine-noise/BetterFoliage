@@ -39,6 +39,7 @@ class LeavesConfig(node: ConfigNode) : DelegatingConfigGroup(node) {
     val hOffset by double(0.2, min = 0.0, max = 0.4, langKey = recurring)
     val vOffset by double(0.1, min = 0.0, max = 0.4, langKey = recurring)
     val size by double(1.4, min = 0.75, max = 2.5, langKey = recurring)
+    val shaderWind by boolean(true, langKey = recurring)
 }
 
 class ShortGrassConfig(node: ConfigNode) : DelegatingConfigGroup(node), PopulationConfigData {
@@ -86,6 +87,7 @@ class LilypadConfig(node: ConfigNode) : DelegatingConfigGroup(node), PopulationC
     override val enabled by boolean(true, langKey = recurring)
     val hOffset by double(0.1, min = 0.0, max = 0.25, langKey = recurring)
     override val population by population(16)
+    val shaderWind by boolean(true, langKey = recurring)
 }
 
 class ReedConfig(node: ConfigNode) : DelegatingConfigGroup(node), PopulationConfigData {
