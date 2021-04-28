@@ -8,6 +8,7 @@ import mods.betterfoliage.render.column.ColumnLayerData.SpecialRender.BlockType.
 import mods.betterfoliage.render.column.ColumnLayerData.SpecialRender.QuadrantType
 import mods.betterfoliage.render.column.ColumnLayerData.SpecialRender.QuadrantType.*
 import mods.betterfoliage.chunk.BlockCtx
+import mods.betterfoliage.render.block.vanilla.RoundLogKey
 import mods.betterfoliage.util.*
 import net.minecraft.block.BlockState
 import net.minecraft.util.math.BlockPos
@@ -78,7 +79,7 @@ abstract class ColumnRenderLayer : ChunkOverlayLayer<ColumnLayerData> {
     }
 
     override fun calculate(ctx: BlockCtx): ColumnLayerData {
-        if (allDirections.all { ctx.offset(it).isNormalCube }) return ColumnLayerData.SkipRender
+        if (allDirections.all { dir -> ctx.offset(dir).let { it.isNormalCube && BetterFoliage.modelReplacer[it.state] !is RoundLogKey } }) return ColumnLayerData.SkipRender
 //        val columnTextures = registry[ctx] ?: return ColumnLayerData.ResolveError
         val columnTextures = getColumnKey(ctx.state) ?: return ColumnLayerData.ResolveError
 
