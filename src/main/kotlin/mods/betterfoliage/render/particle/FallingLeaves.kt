@@ -7,6 +7,7 @@ import mods.betterfoliage.render.block.vanilla.LeafKey
 import mods.betterfoliage.util.*
 import net.fabricmc.fabric.api.event.world.WorldTickCallback
 import net.minecraft.client.MinecraftClient
+import net.minecraft.client.particle.ParticleTextureSheet
 import net.minecraft.client.render.BufferBuilder
 import net.minecraft.client.world.ClientWorld
 import net.minecraft.util.math.BlockPos
@@ -49,7 +50,7 @@ class FallingLeafParticle(
 
     override fun update() {
         if (randomF() > 0.95f) rotPositive = !rotPositive
-//        if (age > maxAge - 20) colorAlpha = 0.05f * (maxAge - age)
+        if (age > maxAge - 20) colorAlpha = 0.05f * (maxAge - age)
 
         if (onGround || wasCollided) {
             velocity.setTo(0.0, 0.0, 0.0)
@@ -74,6 +75,10 @@ class FallingLeafParticle(
         val color =  overrideColor ?: blockColor
         setColor(color)
     }
+
+    override fun getType() =
+        if (BetterFoliage.config.fallingLeaves.opacityHack) ParticleTextureSheet.PARTICLE_SHEET_OPAQUE
+        else ParticleTextureSheet.PARTICLE_SHEET_TRANSLUCENT
 }
 
 object LeafWindTracker : WorldTickCallback, ClientWorldLoadCallback {

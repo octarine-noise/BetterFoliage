@@ -132,6 +132,7 @@ class NetherrackConfig(node: ConfigNode) : DelegatingConfigGroup(node) {
 
 class FallingLeavesConfig(node: ConfigNode) : DelegatingConfigGroup(node) {
     val enabled by boolean(true, langKey = recurring)
+    val opacityHack by boolean(false)
     val speed by double(0.05, min = 0.01, max = 0.15)
     val windStrength by double(0.5, min = 0.1, max = 2.0)
     val stormStrength by double(0.8, min = 0.1, max = 2.0) { it.coerceAtLeast(windStrength) }
