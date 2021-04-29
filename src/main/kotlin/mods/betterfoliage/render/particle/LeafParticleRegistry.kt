@@ -1,8 +1,8 @@
 package mods.betterfoliage.render.particle
 
 import mods.betterfoliage.BetterFoliage
-import mods.betterfoliage.resource.model.FixedSpriteSet
-import mods.betterfoliage.resource.model.SpriteSet
+import mods.betterfoliage.model.FixedSpriteSet
+import mods.betterfoliage.model.SpriteSet
 import mods.betterfoliage.util.*
 import net.fabricmc.fabric.api.event.client.ClientSpriteRegistryCallback
 import net.minecraft.client.texture.SpriteAtlasTexture
@@ -19,7 +19,7 @@ object LeafParticleRegistry : ClientSpriteRegistryCallback {
         spriteSets.clear()
         typeMappings.loadMappings(Identifier(BetterFoliage.MOD_ID, "leaf_texture_mappings.cfg"))
         (typeMappings.mappings.map { it.type } + "default").distinct().forEach { leafType ->
-            val validIds = (0 until 16).map { idx -> Identifier(BetterFoliage.MOD_ID, "falling_leaf_${leafType}_$idx") }
+            val validIds = (0 until 16).map { idx -> Identifier(BetterFoliage.MOD_ID, "particle/falling_leaf_${leafType}_$idx") }
                 .filter { resourceManager.containsResource(Atlas.PARTICLES.wrap(it)) }
             ids[leafType] = validIds
             validIds.forEach { registry.register(it) }

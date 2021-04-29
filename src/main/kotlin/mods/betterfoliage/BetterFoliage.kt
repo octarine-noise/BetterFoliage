@@ -55,8 +55,8 @@ object BetterFoliage : ClientModInitializer {
 
     override fun onInitializeClient() {
         // Register generated resource pack
-        ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(generatedPack)
-        MinecraftClient.getInstance().resourcePackContainerManager.addCreator(generatedPack.finder)
+        ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(generatedPack.reloader)
+        MinecraftClient.getInstance().resourcePackManager.registerProvider(generatedPack.finder)
 
         // Add standard block support
         modelReplacer.discoverers.add(StandardLeafDiscovery)

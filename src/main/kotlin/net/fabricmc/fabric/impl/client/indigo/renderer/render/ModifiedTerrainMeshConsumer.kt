@@ -1,11 +1,19 @@
 package net.fabricmc.fabric.impl.client.indigo.renderer.render
 
-import mods.betterfoliage.render.lighting.CustomLightingMeshConsumer
+import mods.betterfoliage.render.lighting.AbstractQuadRenderer_aoCalc
+import mods.betterfoliage.render.lighting.AbstractQuadRenderer_blockInfo2
+import mods.betterfoliage.render.lighting.AbstractQuadRenderer_bufferFunc2
+import mods.betterfoliage.render.lighting.AbstractQuadRenderer_transform
 import mods.betterfoliage.render.lighting.CustomLighting
-import mods.betterfoliage.util.*
-import net.fabricmc.fabric.api.renderer.v1.render.RenderContext
-import net.fabricmc.fabric.impl.client.indigo.renderer.aocalc.AoCalculator
+import mods.betterfoliage.render.lighting.CustomLightingMeshConsumer
+import mods.betterfoliage.util.YarnHelper
+import mods.betterfoliage.util.cornerDirFromAo
+import mods.betterfoliage.util.get
+import mods.betterfoliage.util.offset
+import mods.betterfoliage.util.plus
 import net.fabricmc.fabric.impl.client.indigo.renderer.mesh.MutableQuadViewImpl
+import net.minecraft.client.render.RenderLayer
+import net.minecraft.client.render.WorldRenderer
 import net.minecraft.util.math.Direction
 
 val AoCalculator_computeFace = YarnHelper.requiredMethod<Any>(
@@ -18,11 +26,16 @@ val AoFaceData_toArray = YarnHelper.requiredMethod<Unit>(
 )
 
 open class ModifiedTerrainMeshConsumer(
-    blockInfo: TerrainBlockRenderInfo,
-    chunkInfo: ChunkRenderInfo,
-    aoCalc: AoCalculator,
-    transform: RenderContext.QuadTransform
-) : TerrainMeshConsumer(blockInfo, chunkInfo, aoCalc, transform), CustomLightingMeshConsumer {
+    val original: AbstractMeshConsumer
+) : AbstractMeshConsumer(
+    original[AbstractQuadRenderer_blockInfo2],
+    original[AbstractQuadRenderer_bufferFunc2],
+    original[AbstractQuadRenderer_aoCalc],
+    original[AbstractQuadRenderer_transform]
+), CustomLightingMeshConsumer {
+    override fun matrix() = original.matrix()
+    override fun normalMatrix() = original.normalMatrix()
+    override fun overlay() = original.overlay()
 
     /** Custom lighting to use */
     var lighter: CustomLighting? = null
@@ -34,21 +47,23 @@ open class ModifiedTerrainMeshConsumer(
 
     /** Cached block brightness values for all neighbors */
     val brNeighbor = IntArray(6)
+
     /** Cache validity for block brightness values (neighbors + self) */
     val brValid = Array(7) { false }
 
     override var brSelf: Int = -1
-        get() { if (brValid[6]) return field else
-            field = blockInfo.blockView.getBlockState(blockInfo.blockPos).getBlockBrightness(blockInfo.blockView, blockInfo.blockPos)
-            brValid[6] = true
-            return field
+        get() {
+            if (brValid[6]) return field else {
+                field = WorldRenderer.getLightmapCoordinates(blockInfo.blockView, blockInfo.blockPos)
+                brValid[6] = true
+                return field
+            }
         }
         protected set
 
     override fun brNeighbor(dir: Direction): Int {
         if (brValid[dir.ordinal]) return brNeighbor[dir.ordinal]
-        blockInfo.blockView.getBlockState(blockInfo.blockPos)
-            .getBlockBrightness(blockInfo.blockView, blockInfo.blockPos + dir.offset)
+        WorldRenderer.getLightmapCoordinates(blockInfo.blockView, blockInfo.blockPos + dir.offset)
             .let { brNeighbor[dir.ordinal] = it; brValid[dir.ordinal] = true; return it }
     }
 
@@ -62,7 +77,12 @@ open class ModifiedTerrainMeshConsumer(
 
     override fun fillAoData(lightFace: Direction) {
         if (!aoValid[lightFace.ordinal]) {
-            AoFaceData_toArray.invoke(AoCalculator_computeFace.invoke(aoCalc, lightFace, true), aoFull, lightFull, cornerDirFromAo[lightFace.ordinal])
+            AoFaceData_toArray.invoke(
+                AoCalculator_computeFace.invoke(aoCalc, lightFace, true),
+                aoFull,
+                lightFull,
+                cornerDirFromAo[lightFace.ordinal]
+            )
             aoValid[lightFace.ordinal] = true
         }
     }
@@ -72,32 +92,23 @@ open class ModifiedTerrainMeshConsumer(
         aoCalc.light[vIdx] = light
     }
 
-    override fun applyOffsets(quad: MutableQuadViewImpl) {
-        // Moved farther back in the pipeline, after custom lighting is applied
-        // Might possibly mess emissive multitexturing up, but seems to be OK for now
-    }
-
-    override fun tesselateFlat(q: MutableQuadViewImpl, renderLayer: Int, blockColorIndex: Int) {
+    override fun tesselateFlat(q: MutableQuadViewImpl, renderLayer: RenderLayer, blockColorIndex: Int) {
         lighter?.applyLighting(this, q, flat = true, emissive = false)
-        super.applyOffsets(q)
         super.tesselateSmooth(q, renderLayer, blockColorIndex)
     }
 
-    override fun tesselateFlatEmissive(q: MutableQuadViewImpl, renderLayer: Int, blockColorIndex: Int, lightmaps: IntArray) {
+    override fun tesselateFlatEmissive(q: MutableQuadViewImpl, renderLayer: RenderLayer, blockColorIndex: Int) {
         lighter?.applyLighting(this, q, flat = true, emissive = true)
-        super.applyOffsets(q)
         super.tesselateSmoothEmissive(q, renderLayer, blockColorIndex)
     }
 
-    override fun tesselateSmooth(q: MutableQuadViewImpl, renderLayer: Int, blockColorIndex: Int) {
+    override fun tesselateSmooth(q: MutableQuadViewImpl, renderLayer: RenderLayer, blockColorIndex: Int) {
         lighter?.applyLighting(this, q, flat = false, emissive = false)
-        super.applyOffsets(q)
         super.tesselateSmooth(q, renderLayer, blockColorIndex)
     }
 
-    override fun tesselateSmoothEmissive(q: MutableQuadViewImpl, renderLayer: Int, blockColorIndex: Int) {
+    override fun tesselateSmoothEmissive(q: MutableQuadViewImpl, renderLayer: RenderLayer, blockColorIndex: Int) {
         lighter?.applyLighting(this, q, flat = false, emissive = true)
-        super.applyOffsets(q)
         super.tesselateSmoothEmissive(q, renderLayer, blockColorIndex)
     }
 }

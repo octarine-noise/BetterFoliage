@@ -15,15 +15,13 @@ import net.minecraft.util.Identifier
 import net.minecraft.util.registry.Registry
 import java.util.function.Consumer
 
-typealias RenderKeyFactory = (SpriteAtlasTexture)->BlockRenderKey
-
 interface BlockRenderKey {
     fun replace(model: BakedModel, state: BlockState): BakedModel = model
 }
 
 fun ModelLoader.iterateModels(func: (ModelDiscoveryContext)->Unit) {
     Registry.BLOCK.flatMap { block ->
-        block.stateFactory.states.map { state -> state to BlockModels.getModelId(state) }
+        block.stateManager.states.map { state -> state to BlockModels.getModelId(state) }
     }.forEach { (state, stateModelResource) ->
         func(ModelDiscoveryContext(this, state, stateModelResource))
     }

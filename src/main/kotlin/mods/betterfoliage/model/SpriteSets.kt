@@ -1,4 +1,4 @@
-package mods.betterfoliage.resource.model
+package mods.betterfoliage.model
 
 import mods.betterfoliage.util.Atlas
 import mods.betterfoliage.util.get
@@ -47,7 +47,12 @@ class SpriteDelegate(val atlas: Atlas, val idFunc: ()->Identifier) : ReadOnlyPro
     }
 }
 
-class SpriteSetDelegate(val atlas: Atlas, val idRegister: (Identifier)->Identifier = { it }, val idFunc: (Int)->Identifier) : ReadOnlyProperty<Any, SpriteSet>, ClientSpriteRegistryCallback {
+
+class SpriteSetDelegate(
+    val atlas: Atlas,
+    val idRegister: (Identifier)->Identifier = { it },
+    val idFunc: (Int)->Identifier
+) : ReadOnlyProperty<Any, SpriteSet>, ClientSpriteRegistryCallback {
     private var idList: List<Identifier> = emptyList()
     private var spriteSet: SpriteSet? = null
     init { ClientSpriteRegistryCallback.event(atlas.resourceId).register(this) }

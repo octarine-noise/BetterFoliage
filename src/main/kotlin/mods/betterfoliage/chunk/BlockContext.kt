@@ -1,5 +1,6 @@
 package mods.betterfoliage.chunk
 
+import mods.betterfoliage.ChunkRendererRegion_world
 import mods.betterfoliage.util.Int3
 import mods.betterfoliage.util.allDirections
 import mods.betterfoliage.util.offset
@@ -7,9 +8,11 @@ import mods.betterfoliage.util.plus
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
 import net.minecraft.client.MinecraftClient
+import net.minecraft.client.render.chunk.ChunkRendererRegion
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
-import net.minecraft.world.ExtendedBlockView
+import net.minecraft.world.BlockRenderView
+import net.minecraft.world.WorldView
 import net.minecraft.world.biome.Biome
 
 /**
@@ -17,7 +20,7 @@ import net.minecraft.world.biome.Biome
  * block-relative coordinates.
  */
 interface BlockCtx {
-    val world: ExtendedBlockView
+    val world: BlockRenderView
     val pos: BlockPos
 
     fun offset(dir: Direction) = offset(dir.offset)
@@ -27,7 +30,8 @@ interface BlockCtx {
     fun state(dir: Direction) = world.getBlockState(pos + dir.offset)
     fun state(offset: Int3) = world.getBlockState(pos + offset)
 
-    val biome: Biome get() = world.getBiome(pos)
+    val biome: Biome? get() =
+        ChunkRendererRegion_world[world]?.getBiome(pos)
 
     val isNormalCube: Boolean get() = state.isSimpleFullBlock(world, pos)
 
@@ -40,7 +44,7 @@ interface BlockCtx {
 }
 
 open class BasicBlockCtx(
-    override val world: ExtendedBlockView,
+    override val world: BlockRenderView,
     override val pos: BlockPos
 ) : BlockCtx {
     override val state = world.getBlockState(pos)
@@ -48,8 +52,8 @@ open class BasicBlockCtx(
     fun cache() = CachedBlockCtx(world, pos)
 }
 
-open class CachedBlockCtx(world: ExtendedBlockView, pos: BlockPos) : BasicBlockCtx(world, pos) {
+open class CachedBlockCtx(world: BlockRenderView, pos: BlockPos) : BasicBlockCtx(world, pos) {
     var neighbors = Array<BlockState>(6) { world.getBlockState(pos + allDirections[it].offset) }
-    override var biome: Biome = world.getBiome(pos)
+    override var biome: Biome? = super.biome
     override fun state(dir: Direction) = neighbors[dir.ordinal]
 }

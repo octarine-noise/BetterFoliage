@@ -2,8 +2,8 @@ package mods.betterfoliage.chunk
 
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.BlockView
-import net.minecraft.world.ExtendedBlockView
 import net.minecraft.world.LightType
+import net.minecraft.world.WorldView
 
 /**
  * Delegating [IBlockAccess] that fakes a _modified_ location to return values from a _target_ location.
@@ -21,7 +21,7 @@ open class OffsetBlockView(open val original: BlockView, val modded: BlockPos, v
 }
 
 @Suppress("NOTHING_TO_INLINE", "NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS", "HasPlatformType")
-class OffsetExtBlockView(val original: ExtendedBlockView, val modded: BlockPos, val target: BlockPos) : ExtendedBlockView by original {
+class OffsetExtBlockView(val original: WorldView, val modded: BlockPos, val target: BlockPos) : WorldView by original {
     inline fun actualPos(pos: BlockPos) = if (pos != null && pos.x == modded.x && pos.y == modded.y && pos.z == modded.z) target else pos
 
     override fun getBlockState(pos: BlockPos) = original.getBlockState(actualPos(pos))
@@ -29,7 +29,7 @@ class OffsetExtBlockView(val original: ExtendedBlockView, val modded: BlockPos, 
     override fun getFluidState(pos: BlockPos) = original.getFluidState(actualPos(pos))
 
     override fun getLightLevel(type: LightType, pos: BlockPos) = original.getLightLevel(type, actualPos(pos))
-    override fun getLightmapIndex(pos: BlockPos, light: Int) = original.getLightmapIndex(actualPos(pos), light)
+    override fun getBaseLightLevel(pos: BlockPos, light: Int) = original.getBaseLightLevel(actualPos(pos), light)
     override fun getBiome(pos: BlockPos) = original.getBiome(actualPos(pos))
 }
 

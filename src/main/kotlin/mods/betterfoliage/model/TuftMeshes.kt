@@ -1,11 +1,8 @@
-package mods.betterfoliage.resource.model
+package mods.betterfoliage.model
 
-import mods.betterfoliage.util.Atlas
 import mods.betterfoliage.util.*
-import net.fabricmc.fabric.api.renderer.v1.RendererAccess
+import net.fabricmc.fabric.api.renderer.v1.material.BlendMode
 import net.fabricmc.fabric.api.renderer.v1.mesh.Mesh
-import net.minecraft.block.BlockRenderLayer
-import net.minecraft.block.BlockRenderLayer.CUTOUT_MIPPED
 import net.minecraft.client.texture.Sprite
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.Direction.UP
@@ -49,7 +46,7 @@ fun fullCubeTextured(spriteId: Identifier, overrideColor: Int?, scrambleUV: Bool
         .map { if (!scrambleUV) it else it.rotateUV(randomI(max = 4)) }
         .map { it.sprite(sprite) }
         .map { it.colorAndIndex(overrideColor) }
-        .build(BlockRenderLayer.SOLID)
+        .build(BlendMode.SOLID)
 }
 
 fun crossModelsRaw(num: Int, size: Double, hOffset: Double, vOffset: Double): Array<List<Quad>> {
@@ -68,7 +65,7 @@ fun crossModelsTextured(leafBase: Array<List<Quad>>, overrideColor: Int?, scramb
     leaf.map { if (scrambleUV) it.scrambleUV(random, canFlipU = true, canFlipV = true, canRotate = true) else it }
         .map { it.colorAndIndex(overrideColor) }
         .mapIndexed { idx, quad -> quad.sprite(spriteGetter(idx)) }
-        .withOpposites().build(CUTOUT_MIPPED)
+        .withOpposites().build(BlendMode.CUTOUT_MIPPED)
 }.toTypedArray()
 
-fun Array<List<Quad>>.buildTufts() = withOpposites().build(CUTOUT_MIPPED)
+fun Array<List<Quad>>.buildTufts() = withOpposites().build(BlendMode.CUTOUT_MIPPED)

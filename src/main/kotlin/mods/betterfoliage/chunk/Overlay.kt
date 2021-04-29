@@ -7,9 +7,9 @@ import net.minecraft.client.render.chunk.ChunkRendererRegion
 import net.minecraft.client.world.ClientWorld
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.ChunkPos
-import net.minecraft.world.ExtendedBlockView
-import net.minecraft.world.ViewableWorld
+import net.minecraft.world.BlockRenderView
 import net.minecraft.world.World
+import net.minecraft.world.WorldView
 import net.minecraft.world.chunk.WorldChunk
 import net.minecraft.world.dimension.DimensionType
 import java.util.*
@@ -21,13 +21,8 @@ import kotlin.collections.mutableListOf
 import kotlin.collections.mutableMapOf
 import kotlin.collections.set
 
-// net.minecraft.world.chunk.WorldChunk.world
-val WorldChunk_world = YarnHelper.requiredField<World>("net.minecraft.class_2818", "field_12858", "Lnet/minecraft/class_1937;")
-// net.minecraft.client.render.chunk.ChunkRendererRegion.world
-val ChunkRendererRegion_world = YarnHelper.requiredField<World>("net.minecraft.class_853", "field_4490", "Lnet/minecraft/class_1937;")
-
-val ExtendedBlockView.dimType: DimensionType get() = when {
-    this is ViewableWorld -> dimension.type
+val BlockRenderView.dimType: DimensionType get() = when {
+    this is WorldView -> dimension.type
     this is ChunkRendererRegion -> this[ChunkRendererRegion_world]!!.dimension.type
 //    this.isInstance(ChunkCacheOF) -> this[ChunkCacheOF.chunkCache]!!.dimType
     else -> throw IllegalArgumentException("DimensionType of world with class ${this::class.qualifiedName} cannot be determined!")
@@ -38,7 +33,7 @@ val ExtendedBlockView.dimType: DimensionType get() = when {
  */
 interface ChunkOverlayLayer<T> {
     fun calculate(ctx: BlockCtx): T
-    fun onBlockUpdate(world: ExtendedBlockView, pos: BlockPos)
+    fun onBlockUpdate(world: WorldView, pos: BlockPos)
 }
 
 /**

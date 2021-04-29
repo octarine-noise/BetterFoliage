@@ -2,11 +2,12 @@ package mods.betterfoliage.render.particle
 
 import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.render.AbstractParticle
-import mods.betterfoliage.resource.model.SpriteDelegate
-import mods.betterfoliage.resource.model.SpriteSetDelegate
+import mods.betterfoliage.model.SpriteDelegate
+import mods.betterfoliage.model.SpriteSetDelegate
 import mods.betterfoliage.util.*
 import net.minecraft.client.particle.ParticleTextureSheet
-import net.minecraft.client.render.BufferBuilder
+import net.minecraft.client.render.Camera
+import net.minecraft.client.render.VertexConsumer
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.MathHelper
@@ -34,8 +35,9 @@ class RisingSoulParticle(
     override val isValid: Boolean get() = true
 
     override fun update() {
-        val phase = initialPhase + (age.toDouble() * PI2 / 64.0 )
-        val cosPhase = cos(phase); val sinPhase = sin(phase)
+        val phase = initialPhase + (age.toDouble() * PI2 / 64.0)
+        val cosPhase = cos(phase);
+        val sinPhase = sin(phase)
         velocity.setTo(BetterFoliage.config.risingSoul.perturb.let { Double3(cosPhase * it, 0.1, sinPhase * it) })
 
         particleTrail.addFirst(currentPos.copy())
@@ -44,11 +46,12 @@ class RisingSoulParticle(
         if (!BetterFoliage.config.enabled) markDead()
     }
 
-    override fun render(worldRenderer: BufferBuilder, partialTickTime: Float) {
+    override fun buildGeometry(vertexConsumer: VertexConsumer, camera: Camera, tickDelta: Float) {
         var alpha = BetterFoliage.config.risingSoul.opacity.toFloat()
         if (age > maxAge - 40) alpha *= (maxAge - age) / 40.0f
 
-        renderParticleQuad(worldRenderer, partialTickTime,
+        renderParticleQuad(
+            vertexConsumer, camera, tickDelta,
             size = BetterFoliage.config.risingSoul.headSize * 0.25,
             alpha = alpha
         )
@@ -57,20 +60,24 @@ class RisingSoulParticle(
         particleTrail.forEachPairIndexed { idx, current, previous ->
             scale *= BetterFoliage.config.risingSoul.sizeDecay
             alpha *= BetterFoliage.config.risingSoul.opacityDecay.toFloat()
-            if (idx % BetterFoliage.config.risingSoul.trailDensity == 0) renderParticleQuad(worldRenderer, partialTickTime,
-                currentPos = current,
-                prevPos = previous,
-                size = scale,
-                alpha = alpha,
-                sprite = trackIcon
-            )
+            if (idx % BetterFoliage.config.risingSoul.trailDensity == 0)
+                renderParticleQuad(
+                    vertexConsumer, camera, tickDelta,
+                    currentPos = current,
+                    prevPos = previous,
+                    size = scale,
+                    alpha = alpha,
+                    sprite = trackIcon
+                )
         }
     }
 
     override fun getType() = ParticleTextureSheet.PARTICLE_SHEET_TRANSLUCENT
 
     companion object {
-        val headIcons by SpriteSetDelegate(Atlas.PARTICLES) { idx -> Identifier(BetterFoliage.MOD_ID, "rising_soul_$idx") }
-        val trackIcon by SpriteDelegate(Atlas.PARTICLES) { Identifier(BetterFoliage.MOD_ID, "soul_track") }
+        val headIcons by SpriteSetDelegate(Atlas.PARTICLES) { idx ->
+            Identifier(BetterFoliage.MOD_ID, "particle/rising_soul_$idx")
+        }
+        val trackIcon by SpriteDelegate(Atlas.PARTICLES) { Identifier(BetterFoliage.MOD_ID, "particle/soul_track") }
     }
 }

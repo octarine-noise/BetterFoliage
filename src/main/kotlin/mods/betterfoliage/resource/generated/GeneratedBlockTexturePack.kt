@@ -3,9 +3,8 @@ package mods.betterfoliage.resource.generated
 import mods.betterfoliage.util.Atlas
 import mods.betterfoliage.util.HasLogger
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener
-import net.minecraft.client.resource.ClientResourcePackContainer
+import net.minecraft.client.resource.ClientResourcePackProfile
 import net.minecraft.resource.*
-import net.minecraft.resource.ResourcePackContainer.InsertionPosition
 import net.minecraft.resource.ResourceType.CLIENT_RESOURCES
 import net.minecraft.resource.metadata.ResourceMetadataReader
 import net.minecraft.text.LiteralText
@@ -30,13 +29,14 @@ import java.util.function.Supplier
  * @param[packDesc] Description of pack
  * @param[logger] Logger to log to when generating resources
  */
-class GeneratedBlockTexturePack(val reloadId: Identifier, val nameSpace: String, val packName: String, val packDesc: String, override val logger: Logger) : HasLogger, ResourcePack, IdentifiableResourceReloadListener {
+class GeneratedBlockTexturePack(val reloadId: Identifier, val nameSpace: String, val packName: String, val packDesc: String, override val logger: Logger) : HasLogger, ResourcePack {
 
     override fun getName() = reloadId.toString()
     override fun getNamespaces(type: ResourceType) = setOf(nameSpace)
     override fun <T : Any?> parseMetadata(deserializer: ResourceMetadataReader<T>) = null
     override fun openRoot(id: String) = null
-    override fun findResources(type: ResourceType, path: String, maxDepth: Int, filter: Predicate<String>) = emptyList<Identifier>()
+    override fun findResources(type: ResourceType, path: String, prefix: String, maxDepth: Int, filter: Predicate<String>) = emptyList<Identifier>()
+
     override fun close() {}
 
     protected var manager: ResourceManager? = null
@@ -64,29 +64,35 @@ class GeneratedBlockTexturePack(val reloadId: Identifier, val nameSpace: String,
     override fun contains(type: ResourceType, id: Identifier) =
         type == CLIENT_RESOURCES && resources.containsKey(id)
 
-    override fun reload(synchronizer: ResourceReloadListener.Synchronizer, manager: ResourceManager, prepareProfiler: Profiler, applyProfiler: Profiler, prepareExecutor: Executor, applyExecutor: Executor): CompletableFuture<Void> {
-        this.manager = manager
-        return synchronizer.whenPrepared(null).thenRun {
-            this.manager = null
-            identifiers.clear()
-            resources.clear()
-        }
-    }
-
-    override fun getFabricId() = reloadId
-
     /**
      * Supplier for this resource pack. Adds pack as always-on and hidden.
      */
-    val finder = object : ResourcePackCreator {
-        val packInfo = ClientResourcePackContainer(
+    val finder = object : ResourcePackProvider {
+        val packInfo = ClientResourcePackProfile(
             packName, true, Supplier { this@GeneratedBlockTexturePack },
             LiteralText(packName),
             LiteralText(packDesc),
-            ResourcePackCompatibility.COMPATIBLE, InsertionPosition.TOP, true, null
+            ResourcePackCompatibility.COMPATIBLE, ResourcePackProfile.InsertionPosition.TOP, true, null
         )
-        override fun <T : ResourcePackContainer> registerContainer(nameToPackMap: MutableMap<String, T>, packInfoFactory: ResourcePackContainer.Factory<T>) {
-            (nameToPackMap as MutableMap<String, ResourcePackContainer>)[reloadId.toString()] = packInfo
+
+        override fun <T : ResourcePackProfile> register(
+            registry: MutableMap<String, T>,
+            factory: ResourcePackProfile.Factory<T>
+        ) {
+            (registry as MutableMap<String, ResourcePackProfile>)[reloadId.toString()] = packInfo
+        }
+    }
+
+    val reloader = object : IdentifiableResourceReloadListener {
+        override fun getFabricId() = reloadId
+
+        override fun reload(synchronizer: ResourceReloadListener.Synchronizer, manager: ResourceManager, prepareProfiler: Profiler, applyProfiler: Profiler, prepareExecutor: Executor, applyExecutor: Executor): CompletableFuture<Void> {
+            this@GeneratedBlockTexturePack.manager = manager
+            return synchronizer.whenPrepared(null).thenRun {
+                this@GeneratedBlockTexturePack.manager = null
+                identifiers.clear()
+                resources.clear()
+            }
         }
     }
 }

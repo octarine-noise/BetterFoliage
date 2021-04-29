@@ -29,19 +29,20 @@ class FallingLeafParticle(
     }
 
     var rotationSpeed = randomF(min = PI2 / 80.0, max = PI2 / 50.0)
-    var rotPositive = true
     val isMirrored = randomB()
     var wasCollided = false
 
     init {
         angle = randomF(max = PI2)
+        prevAngle = angle - rotationSpeed
+
         maxAge = MathHelper.floor(randomD(0.6, 1.0) * BetterFoliage.config.fallingLeaves.lifetime * 20.0)
         velocityY = -BetterFoliage.config.fallingLeaves.speed
 
         scale = BetterFoliage.config.fallingLeaves.size.toFloat() * 0.1f
 
         val state = world.getBlockState(pos)
-        val blockColor = MinecraftClient.getInstance().blockColorMap.getColorMultiplier(state, world, pos, 0)
+        val blockColor = MinecraftClient.getInstance().blockColorMap.getColor(state, world, pos, 0)
         sprite = LeafParticleRegistry[leafKey.leafType][randomI(max = 1024)]
         setParticleColor(leafKey.overrideColor, blockColor)
     }
@@ -49,11 +50,12 @@ class FallingLeafParticle(
     override val isValid: Boolean get() = (sprite != null)
 
     override fun update() {
-        if (randomF() > 0.95f) rotPositive = !rotPositive
+        if (randomF() > 0.95f) rotationSpeed = -rotationSpeed
         if (age > maxAge - 20) colorAlpha = 0.05f * (maxAge - age)
 
         if (onGround || wasCollided) {
             velocity.setTo(0.0, 0.0, 0.0)
+            prevAngle = angle
             if (!wasCollided) {
                 age = age.coerceAtLeast(maxAge - 20)
                 wasCollided = true
@@ -62,14 +64,15 @@ class FallingLeafParticle(
             val cosRotation = cos(angle).toDouble(); val sinRotation = sin(angle).toDouble()
             velocity.setTo(cosRotation, 0.0, sinRotation).mul(BetterFoliage.config.fallingLeaves.perturb)
                     .add(LeafWindTracker.current).add(0.0, -1.0, 0.0).mul(BetterFoliage.config.fallingLeaves.speed)
-            angle += if (rotPositive) rotationSpeed else -rotationSpeed
+            prevAngle = angle
+            angle += rotationSpeed
         }
     }
 
-    override fun render(worldRenderer: BufferBuilder, partialTickTime: Float) {
-        val tickAngle = angle + partialTickTime * (if (rotPositive) rotationSpeed else -rotationSpeed)
-        renderParticleQuad(worldRenderer, partialTickTime, rotation = tickAngle.toDouble(), isMirrored = isMirrored)
-    }
+//    override fun render(worldRenderer: BufferBuilder, partialTickTime: Float) {
+//        val tickAngle = angle + partialTickTime * (if (rotPositive) rotationSpeed else -rotationSpeed)
+//        renderParticleQuad(worldRenderer, partialTickTime, rotation = tickAngle.toDouble(), isMirrored = isMirrored)
+//    }
 
     fun setParticleColor(overrideColor: Int?, blockColor: Int) {
         val color =  overrideColor ?: blockColor

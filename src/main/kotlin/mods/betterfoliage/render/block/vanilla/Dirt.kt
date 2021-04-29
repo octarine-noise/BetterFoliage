@@ -14,18 +14,17 @@ import mods.betterfoliage.resource.discovery.BlockRenderKey
 import mods.betterfoliage.resource.discovery.ModelDiscoveryBase
 import mods.betterfoliage.resource.discovery.ModelDiscoveryContext
 import mods.betterfoliage.resource.generated.CenteredSprite
-import mods.betterfoliage.resource.model.*
+import mods.betterfoliage.model.*
 import mods.betterfoliage.util.*
+import net.fabricmc.fabric.api.renderer.v1.material.BlendMode
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext
-import net.minecraft.block.BlockRenderLayer
 import net.minecraft.block.BlockState
 import net.minecraft.block.Material
-import net.minecraft.client.MinecraftClient
 import net.minecraft.client.render.model.BakedModel
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction.UP
-import net.minecraft.world.ExtendedBlockView
+import net.minecraft.world.BlockRenderView
 import java.util.*
 import java.util.function.Consumer
 import java.util.function.Supplier
@@ -46,7 +45,7 @@ class DirtModel(wrapped: BakedModel) : WrappedBakedModel(wrapped) {
     val algaeLighting = grassTuftLighting(UP)
     val reedLighting = reedLighting()
 
-    override fun emitBlockQuads(blockView: ExtendedBlockView, state: BlockState, pos: BlockPos, randomSupplier: Supplier<Random>, context: RenderContext) {
+    override fun emitBlockQuads(blockView: BlockRenderView, state: BlockState, pos: BlockPos, randomSupplier: Supplier<Random>, context: RenderContext) {
         if (!BetterFoliage.config.enabled) return super.emitBlockQuads(blockView, state, pos, randomSupplier, context)
 
         val ctx = BasicBlockCtx(blockView, pos)
@@ -56,7 +55,7 @@ class DirtModel(wrapped: BakedModel) : WrappedBakedModel(wrapped) {
         val isWater = stateUp.material == Material.WATER
         val isDeepWater = isWater && ctx.offset(Int3(2 to UP)).state.material == Material.WATER
         val isShallowWater = isWater && ctx.offset(Int3(2 to UP)).state.isAir
-        val isSaltWater = isWater && ctx.biome.category in SALTWATER_BIOMES
+        val isSaltWater = isWater && ctx.biome?.category in SALTWATER_BIOMES
 
         if (BetterFoliage.config.connectedGrass.enabled && keyUp is GrassKey) {
             val grassBaseModel = (ctx.model(UP) as WrappedBakedModel).wrapped
@@ -93,14 +92,14 @@ class DirtModel(wrapped: BakedModel) : WrappedBakedModel(wrapped) {
             val shapes = BetterFoliage.config.algae.let { tuftShapeSet(it.size, it.heightMin, it.heightMax, it.hOffset) }
             tuftModelSet(shapes, Color.white.asInt) { algaeSprites[randomI()] }
                 .withOpposites()
-                .build(BlockRenderLayer.CUTOUT_MIPPED, flatLighting = false)
+                .build(BlendMode.CUTOUT_MIPPED, flatLighting = false)
 
         }
         val reedModels by LazyInvalidatable(BetterFoliage.modelReplacer) {
             val shapes = BetterFoliage.config.reed.let { tuftShapeSet(2.0, it.heightMin, it.heightMax, it.hOffset) }
             tuftModelSet(shapes, Color.white.asInt) { reedSprites[randomI()] }
                 .withOpposites()
-                .build(BlockRenderLayer.CUTOUT_MIPPED, flatLighting = false)
+                .build(BlendMode.CUTOUT_MIPPED, flatLighting = false)
         }
     }
 }

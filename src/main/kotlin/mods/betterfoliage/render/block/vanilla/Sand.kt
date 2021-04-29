@@ -4,24 +4,39 @@ import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.chunk.CachedBlockCtx
 import mods.betterfoliage.render.SALTWATER_BIOMES
 import mods.betterfoliage.render.SAND_BLOCKS
-import mods.betterfoliage.render.lighting.withLighting
 import mods.betterfoliage.render.lighting.grassTuftLighting
-import mods.betterfoliage.util.Atlas
+import mods.betterfoliage.render.lighting.withLighting
 import mods.betterfoliage.resource.discovery.BlockRenderKey
 import mods.betterfoliage.resource.discovery.ModelDiscoveryBase
 import mods.betterfoliage.resource.discovery.ModelDiscoveryContext
-import mods.betterfoliage.resource.model.*
-import mods.betterfoliage.util.*
+import mods.betterfoliage.model.Color
+import mods.betterfoliage.model.SpriteSetDelegate
+import mods.betterfoliage.model.WrappedBakedModel
+import mods.betterfoliage.model.build
+import mods.betterfoliage.model.horizontalRectangle
+import mods.betterfoliage.model.meshifyStandard
+import mods.betterfoliage.model.transform
+import mods.betterfoliage.model.tuftModelSet
+import mods.betterfoliage.model.tuftShapeSet
+import mods.betterfoliage.model.withOpposites
+import mods.betterfoliage.util.Atlas
+import mods.betterfoliage.util.LazyInvalidatable
+import mods.betterfoliage.util.Rotation
+import mods.betterfoliage.util.allDirections
+import mods.betterfoliage.util.get
+import mods.betterfoliage.util.randomB
+import mods.betterfoliage.util.randomD
+import mods.betterfoliage.util.randomI
+import net.fabricmc.fabric.api.renderer.v1.material.BlendMode
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext
-import net.minecraft.block.BlockRenderLayer.CUTOUT_MIPPED
 import net.minecraft.block.BlockState
 import net.minecraft.block.Material
 import net.minecraft.client.render.model.BakedModel
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction.UP
-import net.minecraft.world.ExtendedBlockView
-import java.util.*
+import net.minecraft.world.BlockRenderView
+import java.util.Random
 import java.util.function.Consumer
 import java.util.function.Supplier
 
@@ -40,14 +55,14 @@ class SandModel(wrapped: BakedModel) : WrappedBakedModel(wrapped) {
 
     val coralLighting = allDirections.map { grassTuftLighting(it) }.toTypedArray()
 
-    override fun emitBlockQuads(blockView: ExtendedBlockView, state: BlockState, pos: BlockPos, randomSupplier: Supplier<Random>, context: RenderContext) {
+    override fun emitBlockQuads(blockView: BlockRenderView, state: BlockState, pos: BlockPos, randomSupplier: Supplier<Random>, context: RenderContext) {
         super.emitBlockQuads(blockView, state, pos, randomSupplier, context)
 
         val ctx = CachedBlockCtx(blockView, pos)
 
         val random = randomSupplier.get()
         if (!BetterFoliage.config.enabled || !BetterFoliage.config.coral.enabled(random)) return
-        if (ctx.biome.category !in SALTWATER_BIOMES) return
+        if (ctx.biome?.category !in SALTWATER_BIOMES) return
 
         allDirections.filter { random.nextInt(64) < BetterFoliage.config.coral.chance }.forEach { face ->
             val isWater = ctx.state(face).material == Material.WATER
@@ -76,7 +91,7 @@ class SandModel(wrapped: BakedModel) : WrappedBakedModel(wrapped) {
                 tuftModelSet(shapes, Color.white.asInt) { coralTuftSprites[randomI()] }
                     .transform { rotate(Rotation.fromUp[face]) }
                     .withOpposites()
-                    .build(CUTOUT_MIPPED)
+                    .build(BlendMode.CUTOUT_MIPPED)
             }.toTypedArray()
         }
         val coralCrustModels by LazyInvalidatable(BetterFoliage.modelReplacer) {
@@ -88,7 +103,7 @@ class SandModel(wrapped: BakedModel) : WrappedBakedModel(wrapped) {
                         .rotate(Rotation.fromUp[face])
                         .mirrorUV(randomB(), randomB()).rotateUV(randomI(max = 4))
                         .sprite(coralCrustSprites[idx]).colorAndIndex(null)
-                    ).build(CUTOUT_MIPPED)
+                    ).build(BlendMode.CUTOUT_MIPPED)
                 }
             }.toTypedArray()
         }

@@ -7,6 +7,7 @@ import net.minecraft.util.math.Direction.Axis.*
 import net.minecraft.util.math.Direction.AxisDirection
 import net.minecraft.util.math.Direction.AxisDirection.*
 import net.minecraft.util.math.Direction.*
+import net.minecraft.util.math.Quaternion
 
 // ================================
 // Axes and directions
@@ -52,6 +53,7 @@ data class Double3(var x: Double, var y: Double, var z: Double) {
         val zero: Double3 get() = Double3(0.0, 0.0, 0.0)
         fun weight(v1: Double3, weight1: Double, v2: Double3, weight2: Double) =
             Double3(v1.x * weight1 + v2.x * weight2, v1.y * weight1 + v2.y * weight2, v1.z * weight1 + v2.z * weight2)
+        fun lerp(delta: Double, first: Double3, second: Double3) = first + (second - first) * delta
     }
 
     // immutable operations
@@ -67,6 +69,13 @@ data class Double3(var x: Double, var y: Double, var z: Double) {
         rot.rotatedComponent(UP, x, y, z),
         rot.rotatedComponent(SOUTH, x, y, z)
     )
+
+    /** Rotate vector by the given [Quaternion] */
+    fun rotate(quat: Quaternion) =
+        quat.copy()
+            .apply { hamiltonProduct(Quaternion(x.toFloat(), y.toFloat(), z.toFloat(), 0.0F)) }
+            .apply { hamiltonProduct(quat.copy().apply(Quaternion::conjugate)) }
+            .let { Double3(it.b, it.c, it.d) }
 
     // mutable operations
     fun setTo(other: Double3): Double3 { x = other.x; y = other.y; z = other.z; return this }

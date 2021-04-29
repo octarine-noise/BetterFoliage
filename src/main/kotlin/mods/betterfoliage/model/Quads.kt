@@ -1,11 +1,11 @@
-package mods.betterfoliage.resource.model
+package mods.betterfoliage.model
 
 import mods.betterfoliage.util.Atlas
 import mods.betterfoliage.util.*
 import mods.betterfoliage.util.minmax
 import net.fabricmc.fabric.api.renderer.v1.RendererAccess
+import net.fabricmc.fabric.api.renderer.v1.material.BlendMode
 import net.fabricmc.fabric.api.renderer.v1.mesh.Mesh
-import net.minecraft.block.BlockRenderLayer
 import net.minecraft.client.texture.MissingSprite
 import net.minecraft.client.texture.Sprite
 import net.minecraft.util.math.Direction
@@ -166,9 +166,9 @@ fun Array<List<Quad>>.withOpposites() = map { it.withOpposites() }.toTypedArray(
 /**
  * Pour quad data into a fabric-renderer-api Mesh
  */
-fun List<Quad>.build(layer: BlockRenderLayer, noDiffuse: Boolean = false, flatLighting: Boolean = false): Mesh {
+fun List<Quad>.build(blendMode: BlendMode, noDiffuse: Boolean = false, flatLighting: Boolean = false): Mesh {
     val renderer = RendererAccess.INSTANCE.renderer
-    val material = renderer.materialFinder().blendMode(0, layer).disableAo(0, flatLighting).disableDiffuse(0, noDiffuse).find()
+    val material = renderer.materialFinder().blendMode(0, blendMode).disableAo(0, flatLighting).disableDiffuse(0, noDiffuse).find()
     val builder = renderer.meshBuilder()
     builder.emitter.apply {
         forEach { quad ->
@@ -190,7 +190,7 @@ fun List<Quad>.build(layer: BlockRenderLayer, noDiffuse: Boolean = false, flatLi
     return builder.build()
 }
 
-fun Array<List<Quad>>.build(layer: BlockRenderLayer, noDiffuse: Boolean = false, flatLighting: Boolean = false) = map { it.build(layer, noDiffuse, flatLighting) }.toTypedArray()
+fun Array<List<Quad>>.build(blendMode: BlendMode, noDiffuse: Boolean = false, flatLighting: Boolean = false) = map { it.build(blendMode, noDiffuse, flatLighting) }.toTypedArray()
 
 /**
  * The model should be positioned so that (0,0,0) is the block center.

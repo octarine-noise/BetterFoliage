@@ -1,9 +1,12 @@
-package mods.betterfoliage.resource.model
+package mods.betterfoliage.model
 
+import mods.betterfoliage.BakedQuad_sprite
+import mods.betterfoliage.VertexFormat_offsets
 import mods.betterfoliage.util.Double3
 import mods.betterfoliage.util.allDirections
 import mods.betterfoliage.util.findFirst
-import net.minecraft.block.BlockRenderLayer
+import mods.betterfoliage.util.get
+import net.fabricmc.fabric.api.renderer.v1.material.BlendMode
 import net.minecraft.block.BlockState
 import net.minecraft.client.render.VertexFormat
 import net.minecraft.client.render.VertexFormatElement
@@ -17,6 +20,9 @@ import net.minecraft.client.render.model.BakedQuad
 import net.minecraft.util.math.Direction
 import java.lang.Float
 import java.util.*
+import kotlin.Boolean
+import kotlin.Int
+import kotlin.let
 
 interface BakedModelConverter {
     /**
@@ -50,11 +56,11 @@ val COMMON_MESH_CONVERTERS = listOf(WrappedWeightedModel.converter)
 
 /**
  * Convert [BakedModel] into one using fabric-rendering-api [Mesh] instead of the vanilla pipeline.
- * @param renderLayerOverride Use the given [BlockRenderLayer] for the [Mesh]
+ * @param blendModeOverride Use the given [BlockRenderLayer] for the [Mesh]
  * instead of the one declared by the corresponding [Block]
  */
-fun meshifyStandard(model: BakedModel, state: BlockState, renderLayerOverride: BlockRenderLayer? = null) =
-    (COMMON_MESH_CONVERTERS + WrappedMeshModel.converter(state, renderLayerOverride = renderLayerOverride)).convert(model)
+fun meshifyStandard(model: BakedModel, state: BlockState, blendModeOverride: BlendMode? = null) =
+    (COMMON_MESH_CONVERTERS + WrappedMeshModel.converter(state, blendModeOverride = blendModeOverride)).convert(model)
 
 /**
  * Convert a vanilla [BakedModel] into intermediate [Quad]s
@@ -64,7 +70,7 @@ fun meshifyStandard(model: BakedModel, state: BlockState, renderLayerOverride: B
 fun unbakeQuads(model: BakedModel, state: BlockState, random: Random, unshade: Boolean): List<Quad> {
     return (allDirections.toList() + null as Direction?).flatMap { face ->
         model.getQuads(state, face, random).mapIndexed { qIdx, bakedQuad ->
-            var quad = Quad(Vertex(), Vertex(), Vertex(), Vertex(), face = face, colorIndex = bakedQuad.colorIndex, sprite = bakedQuad.sprite)
+            var quad = Quad(Vertex(), Vertex(), Vertex(), Vertex(), face = face, colorIndex = bakedQuad.colorIndex, sprite = bakedQuad[BakedQuad_sprite])
 
             val format = quadVertexFormat(bakedQuad)
             val stride = format.vertexSizeInteger
@@ -98,7 +104,7 @@ fun unbakeQuads(model: BakedModel, state: BlockState, random: Random, unshade: B
 fun VertexFormat.getByteOffset(type: VertexFormatElement.Type, format: VertexFormatElement.Format, count: Int, index: Int = 0): Int? {
     elements.forEachIndexed { idx, element ->
         if (element.type == type && element.format == format && element.count == count && element.index == index)
-            return getElementOffset(idx)
+            return VertexFormat_offsets[this]!!.getInt(idx)
     }
     return null
 }
@@ -111,4 +117,4 @@ fun VertexFormat.getIntOffset(type: VertexFormatElement.Type, format: VertexForm
     getByteOffset(type, format, count, index)?.let { if (it % 4 == 0) it / 4 else null }
 
 /** Function to determine [VertexFormat] used by [BakedQuad] */
-var quadVertexFormat: (BakedQuad)->VertexFormat = { VertexFormats.POSITION_COLOR_UV_LMAP }
+var quadVertexFormat: (BakedQuad)->VertexFormat = { VertexFormats.POSITION_COLOR_TEXTURE_LIGHT_NORMAL }

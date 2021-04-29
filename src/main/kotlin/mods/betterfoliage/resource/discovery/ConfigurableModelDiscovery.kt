@@ -7,6 +7,7 @@ import mods.betterfoliage.util.stripStart
 import net.minecraft.block.BlockState
 import net.minecraft.client.render.model.ModelLoader
 import net.minecraft.client.render.model.json.JsonUnbakedModel
+import net.minecraft.client.texture.MissingSprite
 import net.minecraft.util.Identifier
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.Level.DEBUG
@@ -39,7 +40,7 @@ abstract class ConfigurableModelDiscovery : ModelDiscoveryBase() {
         return super.discover(loader, atlas)
     }
 
-    abstract fun processModel(state: BlockState, textures: List<String>, atlas: Consumer<Identifier>): BlockRenderKey?
+    abstract fun processModel(state: BlockState, textures: List<Identifier>, atlas: Consumer<Identifier>): BlockRenderKey?
 
     override fun processModel(ctx: ModelDiscoveryContext, atlas: Consumer<Identifier>): BlockRenderKey? {
         val matchClass = matchClasses.matchingClass(ctx.state.block) ?: return null
@@ -51,11 +52,11 @@ abstract class ConfigurableModelDiscovery : ModelDiscoveryBase() {
             if (modelMatch != null) {
                 log(DEBUG, "      model ${model} matches ${modelMatch.modelLocation}")
 
-                val textures = modelMatch.textureNames.map { it to model.resolveTexture(it) }
+                val textures = modelMatch.textureNames.map { it to model.resolveSprite(it).textureId }
                 val texMapString = Joiner.on(", ").join(textures.map { "${it.first}=${it.second}" })
                 log(DEBUG, "    sprites [$texMapString]")
 
-                if (textures.all { it.second != "missingno" }) {
+                if (textures.all { it.second != MissingSprite.getMissingSpriteId() }) {
                     // found a valid model (all required textures exist)
                     return processModel(ctx.state, textures.map { it.second }, atlas).also {
                         log(DEBUG, "    valid model discovered: $it")

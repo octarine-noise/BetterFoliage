@@ -2,15 +2,15 @@ package mods.betterfoliage.render
 
 import mods.betterfoliage.util.Double3
 import net.minecraft.client.MinecraftClient
-import net.minecraft.client.particle.ParticleTextureSheet
 import net.minecraft.client.particle.SpriteBillboardParticle
-import net.minecraft.client.render.BufferBuilder
 import net.minecraft.client.render.Camera
+import net.minecraft.client.render.VertexConsumer
 import net.minecraft.client.texture.Sprite
+import net.minecraft.client.util.math.Vector3f
+import net.minecraft.util.math.MathHelper
 import net.minecraft.world.World
-import kotlin.math.cos
-import kotlin.math.sin
 
+fun VertexConsumer.vertex(v: Double3) = vertex(v.x, v.y, v.z)
 
 abstract class AbstractParticle(world: World, x: Double, y: Double, z: Double) : SpriteBillboardParticle(world, x, y, z) {
 
@@ -34,9 +34,6 @@ abstract class AbstractParticle(world: World, x: Double, y: Double, z: Double) :
         velocityX = velocity.x; velocityY = velocity.y; velocityZ = velocity.z;
     }
 
-    /** Render the particle. */
-    abstract fun render(worldRenderer: BufferBuilder, partialTickTime: Float)
-
     /** Update particle on world tick. */
     abstract fun update()
 
@@ -46,80 +43,56 @@ abstract class AbstractParticle(world: World, x: Double, y: Double, z: Double) :
     /** Add the particle to the effect renderer if it is valid. */
     fun addIfValid() { if (isValid) MinecraftClient.getInstance().particleManager.addParticle(this) }
 
-    override fun buildGeometry(buffer: BufferBuilder, camera: Camera, tickDelta: Float, rotX: Float, rotZ: Float, rotYZ: Float, rotXY: Float, rotXZ: Float) {
-        billboardRot.first.setTo(rotX + rotXY, rotZ, rotYZ + rotXZ)
-        billboardRot.second.setTo(rotX - rotXY, -rotZ, rotYZ - rotXZ)
-        render(buffer, tickDelta)
+    override fun buildGeometry(vertexConsumer: VertexConsumer, camera: Camera, tickDelta: Float) {
+        renderParticleQuad(vertexConsumer, camera, tickDelta)
     }
 
     /**
      * Render a particle quad.
      *
      * @param[tessellator] the [Tessellator] instance to use
-     * @param[partialTickTime] partial tick time
+     * @param[tickDelta] partial tick time
      * @param[currentPos] render position
      * @param[prevPos] previous tick position for interpolation
      * @param[size] particle size
-     * @param[rotation] viewpoint-dependent particle rotation (64 steps)
+     * @param[currentAngle] viewpoint-dependent particle rotation (64 steps)
      * @param[sprite] particle texture
      * @param[isMirrored] mirror particle texture along V-axis
      * @param[alpha] aplha blending
      */
-    fun renderParticleQuad(worldRenderer: BufferBuilder,
-                           partialTickTime: Float,
+    fun renderParticleQuad(vertexConsumer: VertexConsumer,
+                           camera: Camera,
+                           tickDelta: Float,
                            currentPos: Double3 = this.currentPos,
                            prevPos: Double3 = this.prevPos,
                            size: Double = scale.toDouble(),
-                           rotation: Double = 0.0,
+                           currentAngle: Float = this.angle,
+                           prevAngle: Float = this.prevAngle,
                            sprite: Sprite = this.sprite,
-                           isMirrored: Boolean = false,
                            alpha: Float = this.colorAlpha) {
 
-        val minU = (if (isMirrored) sprite.minU else sprite.maxU).toDouble()
-        val maxU = (if (isMirrored) sprite.maxU else sprite.minU).toDouble()
-        val minV = sprite.minV.toDouble()
-        val maxV = sprite.maxV.toDouble()
+        val center = Double3.lerp(tickDelta.toDouble(), prevPos, currentPos)
+        val angle = MathHelper.lerp(tickDelta, prevAngle, currentAngle)
+        val rotation = camera.rotation.copy().apply { hamiltonProduct(Vector3f.POSITIVE_Z.getRadialQuaternion(angle)) }
+        val lightmapCoord = getColorMultiplier(tickDelta)
 
-        val center = currentPos.copy().sub(prevPos).mul(partialTickTime.toDouble()).add(prevPos).sub(cameraX, cameraY, cameraZ)
+        val coords = arrayOf(
+            Double3(-1.0, -1.0, 0.0),
+            Double3(-1.0, 1.0, 0.0),
+            Double3(1.0, 1.0, 0.0),
+            Double3(1.0, -1.0, 0.0)
+        ).map { it.rotate(rotation).mul(size).add(center).sub(camera.pos.x, camera.pos.y, camera.pos.z) }
 
-        val cosRotation = cos(rotation); val sinRotation = sin(rotation)
-        val v1 = Double3.weight(billboardRot.first, cosRotation * size, billboardRot.second, sinRotation * size)
-        val v2 = Double3.weight(billboardRot.first, -sinRotation * size, billboardRot.second, cosRotation * size)
-
-        val renderBrightness = this.getColorMultiplier(partialTickTime)
-        val brHigh = renderBrightness shr 16 and 65535
-        val brLow = renderBrightness and 65535
-
-        worldRenderer
-            .vertex(center.x - v1.x, center.y - v1.y, center.z - v1.z)
-            .texture(maxU, maxV)
-            .color(colorRed, colorGreen, colorBlue, alpha)
-            .texture(brHigh, brLow)
+        fun renderVertex(vertex: Double3, u: Float, v: Float) = vertexConsumer
+            .vertex(vertex.x, vertex.y, vertex.z).texture(u, v)
+            .color(colorRed, colorGreen, colorBlue, alpha).light(lightmapCoord)
             .next()
 
-        worldRenderer
-            .vertex(center.x - v2.x, center.y - v2.y, center.z - v2.z)
-            .texture(maxU, minV)
-            .color(colorRed, colorGreen, colorBlue, alpha)
-            .texture(brHigh, brLow)
-            .next()
-
-        worldRenderer
-            .vertex(center.x + v1.x, center.y + v1.y, center.z + v1.z)
-            .texture(minU, minV)
-            .color(colorRed, colorGreen, colorBlue, alpha)
-            .texture(brHigh, brLow)
-            .next()
-
-        worldRenderer
-            .vertex(center.x + v2.x, center.y + v2.y, center.z + v2.z)
-            .texture(minU, maxV)
-            .color(colorRed, colorGreen, colorBlue, alpha)
-            .texture(brHigh, brLow)
-            .next()
+        renderVertex(coords[0], sprite.maxU, sprite.maxV)
+        renderVertex(coords[1], sprite.maxU, sprite.minV)
+        renderVertex(coords[2], sprite.minU, sprite.minV)
+        renderVertex(coords[3], sprite.minU, sprite.maxV)
     }
-
-    override fun getType() = ParticleTextureSheet.PARTICLE_SHEET_OPAQUE
 
     fun setColor(color: Int) {
         colorBlue = (color and 255) / 256.0f

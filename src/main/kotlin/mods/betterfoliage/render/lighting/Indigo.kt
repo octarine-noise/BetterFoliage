@@ -1,43 +1,53 @@
 package mods.betterfoliage.render.lighting
 
-import it.unimi.dsi.fastutil.ints.Int2ObjectFunction
+import mods.betterfoliage.util.YarnHelper
+import mods.betterfoliage.util.get
 import mods.betterfoliage.util.reflectField
 import net.fabricmc.fabric.api.renderer.v1.mesh.Mesh
 import net.fabricmc.fabric.api.renderer.v1.model.FabricBakedModel
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext
-import net.fabricmc.fabric.impl.client.indigo.renderer.accessor.AccessBufferBuilder
 import net.fabricmc.fabric.impl.client.indigo.renderer.aocalc.AoCalculator
 import net.fabricmc.fabric.impl.client.indigo.renderer.render.*
-import net.minecraft.block.BlockRenderLayer
 import net.minecraft.block.BlockState
+import net.minecraft.client.render.RenderLayer
+import net.minecraft.client.render.VertexConsumer
 import net.minecraft.client.render.model.BakedModel
 import net.minecraft.util.math.BlockPos
-import net.minecraft.world.ExtendedBlockView
+import net.minecraft.world.BlockRenderView
 import java.util.*
 import java.util.function.Consumer
 import java.util.function.Supplier
 
+val AbstractQuadRenderer_blockInfo2 = YarnHelper.requiredField<TerrainBlockRenderInfo>(
+    "net.fabricmc.fabric.impl.client.indigo.renderer.render.AbstractQuadRenderer",
+    "blockInfo", "Lnet/fabricmc/fabric/impl/client/indigo/renderer/render/TerrainBlockRenderInfo;"
+)
+val AbstractQuadRenderer_bufferFunc2 = YarnHelper.requiredField<java.util.function.Function<RenderLayer, VertexConsumer>>(
+    "net.fabricmc.fabric.impl.client.indigo.renderer.render.AbstractQuadRenderer",
+    "bufferFunc", "Ljava/util/function/Function;"
+)
+val AbstractQuadRenderer_aoCalc = YarnHelper.requiredField<AoCalculator>(
+    "net.fabricmc.fabric.impl.client.indigo.renderer.render.AbstractQuadRenderer",
+    "aoCalc", "Lnet/fabricmc/fabric/impl/client/indigo/renderer/aocalc/AoCalculator;"
+)
+val AbstractQuadRenderer_transform = YarnHelper.requiredField<RenderContext.QuadTransform>(
+    "net.fabricmc.fabric.impl.client.indigo.renderer.render.AbstractQuadRenderer",
+    "transform", "Lnet/fabricmc/fabric/api/renderer/v1/render/RenderContext\$QuadTransform;"
+)
+
 val MODIFIED_CONSUMER_POOL = ThreadLocal<ModifiedTerrainMeshConsumer>()
 
-fun TerrainMeshConsumer.modified() = MODIFIED_CONSUMER_POOL.get() ?: let {
-    val blockInfo = reflectField<TerrainBlockRenderInfo>("blockInfo")
-    val chunkInfo = reflectField<ChunkRenderInfo>("chunkInfo")
-    val aoCalc = reflectField<AoCalculator>("aoCalc")
-    val transform = reflectField<RenderContext.QuadTransform>("transform")
-    ModifiedTerrainMeshConsumer(blockInfo, chunkInfo, aoCalc, transform)
+fun AbstractMeshConsumer.modified() = MODIFIED_CONSUMER_POOL.get() ?: let {
+    ModifiedTerrainMeshConsumer(this)
 }.apply { MODIFIED_CONSUMER_POOL.set(this) }
-
-val TerrainRenderContext_blockInfo = TerrainRenderContext::class.java.declaredFields.find { it.name == "blockInfo" }?.apply { isAccessible = true }
-val BlockRenderInfo_layerIndexOrDefault = BlockRenderInfo::class.java.declaredMethods.find { it.name == "layerIndexOrDefault" }?.apply { isAccessible = true }
-val AbstractQuadRenderer_bufferFunc = AbstractQuadRenderer::class.java.declaredFields.find { it.name == "bufferFunc" }?.apply { isAccessible = true }
 
 /**
  * Render the given model at the given position.
  * Mutates the state of the [RenderContext]!!
  */
-fun RenderContext.renderMasquerade(model: BakedModel, blockView: ExtendedBlockView, state: BlockState, pos: BlockPos, randomSupplier: Supplier<Random>, context: RenderContext) = when(this) {
+fun RenderContext.renderMasquerade(model: BakedModel, blockView: BlockRenderView, state: BlockState, pos: BlockPos, randomSupplier: Supplier<Random>, context: RenderContext) = when(this) {
     is TerrainRenderContext -> {
-        val blockInfo = TerrainRenderContext_blockInfo!!.get(this) as BlockRenderInfo
+        val blockInfo = meshConsumer()[AbstractQuadRenderer_blockInfo2]!!
         blockInfo.prepareForBlock(state, pos, model.useAmbientOcclusion())
         (model as FabricBakedModel).emitBlockQuads(blockView, state, pos, randomSupplier, context)
     }
@@ -49,7 +59,7 @@ fun RenderContext.renderMasquerade(model: BakedModel, blockView: ExtendedBlockVi
 /** Execute the provided block with a mesh consumer using the given custom lighting. */
 fun RenderContext.withLighting(lighter: CustomLighting, func: (Consumer<Mesh>)->Unit) = when(this) {
     is TerrainRenderContext -> {
-        val consumer = (meshConsumer() as TerrainMeshConsumer).modified()
+        val consumer = (meshConsumer() as AbstractMeshConsumer).modified()
         consumer.clearLighting()
         consumer.lighter = lighter
         func(consumer)
@@ -59,12 +69,10 @@ fun RenderContext.withLighting(lighter: CustomLighting, func: (Consumer<Mesh>)->
 }
 
 /** Get the [BufferBuilder] responsible for a given [BlockRenderLayer] */
-fun RenderContext.getBufferBuilder(layer: BlockRenderLayer) = when(this) {
+fun RenderContext.getBufferBuilder(layer: RenderLayer) = when(this) {
     is TerrainRenderContext -> {
-        val blockInfo = TerrainRenderContext_blockInfo!!.get(this) as BlockRenderInfo
-        val layerIdx = BlockRenderInfo_layerIndexOrDefault!!.invoke(blockInfo, layer) as Int
-        val bufferFunc = AbstractQuadRenderer_bufferFunc!!.get(meshConsumer()) as Int2ObjectFunction<AccessBufferBuilder>
-        bufferFunc[layerIdx]
+        val bufferFunc = meshConsumer()[AbstractQuadRenderer_bufferFunc2]!!
+        bufferFunc.apply(layer)
     }
     else -> null
 }

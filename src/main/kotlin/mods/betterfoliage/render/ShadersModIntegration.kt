@@ -4,11 +4,10 @@ import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.render.lighting.getBufferBuilder
 import mods.betterfoliage.util.getAllMethods
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext
-import net.minecraft.block.BlockRenderLayer
-import net.minecraft.block.BlockRenderLayer.CUTOUT_MIPPED
 import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
 import net.minecraft.client.render.BufferBuilder
+import net.minecraft.client.render.RenderLayer
 
 /**
  * Integration for ShadersMod.
@@ -32,7 +31,7 @@ object ShadersModIntegration {
     }
 
     /** Quads rendered inside this block will use the given block entity data in shader programs. */
-    inline fun renderAs(ctx: RenderContext, state: BlockState, layer: BlockRenderLayer, enabled: Boolean = true, func: ()->Unit) {
+    inline fun renderAs(ctx: RenderContext, state: BlockState, layer: RenderLayer, enabled: Boolean = true, func: ()->Unit) {
         if (isAvailable && enabled) {
             val sVertexBuilder = BufferBuilder_SVertexBuilder!!.get(ctx.getBufferBuilder(layer))
             val aliasBlockId = BlockAliases_getAliasBlockId!!.invoke(null, state)
@@ -46,9 +45,9 @@ object ShadersModIntegration {
 
     /** Quads rendered inside this block will behave as tallgrass blocks in shader programs. */
     inline fun grass(ctx: RenderContext, enabled: Boolean = true, func: ()->Unit) =
-        renderAs(ctx, defaultGrass, CUTOUT_MIPPED, enabled, func)
+        renderAs(ctx, defaultGrass, RenderLayer.getCutoutMipped(), enabled, func)
 
     /** Quads rendered inside this block will behave as leaf blocks in shader programs. */
     inline fun leaves(ctx: RenderContext, enabled: Boolean = true, func: ()->Unit) =
-        renderAs(ctx, defaultLeaves, CUTOUT_MIPPED, enabled, func)
+        renderAs(ctx, defaultLeaves, RenderLayer.getCutoutMipped(), enabled, func)
 }

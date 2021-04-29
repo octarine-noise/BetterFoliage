@@ -2,8 +2,8 @@ import net.fabricmc.loom.task.RemapJarTask
 import org.ajoberstar.grgit.Grgit
 
 plugins {
-    kotlin("jvm").version("1.3.60")
     id("fabric-loom").version("0.2.6-SNAPSHOT")
+    kotlin("jvm").version("1.4.31")
     id("org.ajoberstar.grgit").version("3.1.1")
 }
 apply(plugin = "org.ajoberstar.grgit")
@@ -40,7 +40,7 @@ dependencies {
 //    "modImplementation"("grondag:canvas:0.7.+")
 
     // Optifabric
-    "modImplementation"("com.github.modmuss50:OptiFabric:df03dc2c22")
+//    "modImplementation"("com.github.modmuss50:OptiFabric:1.0.0")
     "implementation"("org.zeroturnaround:zt-zip:1.13")
 }
 

@@ -1,33 +1,26 @@
 package mods.betterfoliage.render.block.vanilla
 
-import it.unimi.dsi.fastutil.ints.Int2ObjectFunction
 import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.chunk.BasicBlockCtx
 import mods.betterfoliage.render.SNOW_MATERIALS
 import mods.betterfoliage.render.ShadersModIntegration
-import mods.betterfoliage.render.lighting.getBufferBuilder
 import mods.betterfoliage.render.lighting.withLighting
 import mods.betterfoliage.render.lighting.roundLeafLighting
 import mods.betterfoliage.render.particle.LeafParticleRegistry
 import mods.betterfoliage.util.Atlas
 import mods.betterfoliage.resource.discovery.*
 import mods.betterfoliage.resource.generated.GeneratedLeafSprite
-import mods.betterfoliage.resource.model.*
+import mods.betterfoliage.model.*
 import mods.betterfoliage.util.*
+import net.fabricmc.fabric.api.renderer.v1.material.BlendMode
 import net.fabricmc.fabric.api.renderer.v1.model.FabricBakedModel
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext
-import net.fabricmc.fabric.impl.client.indigo.renderer.accessor.AccessBufferBuilder
-import net.fabricmc.fabric.impl.client.indigo.renderer.render.BlockRenderInfo
-import net.fabricmc.fabric.impl.client.indigo.renderer.render.TerrainMeshConsumer
-import net.fabricmc.fabric.impl.client.indigo.renderer.render.TerrainRenderContext
-import net.minecraft.block.BlockRenderLayer
-import net.minecraft.block.BlockRenderLayer.CUTOUT_MIPPED
 import net.minecraft.block.BlockState
 import net.minecraft.client.render.model.BakedModel
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction.*
-import net.minecraft.world.ExtendedBlockView
+import net.minecraft.world.BlockRenderView
 import java.util.*
 import java.util.function.Consumer
 import java.util.function.Supplier
@@ -47,8 +40,8 @@ object StandardLeafDiscovery : ConfigurableModelDiscovery() {
     override val matchClasses: ConfigurableBlockMatcher get() = BetterFoliage.blockConfig.leafBlocks
     override val modelTextures: List<ModelTextureList> get() = BetterFoliage.blockConfig.leafModels.modelList
 
-    override fun processModel(state: BlockState, textures: List<String>, atlas: Consumer<Identifier>) =
-        defaultRegisterLeaf(Identifier(textures[0]), atlas)
+    override fun processModel(state: BlockState, textures: List<Identifier>, atlas: Consumer<Identifier>) =
+        defaultRegisterLeaf(textures[0], atlas)
 
 }
 
@@ -84,7 +77,7 @@ class NormalLeavesModel(val key: Key, wrapped: BakedModel) : WrappedBakedModel(w
     val leafSnowed by leafModelsSnowed.delegate(key)
     val leafLighting = roundLeafLighting()
 
-    override fun emitBlockQuads(blockView: ExtendedBlockView, state: BlockState, pos: BlockPos, randomSupplier: Supplier<Random>, context: RenderContext) {
+    override fun emitBlockQuads(blockView: BlockRenderView, state: BlockState, pos: BlockPos, randomSupplier: Supplier<Random>, context: RenderContext) {
         ShadersModIntegration.leaves(context, BetterFoliage.config.leaves.shaderWind) {
             super.emitBlockQuads(blockView, state, pos, randomSupplier, context)
             if (!BetterFoliage.config.enabled || !BetterFoliage.config.leaves.enabled) return
@@ -106,7 +99,7 @@ class NormalLeavesModel(val key: Key, wrapped: BakedModel) : WrappedBakedModel(w
         override val leafType: String,
         override val overrideColor: Int?
     ) : LeafKey {
-        override fun replace(model: BakedModel, state: BlockState) = NormalLeavesModel(this, meshifyStandard(model, state, renderLayerOverride = CUTOUT_MIPPED))
+        override fun replace(model: BakedModel, state: BlockState) = NormalLeavesModel(this, meshifyStandard(model, state, blendModeOverride = BlendMode.CUTOUT_MIPPED))
     }
 
     companion object {

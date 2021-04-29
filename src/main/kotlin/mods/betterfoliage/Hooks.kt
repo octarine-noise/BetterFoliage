@@ -2,19 +2,15 @@
 package mods.betterfoliage
 
 import mods.betterfoliage.chunk.ChunkOverlayManager
-import mods.betterfoliage.render.particle.FallingLeafParticle
-import mods.betterfoliage.render.particle.RisingSoulParticle
 import mods.betterfoliage.render.block.vanilla.LeafKey
 import mods.betterfoliage.render.block.vanilla.RoundLogKey
+import mods.betterfoliage.render.particle.FallingLeafParticle
+import mods.betterfoliage.render.particle.RisingSoulParticle
 import mods.betterfoliage.util.offset
 import mods.betterfoliage.util.plus
 import mods.betterfoliage.util.randomD
-import net.minecraft.block.BlockRenderLayer
-import net.minecraft.block.BlockRenderLayer.CUTOUT
-import net.minecraft.block.BlockRenderLayer.CUTOUT_MIPPED
 import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
-import net.minecraft.client.MinecraftClient
 import net.minecraft.client.world.ClientWorld
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
@@ -63,5 +59,6 @@ fun getVoxelShapeOverride(state: BlockState, reader: BlockView, pos: BlockPos, d
     if (BetterFoliage.modelReplacer[state] is RoundLogKey) {
         return VoxelShapes.empty()
     }
-    return state.getCullShape(reader, pos, dir)
+    // TODO ?
+    return state.getCullingFace(reader, pos, dir)
 }

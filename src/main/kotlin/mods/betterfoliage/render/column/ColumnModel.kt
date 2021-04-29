@@ -5,13 +5,13 @@ import mods.betterfoliage.chunk.ChunkOverlayManager
 import mods.betterfoliage.render.column.ColumnLayerData.NormalRender
 import mods.betterfoliage.render.column.ColumnLayerData.SpecialRender.BlockType.*
 import mods.betterfoliage.render.column.ColumnLayerData.SpecialRender.QuadrantType.*
-import mods.betterfoliage.resource.model.WrappedBakedModel
+import mods.betterfoliage.model.WrappedBakedModel
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext
 import net.minecraft.block.BlockState
 import net.minecraft.client.render.model.BakedModel
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction.Axis
-import net.minecraft.world.ExtendedBlockView
+import net.minecraft.world.BlockRenderView
 import java.util.*
 import java.util.function.Supplier
 
@@ -21,7 +21,7 @@ abstract class ColumnModelBase(wrapped: BakedModel) : WrappedBakedModel(wrapped)
     abstract val connectPerpendicular: Boolean
     abstract fun getMeshSet(axis: Axis, quadrant: Int): ColumnMeshSet
 
-    override fun emitBlockQuads(blockView: ExtendedBlockView, state: BlockState, pos: BlockPos, randomSupplier: Supplier<Random>, context: RenderContext) {
+    override fun emitBlockQuads(blockView: BlockRenderView, state: BlockState, pos: BlockPos, randomSupplier: Supplier<Random>, context: RenderContext) {
         val ctx = CachedBlockCtx(blockView, pos)
         val roundLog = ChunkOverlayManager.get(overlayLayer, ctx)
 

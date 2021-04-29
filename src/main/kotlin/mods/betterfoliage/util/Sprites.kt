@@ -1,6 +1,6 @@
 package mods.betterfoliage.util
 
-import mods.betterfoliage.resource.model.HSB
+import mods.betterfoliage.model.HSB
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.texture.Sprite
 import net.minecraft.client.texture.SpriteAtlasTexture
@@ -15,7 +15,7 @@ import kotlin.math.atan2
 
 enum class Atlas(val basePath: String, val resourceId: Identifier) {
     BLOCKS("textures", SpriteAtlasTexture.BLOCK_ATLAS_TEX),
-    PARTICLES("textures/particle", SpriteAtlasTexture.PARTICLE_ATLAS_TEX);
+    PARTICLES("textures", SpriteAtlasTexture.PARTICLE_ATLAS_TEX);
 
     /** Get the fully-qualified resource name for sprites belonging to this atlas*/
     fun wrap(resource: Identifier) = Identifier(resource.namespace, "$basePath/${resource.path}.png")

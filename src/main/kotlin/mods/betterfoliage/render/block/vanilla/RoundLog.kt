@@ -4,14 +4,13 @@ import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.render.column.*
 import mods.betterfoliage.util.Atlas
 import mods.betterfoliage.resource.discovery.*
-import mods.betterfoliage.resource.model.meshifyStandard
+import mods.betterfoliage.model.meshifyStandard
 import mods.betterfoliage.util.LazyMap
 import mods.betterfoliage.util.get
 import mods.betterfoliage.util.tryDefault
 import net.minecraft.block.BlockState
 import net.minecraft.block.LogBlock
 import net.minecraft.client.render.model.BakedModel
-import net.minecraft.client.texture.SpriteAtlasTexture
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.Direction.Axis
 import java.util.function.Consumer
@@ -28,10 +27,10 @@ object StandardLogDiscovery : ConfigurableModelDiscovery() {
     override val matchClasses: ConfigurableBlockMatcher get() = BetterFoliage.blockConfig.logBlocks
     override val modelTextures: List<ModelTextureList> get() = BetterFoliage.blockConfig.logModels.modelList
 
-    override fun processModel(state: BlockState, textures: List<String>, atlas: Consumer<Identifier>): BlockRenderKey? {
+    override fun processModel(state: BlockState, textures: List<Identifier>, atlas: Consumer<Identifier>): BlockRenderKey? {
         val axis = getAxis(state)
         log("       axis $axis")
-        return RoundLogModel.Key(axis, Identifier(textures[0]), Identifier(textures[1]))
+        return RoundLogModel.Key(axis, textures[0], textures[1])
     }
 
     fun getAxis(state: BlockState): Axis? {

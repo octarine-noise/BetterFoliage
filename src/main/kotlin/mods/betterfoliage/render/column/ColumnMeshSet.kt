@@ -2,13 +2,25 @@ package mods.betterfoliage.render.column
 
 import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.render.column.ColumnLayerData.SpecialRender.QuadrantType
-import mods.betterfoliage.render.column.ColumnLayerData.SpecialRender.QuadrantType.*
-import mods.betterfoliage.resource.model.*
+import mods.betterfoliage.render.column.ColumnLayerData.SpecialRender.QuadrantType.INVISIBLE
+import mods.betterfoliage.render.column.ColumnLayerData.SpecialRender.QuadrantType.LARGE_RADIUS
+import mods.betterfoliage.render.column.ColumnLayerData.SpecialRender.QuadrantType.SMALL_RADIUS
+import mods.betterfoliage.render.column.ColumnLayerData.SpecialRender.QuadrantType.SQUARE
+import mods.betterfoliage.model.Color
+import mods.betterfoliage.model.Quad
+import mods.betterfoliage.model.UV
+import mods.betterfoliage.model.Vertex
+import mods.betterfoliage.model.build
+import mods.betterfoliage.model.horizontalRectangle
+import mods.betterfoliage.model.verticalRectangle
 import mods.betterfoliage.util.Double3
 import mods.betterfoliage.util.Rotation
-import net.minecraft.block.BlockRenderLayer.SOLID
+import net.fabricmc.fabric.api.renderer.v1.material.BlendMode.SOLID
 import net.minecraft.client.texture.Sprite
-import net.minecraft.util.math.Direction.*
+import net.minecraft.util.math.Direction.Axis
+import net.minecraft.util.math.Direction.EAST
+import net.minecraft.util.math.Direction.SOUTH
+import net.minecraft.util.math.Direction.UP
 
 /**
  * Collection of dynamically generated meshes used to render rounded columns.

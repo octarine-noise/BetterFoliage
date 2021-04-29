@@ -1,20 +1,30 @@
 package mods.betterfoliage.render.column
 
 import mods.betterfoliage.BetterFoliage
+import mods.betterfoliage.chunk.BlockCtx
 import mods.betterfoliage.chunk.ChunkOverlayLayer
 import mods.betterfoliage.chunk.ChunkOverlayManager
 import mods.betterfoliage.chunk.dimType
-import mods.betterfoliage.render.column.ColumnLayerData.SpecialRender.BlockType.*
-import mods.betterfoliage.render.column.ColumnLayerData.SpecialRender.QuadrantType
-import mods.betterfoliage.render.column.ColumnLayerData.SpecialRender.QuadrantType.*
-import mods.betterfoliage.chunk.BlockCtx
 import mods.betterfoliage.render.block.vanilla.RoundLogKey
-import mods.betterfoliage.util.*
+import mods.betterfoliage.render.column.ColumnLayerData.SpecialRender.BlockType.NONSOLID
+import mods.betterfoliage.render.column.ColumnLayerData.SpecialRender.BlockType.PARALLEL
+import mods.betterfoliage.render.column.ColumnLayerData.SpecialRender.BlockType.PERPENDICULAR
+import mods.betterfoliage.render.column.ColumnLayerData.SpecialRender.BlockType.SOLID
+import mods.betterfoliage.render.column.ColumnLayerData.SpecialRender.QuadrantType
+import mods.betterfoliage.render.column.ColumnLayerData.SpecialRender.QuadrantType.INVISIBLE
+import mods.betterfoliage.render.column.ColumnLayerData.SpecialRender.QuadrantType.LARGE_RADIUS
+import mods.betterfoliage.render.column.ColumnLayerData.SpecialRender.QuadrantType.SMALL_RADIUS
+import mods.betterfoliage.render.column.ColumnLayerData.SpecialRender.QuadrantType.SQUARE
+import mods.betterfoliage.util.Int3
+import mods.betterfoliage.util.Rotation
+import mods.betterfoliage.util.allDirections
+import mods.betterfoliage.util.face
+import mods.betterfoliage.util.plus
 import net.minecraft.block.BlockState
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction.Axis
 import net.minecraft.util.math.Direction.AxisDirection
-import net.minecraft.world.ExtendedBlockView
+import net.minecraft.world.WorldView
 
 /** Index of SOUTH-EAST quadrant. */
 const val SE = 0
@@ -74,7 +84,7 @@ abstract class ColumnRenderLayer : ChunkOverlayLayer<ColumnLayerData> {
 
     val allNeighborOffsets = (-1..1).flatMap { offsetX -> (-1..1).flatMap { offsetY -> (-1..1).map { offsetZ -> Int3(offsetX, offsetY, offsetZ) }}}
 
-    override fun onBlockUpdate(world: ExtendedBlockView, pos: BlockPos) {
+    override fun onBlockUpdate(world: WorldView, pos: BlockPos) {
         allNeighborOffsets.forEach { offset -> ChunkOverlayManager.clear(world.dimType, this, pos + offset) }
     }
 
