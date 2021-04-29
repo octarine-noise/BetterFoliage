@@ -1,5 +1,6 @@
 package mods.betterfoliage.client.render.column
 
+import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.client.chunk.ChunkOverlayLayer
 import mods.betterfoliage.client.chunk.ChunkOverlayManager
 import mods.betterfoliage.client.chunk.dimType
@@ -72,7 +73,7 @@ abstract class ColumnRenderLayer : ChunkOverlayLayer<ColumnLayerData> {
     }
 
     override fun calculate(ctx: BlockCtx): ColumnLayerData {
-        if (allDirections.all { ctx.offset(it).isNormalCube }) return ColumnLayerData.SkipRender
+        if (allDirections.all { dir -> ctx.offset(dir).let { it.isNormalCube && registry[ctx] == null }}) return ColumnLayerData.SkipRender
         val columnTextures = registry[ctx] ?: return ColumnLayerData.ResolveError
 
         // if log axis is not defined and "Default to vertical" config option is not set, render normally
