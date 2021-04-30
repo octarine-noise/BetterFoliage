@@ -1,19 +1,16 @@
 package mods.betterfoliage.client.render
 
-import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.BetterFoliageMod
-import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.BlockConfig
 import mods.betterfoliage.client.config.Config
 import mods.betterfoliage.client.integration.ShadersModIntegration
-import mods.betterfoliage.client.resource.Identifier
 import mods.octarinecore.client.render.CombinedContext
 import mods.octarinecore.client.render.RenderDecorator
 import mods.octarinecore.client.render.lighting.FlatOffsetNoColor
 import mods.octarinecore.common.Int3
 import net.minecraft.util.Direction.DOWN
 import net.minecraft.util.Direction.UP
-import org.apache.logging.log4j.Level.DEBUG
+import net.minecraft.util.ResourceLocation
 
 class RenderLilypad : RenderDecorator(BetterFoliageMod.MOD_ID, BetterFoliageMod.bus) {
 
@@ -28,8 +25,8 @@ class RenderLilypad : RenderDecorator(BetterFoliageMod.MOD_ID, BetterFoliageMod.
         .setFlatShader(FlatOffsetNoColor(Int3.zero))
         .toCross(UP).addAll()
     }
-    val rootIcon = spriteSet { idx -> Identifier(BetterFoliageMod.MOD_ID, "blocks/better_lilypad_roots_$idx") }
-    val flowerIcon = spriteSet { idx -> Identifier(BetterFoliageMod.MOD_ID, "blocks/better_lilypad_flower_$idx") }
+    val rootIcon = spriteSet { idx -> ResourceLocation(BetterFoliageMod.MOD_ID, "blocks/better_lilypad_roots_$idx") }
+    val flowerIcon = spriteSet { idx -> ResourceLocation(BetterFoliageMod.MOD_ID, "blocks/better_lilypad_flower_$idx") }
     val perturbs = vectorSet(64) { modelIdx -> xzDisk(modelIdx) * Config.lilypad.hOffset }
 
     override fun isEligible(ctx: CombinedContext): Boolean =

@@ -1,6 +1,5 @@
 package mods.octarinecore.client.resource
 
-import mods.betterfoliage.client.resource.Identifier
 import mods.octarinecore.HasLogger
 import mods.octarinecore.common.completedVoid
 import mods.octarinecore.common.map
@@ -9,10 +8,10 @@ import net.minecraft.client.resources.ClientResourcePackInfo
 import net.minecraft.resources.*
 import net.minecraft.resources.ResourcePackType.CLIENT_RESOURCES
 import net.minecraft.resources.data.IMetadataSectionSerializer
+import net.minecraft.util.ResourceLocation
 import net.minecraft.util.text.StringTextComponent
 import org.apache.logging.log4j.Logger
 import java.io.IOException
-import java.lang.IllegalStateException
 import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutionException
@@ -31,18 +30,18 @@ class GeneratedBlockTexturePack(val nameSpace: String, val packName: String, ove
     override fun getResourceNamespaces(type: ResourcePackType) = setOf(nameSpace)
     override fun <T : Any?> getMetadata(deserializer: IMetadataSectionSerializer<T>) = null
     override fun getRootResourceStream(id: String) = null
-    override fun getAllResourceLocations(type: ResourcePackType, path: String, maxDepth: Int, filter: Predicate<String>) = emptyList<Identifier>()
+    override fun getAllResourceLocations(type: ResourcePackType, path: String, maxDepth: Int, filter: Predicate<String>) = emptyList<ResourceLocation>()
     override fun close() {}
 
     protected var manager: CompletableFuture<IResourceManager>? = null
-    val identifiers = Collections.synchronizedMap(mutableMapOf<Any, Identifier>())
-    val resources = Collections.synchronizedMap(mutableMapOf<Identifier, CompletableFuture<ByteArray>>())
+    val identifiers = Collections.synchronizedMap(mutableMapOf<Any, ResourceLocation>())
+    val resources = Collections.synchronizedMap(mutableMapOf<ResourceLocation, CompletableFuture<ByteArray>>())
 
-    fun register(key: Any, func: (IResourceManager)->ByteArray): Identifier {
+    fun register(key: Any, func: (IResourceManager)->ByteArray): ResourceLocation {
         if (manager == null) throw IllegalStateException("Cannot register resources unless block textures are being reloaded")
         identifiers[key]?.let { return it }
 
-        val id = Identifier(nameSpace, UUID.randomUUID().toString())
+        val id = ResourceLocation(nameSpace, UUID.randomUUID().toString())
         val resource = manager!!.map { func(it) }
 
         identifiers[key] = id
@@ -51,12 +50,12 @@ class GeneratedBlockTexturePack(val nameSpace: String, val packName: String, ove
         return id
     }
 
-    override fun getResourceStream(type: ResourcePackType, id: Identifier) =
+    override fun getResourceStream(type: ResourcePackType, id: ResourceLocation) =
         if (type != CLIENT_RESOURCES) null else
             try { resources[id]!!.get().inputStream() }
             catch (e: ExecutionException) { (e.cause as? IOException)?.let { throw it } }   // rethrow wrapped IOException if present
 
-    override fun resourceExists(type: ResourcePackType, id: Identifier) =
+    override fun resourceExists(type: ResourcePackType, id: ResourceLocation) =
         type == CLIENT_RESOURCES && resources.containsKey(id)
 
     override fun setup(manager: IResourceManager, bakeryF: CompletableFuture<ModelBakery>, atlas: AtlasFuture): StitchPhases {

@@ -1,8 +1,8 @@
 package mods.betterfoliage.client.texture
 
-import mods.betterfoliage.client.resource.Identifier
 import mods.octarinecore.client.resource.*
 import net.minecraft.resources.IResourceManager
+import net.minecraft.util.ResourceLocation
 import java.awt.image.BufferedImage
 
 /**
@@ -11,8 +11,8 @@ import java.awt.image.BufferedImage
  *
  * @param[domain] Resource domain of generator
  */
-data class GeneratedGrass(val sprite: Identifier, val isSnowed: Boolean, val atlas: Atlas = Atlas.BLOCKS) {
-    constructor(sprite: String, isSnowed: Boolean) : this(Identifier(sprite), isSnowed)
+data class GeneratedGrass(val sprite: ResourceLocation, val isSnowed: Boolean, val atlas: Atlas = Atlas.BLOCKS) {
+    constructor(sprite: String, isSnowed: Boolean) : this(ResourceLocation(sprite), isSnowed)
 
     fun register(pack: GeneratedBlockTexturePack) = pack.register(this, this::draw)
 

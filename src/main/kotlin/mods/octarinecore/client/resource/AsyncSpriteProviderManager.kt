@@ -1,13 +1,13 @@
 package mods.octarinecore.client.resource
 
-import mods.betterfoliage.client.resource.Identifier
-import mods.betterfoliage.client.resource.Sprite
+import mods.octarinecore.Sprite
 import mods.octarinecore.common.map
 import net.minecraft.client.renderer.texture.AtlasTexture
 import net.minecraft.client.renderer.texture.MissingTextureSprite
 import net.minecraft.profiler.IProfiler
 import net.minecraft.resources.IResourceManager
-import java.util.*
+import net.minecraft.util.ResourceLocation
+import java.util.Collections
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -30,7 +30,7 @@ class AsnycSpriteProviderManager<SOURCE: Any>(val profilerSection: String) {
      * Needed in order to keep the actual [AtlasTexture.stitch] call in the original method, in case
      * other modders want to modify it too.
      */
-    class StitchWrapper(val idList: Iterable<Identifier>, val onComplete: (AtlasTexture.SheetData)->Unit) {
+    class StitchWrapper(val idList: Iterable<ResourceLocation>, val onComplete: (AtlasTexture.SheetData)->Unit) {
         fun complete(sheet: AtlasTexture.SheetData) = onComplete(sheet)
     }
 
@@ -38,7 +38,7 @@ class AsnycSpriteProviderManager<SOURCE: Any>(val profilerSection: String) {
     var currentPhases: List<StitchPhases> = emptyList()
 
     @Suppress("UNCHECKED_CAST")
-    fun prepare(sourceObj: Any, manager: IResourceManager, idList: Iterable<Identifier>, profiler: IProfiler): Set<Identifier> {
+    fun prepare(sourceObj: Any, manager: IResourceManager, idList: Iterable<ResourceLocation>, profiler: IProfiler): Set<ResourceLocation> {
         profiler.startSection(profilerSection)
 
         val source = CompletableFuture<SOURCE>()
@@ -65,8 +65,8 @@ class AsnycSpriteProviderManager<SOURCE: Any>(val profilerSection: String) {
  * Provides a way for [AsyncSpriteProvider]s to register sprites to receive [CompletableFuture]s.
  * Tracks sprite ids that need to be stitched.
  */
-class AtlasFuture(initial: Iterable<Identifier>) {
-    val idSet = Collections.synchronizedSet(mutableSetOf<Identifier>().apply { addAll(initial) })
+class AtlasFuture(initial: Iterable<ResourceLocation>) {
+    val idSet = Collections.synchronizedSet(mutableSetOf<ResourceLocation>().apply { addAll(initial) })
     protected val sheet = CompletableFuture<AtlasTexture.SheetData>()
     protected val finished = CompletableFuture<Void>()
 
@@ -75,8 +75,8 @@ class AtlasFuture(initial: Iterable<Identifier>) {
         finished.complete(null)
     }
 
-    fun sprite(id: String) = sprite(Identifier(id))
-    fun sprite(id: Identifier): CompletableFuture<Sprite> {
+    fun sprite(id: String) = sprite(ResourceLocation(id))
+    fun sprite(id: ResourceLocation): CompletableFuture<Sprite> {
         idSet.add(id)
         return sheet.map { sheetData -> sheetData.sprites.find { it.name == id } ?: throw IllegalStateException("Atlas does not contain $id") }
     }

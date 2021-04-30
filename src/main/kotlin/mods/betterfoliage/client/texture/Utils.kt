@@ -1,11 +1,10 @@
 @file:JvmName("Utils")
 package mods.betterfoliage.client.texture
 
-import mods.betterfoliage.client.resource.Identifier
-import mods.octarinecore.client.resource.Atlas
 import mods.octarinecore.client.resource.get
 import mods.octarinecore.client.resource.loadImage
 import net.minecraft.resources.IResourceManager
+import net.minecraft.util.ResourceLocation
 import java.io.IOException
 
 fun blendRGB(rgb1: Int, rgb2: Int, weight1: Int, weight2: Int): Int {
@@ -17,4 +16,4 @@ fun blendRGB(rgb1: Int, rgb2: Int, weight1: Int, weight2: Int): Int {
     return result
 }
 
-fun IResourceManager.loadSprite(id: Identifier) = this.get(id)?.loadImage() ?: throw IOException("Cannot load resource $id")
+fun IResourceManager.loadSprite(id: ResourceLocation) = this.get(id)?.loadImage() ?: throw IOException("Cannot load resource $id")

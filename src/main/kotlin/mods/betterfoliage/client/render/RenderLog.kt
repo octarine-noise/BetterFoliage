@@ -9,7 +9,6 @@ import mods.betterfoliage.client.render.column.AbstractRenderColumn
 import mods.betterfoliage.client.render.column.ColumnRenderLayer
 import mods.betterfoliage.client.render.column.ColumnTextureInfo
 import mods.betterfoliage.client.render.column.SimpleColumnInfo
-import mods.betterfoliage.client.resource.Identifier
 import mods.octarinecore.client.render.CombinedContext
 import mods.octarinecore.client.resource.*
 import mods.octarinecore.common.config.ConfigurableBlockMatcher
@@ -18,6 +17,7 @@ import mods.octarinecore.tryDefault
 import net.minecraft.block.BlockState
 import net.minecraft.block.LogBlock
 import net.minecraft.util.Direction.Axis
+import net.minecraft.util.ResourceLocation
 import org.apache.logging.log4j.Level
 import java.util.concurrent.CompletableFuture
 
@@ -57,7 +57,7 @@ object AsyncLogDiscovery : ConfigurableModelDiscovery<ColumnTextureInfo>() {
     override fun processModel(state: BlockState, textures: List<String>, atlas: AtlasFuture): CompletableFuture<ColumnTextureInfo> {
         val axis = getAxis(state)
         logger.log(Level.DEBUG, "$logName:       axis $axis")
-        val spriteList = textures.map { atlas.sprite(Identifier(it)) }
+        val spriteList = textures.map { atlas.sprite(ResourceLocation(it)) }
         return atlas.mapAfter {
             SimpleColumnInfo(
                 axis,

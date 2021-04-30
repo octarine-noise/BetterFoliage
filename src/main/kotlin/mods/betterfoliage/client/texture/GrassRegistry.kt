@@ -3,13 +3,16 @@ package mods.betterfoliage.client.texture
 import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.client.config.BlockConfig
 import mods.betterfoliage.client.config.Config
-import mods.betterfoliage.client.resource.Identifier
 import mods.octarinecore.client.render.lighting.HSB
-import mods.octarinecore.client.resource.*
+import mods.octarinecore.client.resource.AtlasFuture
+import mods.octarinecore.client.resource.ConfigurableModelDiscovery
+import mods.octarinecore.client.resource.ModelRenderRegistryRoot
+import mods.octarinecore.client.resource.averageColor
 import mods.octarinecore.common.config.ConfigurableBlockMatcher
 import mods.octarinecore.common.config.ModelTextureList
 import net.minecraft.block.BlockState
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
+import net.minecraft.util.ResourceLocation
 import org.apache.logging.log4j.Level
 import java.lang.Math.min
 import java.util.concurrent.CompletableFuture
@@ -39,7 +42,7 @@ object AsyncGrassDiscovery : ConfigurableModelDiscovery<GrassInfo>() {
 
     override fun processModel(state: BlockState, textures: List<String>, atlas: AtlasFuture): CompletableFuture<GrassInfo> {
         val textureName = textures[0]
-        val spriteF = atlas.sprite(Identifier(textureName))
+        val spriteF = atlas.sprite(ResourceLocation(textureName))
         logger.log(Level.DEBUG, "$logName:       texture $textureName")
         return atlas.mapAfter {
             val sprite = spriteF.get()

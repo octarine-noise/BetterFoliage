@@ -1,8 +1,7 @@
 package mods.octarinecore.client.resource
 
 import mods.betterfoliage.BetterFoliage
-import mods.betterfoliage.client.resource.Identifier
-import mods.betterfoliage.client.resource.Sprite
+import mods.octarinecore.Sprite
 import mods.octarinecore.client.render.Model
 import mods.octarinecore.common.Double3
 import mods.octarinecore.common.Int3
@@ -11,6 +10,7 @@ import mods.octarinecore.common.sink
 import mods.octarinecore.stripEnd
 import mods.octarinecore.stripStart
 import net.minecraft.resources.IResourceManager
+import net.minecraft.util.ResourceLocation
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.MathHelper
 import net.minecraft.world.IWorld
@@ -20,7 +20,7 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.eventbus.api.IEventBus
 import net.minecraftforge.eventbus.api.SubscribeEvent
 import net.minecraftforge.fml.config.ModConfig
-import java.util.*
+import java.util.Random
 import java.util.concurrent.CompletableFuture
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
@@ -29,8 +29,8 @@ enum class Atlas(val basePath: String) {
     BLOCKS("textures"),
     PARTICLES("textures/particle");
 
-    fun wrap(resource: Identifier) = Identifier(resource.namespace, "$basePath/${resource.path}.png")
-    fun unwrap(resource: Identifier) = resource.stripStart("$basePath/").stripEnd(".png")
+    fun wrap(resource: ResourceLocation) = ResourceLocation(resource.namespace, "$basePath/${resource.path}.png")
+    fun unwrap(resource: ResourceLocation) = resource.stripStart("$basePath/").stripEnd(".png")
     fun matches(event: TextureStitchEvent) = event.map.basePath == basePath
 }
 
@@ -62,10 +62,10 @@ open class ResourceHandler(
     // ============================
     // Resource declarations
     // ============================
-    fun sprite(id: Identifier) = sprite { id }
-    fun sprite(idFunc: ()->Identifier) = AsyncSpriteDelegate(idFunc).apply { BetterFoliage.getSpriteManager(targetAtlas).providers.add(this) }
-    fun spriteSet(idFunc: (Int)->Identifier) = AsyncSpriteSet(targetAtlas, idFunc).apply { BetterFoliage.getSpriteManager(targetAtlas).providers.add(this) }
-    fun spriteSetTransformed(check: (Int)->Identifier, register: (Identifier)->Identifier) =
+    fun sprite(id: ResourceLocation) = sprite { id }
+    fun sprite(idFunc: ()->ResourceLocation) = AsyncSpriteDelegate(idFunc).apply { BetterFoliage.getSpriteManager(targetAtlas).providers.add(this) }
+    fun spriteSet(idFunc: (Int)->ResourceLocation) = AsyncSpriteSet(targetAtlas, idFunc).apply { BetterFoliage.getSpriteManager(targetAtlas).providers.add(this) }
+    fun spriteSetTransformed(check: (Int)->ResourceLocation, register: (ResourceLocation)->ResourceLocation) =
         AsyncSpriteSet(targetAtlas, check, register).apply { BetterFoliage.getSpriteManager(targetAtlas).providers.add(this) }
     fun model(init: Model.()->Unit) = ModelHolder(init).apply { resources.add(this) }
     fun modelSet(num: Int, init: Model.(Int)->Unit) = ModelSet(num, init).apply { resources.add(this) }
@@ -88,7 +88,7 @@ open class ResourceHandler(
 // ============================
 // Resource container classes
 // ============================
-class AsyncSpriteDelegate(val idFunc: ()->Identifier) : ReadOnlyProperty<Any, Sprite>, AsyncSpriteProvider<Any> {
+class AsyncSpriteDelegate(val idFunc: ()->ResourceLocation) : ReadOnlyProperty<Any, Sprite>, AsyncSpriteProvider<Any> {
     protected lateinit var value: Sprite
     override fun getValue(thisRef: Any, property: KProperty<*>) = value
 
@@ -108,7 +108,7 @@ interface SpriteSet {
     operator fun get(idx: Int): Sprite
 }
 
-class AsyncSpriteSet(val targetAtlas: Atlas = Atlas.BLOCKS, val idFunc: (Int)->Identifier, val transform: (Identifier)->Identifier = { it }) : AsyncSpriteProvider<Any> {
+class AsyncSpriteSet(val targetAtlas: Atlas = Atlas.BLOCKS, val idFunc: (Int)->ResourceLocation, val transform: (ResourceLocation)->ResourceLocation = { it }) : AsyncSpriteProvider<Any> {
     var num = 0
         protected set
     protected var sprites: List<Sprite> = emptyList()

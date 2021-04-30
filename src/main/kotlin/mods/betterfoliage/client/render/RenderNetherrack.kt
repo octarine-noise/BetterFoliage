@@ -1,22 +1,22 @@
 package mods.betterfoliage.client.render
 
-import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.BetterFoliageMod
-import mods.betterfoliage.client.Client
-import mods.betterfoliage.client.config.BlockConfig
 import mods.betterfoliage.client.config.Config
-import mods.betterfoliage.client.resource.Identifier
-import mods.octarinecore.client.render.*
-import mods.octarinecore.client.render.lighting.*
+import mods.octarinecore.client.render.CombinedContext
+import mods.octarinecore.client.render.RenderDecorator
+import mods.octarinecore.client.render.lighting.cornerAo
+import mods.octarinecore.client.render.lighting.cornerFlat
+import mods.octarinecore.client.render.lighting.faceOrientedAuto
 import mods.octarinecore.random
 import net.minecraft.block.Blocks
 import net.minecraft.util.Direction.Axis
-import net.minecraft.util.Direction.*
-import org.apache.logging.log4j.Level.DEBUG
+import net.minecraft.util.Direction.DOWN
+import net.minecraft.util.Direction.UP
+import net.minecraft.util.ResourceLocation
 
 class RenderNetherrack : RenderDecorator(BetterFoliageMod.MOD_ID, BetterFoliageMod.bus) {
 
-    val netherrackIcon = spriteSet { idx -> Identifier(BetterFoliageMod.MOD_ID, "blocks/better_netherrack_$idx") }
+    val netherrackIcon = spriteSet { idx -> ResourceLocation(BetterFoliageMod.MOD_ID, "blocks/better_netherrack_$idx") }
     val netherrackModel = modelSet(64) { modelIdx ->
         verticalRectangle(x1 = -0.5, z1 = 0.5, x2 = 0.5, z2 = -0.5, yTop = -0.5,
         yBottom = -0.5 - random(Config.netherrack.heightMin, Config.netherrack.heightMax))

@@ -5,7 +5,6 @@ import mods.betterfoliage.client.config.BlockConfig
 import mods.betterfoliage.client.render.AsyncLogDiscovery
 import mods.betterfoliage.client.render.column.ColumnTextureInfo
 import mods.betterfoliage.client.render.column.SimpleColumnInfo
-import mods.betterfoliage.client.resource.Identifier
 import mods.betterfoliage.client.texture.LeafInfo
 import mods.betterfoliage.client.texture.defaultRegisterLeaf
 import mods.octarinecore.HasLogger
@@ -19,6 +18,7 @@ import net.minecraft.block.BlockState
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.model.ModelBakery
 import net.minecraft.resources.IResourceManager
+import net.minecraft.util.ResourceLocation
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.IBlockReader
 import net.minecraftforge.fml.ModList
@@ -61,7 +61,7 @@ object ForestryIntegration {
 
 object ForestryLeafDiscovery : HasLogger, AsyncSpriteProvider<ModelBakery>, ModelRenderRegistry<LeafInfo> {
     override val logger = BetterFoliage.logDetail
-    var idToValue = emptyMap<Identifier, LeafInfo>()
+    var idToValue = emptyMap<ResourceLocation, LeafInfo>()
 
     override fun get(state: BlockState, world: IBlockReader, pos: BlockPos): LeafInfo? {
         // check variant property (used in decorative leaves)
@@ -82,7 +82,7 @@ object ForestryLeafDiscovery : HasLogger, AsyncSpriteProvider<ModelBakery>, Mode
     }
 
     override fun setup(manager: IResourceManager, bakeryF: CompletableFuture<ModelBakery>, atlasFuture: AtlasFuture): StitchPhases {
-        val futures = mutableMapOf<Identifier, CompletableFuture<LeafInfo>>()
+        val futures = mutableMapOf<ResourceLocation, CompletableFuture<LeafInfo>>()
 
         return StitchPhases(
             discovery = bakeryF.thenRunAsync {

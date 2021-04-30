@@ -2,14 +2,13 @@ package mods.betterfoliage.client.texture
 
 import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.BetterFoliageMod
-import mods.betterfoliage.client.resource.Identifier
-import mods.betterfoliage.client.resource.Sprite
+import mods.octarinecore.Sprite
 import mods.octarinecore.client.resource.*
-import mods.octarinecore.stripStart
-import mods.octarinecore.client.resource.Atlas
 import mods.octarinecore.common.sinkAsync
+import mods.octarinecore.stripStart
 import net.minecraft.client.particle.ParticleManager
 import net.minecraft.resources.IResourceManager
+import net.minecraft.util.ResourceLocation
 import java.util.concurrent.CompletableFuture
 
 class FixedSpriteSet(val sprites: List<Sprite>) : SpriteSet {
@@ -30,11 +29,11 @@ object LeafParticleRegistry : AsyncSpriteProvider<ParticleManager> {
 
         return StitchPhases(
             discovery = particleF.sinkAsync {
-                typeMappings.loadMappings(Identifier(BetterFoliageMod.MOD_ID, "leaf_texture_mappings.cfg"))
+                typeMappings.loadMappings(ResourceLocation(BetterFoliageMod.MOD_ID, "leaf_texture_mappings.cfg"))
                 (typeMappings.mappings.map { it.type } + "default").distinct().forEach { leafType ->
-                    val ids = (0 until 16).map { idx -> Identifier(BetterFoliageMod.MOD_ID, "falling_leaf_${leafType}_$idx") }
+                    val ids = (0 until 16).map { idx -> ResourceLocation(BetterFoliageMod.MOD_ID, "falling_leaf_${leafType}_$idx") }
                     val wids = ids.map { Atlas.PARTICLES.wrap(it) }
-                    futures[leafType] = (0 until 16).map { idx -> Identifier(BetterFoliageMod.MOD_ID, "falling_leaf_${leafType}_$idx") }
+                    futures[leafType] = (0 until 16).map { idx -> ResourceLocation(BetterFoliageMod.MOD_ID, "falling_leaf_${leafType}_$idx") }
                         .filter { manager.hasResource(Atlas.PARTICLES.wrap(it)) }
                         .map { atlasFuture.sprite(it) }
                 }
@@ -57,7 +56,7 @@ object LeafParticleRegistry : AsyncSpriteProvider<ParticleManager> {
 class TextureMatcher {
 
     data class Mapping(val domain: String?, val path: String, val type: String) {
-        fun matches(iconLocation: Identifier): Boolean {
+        fun matches(iconLocation: ResourceLocation): Boolean {
             return (domain == null || domain == iconLocation.namespace) &&
                 iconLocation.path.stripStart("blocks/").contains(path, ignoreCase = true)
         }
@@ -65,10 +64,10 @@ class TextureMatcher {
 
     val mappings: MutableList<Mapping> = mutableListOf()
 
-    fun getType(resource: Identifier) = mappings.filter { it.matches(resource) }.map { it.type }.firstOrNull()
-    fun getType(iconName: String) = Identifier(iconName).let { getType(it) }
+    fun getType(resource: ResourceLocation) = mappings.filter { it.matches(resource) }.map { it.type }.firstOrNull()
+    fun getType(iconName: String) = ResourceLocation(iconName).let { getType(it) }
 
-    fun loadMappings(mappingLocation: Identifier) {
+    fun loadMappings(mappingLocation: ResourceLocation) {
         mappings.clear()
         resourceManager[mappingLocation]?.getLines()?.let { lines ->
             lines.filter { !it.startsWith("//") }.filter { !it.isEmpty() }.forEach { line ->

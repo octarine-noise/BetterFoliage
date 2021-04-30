@@ -18,6 +18,8 @@ import net.minecraft.world.IBlockReader
 import net.minecraft.world.IEnviromentBlockReader
 import java.util.*
 
+typealias Sprite = TextureAtlasSprite
+
 // Java
 val String = ClassRef<String>("java.lang.String")
 val Map = ClassRef<Map<*, *>>("java.util.Map")

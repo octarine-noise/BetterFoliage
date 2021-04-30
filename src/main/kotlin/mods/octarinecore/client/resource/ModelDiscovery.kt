@@ -1,20 +1,20 @@
 package mods.octarinecore.client.resource
 
 import com.google.common.base.Joiner
-import mods.betterfoliage.client.resource.ModelIdentifier
 import mods.octarinecore.HasLogger
 import mods.octarinecore.client.render.BlockCtx
 import mods.octarinecore.common.Int3
 import mods.octarinecore.common.config.IBlockMatcher
 import mods.octarinecore.common.config.ModelTextureList
 import mods.octarinecore.common.plus
-import mods.octarinecore.findFirst
 import mods.octarinecore.common.sinkAsync
+import mods.octarinecore.findFirst
 import net.minecraft.block.BlockState
 import net.minecraft.client.renderer.BlockModelShapes
 import net.minecraft.client.renderer.model.BlockModel
 import net.minecraft.client.renderer.model.IUnbakedModel
 import net.minecraft.client.renderer.model.ModelBakery
+import net.minecraft.client.renderer.model.ModelResourceLocation
 import net.minecraft.client.renderer.model.VariantList
 import net.minecraft.resources.IResourceManager
 import net.minecraft.util.ResourceLocation
@@ -40,7 +40,7 @@ abstract class ModelRenderRegistryRoot<T> : ModelRenderRegistry<T> {
 class ModelDiscoveryContext(
     bakery: ModelBakery,
     val state: BlockState,
-    val modelId: ModelIdentifier
+    val modelId: ModelResourceLocation
 ) {
     val models = bakery.unwrapVariants(bakery.getUnbakedModel(modelId) to modelId)
         .filter { it.second != bakery.getUnbakedModel(ModelBakery.MODEL_MISSING) }

@@ -1,10 +1,9 @@
 package mods.betterfoliage.client.integration
 
 import mods.betterfoliage.BetterFoliage
-import mods.betterfoliage.client.render.LogRegistry
 import mods.betterfoliage.client.render.column.ColumnTextureInfo
 import mods.betterfoliage.client.render.column.SimpleColumnInfo
-import mods.betterfoliage.client.resource.Sprite
+import mods.octarinecore.Sprite
 import mods.octarinecore.client.render.CombinedContext
 import mods.octarinecore.client.render.Quad
 import mods.octarinecore.client.render.lighting.QuadIconResolver
@@ -17,7 +16,6 @@ import net.minecraft.util.Direction
 import net.minecraft.util.Direction.*
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.fml.ModList
-import org.apache.logging.log4j.Level
 import java.util.concurrent.CompletableFuture
 
 

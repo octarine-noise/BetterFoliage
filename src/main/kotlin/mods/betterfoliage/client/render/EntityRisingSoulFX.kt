@@ -1,10 +1,7 @@
 package mods.betterfoliage.client.render
 
-import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.BetterFoliageMod
-import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.Config
-import mods.betterfoliage.client.resource.Identifier
 import mods.octarinecore.client.render.AbstractEntityFX
 import mods.octarinecore.client.resource.Atlas
 import mods.octarinecore.client.resource.ResourceHandler
@@ -15,7 +12,6 @@ import net.minecraft.util.ResourceLocation
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.MathHelper
 import net.minecraft.world.World
-import org.apache.logging.log4j.Level.DEBUG
 import java.util.*
 
 class EntityRisingSoulFX(world: World, pos: BlockPos) :
@@ -69,5 +65,5 @@ AbstractEntityFX(world, pos.x.toDouble() + 0.5, pos.y.toDouble() + 1.0, pos.z.to
 
 object RisingSoulTextures : ResourceHandler(BetterFoliageMod.MOD_ID, BetterFoliageMod.bus, targetAtlas = Atlas.PARTICLES) {
     val headIcons = spriteSet { idx -> ResourceLocation(BetterFoliageMod.MOD_ID, "rising_soul_$idx") }
-    val trackIcon by sprite(Identifier(BetterFoliageMod.MOD_ID, "soul_track"))
+    val trackIcon by sprite(ResourceLocation(BetterFoliageMod.MOD_ID, "soul_track"))
 }

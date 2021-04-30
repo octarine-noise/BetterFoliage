@@ -4,7 +4,6 @@ import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.config.Config
 import mods.betterfoliage.client.integration.OptifineCustomColors
 import mods.betterfoliage.client.integration.ShadersModIntegration
-import mods.betterfoliage.client.resource.Identifier
 import mods.betterfoliage.client.texture.LeafRegistry
 import mods.octarinecore.PI2
 import mods.octarinecore.client.render.CombinedContext
@@ -18,6 +17,7 @@ import mods.octarinecore.common.allDirections
 import mods.octarinecore.common.vec
 import mods.octarinecore.random
 import net.minecraft.util.Direction.UP
+import net.minecraft.util.ResourceLocation
 import java.lang.Math.cos
 import java.lang.Math.sin
 
@@ -30,7 +30,7 @@ class RenderLeaves : RenderDecorator(BetterFoliageMod.MOD_ID, BetterFoliageMod.b
         .scale(Config.leaves.size)
         .toCross(UP).addAll()
     }
-    val snowedIcon = spriteSet { idx -> Identifier(BetterFoliageMod.MOD_ID, "blocks/better_leaves_snowed_$idx") }
+    val snowedIcon = spriteSet { idx -> ResourceLocation(BetterFoliageMod.MOD_ID, "blocks/better_leaves_snowed_$idx") }
 
     val perturbs = vectorSet(64) { idx ->
         val angle = PI2 * idx / 64.0

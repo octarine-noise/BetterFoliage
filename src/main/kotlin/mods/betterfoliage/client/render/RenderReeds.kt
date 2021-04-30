@@ -2,10 +2,8 @@ package mods.betterfoliage.client.render
 
 import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.BetterFoliageMod
-import mods.betterfoliage.client.Client
 import mods.betterfoliage.client.config.Config
 import mods.betterfoliage.client.integration.ShadersModIntegration
-import mods.betterfoliage.client.resource.Identifier
 import mods.octarinecore.client.render.CombinedContext
 import mods.octarinecore.client.render.RenderDecorator
 import mods.octarinecore.client.render.lighting.FlatOffsetNoColor
@@ -14,13 +12,13 @@ import mods.octarinecore.random
 import net.minecraft.block.material.Material
 import net.minecraft.tags.BlockTags
 import net.minecraft.util.Direction.UP
-import org.apache.logging.log4j.Level.DEBUG
+import net.minecraft.util.ResourceLocation
 
 class RenderReeds : RenderDecorator(BetterFoliageMod.MOD_ID, BetterFoliageMod.bus) {
 
     val noise = simplexNoise()
     val reedIcons = spriteSetTransformed(
-        check = { idx -> Identifier(BetterFoliageMod.MOD_ID, "blocks/better_reed_$idx")},
+        check = { idx -> ResourceLocation(BetterFoliageMod.MOD_ID, "blocks/better_reed_$idx") },
         register = { CenteredSprite(it).register(BetterFoliage.asyncPack) }
     )
     val reedModels = modelSet(64) { modelIdx ->

@@ -2,13 +2,13 @@ package mods.betterfoliage.client.texture
 
 import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.client.config.BlockConfig
-import mods.betterfoliage.client.resource.Identifier
 import mods.octarinecore.HasLogger
 import mods.octarinecore.client.resource.*
 import mods.octarinecore.common.config.ConfigurableBlockMatcher
 import mods.octarinecore.common.config.ModelTextureList
 import net.minecraft.block.BlockState
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
+import net.minecraft.util.ResourceLocation
 import java.util.concurrent.CompletableFuture
 
 const val defaultLeafColor = 0
@@ -35,7 +35,8 @@ object AsyncLeafDiscovery : ConfigurableModelDiscovery<LeafInfo>() {
     override val matchClasses: ConfigurableBlockMatcher get() = BlockConfig.leafBlocks
     override val modelTextures: List<ModelTextureList> get() = BlockConfig.leafModels.modelList
 
-    override fun processModel(state: BlockState, textures: List<String>, atlas: AtlasFuture) = defaultRegisterLeaf(Identifier(textures[0]), atlas)
+    override fun processModel(state: BlockState, textures: List<String>, atlas: AtlasFuture) =
+        defaultRegisterLeaf(ResourceLocation(textures[0]), atlas)
 
     fun init() {
         LeafRegistry.registries.add(this)
@@ -43,7 +44,7 @@ object AsyncLeafDiscovery : ConfigurableModelDiscovery<LeafInfo>() {
     }
 }
 
-fun HasLogger.defaultRegisterLeaf(sprite: Identifier, atlas: AtlasFuture): CompletableFuture<LeafInfo> {
+fun HasLogger.defaultRegisterLeaf(sprite: ResourceLocation, atlas: AtlasFuture): CompletableFuture<LeafInfo> {
     val leafType = LeafParticleRegistry.typeMappings.getType(sprite) ?: "default"
     val generated = GeneratedLeaf(sprite, leafType).register(BetterFoliage.asyncPack)
     val roundLeaf = atlas.sprite(generated)

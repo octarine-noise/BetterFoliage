@@ -1,12 +1,12 @@
 package mods.octarinecore.client.resource
 
-import mods.betterfoliage.client.resource.Identifier
 import mods.betterfoliage.client.texture.loadSprite
 import net.minecraft.resources.IResourceManager
+import net.minecraft.util.ResourceLocation
 import java.awt.image.BufferedImage
 import java.lang.Math.max
 
-data class CenteredSprite(val sprite: Identifier, val atlas: Atlas = Atlas.BLOCKS, val aspectHeight: Int = 1, val aspectWidth: Int = 1) {
+data class CenteredSprite(val sprite: ResourceLocation, val atlas: Atlas = Atlas.BLOCKS, val aspectHeight: Int = 1, val aspectWidth: Int = 1) {
 
     fun register(pack: GeneratedBlockTexturePack) = pack.register(this, this::draw)
 

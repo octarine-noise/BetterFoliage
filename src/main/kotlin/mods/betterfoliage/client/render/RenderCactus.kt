@@ -5,7 +5,6 @@ import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.client.config.Config
 import mods.betterfoliage.client.render.column.ColumnTextureInfo
 import mods.betterfoliage.client.render.column.SimpleColumnInfo
-import mods.betterfoliage.client.resource.Identifier
 import mods.octarinecore.client.render.*
 import mods.octarinecore.client.render.lighting.*
 import mods.octarinecore.client.resource.*
@@ -15,7 +14,7 @@ import mods.octarinecore.common.config.SimpleBlockMatcher
 import net.minecraft.block.BlockState
 import net.minecraft.block.CactusBlock
 import net.minecraft.util.Direction.*
-import org.apache.logging.log4j.Level.DEBUG
+import net.minecraft.util.ResourceLocation
 import java.util.concurrent.CompletableFuture
 
 object AsyncCactusDiscovery : ConfigurableModelDiscovery<ColumnTextureInfo>() {
@@ -23,7 +22,7 @@ object AsyncCactusDiscovery : ConfigurableModelDiscovery<ColumnTextureInfo>() {
     override val matchClasses = SimpleBlockMatcher(CactusBlock::class.java)
     override val modelTextures = listOf(ModelTextureList("block/cactus", "top", "bottom", "side"))
     override fun processModel(state: BlockState, textures: List<String>, atlas: AtlasFuture): CompletableFuture<ColumnTextureInfo>? {
-        val sprites = textures.map { atlas.sprite(Identifier(it)) }
+        val sprites = textures.map { atlas.sprite(ResourceLocation(it)) }
         return atlas.mapAfter {
             SimpleColumnInfo(
                 Axis.Y,
@@ -44,8 +43,8 @@ class RenderCactus : RenderDecorator(BetterFoliageMod.MOD_ID, BetterFoliageMod.b
     val cactusStemRadius = 0.4375
     val cactusArmRotation = listOf(NORTH, SOUTH, EAST, WEST).map { Rotation.rot90[it.ordinal] }
 
-    val iconCross by sprite(Identifier(BetterFoliageMod.MOD_ID, "blocks/better_cactus"))
-    val iconArm = spriteSet { idx -> Identifier(BetterFoliageMod.MOD_ID, "blocks/better_cactus_arm_$idx") }
+    val iconCross by sprite(ResourceLocation(BetterFoliageMod.MOD_ID, "blocks/better_cactus"))
+    val iconArm = spriteSet { idx -> ResourceLocation(BetterFoliageMod.MOD_ID, "blocks/better_cactus_arm_$idx") }
 
     val modelStem = model {
         horizontalRectangle(x1 = -cactusStemRadius, x2 = cactusStemRadius, z1 = -cactusStemRadius, z2 = cactusStemRadius, y = 0.5)
