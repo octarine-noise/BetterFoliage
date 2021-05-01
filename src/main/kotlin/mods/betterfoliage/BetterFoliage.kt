@@ -1,12 +1,9 @@
 package mods.betterfoliage
 
-import mods.betterfoliage.client.Client
-import mods.betterfoliage.client.render.RisingSoulTextures
-import mods.octarinecore.client.gui.textComponent
+import mods.betterfoliage.util.textComponent
 import mods.octarinecore.client.resource.AsnycSpriteProviderManager
-import mods.octarinecore.client.resource.AsyncSpriteProvider
-import mods.octarinecore.client.resource.Atlas
-import mods.octarinecore.client.resource.GeneratedBlockTexturePack
+import mods.betterfoliage.resource.generated.GeneratedBlockTexturePack
+import mods.betterfoliage.util.Atlas
 import net.minecraft.block.BlockState
 import net.minecraft.client.Minecraft
 import net.minecraft.client.particle.ParticleManager

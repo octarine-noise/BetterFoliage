@@ -1,11 +1,11 @@
 package mods.betterfoliage.mixin;
 
-import mods.betterfoliage.client.integration.ShadersModIntegration;
+import mods.betterfoliage.integration.ShadersModIntegration;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.renderer.BlockModelRenderer;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IEnviromentBlockReader;
+import net.minecraft.world.ILightReader;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
@@ -18,7 +18,7 @@ public class MixinShadersBlockModelRenderer {
 
     @SuppressWarnings("UnresolvedMixinReference")
     @ModifyArg(method = renderModel, at = @At(value = "INVOKE", target = pushEntity), remap = false)
-    BlockState overrideBlockState(BlockState state, BlockPos pos, IEnviromentBlockReader world, BufferBuilder buffer) {
+    BlockState overrideBlockState(BlockState state, BlockPos pos, ILightReader world, BufferBuilder buffer) {
         return ShadersModIntegration.getBlockStateOverride(state, world, pos);
     }
 }

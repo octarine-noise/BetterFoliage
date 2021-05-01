@@ -1,6 +1,6 @@
 plugins {
     kotlin("jvm").version("1.3.61")
-    id("net.minecraftforge.gradle").version("3.0.157")
+    id("net.minecraftforge.gradle").version("3.0.194")
     id("org.spongepowered.mixin").version("0.7-SNAPSHOT")
 }
 apply(plugin = "org.spongepowered.mixin")

@@ -1,6 +1,6 @@
 package mods.betterfoliage.mixin;
 
-import mods.betterfoliage.client.Hooks;
+import mods.betterfoliage.Hooks;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.renderer.WorldRenderer;
@@ -17,7 +17,7 @@ import java.util.Random;
 @Mixin(ClientWorld.class)
 public class MixinClientWorld {
 
-    private static final String worldAnimateTick = "Lnet/minecraft/client/world/ClientWorld;animateTick(IIIILjava/util/Random;ZLnet/minecraft/util/math/BlockPos$MutableBlockPos;)V";
+    private static final String worldAnimateTick = "Lnet/minecraft/client/world/ClientWorld;animateTick(IIIILjava/util/Random;ZLnet/minecraft/util/math/BlockPos$Mutable;)V";
     private static final String blockAnimateTick = "Lnet/minecraft/block/Block;animateTick(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Ljava/util/Random;)V";
 
     private static final String worldNotify = "Lnet/minecraft/client/world/ClientWorld;notifyBlockUpdate(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Lnet/minecraft/block/BlockState;I)V";
@@ -34,7 +34,7 @@ public class MixinClientWorld {
 
     /**
      * Inject callback to get notified of client-side blockstate changes.
-     * Used to invalidate caches in the {@link mods.betterfoliage.client.chunk.ChunkOverlayManager}
+     * Used to invalidate caches in the {@link mods.betterfoliage.chunk.ChunkOverlayManager}
      */
     @Redirect(method = worldNotify, at = @At(value = "INVOKE", target = rendererNotify))
     void onClientBlockChanged(WorldRenderer renderer, IBlockReader world, BlockPos pos, BlockState oldState, BlockState newState, int flags) {
