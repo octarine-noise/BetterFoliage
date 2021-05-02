@@ -12,9 +12,9 @@ import net.minecraft.util.math.Direction
 import net.minecraft.util.math.Direction.*
 import java.lang.Math.max
 import java.lang.Math.min
+import java.util.Random
 import kotlin.math.cos
 import kotlin.math.sin
-import kotlin.random.Random
 
 /**
  * Vertex UV coordinates
