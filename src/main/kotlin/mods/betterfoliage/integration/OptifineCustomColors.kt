@@ -1,39 +1,44 @@
 package mods.betterfoliage.integration
 
-import mods.betterfoliage.BetterFoliage
-import mods.betterfoliage.render.old.CombinedContext
+import mods.betterfoliage.chunk.BlockCtx
 import mods.betterfoliage.util.ThreadLocalDelegate
-import mods.octarinecore.*
 import mods.betterfoliage.util.allAvailable
 import mods.betterfoliage.util.reflectField
+import mods.octarinecore.BlockPos
+import mods.octarinecore.BlockState
+import mods.octarinecore.CustomColors
+import mods.octarinecore.RenderEnv
 import net.minecraft.block.BlockState
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.model.BakedQuad
 import net.minecraft.util.Direction.UP
 import net.minecraft.util.math.BlockPos
-import org.apache.logging.log4j.Level
+import net.minecraft.world.level.ColorResolver
+import org.apache.logging.log4j.Level.INFO
+import org.apache.logging.log4j.LogManager
 
 /**
  * Integration for OptiFine custom block colors.
  */
 @Suppress("UNCHECKED_CAST")
 object OptifineCustomColors {
+    val logger = LogManager.getLogger(this)
 
     val isColorAvailable = allAvailable(CustomColors, CustomColors.getColorMultiplier)
 
     init {
-        BetterFoliage.log(Level.INFO, "Optifine custom color support is ${if (isColorAvailable) "enabled" else "disabled" }")
+        logger.log(INFO, "Optifine custom color support is ${if (isColorAvailable) "enabled" else "disabled" }")
     }
 
     val renderEnv by ThreadLocalDelegate { OptifineRenderEnv() }
     val fakeQuad = BakedQuad(IntArray(0), 1, UP, null, true)
 
-    fun getBlockColor(ctx: CombinedContext): Int {
+    fun getBlockColor(ctx: BlockCtx, resolver: ColorResolver): Int {
         val ofColor = if (isColorAvailable && Minecraft.getInstance().gameSettings.reflectField<Boolean>("ofCustomColors") == true) {
             renderEnv.reset(ctx.state, ctx.pos)
             CustomColors.getColorMultiplier.invokeStatic(fakeQuad, ctx.state, ctx.world, ctx.pos, renderEnv.wrapped) as? Int
         } else null
-        return if (ofColor == null || ofColor == -1) ctx.lightingCtx.color else ofColor
+        return if (ofColor == null || ofColor == -1) ctx.color(resolver) else ofColor
     }
 }
 

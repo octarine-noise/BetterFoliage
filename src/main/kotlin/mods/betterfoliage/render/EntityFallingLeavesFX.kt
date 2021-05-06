@@ -1,10 +1,8 @@
 package mods.betterfoliage.render
 
 import mods.betterfoliage.config.Config
-import mods.betterfoliage.texture.LeafParticleRegistry
-import mods.betterfoliage.texture.LeafRegistry
 import mods.betterfoliage.render.old.AbstractEntityFX
-import mods.betterfoliage.render.lighting.HSB
+import mods.betterfoliage.render.old.HSB
 import mods.betterfoliage.util.Double3
 import mods.betterfoliage.util.PI2
 import mods.betterfoliage.util.minmax
@@ -18,7 +16,7 @@ import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.event.TickEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.eventbus.api.SubscribeEvent
-import java.util.*
+import java.util.Random
 import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sin
@@ -47,15 +45,15 @@ class EntityFallingLeavesFX(
         particleScale = Config.fallingLeaves.size.toFloat() * 0.1f
 
         val state = world.getBlockState(pos)
-        val leafInfo = LeafRegistry[state, world, pos]
+//        val leafInfo = LeafRegistry[state, world, pos]
         val blockColor = Minecraft.getInstance().blockColors.getColor(state, world, pos, 0)
-        if (leafInfo != null) {
-            sprite = leafInfo.particleTextures[rand.nextInt(1024)]
-            calculateParticleColor(leafInfo.averageColor, blockColor)
-        } else {
-            sprite = LeafParticleRegistry["default"][rand.nextInt(1024)]
-            setColor(blockColor)
-        }
+//        if (leafInfo != null) {
+//            sprite = leafInfo.particleTextures[rand.nextInt(1024)]
+//            calculateParticleColor(leafInfo.averageColor, blockColor)
+//        } else {
+//            sprite = LeafParticleRegistry["default"][rand.nextInt(1024)]
+//            setColor(blockColor)
+//        }
     }
 
     override val isValid: Boolean get() = (sprite != null)

@@ -14,6 +14,5 @@ public class MixinConnector implements IMixinConnector {
         } catch (ClassNotFoundException e) {
             Mixins.addConfiguration("betterfoliage.vanilla.mixins.json");
         }
-
     }
 }

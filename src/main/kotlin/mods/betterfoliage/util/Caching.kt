@@ -17,6 +17,10 @@ interface Invalidator {
     }
 }
 
+class SimpleInvalidator : Invalidator {
+    override val callbacks = mutableListOf<WeakReference<() -> Unit>>()
+}
+
 class LazyInvalidatable<V>(invalidator: Invalidator, val valueFactory: ()->V): ReadOnlyProperty<Any, V> {
     init { invalidator.onInvalidate { value = null } }
 
@@ -31,7 +35,7 @@ class LazyInvalidatable<V>(invalidator: Invalidator, val valueFactory: ()->V): R
     }
 }
 
-class LazyMap<K, V>(val invalidator: Invalidator, val valueFactory: (K)->V) {
+open class LazyMapInvalidatable<K, V>(val invalidator: Invalidator, val valueFactory: (K)->V) {
     init { invalidator.onInvalidate { values.clear() } }
 
     val values = mutableMapOf<K, V>()

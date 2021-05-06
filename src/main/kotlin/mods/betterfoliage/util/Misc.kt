@@ -1,6 +1,7 @@
 @file:Suppress("NOTHING_TO_INLINE")
 package mods.betterfoliage.util
 
+import mods.betterfoliage.BetterFoliageMod
 import net.minecraft.util.ResourceLocation
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
@@ -49,6 +50,11 @@ fun nextPowerOf2(x: Int): Int {
     return 1 shl (if (x == 0) 0 else 32 - Integer.numberOfLeadingZeros(x - 1))
 }
 
+abstract class HasLogger {
+    val logger = BetterFoliageMod.logger(this)
+    val detailLogger = BetterFoliageMod.detailLogger(this)
+}
+
 /**
  * Check if the Chunk containing the given [BlockPos] is loaded.
  * Works for both [World] and [ChunkCache] (vanilla and OptiFine) instances.
@@ -59,15 +65,6 @@ fun nextPowerOf2(x: Int): Int {
 //    Refs.OptifineChunkCache.isInstance(this) -> (Refs.CCOFChunkCache.get(this) as ChunkCache).world.isBlockLoaded(pos, false)
 //    else -> false
 //}
-
-interface HasLogger {
-    val logger: Logger
-    val logName: String get() = this::class.simpleName!!
-    fun log(msg: String) = log(Level.INFO, msg)
-    fun log(level: Level, msg: String) = logger.log(level, "[$logName] $msg")
-    fun log(msg: String, e: Throwable) = log(Level.WARN, msg, e)
-    fun log(level: Level, msg: String, e: Throwable) = logger.log(level, "[$logName] $msg", e)
-}
 
 //fun textComponent(msg: String, color: Formatting = Formatting.GRAY): LiteralText {
 //    val style = Style().apply { this.color = color }

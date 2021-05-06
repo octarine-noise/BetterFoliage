@@ -7,6 +7,8 @@ import net.minecraft.util.Direction.AxisDirection.NEGATIVE
 import net.minecraft.util.Direction.AxisDirection.POSITIVE
 import net.minecraft.util.math.BlockPos
 
+val EPSILON = 0.05
+
 // ================================
 // Axes and directions
 // ================================
@@ -22,8 +24,19 @@ val Pair<Axis, AxisDirection>.face: Direction get() = when(this) {
     Y to POSITIVE -> UP; Y to NEGATIVE -> DOWN;
     Z to POSITIVE -> SOUTH; else -> NORTH;
 }
-val Direction.perpendiculars: List<Direction> get() =
-    axes.filter { it != this.axis }.cross(axisDirs).map { it.face }
+val directionsAndNull = arrayOf(DOWN, UP, NORTH, SOUTH, WEST, EAST, null)
+
+val Direction.perpendiculars: Array<Direction> get() =
+    axes.filter { it != this.axis }.flatMap { listOf((it to POSITIVE).face, (it to NEGATIVE).face) }.toTypedArray()
+
+val perpendiculars: Array<Array<Direction>> = Direction.values().map { dir ->
+    axes.filter { it != dir.axis }
+        .flatMap { listOf(
+            (it to POSITIVE).face,
+            (it to NEGATIVE).face
+        ) }.toTypedArray()
+}.toTypedArray()
+
 val Direction.offset: Int3 get() = allDirOffsets[ordinal]
 
 /** Old ForgeDirection rotation matrix yanked from 1.7.10 */
@@ -172,6 +185,14 @@ class Rotation(val forward: Array<Direction>, val reverse: Array<Direction>) {
         // Forge rotation matrix is left-hand
         val rot90 = Array(6) { idx -> Rotation(allDirections[idx].opposite.rotations, allDirections[idx].rotations) }
         val identity = Rotation(allDirections, allDirections)
+        val fromUp = arrayOf(
+            rot90[EAST.ordinal] * 2,
+            identity,
+            rot90[WEST.ordinal],
+            rot90[EAST.ordinal],
+            rot90[SOUTH.ordinal],
+            rot90[NORTH.ordinal]
+        )
     }
 
 }

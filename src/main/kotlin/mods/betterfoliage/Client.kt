@@ -2,83 +2,64 @@ package mods.betterfoliage
 
 import mods.betterfoliage.chunk.ChunkOverlayManager
 import mods.betterfoliage.config.BlockConfig
-import mods.betterfoliage.integration.*
-import mods.betterfoliage.render.*
-import mods.betterfoliage.render.block.vanillaold.AsyncCactusDiscovery
-import mods.betterfoliage.render.block.vanillaold.AsyncLogDiscovery
-import mods.betterfoliage.render.block.vanillaold.RenderAlgae
-import mods.betterfoliage.render.block.vanillaold.RenderCactus
-import mods.betterfoliage.render.block.vanillaold.RenderConnectedGrass
-import mods.betterfoliage.render.block.vanillaold.RenderConnectedGrassLog
-import mods.betterfoliage.render.block.vanillaold.RenderCoral
-import mods.betterfoliage.render.block.vanillaold.RenderGrass
-import mods.betterfoliage.render.block.vanillaold.RenderLeaves
-import mods.betterfoliage.render.block.vanillaold.RenderLilypad
-import mods.betterfoliage.render.block.vanillaold.RenderLog
-import mods.betterfoliage.render.block.vanillaold.RenderMycelium
-import mods.betterfoliage.render.block.vanillaold.RenderNetherrack
-import mods.betterfoliage.render.block.vanillaold.RenderReeds
-import mods.betterfoliage.texture.AsyncGrassDiscovery
-import mods.betterfoliage.texture.AsyncLeafDiscovery
-import mods.betterfoliage.texture.LeafParticleRegistry
-import mods.betterfoliage.render.old.RenderDecorator
-import mods.betterfoliage.resource.IConfigChangeListener
+import mods.betterfoliage.integration.OptifineCustomColors
+import mods.betterfoliage.integration.ShadersModIntegration
+import mods.betterfoliage.render.LeafWindTracker
+import mods.betterfoliage.render.block.vanilla.StandardDirtDiscovery
+import mods.betterfoliage.render.block.vanilla.StandardDirtKey
+import mods.betterfoliage.render.block.vanilla.StandardGrassDiscovery
+import mods.betterfoliage.render.block.vanilla.StandardGrassModel
+import mods.betterfoliage.render.block.vanilla.StandardLeafDiscovery
+import mods.betterfoliage.render.block.vanilla.StandardLeafModel
+import mods.betterfoliage.render.lighting.AoSideHelper
+import mods.betterfoliage.resource.discovery.BakeWrapperManager
+import mods.betterfoliage.resource.discovery.BlockTypeCache
+import mods.betterfoliage.resource.generated.GeneratedTexturePack
 import net.minecraft.block.BlockState
+import net.minecraft.block.Blocks
+import net.minecraft.client.renderer.RenderType
+import net.minecraft.client.renderer.RenderTypeLookup
+import net.minecraftforge.common.ForgeConfig
 
 /**
  * Object responsible for initializing (and holding a reference to) all the infrastructure of the mod
  * except for the call hooks.
  */
 object Client {
-    var renderers = emptyList<RenderDecorator>()
-    var configListeners = emptyList<IConfigChangeListener>()
+    val asyncPack = GeneratedTexturePack("bf_gen", "Better Foliage generated assets")
+    var blockTypes = BlockTypeCache()
 
     val suppressRenderErrors = mutableSetOf<BlockState>()
 
     fun init() {
-        // init renderers
-        renderers = listOf(
-            RenderGrass(),
-            RenderMycelium(),
-            RenderLeaves(),
-            RenderCactus(),
-            RenderLilypad(),
-            RenderReeds(),
-            RenderAlgae(),
-            RenderCoral(),
-            RenderLog(),
-            RenderNetherrack(),
-            RenderConnectedGrass(),
-            RenderConnectedGrassLog()
-        )
+        // discoverers
+        BetterFoliageMod.bus.register(BakeWrapperManager)
+        listOf(
+            StandardLeafDiscovery,
+            StandardGrassDiscovery,
+            StandardDirtDiscovery
+        ).forEach {
+            BakeWrapperManager.discoverers.add(it)
+        }
 
-        // init other singletons
+        // init singletons
         val singletons = listOf(
+            AoSideHelper,
             BlockConfig,
             ChunkOverlayManager,
-            LeafWindTracker,
-            RisingSoulTextures
+            LeafWindTracker
+        )
+
+        val modelSingletons = listOf(
+            StandardLeafModel.Companion,
+            StandardGrassModel.Companion
         )
 
         // init mod integrations
         val integrations = listOf(
             ShadersModIntegration,
             OptifineCustomColors
-//            ForestryIntegration,
-//            IC2RubberIntegration,
-//            TechRebornRubberIntegration
         )
-
-        LeafParticleRegistry.init()
-
-        // add basic block support instances as last
-        AsyncLeafDiscovery.init()
-        AsyncGrassDiscovery.init()
-        AsyncLogDiscovery.init()
-        AsyncCactusDiscovery.init()
-
-        configListeners = listOf(renderers, singletons, integrations).flatten().filterIsInstance<IConfigChangeListener>()
-        configListeners.forEach { it.onConfigChange() }
     }
 }
 

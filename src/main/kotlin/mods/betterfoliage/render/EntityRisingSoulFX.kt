@@ -2,13 +2,10 @@ package mods.betterfoliage.render
 
 import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.config.Config
-import mods.betterfoliage.resource.Identifier
 import mods.betterfoliage.render.old.AbstractEntityFX
-import mods.betterfoliage.resource.ResourceHandler
 import mods.betterfoliage.util.Atlas
 import mods.betterfoliage.util.Double3
 import net.minecraft.client.renderer.BufferBuilder
-import net.minecraft.util.ResourceLocation
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.MathHelper
 import net.minecraft.world.World
@@ -23,7 +20,7 @@ AbstractEntityFX(world, pos.x.toDouble() + 0.5, pos.y.toDouble() + 1.0, pos.z.to
     init {
         motionY = 0.1
         particleGravity = 0.0f
-        sprite = RisingSoulTextures.headIcons[rand.nextInt(256)]
+//        sprite = RisingSoulTextures.headIcons[rand.nextInt(256)]
         maxAge = MathHelper.floor((0.6 + 0.4 * rand.nextDouble()) * Config.risingSoul.lifetime * 20.0)
     }
 
@@ -63,7 +60,7 @@ AbstractEntityFX(world, pos.x.toDouble() + 0.5, pos.y.toDouble() + 1.0, pos.z.to
     }
 }
 
-object RisingSoulTextures : ResourceHandler(BetterFoliageMod.MOD_ID, BetterFoliageMod.bus, targetAtlas = Atlas.PARTICLES) {
-    val headIcons = spriteSet { idx -> ResourceLocation(BetterFoliageMod.MOD_ID, "rising_soul_$idx") }
-    val trackIcon by sprite(Identifier(BetterFoliageMod.MOD_ID, "soul_track"))
-}
+//object RisingSoulTextures : ResourceHandler(BetterFoliageMod.MOD_ID, BetterFoliageMod.bus, targetAtlas = Atlas.PARTICLES) {
+//    val headIcons = spriteSet { idx -> ResourceLocation(BetterFoliageMod.MOD_ID, "rising_soul_$idx") }
+//    val trackIcon by sprite(Identifier(BetterFoliageMod.MOD_ID, "soul_track"))
+//}

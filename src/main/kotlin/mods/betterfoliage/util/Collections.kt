@@ -1,5 +1,6 @@
 package mods.betterfoliage.util
 
+import com.google.common.collect.ImmutableList
 import java.util.*
 
 /**
@@ -26,6 +27,8 @@ inline fun <T, C: Comparable<C>> Triple<T, T, T>.maxValueBy(func: (T)->C): C {
     func(third).let { if (it > result) result = it }
     return result
 }
+
+inline fun <reified T, reified R> Array<T>.mapArray(func: (T)->R) = Array<R>(size) { idx -> func(get(idx)) }
 
 @Suppress("UNCHECKED_CAST")
 inline fun <K, V> Map<K, V?>.filterValuesNotNull() = filterValues { it != null } as Map<K, V>
@@ -61,3 +64,8 @@ inline fun <T> MutableList<T>.exchange(idx1: Int, idx2: Int) {
 
 /** Return a random element from the array using the provided random generator */
 inline operator fun <T> Array<T>.get(random: Random) = get(random.nextInt(Int.MAX_VALUE) % size)
+
+fun <T> Iterable<T>.toImmutableList() = ImmutableList.builder<T>().let { builder ->
+    forEach { builder.add(it) }
+    builder.build()
+}

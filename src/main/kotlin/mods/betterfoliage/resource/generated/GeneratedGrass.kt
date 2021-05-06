@@ -1,14 +1,13 @@
 package mods.betterfoliage.resource.generated
 
-import mods.betterfoliage.resource.Identifier
 import mods.betterfoliage.texture.blendRGB
 import mods.betterfoliage.texture.loadSprite
 import mods.betterfoliage.util.Atlas
 import mods.betterfoliage.util.bytes
 import mods.betterfoliage.util.get
 import mods.betterfoliage.util.set
-import mods.octarinecore.client.resource.*
 import net.minecraft.resources.IResourceManager
+import net.minecraft.util.ResourceLocation
 import java.awt.image.BufferedImage
 
 /**
@@ -17,13 +16,13 @@ import java.awt.image.BufferedImage
  *
  * @param[domain] Resource domain of generator
  */
-data class GeneratedGrass(val sprite: Identifier, val isSnowed: Boolean, val atlas: Atlas = Atlas.BLOCKS) {
-    constructor(sprite: String, isSnowed: Boolean) : this(Identifier(sprite), isSnowed)
+data class GeneratedGrass(val baseSprite: ResourceLocation, val isSnowed: Boolean, val atlas: Atlas = Atlas.BLOCKS) {
+    constructor(sprite: String, isSnowed: Boolean) : this(ResourceLocation(sprite), isSnowed)
 
-    fun register(pack: GeneratedBlockTexturePack) = pack.register(this, this::draw)
+    fun register(pack: GeneratedTexturePack) = pack.register(atlas, this, this::draw)
 
     fun draw(resourceManager: IResourceManager): ByteArray {
-        val baseTexture = resourceManager.loadSprite(atlas.wrap(sprite))
+        val baseTexture = resourceManager.loadSprite(atlas.file(baseSprite))
 
         val result = BufferedImage(baseTexture.width, baseTexture.height, BufferedImage.TYPE_4BYTE_ABGR)
         val graphics = result.createGraphics()
@@ -47,7 +46,7 @@ data class GeneratedGrass(val sprite: Identifier, val isSnowed: Boolean, val atl
 
         // blend with white if snowed
         if (isSnowed) {
-            for (x in 0..result.width - 1) for (y in 0..result.height - 1) {
+            for (x in 0 until result.width) for (y in 0 until result.height) {
                 result[x, y] = blendRGB(result[x, y], 16777215, 2, 3)
             }
         }

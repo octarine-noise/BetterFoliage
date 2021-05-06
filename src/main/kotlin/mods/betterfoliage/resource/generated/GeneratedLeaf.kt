@@ -8,7 +8,6 @@ import mods.betterfoliage.util.get
 import mods.betterfoliage.util.loadImage
 import mods.betterfoliage.util.resourceManager
 import mods.betterfoliage.util.set
-import mods.octarinecore.client.resource.*
 import net.minecraft.resources.IResource
 import net.minecraft.resources.IResourceManager
 import net.minecraft.util.ResourceLocation
@@ -22,12 +21,12 @@ import java.awt.image.BufferedImage
  *
  * @param[domain] Resource domain of generator
  */
-data class GeneratedLeaf(val sprite: ResourceLocation, val leafType: String, val atlas: Atlas = Atlas.BLOCKS) {
+data class GeneratedLeaf(val baseSprite: ResourceLocation, val leafType: String, val atlas: Atlas = Atlas.BLOCKS) {
 
-    fun register(pack: GeneratedBlockTexturePack) = pack.register(this, this::draw)
+    fun register(pack: GeneratedTexturePack) = pack.register(atlas, this, this::draw)
 
     fun draw(resourceManager: IResourceManager): ByteArray {
-        val baseTexture = resourceManager.loadSprite(atlas.wrap(sprite))
+        val baseTexture = resourceManager.loadSprite(atlas.file(baseSprite))
 
         val size = baseTexture.width
         val frames = baseTexture.height / size

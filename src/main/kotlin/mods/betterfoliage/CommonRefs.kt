@@ -1,27 +1,34 @@
 package mods.octarinecore
 
 import mods.betterfoliage.util.ClassRef
+import mods.betterfoliage.util.ClassRef.Companion.float
 import mods.betterfoliage.util.ClassRef.Companion.void
 import mods.betterfoliage.util.FieldRef
 import mods.betterfoliage.util.MethodRef
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
+import net.minecraft.client.renderer.BlockModelRenderer
 import net.minecraft.client.renderer.BlockRendererDispatcher
 import net.minecraft.client.renderer.BufferBuilder
 import net.minecraft.client.renderer.chunk.ChunkRenderCache
 import net.minecraft.client.renderer.model.BakedQuad
+import net.minecraft.client.renderer.model.IUnbakedModel
+import net.minecraft.client.renderer.model.ModelBakery
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.util.ResourceLocation
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.IBlockReader
 import net.minecraft.world.ILightReader
+import net.minecraftforge.client.model.pipeline.BlockInfo
+import net.minecraftforge.client.model.pipeline.VertexLighterFlat
 import java.util.*
 
 // Java
 val String = ClassRef<String>("java.lang.String")
-val Map = ClassRef<Map<*, *>>("java.util.Map")
 val List = ClassRef<List<*>>("java.util.List")
 val Random = ClassRef<Random>("java.util.Random")
+fun <K, V> mapRef() = ClassRef<Map<K, V>>("java.util.Map")
+fun <K, V> mapRefMutable() = ClassRef<MutableMap<K, V>>("java.util.Map")
 
 // Minecraft
 val IBlockReader = ClassRef<IBlockReader>("net.minecraft.world.IBlockReader")
@@ -38,6 +45,19 @@ val BlockRendererDispatcher = ClassRef<BlockRendererDispatcher>("net.minecraft.c
 val ChunkRenderCache = ClassRef<ChunkRenderCache>("net.minecraft.client.renderer.chunk.ChunkRenderCache")
 val ResourceLocation = ClassRef<ResourceLocation>("net.minecraft.util.ResourceLocation")
 val BakedQuad = ClassRef<BakedQuad>("net.minecraft.client.renderer.model.BakedQuad")
+val BlockModelRenderer = ClassRef<BlockModelRenderer>("net.minecraft.client.renderer.BlockModelRenderer")
+
+val VertexLighterFlat = ClassRef<VertexLighterFlat>("net.minecraftforge.client.model.pipeline.VertexLighterFlat")
+val BlockInfo = ClassRef<BlockInfo>("net.minecraftforge.client.model.pipeline.BlockInfo")
+val VertexLighterFlat_blockInfo = FieldRef(VertexLighterFlat, "blockInfo", BlockInfo)
+val BlockInfo_shx = FieldRef(BlockInfo, "shx", float)
+val BlockInfo_shy = FieldRef(BlockInfo, "shy", float)
+val BlockInfo_shz = FieldRef(BlockInfo, "shz", float)
+
+object ModelBakery : ClassRef<ModelBakery>("net.minecraft.client.renderer.model.ModelBakery") {
+    val unbakedModels = FieldRef(this, "unbakedModels", mapRefMutable<ResourceLocation, IUnbakedModel>())
+    val topUnbakedModels = FieldRef(this, "topUnbakedModels", mapRefMutable<ResourceLocation, IUnbakedModel>())
+}
 
 // Optifine
 val OptifineClassTransformer = ClassRef<Any>("optifine.OptiFineClassTransformer")

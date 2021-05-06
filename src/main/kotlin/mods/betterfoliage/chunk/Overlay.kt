@@ -1,7 +1,6 @@
 package mods.betterfoliage.chunk
 
 import mods.octarinecore.ChunkCacheOF
-import mods.betterfoliage.render.old.BlockCtx
 import mods.betterfoliage.util.get
 import mods.betterfoliage.util.isInstance
 import net.minecraft.client.renderer.chunk.ChunkRenderCache

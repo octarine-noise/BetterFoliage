@@ -9,13 +9,16 @@ repositories {
     maven("http://files.minecraftforge.net/maven")
     maven("https://repo.spongepowered.org/maven")
     maven("https://minecraft.curseforge.com/api/maven")
+    maven("https://maven.shedaniel.me/")
+    maven("https://www.cursemaven.com")
 }
 
 dependencies {
     "minecraft"("net.minecraftforge:forge:${properties["mcVersion"]}-${properties["forgeVersion"]}")
 
+    "api"(fg.deobf("curse.maven:clothconfig-348521:2938583"))
     "implementation"("kottle:Kottle:${properties["kottleVersion"]}")
-    "implementation"("org.spongepowered:mixin:0.8-SNAPSHOT")
+//    "implementation"("org.spongepowered:mixin:0.8-SNAPSHOT")
 }
 
 configurations["annotationProcessor"].extendsFrom(configurations["implementation"])
@@ -44,7 +47,9 @@ java {
 
 kotlin {
     target.compilations.configureEach {
+        kotlinOptions.jvmTarget = "1.8"
         kotlinOptions.freeCompilerArgs += listOf("-Xno-param-assertions", "-Xno-call-assertions")
+
     }
 }
 

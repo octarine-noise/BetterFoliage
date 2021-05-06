@@ -16,15 +16,15 @@ public class MixinOptifineChunkRender {
     private static final String invokeReflector = "Lnet/optifine/reflect/Reflector;callBoolean(Ljava/lang/Object;Lnet/optifine/reflect/ReflectorMethod;[Ljava/lang/Object;)Z";
     private static final String forgeBlockCanRender = "Lnet/minecraft/client/renderer/chunk/ChunkRender;FORGE_BLOCK_CAN_RENDER_IN_LAYER:Z";
 
-    @Redirect(
-            method = compile,
-            at = @At(value = "INVOKE", target = invokeReflector),
-            slice = @Slice(
-                    from = @At(value = "FIELD", target = forgeBlockCanRender)
-            )
-    )
-    @SuppressWarnings("UnresolvedMixinReference")
-    boolean canRenderInLayer(Object state, @Coerce Object reflector, Object[] layer) {
-        return Hooks.canRenderInLayerOverride((BlockState) state, (RenderType) layer[0]);
-    }
+//    @Redirect(
+//            method = compile,
+//            at = @At(value = "INVOKE", target = invokeReflector),
+//            slice = @Slice(
+//                    from = @At(value = "FIELD", target = forgeBlockCanRender)
+//            )
+//    )
+//    @SuppressWarnings("UnresolvedMixinReference")
+//    boolean canRenderInLayer(Object state, @Coerce Object reflector, Object[] layer) {
+//        return Hooks.canRenderInLayerOverride((BlockState) state, (RenderType) layer[0]);
+//    }
 }

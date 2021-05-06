@@ -7,9 +7,6 @@
   "mixins": [
   ],
   "client": [
-    "MixinOptifineChunkRender",
-    "MixinShadersBlockModelRenderer",
-    "MixinOptifineBlockUtils"
   ],
   "server": [
   ],

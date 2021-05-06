@@ -1,7 +1,8 @@
 package mods.betterfoliage.util
 
-import mods.betterfoliage.render.lighting.HSB
+import mods.betterfoliage.render.old.HSB
 import net.minecraft.client.Minecraft
+import net.minecraft.client.renderer.model.Material
 import net.minecraft.client.renderer.texture.AtlasTexture
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.resources.IResource
@@ -15,29 +16,33 @@ import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
 
-enum class Atlas(val basePath: String, val resourceId: ResourceLocation) {
-    BLOCKS("textures", AtlasTexture.LOCATION_BLOCKS_TEXTURE),
-    PARTICLES("textures", AtlasTexture.LOCATION_PARTICLES_TEXTURE);
+enum class Atlas(val resourceId: ResourceLocation) {
+    BLOCKS(AtlasTexture.LOCATION_BLOCKS_TEXTURE),
+    PARTICLES(AtlasTexture.LOCATION_PARTICLES_TEXTURE);
 
-    /** Get the fully-qualified resource name for sprites belonging to this atlas*/
-    fun wrap(resource: ResourceLocation) = ResourceLocation(resource.namespace, "$basePath/${resource.path}.png")
-
-    /** Get the short resource name for sprites belonging to this atlas*/
-    fun unwrap(resource: ResourceLocation) = resource.stripStart("$basePath/").stripEnd(".png")
+    /** Get the fully-qualified resource name for sprites belonging to this atlas */
+    fun file(resource: ResourceLocation) = ResourceLocation(resource.namespace, "textures/${resource.path}.png")
 
     /** Reference to the atlas itself */
-    val atlas: AtlasTexture get() = Minecraft.getInstance().textureManager.getTexture(resourceId) as AtlasTexture
+    private val atlas: AtlasTexture get() = Minecraft.getInstance().textureManager.getTexture(resourceId) as AtlasTexture
+
+    /** Get a sprite from this atlas */
+    operator fun get(location: ResourceLocation) = atlas.getSprite(location)
 }
+
+val Material.atlas: Atlas get() = Atlas.values().find { it.resourceId == atlasLocation } ?: Atlas.BLOCKS
 
 inline operator fun AtlasTexture.get(res: ResourceLocation): TextureAtlasSprite? = this.getSprite(res)
 inline operator fun AtlasTexture.get(name: String): TextureAtlasSprite? = get(ResourceLocation(name))
 
-fun IResourceManager.loadSprite(id: ResourceLocation) = this.get(id)?.loadImage() ?: throw IOException("Cannot load resource $id")
+fun IResourceManager.loadSprite(id: ResourceLocation) =
+    this.get(id)?.loadImage() ?: throw IOException("Cannot load resource $id")
 
 fun IResource.loadImage(): BufferedImage? = ImageIO.read(this.inputStream)
 
 /** Index operator to get the RGB value of a pixel. */
 operator fun BufferedImage.get(x: Int, y: Int) = this.getRGB(x, y)
+
 /** Index operator to set the RGB value of a pixel. */
 operator fun BufferedImage.set(x: Int, y: Int, value: Int) = this.setRGB(x, y, value)
 
@@ -50,30 +55,31 @@ val BufferedImage.bytes: ByteArray get() =
  * Only non-transparent pixels are considered. Averages are taken in the HSB color space (note: Hue is a circular average),
  * and the result transformed back to the RGB color space.
  */
-val TextureAtlasSprite.averageColor: Int get() {
-    var numOpaque = 0
-    var sumHueX = 0.0
-    var sumHueY = 0.0
-    var sumSaturation = 0.0f
-    var sumBrightness = 0.0f
-    for (x in 0 until width)
-        for (y in 0 until height) {
-            val pixel = getPixelRGBA(0, x, y)
-            val alpha = (pixel shr 24) and 255
-            val hsb = HSB.fromColor(pixel)
-            if (alpha == 255) {
-                numOpaque++
-                sumHueX += cos((hsb.hue.toDouble() - 0.5) * PI2)
-                sumHueY += sin((hsb.hue.toDouble() - 0.5) * PI2)
-                sumSaturation += hsb.saturation
-                sumBrightness += hsb.brightness
+val TextureAtlasSprite.averageColor: HSB
+    get() {
+        var numOpaque = 0
+        var sumHueX = 0.0
+        var sumHueY = 0.0
+        var sumSaturation = 0.0f
+        var sumBrightness = 0.0f
+        for (x in 0 until width)
+            for (y in 0 until height) {
+                val pixel = getPixelRGBA(0, x, y)
+                val alpha = (pixel shr 24) and 255
+                val hsb = HSB.fromColor(pixel)
+                if (alpha == 255) {
+                    numOpaque++
+                    sumHueX += cos((hsb.hue.toDouble() - 0.5) * PI2)
+                    sumHueY += sin((hsb.hue.toDouble() - 0.5) * PI2)
+                    sumSaturation += hsb.saturation
+                    sumBrightness += hsb.brightness
+                }
             }
-        }
 
-    // circular average - transform sum vector to polar angle
-    val avgHue = (atan2(sumHueY, sumHueX) / PI2 + 0.5).toFloat()
-    return HSB(avgHue, sumSaturation / numOpaque.toFloat(), sumBrightness / numOpaque.toFloat()).asColor
-}
+        // circular average - transform sum vector to polar angle
+        val avgHue = (atan2(sumHueY, sumHueX) / PI2 + 0.5).toFloat()
+        return HSB(avgHue, sumSaturation / numOpaque.toFloat(), sumBrightness / numOpaque.toFloat())
+    }
 
 /** Weighted blend of 2 packed RGB colors */
 fun blendRGB(rgb1: Int, rgb2: Int, weight1: Int, weight2: Int): Int {

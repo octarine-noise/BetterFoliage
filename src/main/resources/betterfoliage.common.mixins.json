@@ -9,10 +9,11 @@
   "client": [
     "MixinBlock",
     "MixinBlockState",
-    "MixinChunkRender",
+    "MixinBlockModelRenderer",
     "MixinClientWorld",
     "MixinModelBakery",
-    "MixinParticleManager"
+    "MixinForgeBlockModelRenderer",
+    "MixinForgeCustomVertexLighting"
   ],
   "server": [
   ],
