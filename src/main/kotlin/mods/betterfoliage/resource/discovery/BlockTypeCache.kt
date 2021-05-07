@@ -11,7 +11,7 @@ class BlockTypeCache {
     val dirt = mutableSetOf<BlockState>()
 
     companion object : ModelDiscovery {
-        override fun onModelsLoaded(bakery: ModelBakery, sprites: MutableSet<ResourceLocation>, replacements: MutableMap<ResourceLocation, ModelBakeKey>
+        override fun onModelsLoaded(bakery: ModelBakery, sprites: MutableSet<ResourceLocation>, replacements: MutableMap<ResourceLocation, ModelBakingKey>
         ) {
             Client.blockTypes = BlockTypeCache()
         }

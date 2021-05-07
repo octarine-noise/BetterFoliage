@@ -1,6 +1,6 @@
 package mods.betterfoliage.util
 
-import mods.betterfoliage.render.old.HSB
+import mods.betterfoliage.model.HSB
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.model.Material
 import net.minecraft.client.renderer.texture.AtlasTexture

@@ -2,7 +2,7 @@ package mods.betterfoliage.mixin;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import mods.betterfoliage.render.pipeline.RenderCtxForge;
-import mods.betterfoliage.render.ISpecialRenderModel;
+import mods.betterfoliage.model.SpecialRenderModel;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.util.math.BlockPos;
@@ -36,8 +36,8 @@ public class MixinForgeBlockModelRenderer {
             long seed,
             IModelData modelData
     ) {
-        if (model instanceof ISpecialRenderModel)
-            return RenderCtxForge.render(lighter, world, (ISpecialRenderModel) model, state, pos, matrixStack, checkSides, rand, seed, modelData);
+        if (model instanceof SpecialRenderModel)
+            return RenderCtxForge.render(lighter, world, (SpecialRenderModel) model, state, pos, matrixStack, checkSides, rand, seed, modelData);
         else
             return ForgeBlockModelRenderer.render(lighter, world, model, state, pos, matrixStack, checkSides, rand, seed, modelData);
     }

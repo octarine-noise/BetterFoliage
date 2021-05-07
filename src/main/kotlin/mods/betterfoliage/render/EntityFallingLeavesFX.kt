@@ -2,7 +2,7 @@ package mods.betterfoliage.render
 
 import mods.betterfoliage.config.Config
 import mods.betterfoliage.render.old.AbstractEntityFX
-import mods.betterfoliage.render.old.HSB
+import mods.betterfoliage.model.HSB
 import mods.betterfoliage.util.Double3
 import mods.betterfoliage.util.PI2
 import mods.betterfoliage.util.minmax

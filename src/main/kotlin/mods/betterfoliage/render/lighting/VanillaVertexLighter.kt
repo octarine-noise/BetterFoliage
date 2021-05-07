@@ -1,6 +1,6 @@
 package mods.betterfoliage.render.lighting
 
-import mods.betterfoliage.render.old.HalfBakedQuad
+import mods.betterfoliage.model.HalfBakedQuad
 import mods.betterfoliage.util.Double3
 import mods.betterfoliage.util.EPSILON
 import mods.betterfoliage.util.minBy

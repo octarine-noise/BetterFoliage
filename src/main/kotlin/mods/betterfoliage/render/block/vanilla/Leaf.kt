@@ -6,21 +6,21 @@ import mods.betterfoliage.config.BlockConfig
 import mods.betterfoliage.config.Config
 import mods.betterfoliage.config.ConfigurableBlockMatcher
 import mods.betterfoliage.config.ModelTextureList
-import mods.betterfoliage.render.ISpecialRenderModel
+import mods.betterfoliage.model.SpecialRenderModel
 import mods.betterfoliage.render.lighting.RoundLeafLighting
-import mods.betterfoliage.render.old.Color
-import mods.betterfoliage.render.old.HalfBakedSpecialWrapper
-import mods.betterfoliage.render.old.HalfBakedWrapKey
+import mods.betterfoliage.model.Color
+import mods.betterfoliage.model.HalfBakedSpecialWrapper
+import mods.betterfoliage.model.HalfBakedWrapperKey
 import mods.betterfoliage.render.pipeline.RenderCtxBase
 import mods.betterfoliage.render.pipeline.RenderCtxVanilla
 import mods.betterfoliage.resource.discovery.BakeWrapperManager
-import mods.betterfoliage.resource.discovery.ConfigurableModelReplacer
-import mods.betterfoliage.resource.discovery.ModelBakeKey
+import mods.betterfoliage.resource.discovery.ConfigurableModelDiscovery
+import mods.betterfoliage.resource.discovery.ModelBakingKey
 import mods.betterfoliage.resource.generated.GeneratedLeaf
-import mods.betterfoliage.resource.model.SpriteSetDelegate
-import mods.betterfoliage.resource.model.crossModelsRaw
-import mods.betterfoliage.resource.model.crossModelsTextured
-import mods.betterfoliage.resource.model.crossModelsTinted
+import mods.betterfoliage.model.SpriteSetDelegate
+import mods.betterfoliage.model.crossModelsRaw
+import mods.betterfoliage.model.crossModelsTextured
+import mods.betterfoliage.model.crossModelsTinted
 import mods.betterfoliage.texture.LeafParticleRegistry
 import mods.betterfoliage.util.Atlas
 import mods.betterfoliage.util.LazyMapInvalidatable
@@ -33,7 +33,7 @@ import net.minecraft.util.ResourceLocation
 import org.apache.logging.log4j.Level.INFO
 import org.apache.logging.log4j.Logger
 
-object StandardLeafDiscovery : ConfigurableModelReplacer() {
+object StandardLeafDiscovery : ConfigurableModelDiscovery() {
     override val matchClasses: ConfigurableBlockMatcher get() = BlockConfig.leafBlocks
     override val modelTextures: List<ModelTextureList> get() = BlockConfig.leafModels.modelList
 
@@ -42,11 +42,11 @@ object StandardLeafDiscovery : ConfigurableModelReplacer() {
         location: ResourceLocation,
         textureMatch: List<ResourceLocation>,
         sprites: MutableSet<ResourceLocation>,
-        replacements: MutableMap<ResourceLocation, ModelBakeKey>
+        replacements: MutableMap<ResourceLocation, ModelBakingKey>
     ): Boolean {
         val leafType = LeafParticleRegistry.typeMappings.getType(textureMatch[0]) ?: "default"
         val generated = GeneratedLeaf(textureMatch[0], leafType)
-            .register(Client.asyncPack)
+            .register(Client.generatedPack)
             .apply { sprites.add(this) }
 
         detailLogger.log(INFO, "     particle $leafType")
@@ -72,15 +72,15 @@ fun TextureAtlasSprite.getColorOverride(threshold: Double) = averageColor.let {
 data class StandardLeafKey(
     val roundLeafTexture: ResourceLocation,
     val leafType: String
-) : HalfBakedWrapKey() {
-    override fun replace(wrapped: ISpecialRenderModel): ISpecialRenderModel {
+) : HalfBakedWrapperKey() {
+    override fun replace(wrapped: SpecialRenderModel): SpecialRenderModel {
         Atlas.BLOCKS[roundLeafTexture].logColorOverride(BetterFoliageMod.detailLogger(this), 0.1)
         return StandardLeafModel(wrapped, this)
     }
 }
 
 class StandardLeafModel(
-    model: ISpecialRenderModel,
+    model: SpecialRenderModel,
     key: StandardLeafKey
 ) : HalfBakedSpecialWrapper(model) {
     val leafNormal by leafModelsNormal.delegate(key)

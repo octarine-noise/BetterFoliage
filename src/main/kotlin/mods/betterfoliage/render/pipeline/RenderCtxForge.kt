@@ -1,16 +1,12 @@
 package mods.betterfoliage.render.pipeline
 
 import com.mojang.blaze3d.matrix.MatrixStack
-import mods.betterfoliage.render.ISpecialRenderModel
+import mods.betterfoliage.model.SpecialRenderModel
 import mods.betterfoliage.render.lighting.ForgeVertexLighter
 import mods.betterfoliage.render.lighting.ForgeVertexLighterAccess
-import mods.betterfoliage.render.old.HalfBakedQuad
-import mods.betterfoliage.util.Int3
-import mods.betterfoliage.util.directionsAndNull
-import mods.betterfoliage.util.get
-import mods.octarinecore.VertexLighterFlat_blockInfo
+import mods.betterfoliage.model.HalfBakedQuad
 import net.minecraft.block.BlockState
-import net.minecraft.client.renderer.model.IBakedModel
+import net.minecraft.client.renderer.LightTexture
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.ILightReader
 import net.minecraftforge.client.model.data.IModelData
@@ -25,28 +21,28 @@ class RenderCtxForge(
     checkSides: Boolean,
     random: Random,
     modelData: IModelData
-): RenderCtxBase(world, pos, matrixStack, checkSides, random, modelData), ForgeVertexLighterAccess {
+): RenderCtxBase(world, pos, matrixStack, checkSides, random, modelData), ForgeVertexLighter {
 
-    val blockInfo = lighter[VertexLighterFlat_blockInfo]
-    override var vertexLighter: ForgeVertexLighter
-        get() = (lighter as ForgeVertexLighterAccess).vertexLighter
-        set(value) { (lighter as ForgeVertexLighterAccess).vertexLighter = value }
+    override fun renderQuad(quad: HalfBakedQuad) {
+        // set Forge lighter AO calculator to us
+        vertexLighter.updateLightmapAndColor(quad, lightingData)
+        quad.baked.pipe(lighter)
+    }
 
-    override fun renderQuad(quad: HalfBakedQuad) { quad.baked.pipe(lighter) }
-
-    override fun renderFallback(model: IBakedModel) {
-        directionsAndNull.forEach { face ->
-            model.getQuads(state, null, random, modelData).forEach { quad ->
-                if (quad.face.shouldRender()) {
-                    quad.pipe(lighter)
-                    hasRendered = true
-                }
-            }
+    // somewhat ugly hack to pipe lighting values into the Forge pipeline
+    var vIdx = 0
+    override fun updateVertexLightmap(normal: FloatArray, lightmap: FloatArray, x: Float, y: Float, z: Float) {
+        lightingData.packedLight[vIdx].let { packedLight ->
+            lightmap[0] = LightTexture.getLightBlock(packedLight) / 0xF.toFloat()
+            lightmap[1] = LightTexture.getLightSky(packedLight) / 0xF.toFloat()
         }
     }
 
-    override fun renderMasquerade(offset: Int3, func: () -> Unit) {
-        TODO("Not yet implemented")
+    override fun updateVertexColor(normal: FloatArray, color: FloatArray, x: Float, y: Float, z: Float, tint: Float, multiplier: Int) {
+        color[0] = lightingData.tint[0] * lightingData.colorMultiplier[vIdx]
+        color[1] = lightingData.tint[1] * lightingData.colorMultiplier[vIdx]
+        color[2] = lightingData.tint[2] * lightingData.colorMultiplier[vIdx]
+        vIdx++
     }
 
     companion object {
@@ -54,7 +50,7 @@ class RenderCtxForge(
         fun render(
             lighter: VertexLighterFlat,
             world: ILightReader,
-            model: ISpecialRenderModel,
+            model: SpecialRenderModel,
             state: BlockState,
             pos: BlockPos,
             matrixStack: MatrixStack,
@@ -68,6 +64,7 @@ class RenderCtxForge(
             rand.setSeed(seed)
             lighter.updateBlockInfo()
             return RenderCtxForge(world, pos, lighter, matrixStack, checkSides, rand, modelData).let {
+                (lighter as ForgeVertexLighterAccess).vertexLighter = it
                 model.render(it, false)
                 lighter.resetBlockInfo()
                 it.hasRendered

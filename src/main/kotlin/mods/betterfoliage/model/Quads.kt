@@ -1,26 +1,16 @@
-package mods.betterfoliage.render.old
+package mods.betterfoliage.model
 
 import mods.betterfoliage.util.Double3
 import mods.betterfoliage.util.Rotation
-import mods.betterfoliage.util.allDirections
 import mods.betterfoliage.util.boxFaces
 import mods.betterfoliage.util.get
 import mods.betterfoliage.util.minmax
 import mods.betterfoliage.util.nearestAngle
-import mods.betterfoliage.util.replace
 import mods.betterfoliage.util.rotate
 import mods.betterfoliage.util.times
-import mods.betterfoliage.util.toImmutableList
 import mods.betterfoliage.util.vec
-import net.minecraft.client.renderer.model.BakedQuad
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats
-import net.minecraft.client.renderer.vertex.VertexFormat
-import net.minecraft.client.renderer.vertex.VertexFormatElement
-import net.minecraft.client.renderer.vertex.VertexFormatElement.Type
-import net.minecraft.client.renderer.vertex.VertexFormatElement.Usage
 import net.minecraft.util.Direction
-import net.minecraftforge.client.model.pipeline.BakedQuadBuilder
 import java.lang.Math.max
 import java.lang.Math.min
 import java.util.Random

@@ -1,4 +1,4 @@
-package mods.betterfoliage.resource.model
+package mods.betterfoliage.model
 
 import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.util.Atlas

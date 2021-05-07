@@ -60,7 +60,6 @@ abstract public class MixinForgeCustomVertexLighting implements ForgeVertexLight
 
     @Inject(method = resetBlockInfo, at = @At("RETURN"), remap = false)
     void onReset(CallbackInfo ci) {
-        // just in case
         vertexLighter = this;
     }
 }

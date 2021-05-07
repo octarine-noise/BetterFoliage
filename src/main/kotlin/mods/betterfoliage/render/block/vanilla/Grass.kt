@@ -6,22 +6,22 @@ import mods.betterfoliage.config.BlockConfig
 import mods.betterfoliage.config.Config
 import mods.betterfoliage.config.ConfigurableBlockMatcher
 import mods.betterfoliage.config.ModelTextureList
-import mods.betterfoliage.render.ISpecialRenderModel
+import mods.betterfoliage.model.SpecialRenderModel
 import mods.betterfoliage.render.lighting.LightingPreferredFace
-import mods.betterfoliage.render.old.Color
-import mods.betterfoliage.render.old.HalfBakedSpecialWrapper
-import mods.betterfoliage.render.old.HalfBakedWrapKey
+import mods.betterfoliage.model.Color
+import mods.betterfoliage.model.HalfBakedSpecialWrapper
+import mods.betterfoliage.model.HalfBakedWrapperKey
 import mods.betterfoliage.render.pipeline.RenderCtxBase
 import mods.betterfoliage.render.pipeline.RenderCtxVanilla
 import mods.betterfoliage.resource.discovery.BakeWrapperManager
-import mods.betterfoliage.resource.discovery.ConfigurableModelReplacer
-import mods.betterfoliage.resource.discovery.ModelBakeKey
-import mods.betterfoliage.resource.model.SpriteSetDelegate
-import mods.betterfoliage.resource.model.buildTufts
-import mods.betterfoliage.resource.model.fullCubeTextured
-import mods.betterfoliage.resource.model.fullCubeTinted
-import mods.betterfoliage.resource.model.tuftModelSet
-import mods.betterfoliage.resource.model.tuftShapeSet
+import mods.betterfoliage.resource.discovery.ConfigurableModelDiscovery
+import mods.betterfoliage.resource.discovery.ModelBakingKey
+import mods.betterfoliage.model.SpriteSetDelegate
+import mods.betterfoliage.model.buildTufts
+import mods.betterfoliage.model.fullCubeTextured
+import mods.betterfoliage.model.fullCubeTinted
+import mods.betterfoliage.model.tuftModelSet
+import mods.betterfoliage.model.tuftShapeSet
 import mods.betterfoliage.util.Atlas
 import mods.betterfoliage.util.LazyInvalidatable
 import mods.betterfoliage.util.LazyMapInvalidatable
@@ -29,14 +29,11 @@ import mods.betterfoliage.util.get
 import mods.betterfoliage.util.isSnow
 import mods.betterfoliage.util.randomI
 import net.minecraft.block.BlockState
-import net.minecraft.block.Blocks
-import net.minecraft.client.renderer.RenderType
-import net.minecraft.client.renderer.RenderTypeLookup
 import net.minecraft.util.Direction.DOWN
 import net.minecraft.util.Direction.UP
 import net.minecraft.util.ResourceLocation
 
-object StandardGrassDiscovery : ConfigurableModelReplacer() {
+object StandardGrassDiscovery : ConfigurableModelDiscovery() {
     override val matchClasses: ConfigurableBlockMatcher get() = BlockConfig.grassBlocks
     override val modelTextures: List<ModelTextureList> get() = BlockConfig.grassModels.modelList
 
@@ -45,36 +42,33 @@ object StandardGrassDiscovery : ConfigurableModelReplacer() {
         location: ResourceLocation,
         textureMatch: List<ResourceLocation>,
         sprites: MutableSet<ResourceLocation>,
-        replacements: MutableMap<ResourceLocation, ModelBakeKey>
+        replacements: MutableMap<ResourceLocation, ModelBakingKey>
     ): Boolean {
         replacements[location] = StandardGrassKey(textureMatch[0])
         Client.blockTypes.grass.add(state)
-        RenderTypeLookup.setRenderLayer(state.block, RenderType.getCutout())
+//        RenderTypeLookup.setRenderLayer(state.block, RenderType.getCutout())
         return true
     }
 }
 
 data class StandardGrassKey(
     val grassLocation: ResourceLocation
-) : HalfBakedWrapKey() {
-    override fun replace(wrapped: ISpecialRenderModel): ISpecialRenderModel {
+) : HalfBakedWrapperKey() {
+    override fun replace(wrapped: SpecialRenderModel): SpecialRenderModel {
         Atlas.BLOCKS[grassLocation].logColorOverride(detailLogger, Config.shortGrass.saturationThreshold)
         return StandardGrassModel(wrapped, this)
     }
 }
 
 class StandardGrassModel(
-    wrapped: ISpecialRenderModel,
+    wrapped: SpecialRenderModel,
     key: StandardGrassKey
 ) : HalfBakedSpecialWrapper(wrapped) {
 
     val tuftNormal by grassTuftMeshesNormal.delegate(key)
     val tuftSnowed by grassTuftMeshesSnowed.delegate(key)
     val fullBlock by grassFullBlockMeshes.delegate(key)
-
-    val upNormal = arrayOf(0.0f, 1.0f, 0.0f, 0.0f).toFloatArray()
-
-    val vanillaTuftLighting = LightingPreferredFace(UP)
+    val tuftLighting = LightingPreferredFace(UP)
 
     override fun render(ctx: RenderCtxBase, noDecorations: Boolean) {
         if (!Config.enabled || noDecorations) return super.render(ctx, noDecorations)
@@ -94,7 +88,7 @@ class StandardGrassModel(
         }
 
         if (Config.shortGrass.enabled(ctx.random) && !ctx.isNeighborSolid(UP)) {
-            (ctx as? RenderCtxVanilla)?.let { it.vertexLighter = vanillaTuftLighting }
+            (ctx as? RenderCtxVanilla)?.let { it.vertexLighter = tuftLighting }
             ctx.render(if (isSnowed) tuftSnowed[ctx.random] else tuftNormal[ctx.random])
         }
     }

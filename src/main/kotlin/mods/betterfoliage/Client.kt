@@ -7,10 +7,15 @@ import mods.betterfoliage.integration.ShadersModIntegration
 import mods.betterfoliage.render.LeafWindTracker
 import mods.betterfoliage.render.block.vanilla.StandardDirtDiscovery
 import mods.betterfoliage.render.block.vanilla.StandardDirtKey
+import mods.betterfoliage.render.block.vanilla.StandardDirtModel
 import mods.betterfoliage.render.block.vanilla.StandardGrassDiscovery
 import mods.betterfoliage.render.block.vanilla.StandardGrassModel
 import mods.betterfoliage.render.block.vanilla.StandardLeafDiscovery
 import mods.betterfoliage.render.block.vanilla.StandardLeafModel
+import mods.betterfoliage.render.block.vanilla.StandardMyceliumDiscovery
+import mods.betterfoliage.render.block.vanilla.StandardMyceliumModel
+import mods.betterfoliage.render.block.vanilla.StandardSandDiscovery
+import mods.betterfoliage.render.block.vanilla.StandardSandModel
 import mods.betterfoliage.render.lighting.AoSideHelper
 import mods.betterfoliage.resource.discovery.BakeWrapperManager
 import mods.betterfoliage.resource.discovery.BlockTypeCache
@@ -26,7 +31,7 @@ import net.minecraftforge.common.ForgeConfig
  * except for the call hooks.
  */
 object Client {
-    val asyncPack = GeneratedTexturePack("bf_gen", "Better Foliage generated assets")
+    val generatedPack = GeneratedTexturePack("bf_gen", "Better Foliage generated assets")
     var blockTypes = BlockTypeCache()
 
     val suppressRenderErrors = mutableSetOf<BlockState>()
@@ -37,7 +42,9 @@ object Client {
         listOf(
             StandardLeafDiscovery,
             StandardGrassDiscovery,
-            StandardDirtDiscovery
+            StandardDirtDiscovery,
+            StandardMyceliumDiscovery,
+            StandardSandDiscovery
         ).forEach {
             BakeWrapperManager.discoverers.add(it)
         }
@@ -52,7 +59,10 @@ object Client {
 
         val modelSingletons = listOf(
             StandardLeafModel.Companion,
-            StandardGrassModel.Companion
+            StandardGrassModel.Companion,
+            StandardDirtModel.Companion,
+            StandardMyceliumModel.Companion,
+            StandardSandModel.Companion
         )
 
         // init mod integrations

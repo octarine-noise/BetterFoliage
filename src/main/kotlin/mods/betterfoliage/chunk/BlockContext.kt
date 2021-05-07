@@ -7,6 +7,7 @@ import mods.betterfoliage.util.plus
 import mods.betterfoliage.util.semiRandom
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
+import net.minecraft.client.renderer.chunk.ChunkRenderCache
 import net.minecraft.util.Direction
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.ILightReader
@@ -29,7 +30,9 @@ interface BlockCtx {
     fun state(dir: Direction) = world.getBlockState(pos + dir.offset)
     fun state(offset: Int3) = world.getBlockState(pos + offset)
 
-    val biome: Biome? get() = (world as? IWorldReader)?.getBiome(pos)
+    val biome: Biome? get() =
+        (world as? IWorldReader)?.getBiome(pos) ?:
+        (world as? ChunkRenderCache)?.world?.getBiome(pos)
 
     val isNormalCube: Boolean get() = state.isNormalCube(world, pos)
 

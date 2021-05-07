@@ -15,11 +15,11 @@ import net.minecraft.util.ResourceLocation
 import net.minecraftforge.registries.ForgeRegistries
 import org.apache.logging.log4j.Level
 
-abstract class ModelReplacer : HasLogger(), ModelDiscovery {
+abstract class AbstractModelDiscovery : HasLogger(), ModelDiscovery {
     override fun onModelsLoaded(
         bakery: ModelBakery,
         sprites: MutableSet<ResourceLocation>,
-        replacements: MutableMap<ResourceLocation, ModelBakeKey>
+        replacements: MutableMap<ResourceLocation, ModelBakingKey>
     ) {
         ForgeRegistries.BLOCKS
             .flatMap { block -> block.stateContainer.validStates }
@@ -38,7 +38,7 @@ abstract class ModelReplacer : HasLogger(), ModelDiscovery {
         state: BlockState,
         location: ResourceLocation,
         sprites: MutableSet<ResourceLocation>,
-        replacements: MutableMap<ResourceLocation, ModelBakeKey>
+        replacements: MutableMap<ResourceLocation, ModelBakingKey>
     ): Boolean {
         // built-in support for container models
         return when (val model = bakery.getUnbakedModel(location)) {
@@ -59,9 +59,7 @@ abstract class ModelReplacer : HasLogger(), ModelDiscovery {
     }
 }
 
-
-
-abstract class ConfigurableModelReplacer : ModelReplacer() {
+abstract class ConfigurableModelDiscovery : AbstractModelDiscovery() {
     abstract val matchClasses: IBlockMatcher
     abstract val modelTextures: List<ModelTextureList>
 
@@ -70,7 +68,7 @@ abstract class ConfigurableModelReplacer : ModelReplacer() {
         location: ResourceLocation,
         textureMatch: List<ResourceLocation>,
         sprites: MutableSet<ResourceLocation>,
-        replacements: MutableMap<ResourceLocation, ModelBakeKey>
+        replacements: MutableMap<ResourceLocation, ModelBakingKey>
     ): Boolean
 
     override fun processModel(
@@ -78,7 +76,7 @@ abstract class ConfigurableModelReplacer : ModelReplacer() {
         state: BlockState,
         location: ResourceLocation,
         sprites: MutableSet<ResourceLocation>,
-        replacements: MutableMap<ResourceLocation, ModelBakeKey>
+        replacements: MutableMap<ResourceLocation, ModelBakingKey>
     ): Boolean {
         val model = bakery.getUnbakedModel(location)
         if (model is BlockModel) {

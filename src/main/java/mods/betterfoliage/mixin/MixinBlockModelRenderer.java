@@ -2,7 +2,7 @@ package mods.betterfoliage.mixin;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
-import mods.betterfoliage.render.ISpecialRenderModel;
+import mods.betterfoliage.model.SpecialRenderModel;
 import mods.betterfoliage.render.pipeline.RenderCtxVanilla;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.renderer.BlockModelRenderer;
@@ -25,16 +25,16 @@ public class MixinBlockModelRenderer {
 
     @Redirect(method = renderModel, at = @At(value = "INVOKE", target = renderModelSmooth), remap = false)
     public boolean onRenderModelSmooth(BlockModelRenderer renderer, ILightReader world, IBakedModel model, BlockState state, BlockPos pos, MatrixStack matrixStack, IVertexBuilder buffer, boolean checkSides, Random random, long rand, int combinedOverlay, IModelData modelData) {
-        if (model instanceof ISpecialRenderModel)
-            return RenderCtxVanilla.render(renderer, world, (ISpecialRenderModel) model, state, pos, matrixStack, buffer, checkSides, random, rand, combinedOverlay, modelData, true);
+        if (model instanceof SpecialRenderModel)
+            return RenderCtxVanilla.render(renderer, world, (SpecialRenderModel) model, state, pos, matrixStack, buffer, checkSides, random, rand, combinedOverlay, modelData, true);
         else
             return renderer.renderModelSmooth(world, model, state, pos, matrixStack, buffer, checkSides, random, rand, combinedOverlay, modelData);
     }
 
     @Redirect(method = renderModel, at = @At(value = "INVOKE", target = renderModelFlat), remap = false)
     public boolean onRenderModelFlat(BlockModelRenderer renderer, ILightReader world, IBakedModel model, BlockState state, BlockPos pos, MatrixStack matrixStack, IVertexBuilder buffer, boolean checkSides, Random random, long rand, int combinedOverlay, IModelData modelData) {
-        if (model instanceof ISpecialRenderModel)
-            return RenderCtxVanilla.render(renderer, world, (ISpecialRenderModel) model, state, pos, matrixStack, buffer, checkSides, random, rand, combinedOverlay, modelData, false);
+        if (model instanceof SpecialRenderModel)
+            return RenderCtxVanilla.render(renderer, world, (SpecialRenderModel) model, state, pos, matrixStack, buffer, checkSides, random, rand, combinedOverlay, modelData, false);
         else
             return renderer.renderModelSmooth(world, model, state, pos, matrixStack, buffer, checkSides, random, rand, combinedOverlay, modelData);
     }

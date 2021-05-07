@@ -1,22 +1,16 @@
-package mods.betterfoliage.resource.model
+package mods.betterfoliage.model
 
 import mods.betterfoliage.render.block.vanilla.getColorOverride
-import mods.betterfoliage.render.old.Color
-import mods.betterfoliage.render.old.HalfBakedQuad
-import mods.betterfoliage.render.old.Quad
-import mods.betterfoliage.render.old.bake
 import mods.betterfoliage.util.Atlas
 import mods.betterfoliage.util.Double3
 import mods.betterfoliage.util.PI2
 import mods.betterfoliage.util.allDirections
-import mods.betterfoliage.util.averageColor
 import mods.betterfoliage.util.random
 import mods.betterfoliage.util.randomB
 import mods.betterfoliage.util.randomD
 import mods.betterfoliage.util.randomI
 import mods.betterfoliage.util.rot
 import mods.betterfoliage.util.vec
-import net.minecraft.client.renderer.model.BakedQuad
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.util.Direction.UP
 import net.minecraft.util.ResourceLocation
@@ -127,3 +121,5 @@ fun crossModelsTinted(
 fun List<Quad>.withOpposites() = flatMap { listOf(it, it.flipped) }
 fun List<List<Quad>>.buildTufts(applyDiffuseLighting: Boolean = false) =
     map { it.withOpposites().bake(applyDiffuseLighting) }.toTypedArray()
+
+fun List<List<Quad>>.transform(trans: Quad.(Int)-> Quad) = mapIndexed { idx, qList -> qList.map { it.trans(idx) } }
