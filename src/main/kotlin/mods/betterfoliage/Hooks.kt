@@ -1,10 +1,16 @@
 @file:JvmName("Hooks")
 package mods.betterfoliage
 
+import mods.betterfoliage.config.Config
+import mods.betterfoliage.model.getActualRenderModel
+import mods.betterfoliage.render.particle.FallingLeafParticle
+import mods.betterfoliage.texture.LeafBlockModel
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
+import net.minecraft.client.Minecraft
 import net.minecraft.client.world.ClientWorld
 import net.minecraft.util.Direction
+import net.minecraft.util.Direction.DOWN
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.shapes.VoxelShape
 import net.minecraft.world.IBlockReader
@@ -33,14 +39,17 @@ fun onRandomDisplayTick(block: Block, state: BlockState, world: World, pos: Bloc
 //        Math.random() < Config.risingSoul.chance) {
 //            EntityRisingSoulFX(world, pos).addIfValid()
 //    }
-//
-//    if (Config.enabled &&
-//        Config.fallingLeaves.enabled &&
-//        BlockConfig.leafBlocks.matchesClass(state.block) &&
-//        world.isAirBlock(pos + down1) &&
-//        Math.random() < Config.fallingLeaves.chance) {
-//            EntityFallingLeavesFX(world, pos).addIfValid()
-//    }
+
+    if (Config.enabled &&
+        Config.fallingLeaves.enabled &&
+        random.nextDouble() < Config.fallingLeaves.chance &&
+        world.isAirBlock(pos.offset(DOWN))
+    ) {
+        (getActualRenderModel(world, pos, state, random) as? LeafBlockModel)?.let { leafModel ->
+            val blockColor = Minecraft.getInstance().blockColors.getColor(state, world, pos, 0)
+            FallingLeafParticle(world, pos, leafModel.key, blockColor, random).addIfValid()
+        }
+    }
 }
 
 fun getVoxelShapeOverride(state: BlockState, reader: IBlockReader, pos: BlockPos, dir: Direction): VoxelShape {

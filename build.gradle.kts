@@ -17,6 +17,8 @@ dependencies {
     "minecraft"("net.minecraftforge:forge:${properties["mcVersion"]}-${properties["forgeVersion"]}")
 
     "api"(fg.deobf("curse.maven:clothconfig-348521:2938583"))
+
+    "implementation"(fg.deobf("curse.maven:biomesoplenty-220318:2988999"))
     "implementation"("kottle:Kottle:${properties["kottleVersion"]}")
 //    "implementation"("org.spongepowered:mixin:0.8-SNAPSHOT")
 }

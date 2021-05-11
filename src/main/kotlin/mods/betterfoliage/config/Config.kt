@@ -30,6 +30,7 @@ object Config : DelegatingConfig(BetterFoliageMod.MOD_ID, BetterFoliageMod.MOD_I
         val size by double(min=0.75, max=2.5, default=1.4).lang("size")
         val dense by boolean(false)
         val hideInternal by boolean(true)
+        val saturationThreshold by double(default=0.1)
     }
 
     object shortGrass : PopulationConfigCategory(){

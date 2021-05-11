@@ -6,30 +6,32 @@ import mods.betterfoliage.config.BlockConfig
 import mods.betterfoliage.config.Config
 import mods.betterfoliage.config.ConfigurableBlockMatcher
 import mods.betterfoliage.config.ModelTextureList
-import mods.betterfoliage.model.SpecialRenderModel
-import mods.betterfoliage.render.lighting.RoundLeafLighting
 import mods.betterfoliage.model.Color
+import mods.betterfoliage.model.HSB
 import mods.betterfoliage.model.HalfBakedSpecialWrapper
 import mods.betterfoliage.model.HalfBakedWrapperKey
+import mods.betterfoliage.model.SpecialRenderModel
+import mods.betterfoliage.model.SpriteSetDelegate
+import mods.betterfoliage.model.crossModelsRaw
+import mods.betterfoliage.model.crossModelsTextured
+import mods.betterfoliage.render.lighting.RoundLeafLighting
 import mods.betterfoliage.render.pipeline.RenderCtxBase
 import mods.betterfoliage.render.pipeline.RenderCtxVanilla
 import mods.betterfoliage.resource.discovery.BakeWrapperManager
 import mods.betterfoliage.resource.discovery.ConfigurableModelDiscovery
 import mods.betterfoliage.resource.discovery.ModelBakingKey
 import mods.betterfoliage.resource.generated.GeneratedLeaf
-import mods.betterfoliage.model.SpriteSetDelegate
-import mods.betterfoliage.model.crossModelsRaw
-import mods.betterfoliage.model.crossModelsTextured
-import mods.betterfoliage.model.crossModelsTinted
+import mods.betterfoliage.texture.LeafBlockModel
+import mods.betterfoliage.texture.LeafParticleKey
 import mods.betterfoliage.texture.LeafParticleRegistry
 import mods.betterfoliage.util.Atlas
 import mods.betterfoliage.util.LazyMapInvalidatable
 import mods.betterfoliage.util.averageColor
 import mods.betterfoliage.util.isSnow
 import net.minecraft.block.BlockState
-import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.util.Direction.UP
 import net.minecraft.util.ResourceLocation
+import org.apache.logging.log4j.Level.DEBUG
 import org.apache.logging.log4j.Level.INFO
 import org.apache.logging.log4j.Logger
 
@@ -50,13 +52,12 @@ object StandardLeafDiscovery : ConfigurableModelDiscovery() {
             .apply { sprites.add(this) }
 
         detailLogger.log(INFO, "     particle $leafType")
-        replacements[location] = StandardLeafKey(generated, leafType)
+        replacements[location] = StandardLeafKey(generated, leafType, null)
         return true
     }
 }
 
-fun TextureAtlasSprite.logColorOverride(logger: Logger, threshold: Double) {
-    val hsb = averageColor
+fun logColorOverride(logger: Logger, threshold: Double, hsb: HSB) {
     return if (hsb.saturation >= threshold) {
         logger.log(INFO, "         brightness ${hsb.brightness}")
         logger.log(INFO, "         saturation ${hsb.saturation} >= ${threshold}, will use texture color")
@@ -65,24 +66,30 @@ fun TextureAtlasSprite.logColorOverride(logger: Logger, threshold: Double) {
     }
 }
 
-fun TextureAtlasSprite.getColorOverride(threshold: Double) = averageColor.let {
-    if (it.saturation < threshold) null else it.copy(brightness = (it.brightness * 2.0f).coerceAtMost(0.9f))
-}?.asColor?.let { Color(it) }
+fun HSB.colorOverride(threshold: Double) =
+    if (saturation < threshold) null else copy(brightness = (brightness * 2.0f).coerceAtMost(0.9f)).asColor.let { Color(it) }
 
 data class StandardLeafKey(
     val roundLeafTexture: ResourceLocation,
-    val leafType: String
-) : HalfBakedWrapperKey() {
+    override val leafType: String,
+    override val overrideColor: Color?
+) : HalfBakedWrapperKey(), LeafParticleKey {
+    val tintIndex: Int get() = if (overrideColor == null) 0 else -1
+
     override fun replace(wrapped: SpecialRenderModel): SpecialRenderModel {
-        Atlas.BLOCKS[roundLeafTexture].logColorOverride(BetterFoliageMod.detailLogger(this), 0.1)
-        return StandardLeafModel(wrapped, this)
+        val leafSpriteColor = Atlas.BLOCKS[roundLeafTexture].averageColor.let { hsb ->
+            logColorOverride(BetterFoliageMod.detailLogger(this), Config.leaves.saturationThreshold, hsb)
+            hsb.colorOverride(Config.leaves.saturationThreshold)
+        }
+        detailLogger.log(DEBUG, "roundLeaf=$roundLeafTexture overrideColor=$leafSpriteColor")
+        return StandardLeafModel(wrapped, this.copy(overrideColor = leafSpriteColor))
     }
 }
 
 class StandardLeafModel(
     model: SpecialRenderModel,
-    key: StandardLeafKey
-) : HalfBakedSpecialWrapper(model) {
+    override val key: StandardLeafKey
+) : HalfBakedSpecialWrapper(model), LeafBlockModel {
     val leafNormal by leafModelsNormal.delegate(key)
     val leafSnowed by leafModelsSnowed.delegate(key)
 
@@ -103,10 +110,10 @@ class StandardLeafModel(
             Config.leaves.let { crossModelsRaw(64, it.size, it.hOffset, it.vOffset) }
         }
         val leafModelsNormal = LazyMapInvalidatable(BakeWrapperManager) { key: StandardLeafKey ->
-            crossModelsTinted(leafModelsBase[key], Config.shortGrass.saturationThreshold) { key.roundLeafTexture }
+            crossModelsTextured(leafModelsBase[key], key.tintIndex, true) { key.roundLeafTexture }
         }
         val leafModelsSnowed = LazyMapInvalidatable(BakeWrapperManager) { key: StandardLeafKey ->
-            crossModelsTextured(leafModelsBase[key], Color.white, false) { leafSpritesSnowed[it].name }
+            crossModelsTextured(leafModelsBase[key], -1, false) { leafSpritesSnowed[it].name }
         }
     }
 }

@@ -2,6 +2,8 @@ package mods.betterfoliage.model
 
 import mods.betterfoliage.render.pipeline.RenderCtxBase
 import mods.betterfoliage.util.HasLogger
+import net.minecraft.block.BlockState
+import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.model.IBakedModel
 import net.minecraft.client.renderer.model.Material
 import net.minecraft.client.renderer.model.ModelBakery
@@ -9,6 +11,8 @@ import net.minecraft.client.renderer.model.VariantList
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.util.ResourceLocation
 import net.minecraft.util.WeightedRandom
+import net.minecraft.util.math.BlockPos
+import net.minecraft.world.ILightReader
 import org.apache.logging.log4j.Level.WARN
 import java.util.Random
 import java.util.function.Function
@@ -61,4 +65,13 @@ class SpecialRenderVariantList(
             return SpecialRenderVariantList(weightedSpecials, weightedSpecials[0].model)
         }
     }
+}
+
+fun getActualRenderModel(world: ILightReader, pos: BlockPos, state: BlockState, random: Random): SpecialRenderModel? {
+    val model = Minecraft.getInstance().blockRendererDispatcher.blockModelShapes.getModel(state) as? SpecialRenderModel ?: return null
+    if (model is SpecialRenderVariantList) {
+        random.setSeed(state.getPositionRandom(pos))
+        return model.getModel(random).model
+    }
+    return model
 }

@@ -1,43 +1,70 @@
 package mods.betterfoliage.texture
 
 import mods.betterfoliage.BetterFoliageMod
+import mods.betterfoliage.model.Color
+import mods.betterfoliage.model.FixedSpriteSet
+import mods.betterfoliage.model.SpriteSet
+import mods.betterfoliage.resource.discovery.ModelDefinitionsLoadedEvent
 import mods.betterfoliage.util.Atlas
+import mods.betterfoliage.util.HasLogger
 import mods.betterfoliage.util.get
 import mods.betterfoliage.util.getLines
 import mods.betterfoliage.util.resourceManager
 import mods.betterfoliage.util.stripStart
-import net.minecraft.client.renderer.texture.TextureAtlasSprite
+import net.minecraft.client.renderer.texture.MissingTextureSprite
 import net.minecraft.util.ResourceLocation
-import java.util.concurrent.CompletableFuture
+import net.minecraftforge.client.event.TextureStitchEvent
+import net.minecraftforge.eventbus.api.SubscribeEvent
+import org.apache.logging.log4j.Level
 
-object LeafParticleRegistry {
-    val targetAtlas = Atlas.PARTICLES
+interface LeafBlockModel {
+    val key: LeafParticleKey
+}
+
+interface LeafParticleKey {
+    val leafType: String
+    val overrideColor: Color?
+}
+
+object LeafParticleRegistry : HasLogger() {
     val typeMappings = TextureMatcher()
-//    val particles = hashMapOf<String, SpriteSet>()
+    val particles = hashMapOf<String, SpriteSet>()
 
-    val futures = mutableMapOf<String, List<CompletableFuture<TextureAtlasSprite>>>()
+    operator fun get(type: String) = particles[type] ?: particles["default"]!!
 
-//    operator fun get(type: String) = particles[type] ?: particles["default"]!!
-
-    fun discovery() {
+    @SubscribeEvent
+    fun handleModelLoad(event: ModelDefinitionsLoadedEvent) {
         typeMappings.loadMappings(ResourceLocation(BetterFoliageMod.MOD_ID, "leaf_texture_mappings.cfg"))
-        (typeMappings.mappings.map { it.type } + "default").distinct().forEach { leafType ->
-            val ids = (0 until 16).map { idx -> ResourceLocation(BetterFoliageMod.MOD_ID, "falling_leaf_${leafType}_$idx") }
-            val wids = ids.map { Atlas.PARTICLES.file(it) }
-//            futures[leafType] = (0 until 16).map { idx -> ResourceLocation(BetterFoliageMod.MOD_ID, "falling_leaf_${leafType}_$idx") }
-//                .filter { manager.hasResource(Atlas.PARTICLES.wrap(it)) }
-//                .map { atlasFuture.sprite(it) }
+    }
+
+    @SubscribeEvent
+    fun handlePreStitch(event: TextureStitchEvent.Pre) {
+        if (event.map.textureLocation == Atlas.PARTICLES.resourceId) {
+            (typeMappings.mappings.map { it.type } + "default").distinct().forEach { leafType ->
+                val locations = (0 until 16).map { idx ->
+                    ResourceLocation(BetterFoliageMod.MOD_ID, "particle/falling_leaf_${leafType}_$idx")
+                }.filter { resourceManager.hasResource(Atlas.PARTICLES.file(it)) }
+
+                detailLogger.log(Level.INFO, "Registering sprites for leaf particle type [$leafType], ${locations.size} sprites found")
+                locations.forEach { event.addSprite(it) }
+            }
         }
     }
 
-    fun cleanup() {
-//        futures.forEach { leafType, spriteFutures ->
-//            val sprites = spriteFutures.filter { !it.isCompletedExceptionally }.map { it.get() }
-//            if (sprites.isNotEmpty()) particles[leafType] = FixedSpriteSet(sprites)
-//        }
-//        if (particles["default"] == null) particles["default"] = FixedSpriteSet(listOf(atlasFuture.missing.get()!!))
+    @SubscribeEvent
+    fun handlePostStitch(event: TextureStitchEvent.Post) {
+        if (event.map.textureLocation == Atlas.PARTICLES.resourceId) {
+            (typeMappings.mappings.map { it.type } + "default").distinct().forEach { leafType ->
+                val sprites = (0 until 16).map { idx ->
+                    ResourceLocation(BetterFoliageMod.MOD_ID, "particle/falling_leaf_${leafType}_$idx")
+                }
+                    .map { event.map.getSprite(it) }
+                    .filter { it !is MissingTextureSprite }
+                detailLogger.log(Level.INFO, "Leaf particle type [$leafType], ${sprites.size} sprites in atlas")
+                particles[leafType] = FixedSpriteSet(sprites)
+            }
+        }
     }
-
 }
 
 class TextureMatcher {
@@ -45,7 +72,7 @@ class TextureMatcher {
     data class Mapping(val domain: String?, val path: String, val type: String) {
         fun matches(iconLocation: ResourceLocation): Boolean {
             return (domain == null || domain == iconLocation.namespace) &&
-                iconLocation.path.stripStart("blocks/").contains(path, ignoreCase = true)
+                    iconLocation.path.stripStart("blocks/").contains(path, ignoreCase = true)
         }
     }
 
@@ -61,7 +88,13 @@ class TextureMatcher {
                 if (line2.size == 2) {
                     val mapping = line2[0].trim().split(':')
                     if (mapping.size == 1) mappings.add(Mapping(null, mapping[0].trim(), line2[1].trim()))
-                    else if (mapping.size == 2) mappings.add(Mapping(mapping[0].trim(), mapping[1].trim(), line2[1].trim()))
+                    else if (mapping.size == 2) mappings.add(
+                        Mapping(
+                            mapping[0].trim(),
+                            mapping[1].trim(),
+                            line2[1].trim()
+                        )
+                    )
                 }
             }
         }

@@ -1,8 +1,8 @@
 package mods.betterfoliage.mixin;
 
 import mods.betterfoliage.BetterFoliageMod;
-import mods.betterfoliage.ModelDefinitionsLoadedEvent;
 import mods.betterfoliage.resource.discovery.BakeWrapperManager;
+import mods.betterfoliage.resource.discovery.ModelDefinitionsLoadedEvent;
 import net.minecraft.client.renderer.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.profiler.IProfiler;

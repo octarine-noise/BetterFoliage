@@ -1,6 +1,5 @@
 package mods.betterfoliage.resource.discovery
 
-import mods.betterfoliage.ModelDefinitionsLoadedEvent
 import mods.betterfoliage.model.SpecialRenderVariantList
 import mods.betterfoliage.util.Atlas
 import mods.betterfoliage.util.HasLogger
@@ -16,11 +15,17 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.event.ModelBakeEvent
 import net.minecraftforge.client.event.TextureStitchEvent
+import net.minecraftforge.eventbus.api.Event
+import net.minecraftforge.eventbus.api.EventPriority
 import net.minecraftforge.eventbus.api.SubscribeEvent
 import net.minecraftforge.fml.loading.progress.StartupMessageManager
 import org.apache.logging.log4j.Level.INFO
 import java.lang.ref.WeakReference
 import java.util.function.Function
+
+data class ModelDefinitionsLoadedEvent(
+    val bakery: ModelBakery
+) : Event()
 
 interface ModelDiscovery {
     fun onModelsLoaded(
@@ -50,7 +55,7 @@ object BakeWrapperManager : Invalidator, HasLogger() {
     private val replacements = mutableMapOf<ResourceLocation, ModelBakingKey>()
     private val sprites = mutableSetOf<ResourceLocation>()
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     fun handleModelLoad(event: ModelDefinitionsLoadedEvent) {
         modelsValid.invalidate()
         StartupMessageManager.addModMessage("BetterFoliage: discovering models")

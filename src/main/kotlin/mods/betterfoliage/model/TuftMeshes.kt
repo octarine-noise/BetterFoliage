@@ -1,6 +1,5 @@
 package mods.betterfoliage.model
 
-import mods.betterfoliage.render.block.vanilla.getColorOverride
 import mods.betterfoliage.util.Atlas
 import mods.betterfoliage.util.Double3
 import mods.betterfoliage.util.PI2
@@ -63,20 +62,15 @@ fun tuftModelSet(shapes: Array<TuftShapeKey>, overrideColor: Color?, spriteGette
 
 fun fullCubeTextured(
     spriteLocation: ResourceLocation,
-    overrideColor: Color?,
+    tintIndex: Int,
     scrambleUV: Boolean = true
 ): List<HalfBakedQuad> {
     val sprite = Atlas.BLOCKS[spriteLocation]
     return allDirections.map { Quad.faceQuad(it) }
         .map { if (!scrambleUV) it else it.rotateUV(randomI(max = 4)) }
         .map { it.sprite(sprite) }
-        .map { it.colorAndIndex(overrideColor) }
+        .map { it.colorIndex(tintIndex) }
         .bake(true)
-}
-
-fun fullCubeTinted(spriteLocation: ResourceLocation, threshold: Double, scrambleUV: Boolean = true): List<HalfBakedQuad> {
-    val overrideColor = Atlas.BLOCKS[spriteLocation].getColorOverride(threshold)
-    return fullCubeTextured(spriteLocation, overrideColor, scrambleUV)
 }
 
 fun crossModelsRaw(num: Int, size: Double, hOffset: Double, vOffset: Double): Array<List<Quad>> {
@@ -91,32 +85,21 @@ fun crossModelsRaw(num: Int, size: Double, hOffset: Double, vOffset: Double): Ar
     }
 }
 
-fun crossModelSingle(base: List<Quad>, sprite: TextureAtlasSprite, overrideColor: Color?, scrambleUV: Boolean) =
+fun crossModelSingle(base: List<Quad>, sprite: TextureAtlasSprite, tintIndex: Int,scrambleUV: Boolean) =
     base.map { if (scrambleUV) it.scrambleUV(random, canFlipU = true, canFlipV = true, canRotate = true) else it }
-        .map { it.colorAndIndex(overrideColor) }
+        .map { it.colorIndex(tintIndex) }
         .mapIndexed { idx, quad -> quad.sprite(sprite) }
         .withOpposites()
         .bake(false)
 
 fun crossModelsTextured(
     leafBase: Array<List<Quad>>,
-    overrideColor: Color?,
+    tintIndex: Int,
     scrambleUV: Boolean,
     spriteGetter: (Int) -> ResourceLocation
 ) = leafBase.mapIndexed { idx, leaf ->
-    crossModelSingle(leaf, Atlas.BLOCKS[spriteGetter(idx)], overrideColor, scrambleUV)
+    crossModelSingle(leaf, Atlas.BLOCKS[spriteGetter(idx)], tintIndex, scrambleUV)
 }.toTypedArray()
-
-fun crossModelsTinted(
-    leafBase: Array<List<Quad>>,
-    threshold: Double,
-    scrambleUV: Boolean = true,
-    spriteGetter: (Int) -> ResourceLocation
-) = leafBase.mapIndexed { idx, leaf ->
-    val sprite = Atlas.BLOCKS[spriteGetter(idx)]
-    val overrideColor = sprite.getColorOverride(threshold)
-    crossModelSingle(leaf, sprite, overrideColor, scrambleUV)
-}
 
 fun List<Quad>.withOpposites() = flatMap { listOf(it, it.flipped) }
 fun List<List<Quad>>.buildTufts(applyDiffuseLighting: Boolean = false) =

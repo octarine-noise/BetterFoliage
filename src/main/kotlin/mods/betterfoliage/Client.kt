@@ -4,7 +4,6 @@ import mods.betterfoliage.chunk.ChunkOverlayManager
 import mods.betterfoliage.config.BlockConfig
 import mods.betterfoliage.integration.OptifineCustomColors
 import mods.betterfoliage.integration.ShadersModIntegration
-import mods.betterfoliage.render.LeafWindTracker
 import mods.betterfoliage.render.block.vanilla.StandardDirtDiscovery
 import mods.betterfoliage.render.block.vanilla.StandardDirtKey
 import mods.betterfoliage.render.block.vanilla.StandardDirtModel
@@ -17,9 +16,11 @@ import mods.betterfoliage.render.block.vanilla.StandardMyceliumModel
 import mods.betterfoliage.render.block.vanilla.StandardSandDiscovery
 import mods.betterfoliage.render.block.vanilla.StandardSandModel
 import mods.betterfoliage.render.lighting.AoSideHelper
+import mods.betterfoliage.render.particle.LeafWindTracker
 import mods.betterfoliage.resource.discovery.BakeWrapperManager
 import mods.betterfoliage.resource.discovery.BlockTypeCache
 import mods.betterfoliage.resource.generated.GeneratedTexturePack
+import mods.betterfoliage.texture.LeafParticleRegistry
 import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
 import net.minecraft.client.renderer.RenderType
@@ -39,6 +40,7 @@ object Client {
     fun init() {
         // discoverers
         BetterFoliageMod.bus.register(BakeWrapperManager)
+        BetterFoliageMod.bus.register(LeafParticleRegistry)
         listOf(
             StandardLeafDiscovery,
             StandardGrassDiscovery,
