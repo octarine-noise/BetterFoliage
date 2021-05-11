@@ -98,8 +98,8 @@ class StandardLeafModel(
         if (!Config.enabled || !Config.leaves.enabled || noDecorations) return
 
         (ctx as? RenderCtxVanilla)?.let { it.vertexLighter = RoundLeafLighting }
-        ctx.render(leafNormal[ctx.random.nextInt(64)])
-        if (ctx.state(UP).isSnow) ctx.render(leafSnowed[ctx.random.nextInt(64)])
+        ctx.renderQuads(leafNormal[ctx.random.nextInt(64)])
+        if (ctx.state(UP).isSnow) ctx.renderQuads(leafSnowed[ctx.random.nextInt(64)])
     }
 
     companion object {

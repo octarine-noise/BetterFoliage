@@ -1,6 +1,9 @@
 package mods.betterfoliage.integration
 
 import mods.betterfoliage.config.BlockConfig
+import mods.betterfoliage.render.pipeline.RenderCtxBase
+import mods.betterfoliage.render.pipeline.RenderCtxForge
+import mods.betterfoliage.render.pipeline.RenderCtxVanilla
 import mods.betterfoliage.util.HasLogger
 import mods.betterfoliage.util.allAvailable
 import mods.betterfoliage.util.get
@@ -51,10 +54,15 @@ object ShadersModIntegration : HasLogger() {
     }
 
     /** Quads rendered inside this block will behave as tallgrass blocks in shader programs. */
-    inline fun grass(buffer: BufferBuilder, enabled: Boolean = true, func: ()->Unit) =
-        renderAs(buffer, defaultGrass, MODEL, enabled, func)
+    inline fun grass(ctx: RenderCtxBase, enabled: Boolean = true, func: ()->Unit) =
+        ((ctx as? RenderCtxVanilla)?.buffer as? BufferBuilder)?.let { bufferBuilder ->
+            renderAs(bufferBuilder, defaultGrass, MODEL, enabled, func)
+        }
+
 
     /** Quads rendered inside this block will behave as leaf blocks in shader programs. */
-    inline fun leaves(buffer: BufferBuilder, enabled: Boolean = true, func: ()->Unit) =
-        renderAs(buffer, defaultLeaves, MODEL, enabled, func)
+    inline fun leaves(ctx: RenderCtxBase, enabled: Boolean = true, func: ()->Unit) =
+        ((ctx as? RenderCtxVanilla)?.buffer as? BufferBuilder)?.let { bufferBuilder ->
+            renderAs(bufferBuilder, defaultLeaves, MODEL, enabled, func)
+        }
 }

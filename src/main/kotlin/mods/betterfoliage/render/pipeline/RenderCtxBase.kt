@@ -28,7 +28,7 @@ abstract class RenderCtxBase(
     world: ILightReader,
     pos: BlockPos,
     val matrixStack: MatrixStack,
-    val checkSides: Boolean,
+    var checkSides: Boolean,
     val random: Random,
     val modelData: IModelData
 ) : BlockCtx by BasicBlockCtx(world, pos) {
@@ -45,7 +45,7 @@ abstract class RenderCtxBase(
 
     inline fun Direction?.shouldRender() = this == null || !checkSides || Block.shouldSideBeRendered(state, world, pos, this)
 
-    fun render(quads: Iterable<HalfBakedQuad>) {
+    fun renderQuads(quads: Iterable<HalfBakedQuad>) {
         quads.forEach { quad ->
             if (quad.raw.face.shouldRender()) {
                 renderQuad(quad)

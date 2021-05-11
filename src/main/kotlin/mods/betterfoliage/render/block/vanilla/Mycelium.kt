@@ -2,7 +2,6 @@ package mods.betterfoliage.render.block.vanilla
 
 import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.config.Config
-import mods.betterfoliage.model.Color
 import mods.betterfoliage.model.HalfBakedSpecialWrapper
 import mods.betterfoliage.model.HalfBakedWrapperKey
 import mods.betterfoliage.model.SpecialRenderModel
@@ -67,7 +66,7 @@ class StandardMyceliumModel(
             ctx.state(Direction.UP).isAir(ctx.world, ctx.pos)
         ) {
             ctx.vertexLighter = tuftLighting
-            ctx.render(myceliumTuftModels[ctx.random])
+            ctx.renderQuads(myceliumTuftModels[ctx.random])
         }
     }
 
@@ -77,7 +76,7 @@ class StandardMyceliumModel(
         }
         val myceliumTuftModels by LazyInvalidatable(BakeWrapperManager) {
             val shapes = Config.shortGrass.let { tuftShapeSet(it.size, it.heightMin, it.heightMax, it.hOffset) }
-            tuftModelSet(shapes, Color.white) { idx -> myceliumTuftSprites[randomI()] }.buildTufts()
+            tuftModelSet(shapes, -1) { idx -> myceliumTuftSprites[randomI()] }.buildTufts()
         }
     }
 }

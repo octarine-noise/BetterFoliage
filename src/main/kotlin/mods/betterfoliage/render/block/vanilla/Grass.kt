@@ -6,6 +6,7 @@ import mods.betterfoliage.config.BlockConfig
 import mods.betterfoliage.config.Config
 import mods.betterfoliage.config.ConfigurableBlockMatcher
 import mods.betterfoliage.config.ModelTextureList
+import mods.betterfoliage.integration.ShadersModIntegration
 import mods.betterfoliage.model.Color
 import mods.betterfoliage.model.HalfBakedSpecialWrapper
 import mods.betterfoliage.model.HalfBakedWrapperKey
@@ -17,7 +18,6 @@ import mods.betterfoliage.model.tuftModelSet
 import mods.betterfoliage.model.tuftShapeSet
 import mods.betterfoliage.render.lighting.LightingPreferredFace
 import mods.betterfoliage.render.pipeline.RenderCtxBase
-import mods.betterfoliage.render.pipeline.RenderCtxVanilla
 import mods.betterfoliage.resource.discovery.BakeWrapperManager
 import mods.betterfoliage.resource.discovery.ConfigurableModelDiscovery
 import mods.betterfoliage.resource.discovery.ModelBakingKey
@@ -88,14 +88,16 @@ class StandardGrassModel(
                 Client.blockTypes.run { stateBelow in grass || stateBelow in dirt }
 
         if (connected) {
-            ctx.render(if (isSnowed) snowFullBlockMeshes[ctx.random] else fullBlock[ctx.random])
+            ctx.renderQuads(if (isSnowed) snowFullBlockMeshes[ctx.random] else fullBlock[ctx.random])
         } else {
             super.render(ctx, noDecorations)
         }
 
         if (Config.shortGrass.enabled(ctx.random) && !ctx.isNeighborSolid(UP)) {
-            (ctx as? RenderCtxVanilla)?.let { it.vertexLighter = tuftLighting }
-            ctx.render(if (isSnowed) tuftSnowed[ctx.random] else tuftNormal[ctx.random])
+            ctx.vertexLighter = tuftLighting
+            ShadersModIntegration.grass(ctx, Config.shortGrass.shaderWind) {
+                ctx.renderQuads(if (isSnowed) tuftSnowed[ctx.random] else tuftNormal[ctx.random])
+            }
         }
     }
 
@@ -107,10 +109,10 @@ class StandardGrassModel(
             Config.shortGrass.let { tuftShapeSet(it.size, it.heightMin, it.heightMax, it.hOffset) }
         }
         val grassTuftMeshesNormal = LazyMapInvalidatable(BakeWrapperManager) { key: StandardGrassKey ->
-            tuftModelSet(grassTuftShapes, key.overrideColor) { idx -> grassTuftSprites[randomI()] }.buildTufts()
+            tuftModelSet(grassTuftShapes, key.tintIndex) { idx -> grassTuftSprites[randomI()] }.buildTufts()
         }
         val grassTuftMeshesSnowed = LazyMapInvalidatable(BakeWrapperManager) { key: StandardGrassKey ->
-            tuftModelSet(grassTuftShapes, Color.white) { idx -> grassTuftSprites[randomI()] }.buildTufts()
+            tuftModelSet(grassTuftShapes, -1) { idx -> grassTuftSprites[randomI()] }.buildTufts()
         }
         val grassFullBlockMeshes = LazyMapInvalidatable(BakeWrapperManager) { key: StandardGrassKey ->
             Array(64) { fullCubeTextured(key.grassLocation, key.tintIndex) }

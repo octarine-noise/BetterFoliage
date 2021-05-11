@@ -76,6 +76,7 @@ object Config : DelegatingConfig(BetterFoliageMod.MOD_ID, BetterFoliageMod.MOD_I
         override val enabled by featureEnable()
         val hOffset by double(max=0.25, default=0.1).lang("hOffset")
         override val population by int(max=64, default=16, min=0)
+        val shaderWind by boolean(true).lang("shaderWind")
     }
 
     object reed : PopulationConfigCategory(){

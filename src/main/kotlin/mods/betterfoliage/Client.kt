@@ -11,6 +11,8 @@ import mods.betterfoliage.render.block.vanilla.StandardGrassDiscovery
 import mods.betterfoliage.render.block.vanilla.StandardGrassModel
 import mods.betterfoliage.render.block.vanilla.StandardLeafDiscovery
 import mods.betterfoliage.render.block.vanilla.StandardLeafModel
+import mods.betterfoliage.render.block.vanilla.StandardLilypadDiscovery
+import mods.betterfoliage.render.block.vanilla.StandardLilypadModel
 import mods.betterfoliage.render.block.vanilla.StandardMyceliumDiscovery
 import mods.betterfoliage.render.block.vanilla.StandardMyceliumModel
 import mods.betterfoliage.render.block.vanilla.StandardSandDiscovery
@@ -46,7 +48,8 @@ object Client {
             StandardGrassDiscovery,
             StandardDirtDiscovery,
             StandardMyceliumDiscovery,
-            StandardSandDiscovery
+            StandardSandDiscovery,
+            StandardLilypadDiscovery
         ).forEach {
             BakeWrapperManager.discoverers.add(it)
         }
@@ -64,7 +67,8 @@ object Client {
             StandardGrassModel.Companion,
             StandardDirtModel.Companion,
             StandardMyceliumModel.Companion,
-            StandardSandModel.Companion
+            StandardSandModel.Companion,
+            StandardLilypadModel.Companion
         )
 
         // init mod integrations

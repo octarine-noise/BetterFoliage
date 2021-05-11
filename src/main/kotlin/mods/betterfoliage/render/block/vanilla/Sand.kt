@@ -3,7 +3,6 @@ package mods.betterfoliage.render.block.vanilla
 import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.Client
 import mods.betterfoliage.config.Config
-import mods.betterfoliage.model.Color
 import mods.betterfoliage.model.HalfBakedSpecialWrapper
 import mods.betterfoliage.model.HalfBakedWrapperKey
 import mods.betterfoliage.model.Quad
@@ -79,8 +78,8 @@ class StandardSandModel(
             val isDeepWater = isWater && ctx.offset(face).state(UP).material == Material.WATER
             if (isDeepWater) {
                 ctx.vertexLighter = coralLighting[face]
-                ctx.render(coralCrustModels[face][ctx.random])
-                ctx.render(coralTuftModels[face][ctx.random])
+                ctx.renderQuads(coralCrustModels[face][ctx.random])
+                ctx.renderQuads(coralTuftModels[face][ctx.random])
             }
         }
     }
@@ -95,7 +94,7 @@ class StandardSandModel(
         val coralTuftModels by LazyInvalidatable(BakeWrapperManager) {
             val shapes = Config.coral.let { tuftShapeSet(it.size, 1.0, 1.0, it.hOffset) }
             allDirections.mapArray { face ->
-                tuftModelSet(shapes, Color.white) { coralTuftSprites[randomI()] }
+                tuftModelSet(shapes, -1) { coralTuftSprites[randomI()] }
                     .transform { rotate(Rotation.fromUp[face]) }
                     .buildTufts()
             }

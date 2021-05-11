@@ -3,7 +3,6 @@ package mods.betterfoliage.render.block.vanilla
 import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.Client
 import mods.betterfoliage.config.Config
-import mods.betterfoliage.model.Color
 import mods.betterfoliage.model.HalfBakedSpecialWrapper
 import mods.betterfoliage.model.HalfBakedWrapperKey
 import mods.betterfoliage.model.SpecialRenderModel
@@ -89,10 +88,10 @@ class StandardDirtModel(
 
         if (Config.algae.enabled(ctx.random) && isDeepWater) {
             (ctx as? RenderCtxVanilla)?.vertexLighter = vanillaTuftLighting
-            ctx.render(algaeModels[ctx.random])
+            ctx.renderQuads(algaeModels[ctx.random])
         } else if (Config.reed.enabled(ctx.random) && isShallowWater && !isSaltWater) {
             (ctx as? RenderCtxVanilla)?.vertexLighter = vanillaTuftLighting
-            ctx.render(reedModels[ctx.random])
+            ctx.renderQuads(reedModels[ctx.random])
         }
     }
 
@@ -109,11 +108,11 @@ class StandardDirtModel(
         )
         val algaeModels by LazyInvalidatable(BakeWrapperManager) {
             val shapes = Config.algae.let { tuftShapeSet(it.size, it.heightMin, it.heightMax, it.hOffset) }
-            tuftModelSet(shapes, Color.white) { algaeSprites[randomI()] }.buildTufts()
+            tuftModelSet(shapes, -1) { algaeSprites[randomI()] }.buildTufts()
         }
         val reedModels by LazyInvalidatable(BakeWrapperManager) {
             val shapes = Config.reed.let { tuftShapeSet(2.0, it.heightMin, it.heightMax, it.hOffset) }
-            tuftModelSet(shapes, Color.white) { reedSprites[randomI()] }.buildTufts()
+            tuftModelSet(shapes, -1) { reedSprites[randomI()] }.buildTufts()
         }
     }
 }

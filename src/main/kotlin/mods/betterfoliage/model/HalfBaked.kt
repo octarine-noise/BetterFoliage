@@ -36,7 +36,7 @@ open class HalfBakedSimpleModelWrapper(baseModel: SimpleBakedModel): IBakedModel
     val baseQuads = baseModel.unbakeQuads()
 
     override fun render(ctx: RenderCtxBase, noDecorations: Boolean) {
-        ctx.render(baseQuads)
+        ctx.renderQuads(baseQuads)
     }
 }
 
