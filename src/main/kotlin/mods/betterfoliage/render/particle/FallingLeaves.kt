@@ -73,23 +73,6 @@ class FallingLeafParticle(
         }
     }
 
-    fun calculateParticleColor(textureAvgColor: Int, blockColor: Int) {
-        val texture = HSB.fromColor(textureAvgColor)
-        val block = HSB.fromColor(blockColor)
-
-        val weightTex = texture.saturation / (texture.saturation + block.saturation)
-        val weightBlock = 1.0f - weightTex
-
-        // avoid circular average for hue for performance reasons
-        // one of the color components should dominate anyway
-        val particle = HSB(
-            weightTex * texture.hue + weightBlock * block.hue,
-            weightTex * texture.saturation + weightBlock * block.saturation,
-            weightTex * texture.brightness + weightBlock * block.brightness * biomeBrightnessMultiplier
-        )
-        setColor(particle.asColor)
-    }
-
     override fun getRenderType(): IParticleRenderType = IParticleRenderType.PARTICLE_SHEET_TRANSLUCENT
 }
 

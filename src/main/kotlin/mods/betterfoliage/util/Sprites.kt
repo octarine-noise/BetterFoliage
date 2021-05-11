@@ -66,7 +66,7 @@ val TextureAtlasSprite.averageColor: HSB
             for (y in 0 until height) {
                 val pixel = getPixelRGBA(0, x, y)
                 val alpha = (pixel shr 24) and 255
-                val hsb = HSB.fromColor(pixel)
+                val hsb = HSB.fromColorRGBA(pixel)
                 if (alpha == 255) {
                     numOpaque++
                     sumHueX += cos((hsb.hue.toDouble() - 0.5) * PI2)

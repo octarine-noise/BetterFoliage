@@ -83,8 +83,8 @@ data class Color(val alpha: Int, val red: Int, val green: Int, val blue: Int) {
 
 data class HSB(var hue: Float, var saturation: Float, var brightness: Float) {
     companion object {
-        fun fromColor(color: Int): HSB {
-            val hsbVals = java.awt.Color.RGBtoHSB((color shr 16) and 255, (color shr 8) and 255, color and 255, null)
+        fun fromColorRGBA(color: Int): HSB {
+            val hsbVals = java.awt.Color.RGBtoHSB(color and 255, (color shr 8) and 255, (color shr 16) and 255, null)
             return HSB(hsbVals[0], hsbVals[1], hsbVals[2])
         }
     }
