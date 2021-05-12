@@ -1,4 +1,4 @@
-package mods.betterfoliage.render
+package mods.betterfoliage.render.particle
 
 import mods.betterfoliage.util.Double3
 import net.minecraft.client.MinecraftClient
@@ -9,8 +9,6 @@ import net.minecraft.client.texture.Sprite
 import net.minecraft.client.util.math.Vector3f
 import net.minecraft.util.math.MathHelper
 import net.minecraft.world.World
-
-fun VertexConsumer.vertex(v: Double3) = vertex(v.x, v.y, v.z)
 
 abstract class AbstractParticle(world: World, x: Double, y: Double, z: Double) : SpriteBillboardParticle(world, x, y, z) {
 

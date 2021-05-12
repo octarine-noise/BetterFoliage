@@ -1,7 +1,6 @@
 package mods.betterfoliage.render.particle
 
 import mods.betterfoliage.BetterFoliage
-import mods.betterfoliage.render.AbstractParticle
 import mods.betterfoliage.model.SpriteDelegate
 import mods.betterfoliage.model.SpriteSetDelegate
 import mods.betterfoliage.util.*

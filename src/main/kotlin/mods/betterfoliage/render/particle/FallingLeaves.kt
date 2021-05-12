@@ -2,13 +2,11 @@ package mods.betterfoliage.render.particle
 
 import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.ClientWorldLoadCallback
-import mods.betterfoliage.render.AbstractParticle
 import mods.betterfoliage.render.block.vanilla.LeafKey
 import mods.betterfoliage.util.*
 import net.fabricmc.fabric.api.event.world.WorldTickCallback
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.particle.ParticleTextureSheet
-import net.minecraft.client.render.BufferBuilder
 import net.minecraft.client.world.ClientWorld
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.MathHelper
@@ -68,11 +66,6 @@ class FallingLeafParticle(
             angle += rotationSpeed
         }
     }
-
-//    override fun render(worldRenderer: BufferBuilder, partialTickTime: Float) {
-//        val tickAngle = angle + partialTickTime * (if (rotPositive) rotationSpeed else -rotationSpeed)
-//        renderParticleQuad(worldRenderer, partialTickTime, rotation = tickAngle.toDouble(), isMirrored = isMirrored)
-//    }
 
     fun setParticleColor(overrideColor: Int?, blockColor: Int) {
         val color =  overrideColor ?: blockColor
