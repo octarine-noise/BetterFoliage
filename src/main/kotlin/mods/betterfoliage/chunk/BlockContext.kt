@@ -31,7 +31,8 @@ interface BlockCtx {
     fun state(offset: Int3) = world.getBlockState(pos + offset)
 
     val biome: Biome? get() =
-        ChunkRendererRegion_world[world]?.getBiome(pos)
+        (world as? WorldView)?.getBiome(pos) ?:
+        (world as? ChunkRendererRegion)?.let { ChunkRendererRegion_world[it]?.getBiome(pos) }
 
     val isNormalCube: Boolean get() = state.isSimpleFullBlock(world, pos)
 
