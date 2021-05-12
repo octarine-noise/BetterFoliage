@@ -14,7 +14,9 @@ import mods.betterfoliage.model.tuftShapeSet
 import mods.betterfoliage.render.pipeline.RenderCtxBase
 import mods.betterfoliage.resource.discovery.AbstractModelDiscovery
 import mods.betterfoliage.resource.discovery.BakeWrapperManager
+import mods.betterfoliage.resource.discovery.ModelBakingContext
 import mods.betterfoliage.resource.discovery.ModelBakingKey
+import mods.betterfoliage.resource.discovery.ModelDiscoveryContext
 import mods.betterfoliage.util.Atlas
 import mods.betterfoliage.util.LazyInvalidatable
 import mods.betterfoliage.util.get
@@ -27,23 +29,17 @@ import net.minecraft.util.ResourceLocation
 
 object StandardLilypadDiscovery : AbstractModelDiscovery() {
     val LILYPAD_BLOCKS = listOf(Blocks.LILY_PAD)
-    override fun processModel(
-        bakery: ModelBakery,
-        state: BlockState,
-        location: ResourceLocation,
-        sprites: MutableSet<ResourceLocation>,
-        replacements: MutableMap<ResourceLocation, ModelBakingKey>
-    ): Boolean {
-        val model = bakery.getUnbakedModel(location)
-        if (model is BlockModel && state.block in LILYPAD_BLOCKS) {
-            replacements[location] = StandardLilypadKey
+
+    override fun processModel(ctx: ModelDiscoveryContext) {
+        if (ctx.getUnbaked() is BlockModel && ctx.blockState.block in LILYPAD_BLOCKS) {
+            ctx.addReplacement(StandardLilypadKey)
         }
-        return super.processModel(bakery, state, location, sprites, replacements)
+        super.processModel(ctx)
     }
 }
 
 object StandardLilypadKey : HalfBakedWrapperKey() {
-    override fun replace(wrapped: SpecialRenderModel) = StandardLilypadModel(wrapped)
+    override fun bake(ctx: ModelBakingContext, wrapped: SpecialRenderModel) = StandardLilypadModel(wrapped)
 }
 
 class StandardLilypadModel(

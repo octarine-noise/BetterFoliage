@@ -5,6 +5,7 @@ import mods.betterfoliage.util.Atlas
 import mods.betterfoliage.util.HasLogger
 import mods.betterfoliage.util.Invalidator
 import mods.betterfoliage.util.SimpleInvalidator
+import net.minecraft.block.BlockState
 import net.minecraft.client.renderer.model.IBakedModel
 import net.minecraft.client.renderer.model.IModelTransform
 import net.minecraft.client.renderer.model.IUnbakedModel
@@ -19,13 +20,30 @@ import net.minecraftforge.eventbus.api.Event
 import net.minecraftforge.eventbus.api.EventPriority
 import net.minecraftforge.eventbus.api.SubscribeEvent
 import net.minecraftforge.fml.loading.progress.StartupMessageManager
+import org.apache.logging.log4j.Level.DEBUG
 import org.apache.logging.log4j.Level.INFO
+import org.apache.logging.log4j.Logger
 import java.lang.ref.WeakReference
 import java.util.function.Function
 
 data class ModelDefinitionsLoadedEvent(
     val bakery: ModelBakery
 ) : Event()
+
+data class ModelDiscoveryContext(
+    val bakery: ModelBakery,
+    val blockState: BlockState,
+    val modelLocation: ResourceLocation,
+    val sprites: MutableSet<ResourceLocation>,
+    val replacements: MutableMap<ResourceLocation, ModelBakingKey>,
+    val logger: Logger
+) {
+    fun getUnbaked(location: ResourceLocation = modelLocation) = bakery.getUnbakedModel(location)
+    fun addReplacement(key: ModelBakingKey) {
+        replacements[modelLocation] = key
+        logger.log(INFO, "Adding model replacement $modelLocation -> $key")
+    }
+}
 
 interface ModelDiscovery {
     fun onModelsLoaded(
@@ -35,14 +53,20 @@ interface ModelDiscovery {
     )
 }
 
+data class ModelBakingContext(
+    val bakery: ModelBakery,
+    val spriteGetter: Function<Material, TextureAtlasSprite>,
+    val location: ResourceLocation,
+    val transform: IModelTransform,
+    val logger: Logger
+) {
+    fun getUnbaked() = bakery.getUnbakedModel(location)
+    fun getBaked() = bakery.getBakedModel(location, transform, spriteGetter)
+}
+
 interface ModelBakingKey {
-    fun bake(
-        location: ResourceLocation,
-        unbaked: IUnbakedModel,
-        transform: IModelTransform,
-        bakery: ModelBakery,
-        spriteGetter: Function<Material, TextureAtlasSprite>
-    ): IBakedModel? = unbaked.bakeModel(bakery, spriteGetter, transform, location)
+    fun bake(ctx: ModelBakingContext): IBakedModel? =
+        ctx.getUnbaked().bakeModel(ctx.bakery, ctx.spriteGetter, ctx.transform, ctx.location)
 }
 
 object BakeWrapperManager : Invalidator, HasLogger() {
@@ -57,14 +81,16 @@ object BakeWrapperManager : Invalidator, HasLogger() {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun handleModelLoad(event: ModelDefinitionsLoadedEvent) {
+        val startTime = System.currentTimeMillis()
         modelsValid.invalidate()
         StartupMessageManager.addModMessage("BetterFoliage: discovering models")
         logger.log(INFO, "starting model discovery (${discoverers.size} listeners)")
         discoverers.forEach { listener ->
             val replacementsLocal = mutableMapOf<ResourceLocation, ModelBakingKey>()
-            listener.onModelsLoaded(event.bakery, sprites, replacementsLocal)
-            replacements.putAll(replacementsLocal)
+            listener.onModelsLoaded(event.bakery, sprites, replacements)
         }
+        val elapsed = System.currentTimeMillis() - startTime
+        logger.log(INFO, "finished model discovery in $elapsed ms, ${replacements.size} top-level replacements")
     }
 
     @SubscribeEvent
@@ -89,17 +115,12 @@ object BakeWrapperManager : Invalidator, HasLogger() {
         transform: IModelTransform,
         location: ResourceLocation
     ): IBakedModel? {
+        val ctx = ModelBakingContext(bakery, spriteGetter, location, transform, detailLogger)
         // bake replacement if available
         replacements[location]?.let { replacement ->
             detailLogger.log(INFO, "Baking replacement for [${unbaked::class.java.simpleName}] $location -> $replacement")
-            return replacement.bake(location, unbaked, transform, bakery, spriteGetter)
+            return replacement.bake(ctx)
         }
-        // container model support
-        if (unbaked is VariantList) SpecialRenderVariantList.bakeIfSpecial(location, unbaked, bakery, spriteGetter)?.let {
-            detailLogger.log(INFO, "Wrapping container [${unbaked::class.java.simpleName}] $location")
-            return it
-        }
-
         return unbaked.bakeModel(bakery, spriteGetter, transform, location)
     }
 }

@@ -15,7 +15,8 @@ import mods.betterfoliage.render.pipeline.RenderCtxBase
 import mods.betterfoliage.render.pipeline.RenderCtxVanilla
 import mods.betterfoliage.resource.discovery.AbstractModelDiscovery
 import mods.betterfoliage.resource.discovery.BakeWrapperManager
-import mods.betterfoliage.resource.discovery.ModelBakingKey
+import mods.betterfoliage.resource.discovery.ModelBakingContext
+import mods.betterfoliage.resource.discovery.ModelDiscoveryContext
 import mods.betterfoliage.resource.generated.CenteredSprite
 import mods.betterfoliage.util.Atlas
 import mods.betterfoliage.util.Int3
@@ -23,40 +24,36 @@ import mods.betterfoliage.util.LazyInvalidatable
 import mods.betterfoliage.util.get
 import mods.betterfoliage.util.offset
 import mods.betterfoliage.util.randomI
-import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
 import net.minecraft.block.material.Material
 import net.minecraft.client.renderer.RenderType
 import net.minecraft.client.renderer.RenderTypeLookup
 import net.minecraft.client.renderer.model.BlockModel
-import net.minecraft.client.renderer.model.ModelBakery
 import net.minecraft.util.Direction.UP
 import net.minecraft.util.ResourceLocation
 import net.minecraft.world.biome.Biome
 
 object StandardDirtDiscovery : AbstractModelDiscovery() {
     val DIRT_BLOCKS = listOf(Blocks.DIRT, Blocks.COARSE_DIRT, Blocks.PODZOL)
-    override fun processModel(
-        bakery: ModelBakery,
-        state: BlockState,
-        location: ResourceLocation,
-        sprites: MutableSet<ResourceLocation>,
-        replacements: MutableMap<ResourceLocation, ModelBakingKey>
-    ): Boolean {
-        val model = bakery.getUnbakedModel(location)
-        if (model is BlockModel && state.block in DIRT_BLOCKS) {
-            Client.blockTypes.dirt.add(state)
-            replacements[location] = StandardDirtKey
-//            RenderTypeLookup.setRenderLayer(state.block, RenderType.getCutout())
-            RenderTypeLookup.setRenderLayer(state.block, RenderType.getCutoutMipped())
-            return true
+
+    fun canRenderInLayer(layer: RenderType) = when {
+        !Config.enabled -> layer == RenderType.getSolid()
+        !Config.connectedGrass.enabled && !Config.algae.enabled && !Config.reed.enabled -> layer == RenderType.getSolid()
+        else -> layer == RenderType.getCutoutMipped()
+    }
+
+    override fun processModel(ctx: ModelDiscoveryContext) {
+        if (ctx.getUnbaked() is BlockModel && ctx.blockState.block in DIRT_BLOCKS) {
+            Client.blockTypes.dirt.add(ctx.blockState)
+            ctx.addReplacement(StandardDirtKey)
+            RenderTypeLookup.setRenderLayer(ctx.blockState.block, ::canRenderInLayer)
         }
-        return super.processModel(bakery, state, location, sprites, replacements)
+        super.processModel(ctx)
     }
 }
 
 object StandardDirtKey : HalfBakedWrapperKey() {
-    override fun replace(wrapped: SpecialRenderModel) = StandardDirtModel(wrapped)
+    override fun bake(ctx: ModelBakingContext, wrapped: SpecialRenderModel) = StandardDirtModel(wrapped)
 }
 
 class StandardDirtModel(

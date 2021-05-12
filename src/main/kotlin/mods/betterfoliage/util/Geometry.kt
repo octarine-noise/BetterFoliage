@@ -8,7 +8,8 @@ import net.minecraft.util.Direction.AxisDirection.NEGATIVE
 import net.minecraft.util.Direction.AxisDirection.POSITIVE
 import net.minecraft.util.math.BlockPos
 
-val EPSILON = 0.05
+val EPSILON_ZERO = 0.05
+val EPSILON_ONE = 0.95
 
 // ================================
 // Axes and directions

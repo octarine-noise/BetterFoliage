@@ -1,10 +1,10 @@
 package mods.betterfoliage.resource.generated
 
-import mods.betterfoliage.texture.blendRGB
-import mods.betterfoliage.texture.loadSprite
 import mods.betterfoliage.util.Atlas
+import mods.betterfoliage.util.blendRGB
 import mods.betterfoliage.util.bytes
 import mods.betterfoliage.util.get
+import mods.betterfoliage.util.loadSprite
 import mods.betterfoliage.util.set
 import net.minecraft.resources.IResourceManager
 import net.minecraft.util.ResourceLocation

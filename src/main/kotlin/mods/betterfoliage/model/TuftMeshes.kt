@@ -73,8 +73,8 @@ fun fullCubeTextured(
         .bake(true)
 }
 
-fun crossModelsRaw(num: Int, size: Double, hOffset: Double, vOffset: Double): Array<List<Quad>> {
-    return Array(num) { idx ->
+fun crossModelsRaw(num: Int, size: Double, hOffset: Double, vOffset: Double): List<List<Quad>> {
+    return (0 until num).map { idx ->
         listOf(
             Quad.verticalRectangle(x1 = -0.5, z1 = 0.5, x2 = 0.5, z2 = -0.5, yBottom = -0.5 * 1.41, yTop = 0.5 * 1.41),
             Quad.verticalRectangle(x1 = -0.5, z1 = 0.5, x2 = 0.5, z2 = -0.5, yBottom = -0.5 * 1.41, yTop = 0.5 * 1.41)
@@ -93,7 +93,7 @@ fun crossModelSingle(base: List<Quad>, sprite: TextureAtlasSprite, tintIndex: In
         .bake(false)
 
 fun crossModelsTextured(
-    leafBase: Array<List<Quad>>,
+    leafBase: Iterable<List<Quad>>,
     tintIndex: Int,
     scrambleUV: Boolean,
     spriteGetter: (Int) -> ResourceLocation
@@ -101,8 +101,8 @@ fun crossModelsTextured(
     crossModelSingle(leaf, Atlas.BLOCKS[spriteGetter(idx)], tintIndex, scrambleUV)
 }.toTypedArray()
 
-fun List<Quad>.withOpposites() = flatMap { listOf(it, it.flipped) }
-fun List<List<Quad>>.buildTufts(applyDiffuseLighting: Boolean = false) =
+fun Iterable<Quad>.withOpposites() = flatMap { listOf(it, it.flipped) }
+fun Iterable<List<Quad>>.buildTufts(applyDiffuseLighting: Boolean = false) =
     map { it.withOpposites().bake(applyDiffuseLighting) }.toTypedArray()
 
-fun List<List<Quad>>.transform(trans: Quad.(Int)-> Quad) = mapIndexed { idx, qList -> qList.map { it.trans(idx) } }
+fun Iterable<List<Quad>>.transform(trans: Quad.(Int)-> Quad) = mapIndexed { idx, qList -> qList.map { it.trans(idx) } }

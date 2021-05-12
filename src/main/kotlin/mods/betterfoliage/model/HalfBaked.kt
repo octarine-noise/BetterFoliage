@@ -1,24 +1,19 @@
 package mods.betterfoliage.model
 
 import mods.betterfoliage.render.pipeline.RenderCtxBase
+import mods.betterfoliage.resource.discovery.ModelBakingContext
 import mods.betterfoliage.resource.discovery.ModelBakingKey
 import mods.betterfoliage.util.Double3
 import mods.betterfoliage.util.HasLogger
 import mods.betterfoliage.util.directionsAndNull
+import mods.betterfoliage.util.mapArray
 import net.minecraft.client.renderer.model.BakedQuad
 import net.minecraft.client.renderer.model.IBakedModel
-import net.minecraft.client.renderer.model.IModelTransform
-import net.minecraft.client.renderer.model.IUnbakedModel
-import net.minecraft.client.renderer.model.Material
-import net.minecraft.client.renderer.model.ModelBakery
 import net.minecraft.client.renderer.model.SimpleBakedModel
-import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.client.renderer.vertex.VertexFormatElement
-import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.model.pipeline.BakedQuadBuilder
 import java.util.Random
-import java.util.function.Function
 
 /**
  * Hybrid baked quad implementation, carrying both baked and unbaked information.
@@ -47,23 +42,16 @@ open class HalfBakedSpecialWrapper(val baseModel: SpecialRenderModel): IBakedMod
 }
 
 abstract class HalfBakedWrapperKey : ModelBakingKey, HasLogger() {
-    override fun bake(
-        location: ResourceLocation,
-        unbaked: IUnbakedModel,
-        transform: IModelTransform,
-        bakery: ModelBakery,
-        spriteGetter: Function<Material, TextureAtlasSprite>
-    ): IBakedModel? {
-        val baseModel = super.bake(location, unbaked, transform, bakery, spriteGetter)
+    override fun bake(ctx: ModelBakingContext): IBakedModel? {
+        val baseModel = super.bake(ctx)
         val halfBaked = when(baseModel) {
             is SimpleBakedModel -> HalfBakedSimpleModelWrapper(baseModel)
             else -> null
         }
-        return if (halfBaked == null) baseModel else replace(halfBaked)
+        return if (halfBaked == null) baseModel else bake(ctx, halfBaked)
     }
 
-
-    abstract fun replace(wrapped: SpecialRenderModel): SpecialRenderModel
+    abstract fun bake(ctx: ModelBakingContext, wrapped: SpecialRenderModel): SpecialRenderModel
 }
 
 fun List<Quad>.bake(applyDiffuseLighting: Boolean) = map { quad ->
@@ -105,6 +93,8 @@ fun List<Quad>.bake(applyDiffuseLighting: Boolean) = map { quad ->
     }
     HalfBakedQuad(quad, builder.build())
 }
+
+fun Array<List<Quad>>.bake(applyDiffuseLighting: Boolean) = mapArray { it.bake(applyDiffuseLighting) }
 
 fun BakedQuad.unbake(): HalfBakedQuad {
     val size = DefaultVertexFormats.BLOCK.integerSize

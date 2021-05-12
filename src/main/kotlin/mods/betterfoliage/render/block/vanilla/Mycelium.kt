@@ -13,42 +13,33 @@ import mods.betterfoliage.render.lighting.LightingPreferredFace
 import mods.betterfoliage.render.pipeline.RenderCtxBase
 import mods.betterfoliage.resource.discovery.AbstractModelDiscovery
 import mods.betterfoliage.resource.discovery.BakeWrapperManager
-import mods.betterfoliage.resource.discovery.ModelBakingKey
+import mods.betterfoliage.resource.discovery.ModelBakingContext
+import mods.betterfoliage.resource.discovery.ModelDiscoveryContext
 import mods.betterfoliage.util.Atlas
 import mods.betterfoliage.util.LazyInvalidatable
 import mods.betterfoliage.util.get
 import mods.betterfoliage.util.randomI
-import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
 import net.minecraft.client.renderer.RenderType
 import net.minecraft.client.renderer.RenderTypeLookup
 import net.minecraft.client.renderer.model.BlockModel
-import net.minecraft.client.renderer.model.ModelBakery
 import net.minecraft.util.Direction
 import net.minecraft.util.ResourceLocation
 
 object StandardMyceliumDiscovery : AbstractModelDiscovery() {
     val MYCELIUM_BLOCKS = listOf(Blocks.MYCELIUM)
 
-    override fun processModel(
-        bakery: ModelBakery,
-        state: BlockState,
-        location: ResourceLocation,
-        sprites: MutableSet<ResourceLocation>,
-        replacements: MutableMap<ResourceLocation, ModelBakingKey>
-    ): Boolean {
-        val model = bakery.getUnbakedModel(location)
-        if (model is BlockModel && state.block in MYCELIUM_BLOCKS) {
-            replacements[location] = StandardMyceliumKey
-            RenderTypeLookup.setRenderLayer(state.block, RenderType.getCutout())
-            return true
+    override fun processModel(ctx: ModelDiscoveryContext) {
+        if (ctx.getUnbaked() is BlockModel && ctx.blockState.block in MYCELIUM_BLOCKS) {
+            ctx.addReplacement(StandardMyceliumKey)
+            RenderTypeLookup.setRenderLayer(ctx.blockState.block, RenderType.getCutout())
         }
-        return super.processModel(bakery, state, location, sprites, replacements)
+        super.processModel(ctx)
     }
 }
 
 object StandardMyceliumKey : HalfBakedWrapperKey() {
-    override fun replace(wrapped: SpecialRenderModel) = StandardMyceliumModel(wrapped)
+    override fun bake(ctx: ModelBakingContext, wrapped: SpecialRenderModel) = StandardMyceliumModel(wrapped)
 }
 
 class StandardMyceliumModel(

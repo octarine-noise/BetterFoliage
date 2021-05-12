@@ -4,8 +4,6 @@ import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.Client
 import mods.betterfoliage.config.BlockConfig
 import mods.betterfoliage.config.Config
-import mods.betterfoliage.config.ConfigurableBlockMatcher
-import mods.betterfoliage.config.ModelTextureList
 import mods.betterfoliage.integration.ShadersModIntegration
 import mods.betterfoliage.model.Color
 import mods.betterfoliage.model.HalfBakedSpecialWrapper
@@ -19,8 +17,11 @@ import mods.betterfoliage.model.tuftShapeSet
 import mods.betterfoliage.render.lighting.LightingPreferredFace
 import mods.betterfoliage.render.pipeline.RenderCtxBase
 import mods.betterfoliage.resource.discovery.BakeWrapperManager
+import mods.betterfoliage.resource.discovery.ConfigurableBlockMatcher
 import mods.betterfoliage.resource.discovery.ConfigurableModelDiscovery
-import mods.betterfoliage.resource.discovery.ModelBakingKey
+import mods.betterfoliage.resource.discovery.ModelBakingContext
+import mods.betterfoliage.resource.discovery.ModelDiscoveryContext
+import mods.betterfoliage.resource.discovery.ModelTextureList
 import mods.betterfoliage.util.Atlas
 import mods.betterfoliage.util.LazyInvalidatable
 import mods.betterfoliage.util.LazyMapInvalidatable
@@ -28,7 +29,6 @@ import mods.betterfoliage.util.averageColor
 import mods.betterfoliage.util.get
 import mods.betterfoliage.util.isSnow
 import mods.betterfoliage.util.randomI
-import net.minecraft.block.BlockState
 import net.minecraft.util.Direction.DOWN
 import net.minecraft.util.Direction.UP
 import net.minecraft.util.ResourceLocation
@@ -37,17 +37,9 @@ object StandardGrassDiscovery : ConfigurableModelDiscovery() {
     override val matchClasses: ConfigurableBlockMatcher get() = BlockConfig.grassBlocks
     override val modelTextures: List<ModelTextureList> get() = BlockConfig.grassModels.modelList
 
-    override fun processModel(
-        state: BlockState,
-        location: ResourceLocation,
-        textureMatch: List<ResourceLocation>,
-        sprites: MutableSet<ResourceLocation>,
-        replacements: MutableMap<ResourceLocation, ModelBakingKey>
-    ): Boolean {
-        replacements[location] = StandardGrassKey(textureMatch[0], null)
-        Client.blockTypes.grass.add(state)
-//        RenderTypeLookup.setRenderLayer(state.block, RenderType.getCutout())
-        return true
+    override fun processModel(ctx: ModelDiscoveryContext, textureMatch: List<ResourceLocation>) {
+        ctx.addReplacement(StandardGrassKey(textureMatch[0], null))
+        Client.blockTypes.grass.add(ctx.blockState)
     }
 }
 
@@ -57,7 +49,7 @@ data class StandardGrassKey(
 ) : HalfBakedWrapperKey() {
     val tintIndex: Int get() = if (overrideColor == null) 0 else -1
 
-    override fun replace(wrapped: SpecialRenderModel): SpecialRenderModel {
+    override fun bake(ctx: ModelBakingContext, wrapped: SpecialRenderModel): SpecialRenderModel {
         val grassSpriteColor = Atlas.BLOCKS[grassLocation].averageColor.let { hsb ->
             logColorOverride(BetterFoliageMod.detailLogger(this), Config.shortGrass.saturationThreshold, hsb)
             hsb.colorOverride(Config.shortGrass.saturationThreshold)
@@ -81,7 +73,7 @@ class StandardGrassModel(
 
         val stateBelow = ctx.state(DOWN)
         val stateAbove = ctx.state(UP)
-
+        val isAir = ctx.isAir(UP)
         val isSnowed = stateAbove.isSnow
         val connected = Config.connectedGrass.enabled &&
                 (!isSnowed || Config.connectedGrass.snowEnabled) &&
@@ -93,7 +85,7 @@ class StandardGrassModel(
             super.render(ctx, noDecorations)
         }
 
-        if (Config.shortGrass.enabled(ctx.random) && !ctx.isNeighborSolid(UP)) {
+        if (Config.shortGrass.enabled(ctx.random) && (isAir || isSnowed)) {
             ctx.vertexLighter = tuftLighting
             ShadersModIntegration.grass(ctx, Config.shortGrass.shaderWind) {
                 ctx.renderQuads(if (isSnowed) tuftSnowed[ctx.random] else tuftNormal[ctx.random])

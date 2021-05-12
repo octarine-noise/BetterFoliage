@@ -1,8 +1,8 @@
 package mods.betterfoliage.resource.generated
 
-import mods.betterfoliage.texture.loadSprite
 import mods.betterfoliage.util.Atlas
 import mods.betterfoliage.util.bytes
+import mods.betterfoliage.util.loadSprite
 import net.minecraft.resources.IResourceManager
 import net.minecraft.util.ResourceLocation
 import java.awt.image.BufferedImage

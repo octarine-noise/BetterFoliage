@@ -9,6 +9,7 @@ import mods.betterfoliage.util.nearestAngle
 import mods.betterfoliage.util.rotate
 import mods.betterfoliage.util.times
 import mods.betterfoliage.util.vec
+import net.minecraft.client.renderer.texture.NativeImage
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.util.Direction
 import java.lang.Math.max
@@ -83,6 +84,7 @@ data class Color(val alpha: Int, val red: Int, val green: Int, val blue: Int) {
 
 data class HSB(var hue: Float, var saturation: Float, var brightness: Float) {
     companion object {
+        /** Red is assumed to be LSB, see [NativeImage.PixelFormat.RGBA] */
         fun fromColorRGBA(color: Int): HSB {
             val hsbVals = java.awt.Color.RGBtoHSB(color and 255, (color shr 8) and 255, (color shr 16) and 255, null)
             return HSB(hsbVals[0], hsbVals[1], hsbVals[2])

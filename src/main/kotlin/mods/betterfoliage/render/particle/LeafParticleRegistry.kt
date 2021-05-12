@@ -1,10 +1,10 @@
-package mods.betterfoliage.texture
+package mods.betterfoliage.render.particle
 
 import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.model.Color
 import mods.betterfoliage.model.FixedSpriteSet
 import mods.betterfoliage.model.SpriteSet
-import mods.betterfoliage.resource.discovery.ModelDefinitionsLoadedEvent
+import mods.betterfoliage.resource.VeryEarlyReloadListener
 import mods.betterfoliage.util.Atlas
 import mods.betterfoliage.util.HasLogger
 import mods.betterfoliage.util.get
@@ -15,7 +15,7 @@ import net.minecraft.client.renderer.texture.MissingTextureSprite
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.event.TextureStitchEvent
 import net.minecraftforge.eventbus.api.SubscribeEvent
-import org.apache.logging.log4j.Level
+import org.apache.logging.log4j.Level.INFO
 
 interface LeafBlockModel {
     val key: LeafParticleKey
@@ -26,26 +26,28 @@ interface LeafParticleKey {
     val overrideColor: Color?
 }
 
-object LeafParticleRegistry : HasLogger() {
+object LeafParticleRegistry : HasLogger(), VeryEarlyReloadListener {
     val typeMappings = TextureMatcher()
+    val allTypes get() = (typeMappings.mappings.map { it.type } + "default").distinct()
+
     val particles = hashMapOf<String, SpriteSet>()
 
     operator fun get(type: String) = particles[type] ?: particles["default"]!!
 
-    @SubscribeEvent
-    fun handleModelLoad(event: ModelDefinitionsLoadedEvent) {
+    override fun onReloadStarted() {
         typeMappings.loadMappings(ResourceLocation(BetterFoliageMod.MOD_ID, "leaf_texture_mappings.cfg"))
+        detailLogger.log(INFO, "Loaded leaf particle mappings, types = [${allTypes.joinToString(", ")}]")
     }
 
     @SubscribeEvent
     fun handlePreStitch(event: TextureStitchEvent.Pre) {
         if (event.map.textureLocation == Atlas.PARTICLES.resourceId) {
-            (typeMappings.mappings.map { it.type } + "default").distinct().forEach { leafType ->
+            allTypes.forEach { leafType ->
                 val locations = (0 until 16).map { idx ->
                     ResourceLocation(BetterFoliageMod.MOD_ID, "particle/falling_leaf_${leafType}_$idx")
                 }.filter { resourceManager.hasResource(Atlas.PARTICLES.file(it)) }
 
-                detailLogger.log(Level.INFO, "Registering sprites for leaf particle type [$leafType], ${locations.size} sprites found")
+                detailLogger.log(INFO, "Registering sprites for leaf particle type [$leafType], ${locations.size} sprites found")
                 locations.forEach { event.addSprite(it) }
             }
         }
@@ -60,7 +62,7 @@ object LeafParticleRegistry : HasLogger() {
                 }
                     .map { event.map.getSprite(it) }
                     .filter { it !is MissingTextureSprite }
-                detailLogger.log(Level.INFO, "Leaf particle type [$leafType], ${sprites.size} sprites in atlas")
+                detailLogger.log(INFO, "Leaf particle type [$leafType], ${sprites.size} sprites in atlas")
                 particles[leafType] = FixedSpriteSet(sprites)
             }
         }

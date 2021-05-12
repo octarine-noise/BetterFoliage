@@ -1,9 +1,6 @@
 package mods.betterfoliage.render.particle
 
 import mods.betterfoliage.config.Config
-import mods.betterfoliage.model.HSB
-import mods.betterfoliage.texture.LeafParticleKey
-import mods.betterfoliage.texture.LeafParticleRegistry
 import mods.betterfoliage.util.Double3
 import mods.betterfoliage.util.PI2
 import mods.betterfoliage.util.minmax

@@ -1,44 +1,47 @@
 @file:JvmName("Hooks")
 package mods.betterfoliage
 
+import mods.betterfoliage.chunk.ChunkOverlayManager
 import mods.betterfoliage.config.Config
 import mods.betterfoliage.model.getActualRenderModel
+import mods.betterfoliage.render.block.vanilla.RoundLogKey
 import mods.betterfoliage.render.particle.FallingLeafParticle
-import mods.betterfoliage.texture.LeafBlockModel
+import mods.betterfoliage.render.particle.LeafBlockModel
+import mods.betterfoliage.render.particle.RisingSoulParticle
+import mods.betterfoliage.util.plus
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
+import net.minecraft.block.Blocks
 import net.minecraft.client.Minecraft
 import net.minecraft.client.world.ClientWorld
 import net.minecraft.util.Direction
 import net.minecraft.util.Direction.DOWN
+import net.minecraft.util.Direction.UP
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.shapes.VoxelShape
+import net.minecraft.util.math.shapes.VoxelShapes
 import net.minecraft.world.IBlockReader
 import net.minecraft.world.World
 import java.util.Random
 
 fun getAmbientOcclusionLightValueOverride(original: Float, state: BlockState): Float {
-//    if (Config.enabled && Config.roundLogs.enabled && BlockConfig.logBlocks.matchesClass(state.block)) return Config.roundLogs.dimming.toFloat();
-    return original
-}
-
-fun getUseNeighborBrightnessOverride(original: Boolean, state: BlockState): Boolean {
-//    return original || (Config.enabled && Config.roundLogs.enabled && BlockConfig.logBlocks.matchesClass(state.block));
+    if (Config.enabled && Config.roundLogs.enabled && Client.blockTypes.stateKeys[state] is RoundLogKey)
+        return Config.roundLogs.dimming.toFloat()
     return original
 }
 
 fun onClientBlockChanged(worldClient: ClientWorld, pos: BlockPos, oldState: BlockState, newState: BlockState, flags: Int) {
-//    ChunkOverlayManager.onBlockChange(worldClient, pos)
+    ChunkOverlayManager.onBlockChange(worldClient, pos)
 }
 
 fun onRandomDisplayTick(block: Block, state: BlockState, world: World, pos: BlockPos, random: Random) {
-//    if (Config.enabled &&
-//        Config.risingSoul.enabled &&
-//        state.block == Blocks.SOUL_SAND &&
-//        world.isAirBlock(pos + up1) &&
-//        Math.random() < Config.risingSoul.chance) {
-//            EntityRisingSoulFX(world, pos).addIfValid()
-//    }
+    if (Config.enabled &&
+        Config.risingSoul.enabled &&
+        state.block == Blocks.SOUL_SAND &&
+        world.isAirBlock(pos.offset(UP)) &&
+        Math.random() < Config.risingSoul.chance) {
+            RisingSoulParticle(world, pos).addIfValid()
+    }
 
     if (Config.enabled &&
         Config.fallingLeaves.enabled &&
@@ -53,6 +56,10 @@ fun onRandomDisplayTick(block: Block, state: BlockState, world: World, pos: Bloc
 }
 
 fun getVoxelShapeOverride(state: BlockState, reader: IBlockReader, pos: BlockPos, dir: Direction): VoxelShape {
-//    if (LogRegistry[state, reader, pos] != null) return VoxelShapes.empty()
+    if (Config.enabled && Config.roundLogs.enabled && Client.blockTypes.stateKeys[state] is RoundLogKey)
+        return VoxelShapes.empty()
     return state.getFaceOcclusionShape(reader, pos, dir)
 }
+
+fun shouldForceSideRenderOF(state: BlockState, world: IBlockReader, pos: BlockPos, face: Direction) =
+    world.getBlockState(pos.offset(face)).let { neighbor -> Client.blockTypes.stateKeys[neighbor] is RoundLogKey }

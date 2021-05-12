@@ -90,7 +90,6 @@ abstract class ColumnRenderLayer : ChunkOverlayLayer<ColumnLayerData> {
     override fun calculate(ctx: BlockCtx): ColumnLayerData {
         // TODO detect round logs
         if (allDirections.all { dir -> ctx.offset(dir).let { it.isNormalCube } }) return ColumnLayerData.SkipRender
-//        val columnTextures = registry[ctx] ?: return ColumnLayerData.ResolveError
         val columnTextures = getColumnKey(ctx.state) ?: return ColumnLayerData.ResolveError
 
         // if log axis is not defined and "Default to vertical" config option is not set, render normally

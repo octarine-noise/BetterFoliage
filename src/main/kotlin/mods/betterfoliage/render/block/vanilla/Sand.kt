@@ -18,7 +18,8 @@ import mods.betterfoliage.render.lighting.LightingPreferredFace
 import mods.betterfoliage.render.pipeline.RenderCtxBase
 import mods.betterfoliage.resource.discovery.AbstractModelDiscovery
 import mods.betterfoliage.resource.discovery.BakeWrapperManager
-import mods.betterfoliage.resource.discovery.ModelBakingKey
+import mods.betterfoliage.resource.discovery.ModelBakingContext
+import mods.betterfoliage.resource.discovery.ModelDiscoveryContext
 import mods.betterfoliage.util.Atlas
 import mods.betterfoliage.util.LazyInvalidatable
 import mods.betterfoliage.util.Rotation
@@ -28,39 +29,30 @@ import mods.betterfoliage.util.mapArray
 import mods.betterfoliage.util.randomB
 import mods.betterfoliage.util.randomD
 import mods.betterfoliage.util.randomI
-import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
 import net.minecraft.block.material.Material
 import net.minecraft.client.renderer.RenderType
 import net.minecraft.client.renderer.RenderTypeLookup
 import net.minecraft.client.renderer.model.BlockModel
-import net.minecraft.client.renderer.model.ModelBakery
 import net.minecraft.util.Direction
 import net.minecraft.util.Direction.UP
 import net.minecraft.util.ResourceLocation
 
 object StandardSandDiscovery : AbstractModelDiscovery() {
     val SAND_BLOCKS = listOf(Blocks.SAND, Blocks.RED_SAND)
-    override fun processModel(
-        bakery: ModelBakery,
-        state: BlockState,
-        location: ResourceLocation,
-        sprites: MutableSet<ResourceLocation>,
-        replacements: MutableMap<ResourceLocation, ModelBakingKey>
-    ): Boolean {
-        val model = bakery.getUnbakedModel(location)
-        if (model is BlockModel && state.block in SAND_BLOCKS) {
-            Client.blockTypes.dirt.add(state)
-            replacements[location] = StandardSandKey
-            RenderTypeLookup.setRenderLayer(state.block, RenderType.getCutoutMipped())
-            return true
+
+    override fun processModel(ctx: ModelDiscoveryContext) {
+        if (ctx.getUnbaked() is BlockModel && ctx.blockState.block in SAND_BLOCKS) {
+            Client.blockTypes.dirt.add(ctx.blockState)
+            ctx.addReplacement(StandardSandKey)
+            RenderTypeLookup.setRenderLayer(ctx.blockState.block, RenderType.getCutoutMipped())
         }
-        return super.processModel(bakery, state, location, sprites, replacements)
+        super.processModel(ctx)
     }
 }
 
 object StandardSandKey : HalfBakedWrapperKey() {
-    override fun replace(wrapped: SpecialRenderModel) = StandardSandModel(wrapped)
+    override fun bake(ctx: ModelBakingContext, wrapped: SpecialRenderModel) = StandardSandModel(wrapped)
 }
 
 class StandardSandModel(

@@ -4,8 +4,6 @@ import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.Client
 import mods.betterfoliage.config.BlockConfig
 import mods.betterfoliage.config.Config
-import mods.betterfoliage.config.ConfigurableBlockMatcher
-import mods.betterfoliage.config.ModelTextureList
 import mods.betterfoliage.model.Color
 import mods.betterfoliage.model.HSB
 import mods.betterfoliage.model.HalfBakedSpecialWrapper
@@ -14,21 +12,22 @@ import mods.betterfoliage.model.SpecialRenderModel
 import mods.betterfoliage.model.SpriteSetDelegate
 import mods.betterfoliage.model.crossModelsRaw
 import mods.betterfoliage.model.crossModelsTextured
-import mods.betterfoliage.render.lighting.RoundLeafLighting
+import mods.betterfoliage.render.lighting.RoundLeafLightingPreferUp
+import mods.betterfoliage.render.particle.LeafBlockModel
+import mods.betterfoliage.render.particle.LeafParticleKey
+import mods.betterfoliage.render.particle.LeafParticleRegistry
 import mods.betterfoliage.render.pipeline.RenderCtxBase
-import mods.betterfoliage.render.pipeline.RenderCtxVanilla
 import mods.betterfoliage.resource.discovery.BakeWrapperManager
+import mods.betterfoliage.resource.discovery.ConfigurableBlockMatcher
 import mods.betterfoliage.resource.discovery.ConfigurableModelDiscovery
-import mods.betterfoliage.resource.discovery.ModelBakingKey
+import mods.betterfoliage.resource.discovery.ModelBakingContext
+import mods.betterfoliage.resource.discovery.ModelDiscoveryContext
+import mods.betterfoliage.resource.discovery.ModelTextureList
 import mods.betterfoliage.resource.generated.GeneratedLeaf
-import mods.betterfoliage.texture.LeafBlockModel
-import mods.betterfoliage.texture.LeafParticleKey
-import mods.betterfoliage.texture.LeafParticleRegistry
 import mods.betterfoliage.util.Atlas
 import mods.betterfoliage.util.LazyMapInvalidatable
 import mods.betterfoliage.util.averageColor
 import mods.betterfoliage.util.isSnow
-import net.minecraft.block.BlockState
 import net.minecraft.util.Direction.UP
 import net.minecraft.util.ResourceLocation
 import org.apache.logging.log4j.Level.DEBUG
@@ -39,21 +38,15 @@ object StandardLeafDiscovery : ConfigurableModelDiscovery() {
     override val matchClasses: ConfigurableBlockMatcher get() = BlockConfig.leafBlocks
     override val modelTextures: List<ModelTextureList> get() = BlockConfig.leafModels.modelList
 
-    override fun processModel(
-        state: BlockState,
-        location: ResourceLocation,
-        textureMatch: List<ResourceLocation>,
-        sprites: MutableSet<ResourceLocation>,
-        replacements: MutableMap<ResourceLocation, ModelBakingKey>
-    ): Boolean {
+
+    override fun processModel(ctx: ModelDiscoveryContext, textureMatch: List<ResourceLocation>) {
         val leafType = LeafParticleRegistry.typeMappings.getType(textureMatch[0]) ?: "default"
         val generated = GeneratedLeaf(textureMatch[0], leafType)
             .register(Client.generatedPack)
-            .apply { sprites.add(this) }
+            .apply { ctx.sprites.add(this) }
 
         detailLogger.log(INFO, "     particle $leafType")
-        replacements[location] = StandardLeafKey(generated, leafType, null)
-        return true
+        ctx.addReplacement(StandardLeafKey(generated, leafType, null))
     }
 }
 
@@ -76,7 +69,7 @@ data class StandardLeafKey(
 ) : HalfBakedWrapperKey(), LeafParticleKey {
     val tintIndex: Int get() = if (overrideColor == null) 0 else -1
 
-    override fun replace(wrapped: SpecialRenderModel): SpecialRenderModel {
+    override fun bake(ctx: ModelBakingContext, wrapped: SpecialRenderModel): SpecialRenderModel {
         val leafSpriteColor = Atlas.BLOCKS[roundLeafTexture].averageColor.let { hsb ->
             logColorOverride(BetterFoliageMod.detailLogger(this), Config.leaves.saturationThreshold, hsb)
             hsb.colorOverride(Config.leaves.saturationThreshold)
@@ -97,9 +90,10 @@ class StandardLeafModel(
         super.render(ctx, noDecorations)
         if (!Config.enabled || !Config.leaves.enabled || noDecorations) return
 
-        (ctx as? RenderCtxVanilla)?.let { it.vertexLighter = RoundLeafLighting }
-        ctx.renderQuads(leafNormal[ctx.random.nextInt(64)])
-        if (ctx.state(UP).isSnow) ctx.renderQuads(leafSnowed[ctx.random.nextInt(64)])
+        ctx.vertexLighter = RoundLeafLightingPreferUp
+        val leafIdx = ctx.random.nextInt(64)
+        ctx.renderQuads(leafNormal[leafIdx])
+        if (ctx.state(UP).isSnow) ctx.renderQuads(leafSnowed[leafIdx])
     }
 
     companion object {

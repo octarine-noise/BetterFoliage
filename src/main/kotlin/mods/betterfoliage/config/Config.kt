@@ -1,7 +1,8 @@
 package mods.betterfoliage.config
 
-import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.BetterFoliageMod
+import mods.betterfoliage.resource.discovery.ConfigurableBlockMatcher
+import mods.betterfoliage.resource.discovery.ModelTextureListConfiguration
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.eventbus.api.SubscribeEvent
 import net.minecraftforge.fml.config.ModConfig
@@ -67,7 +68,7 @@ object Config : DelegatingConfig(BetterFoliageMod.MOD_ID, BetterFoliageMod.MOD_I
 
     object cactus : ConfigCategory(){
         val enabled by featureEnable()
-        val size by double(min=0.5, max=1.5, default=0.8).lang("size")
+        val size by double(min=1.0, max=2.0, default=1.3).lang("size")
         val sizeVariation by double(max=0.5, default=0.1)
         val hOffset by double(max=0.5, default=0.1).lang("hOffset")
     }
@@ -117,8 +118,8 @@ object Config : DelegatingConfig(BetterFoliageMod.MOD_ID, BetterFoliageMod.MOD_I
     object netherrack : ConfigCategory(){
         val enabled by featureEnable()
         val hOffset by double(max=0.4, default=0.2).lang("hOffset")
-        val heightMin by double(min=0.1, max=1.5, default=0.6).lang("heightMin")
-        val heightMax by double(min=0.1, max=1.5, default=0.8).lang("heightMax")
+        val heightMin by double(min=0.1, max=1.5, default=0.2).lang("heightMin")
+        val heightMax by double(min=0.1, max=1.5, default=0.5).lang("heightMax")
         val size by double(min=0.5, max=1.5, default=1.0).lang("size")
     }
 
@@ -147,6 +148,7 @@ object Config : DelegatingConfig(BetterFoliageMod.MOD_ID, BetterFoliageMod.MOD_I
         val trailLength by int(min=2, max=128, default=48)
         val trailDensity by int(min=1, max=16, default=3)
     }
+
 }
 
 object BlockConfig {

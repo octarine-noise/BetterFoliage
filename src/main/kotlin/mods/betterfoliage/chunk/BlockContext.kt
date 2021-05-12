@@ -27,8 +27,11 @@ interface BlockCtx {
     fun offset(offset: Int3): BlockCtx
 
     val state: BlockState get() = world.getBlockState(pos)
-    fun state(dir: Direction) = world.getBlockState(pos + dir.offset)
     fun state(offset: Int3) = world.getBlockState(pos + offset)
+    fun state(dir: Direction) = state(dir.offset)
+
+    fun isAir(offset: Int3) = (pos + offset).let { world.getBlockState(it).isAir(world, it) }
+    fun isAir(dir: Direction) = isAir(dir.offset)
 
     val biome: Biome? get() =
         (world as? IWorldReader)?.getBiome(pos) ?:
