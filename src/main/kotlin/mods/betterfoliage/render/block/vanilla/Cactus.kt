@@ -1,12 +1,11 @@
 package mods.betterfoliage.render.block.vanilla
 
 import mods.betterfoliage.BetterFoliageMod
-import mods.betterfoliage.Client
+import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.config.Config
 import mods.betterfoliage.model.HalfBakedSpecialWrapper
 import mods.betterfoliage.model.HalfBakedWrapperKey
 import mods.betterfoliage.model.SpecialRenderModel
-import mods.betterfoliage.model.SpriteDelegate
 import mods.betterfoliage.model.SpriteSetDelegate
 import mods.betterfoliage.model.buildTufts
 import mods.betterfoliage.model.crossModelsRaw
@@ -39,8 +38,9 @@ object StandardCactusDiscovery : AbstractModelDiscovery() {
     override fun processModel(ctx: ModelDiscoveryContext) {
         val model = ctx.getUnbaked()
         if (model is BlockModel && ctx.blockState.block in CACTUS_BLOCKS) {
-            Client.blockTypes.dirt.add(ctx.blockState)
+            BetterFoliage.blockTypes.dirt.add(ctx.blockState)
             ctx.addReplacement(StandardCactusKey)
+            ctx.sprites.add(StandardCactusModel.cactusCrossSprite)
         }
         super.processModel(ctx)
     }
@@ -69,9 +69,7 @@ class StandardCactusModel(
     }
 
     companion object {
-        val cactusCrossSprite by SpriteDelegate(Atlas.BLOCKS) {
-            ResourceLocation(BetterFoliageMod.MOD_ID, "blocks/better_cactus")
-        }
+        val cactusCrossSprite = ResourceLocation(BetterFoliageMod.MOD_ID, "blocks/better_cactus")
         val cactusArmSprites by SpriteSetDelegate(Atlas.BLOCKS) { idx ->
             ResourceLocation(BetterFoliageMod.MOD_ID, "blocks/better_cactus_arm_$idx")
         }
@@ -87,7 +85,7 @@ class StandardCactusModel(
                 crossModelsRaw(64, config.size, 0.0, 0.0)
                     .transform { rotateZ(randomD(-config.sizeVariation, config.sizeVariation)) }
             }
-            crossModelsTextured(models, -1, true) { cactusCrossSprite.name }
+            crossModelsTextured(models, -1, true) { cactusCrossSprite }
         }
     }
 }

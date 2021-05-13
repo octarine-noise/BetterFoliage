@@ -1,5 +1,6 @@
 package mods.betterfoliage.util
 
+import mods.betterfoliage.model.Color
 import mods.betterfoliage.model.HSB
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.model.Material
@@ -8,6 +9,8 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.resources.IResource
 import net.minecraft.resources.IResourceManager
 import net.minecraft.util.ResourceLocation
+import org.apache.logging.log4j.Level
+import org.apache.logging.log4j.Logger
 import java.awt.image.BufferedImage
 import java.io.ByteArrayOutputStream
 import java.io.IOException
@@ -55,31 +58,30 @@ val BufferedImage.bytes: ByteArray get() =
  * Only non-transparent pixels are considered. Averages are taken in the HSB color space (note: Hue is a circular average),
  * and the result transformed back to the RGB color space.
  */
-val TextureAtlasSprite.averageColor: HSB
-    get() {
-        var numOpaque = 0
-        var sumHueX = 0.0
-        var sumHueY = 0.0
-        var sumSaturation = 0.0f
-        var sumBrightness = 0.0f
-        for (x in 0 until width)
-            for (y in 0 until height) {
-                val pixel = getPixelRGBA(0, x, y)
-                val alpha = (pixel shr 24) and 255
-                val hsb = HSB.fromColorRGBA(pixel)
-                if (alpha == 255) {
-                    numOpaque++
-                    sumHueX += cos((hsb.hue.toDouble() - 0.5) * PI2)
-                    sumHueY += sin((hsb.hue.toDouble() - 0.5) * PI2)
-                    sumSaturation += hsb.saturation
-                    sumBrightness += hsb.brightness
-                }
+val TextureAtlasSprite.averageColor: HSB get() {
+    var numOpaque = 0
+    var sumHueX = 0.0
+    var sumHueY = 0.0
+    var sumSaturation = 0.0f
+    var sumBrightness = 0.0f
+    for (x in 0 until width)
+        for (y in 0 until height) {
+            val pixel = getPixelRGBA(0, x, y)
+            val alpha = (pixel shr 24) and 255
+            val hsb = HSB.fromColorRGBA(pixel)
+            if (alpha == 255) {
+                numOpaque++
+                sumHueX += cos((hsb.hue.toDouble() - 0.5) * PI2)
+                sumHueY += sin((hsb.hue.toDouble() - 0.5) * PI2)
+                sumSaturation += hsb.saturation
+                sumBrightness += hsb.brightness
             }
+        }
 
-        // circular average - transform sum vector to polar angle
-        val avgHue = (atan2(sumHueY, sumHueX) / PI2 + 0.5).toFloat()
-        return HSB(avgHue, sumSaturation / numOpaque.toFloat(), sumBrightness / numOpaque.toFloat())
-    }
+    // circular average - transform sum vector to polar angle
+    val avgHue = (atan2(sumHueY, sumHueX) / PI2 + 0.5).toFloat()
+    return HSB(avgHue, sumSaturation / numOpaque.toFloat(), sumBrightness / numOpaque.toFloat())
+}
 
 /** Weighted blend of 2 packed RGB colors */
 fun blendRGB(rgb1: Int, rgb2: Int, weight1: Int, weight2: Int): Int {
@@ -90,3 +92,15 @@ fun blendRGB(rgb1: Int, rgb2: Int, weight1: Int, weight2: Int): Int {
     val result = ((a shl 24) or (r shl 16) or (g shl 8) or b)
     return result
 }
+
+fun logColorOverride(logger: Logger, threshold: Double, hsb: HSB) {
+    return if (hsb.saturation >= threshold) {
+        logger.log(Level.INFO, "         brightness ${hsb.brightness}")
+        logger.log(Level.INFO, "         saturation ${hsb.saturation} >= ${threshold}, will use texture color")
+    } else {
+        logger.log(Level.INFO, "         saturation ${hsb.saturation} < ${threshold}, will use block color")
+    }
+}
+
+fun HSB.colorOverride(threshold: Double) =
+    if (saturation < threshold) null else copy(brightness = (brightness * 2.0f).coerceAtMost(0.9f)).asColor.let { Color(it) }

@@ -1,6 +1,7 @@
 package mods.betterfoliage.resource.discovery
 
 import mods.betterfoliage.BetterFoliageMod
+import mods.betterfoliage.util.HasLogger
 import mods.betterfoliage.util.getJavaClass
 import mods.betterfoliage.util.getLines
 import mods.betterfoliage.util.resourceManager
@@ -23,9 +24,7 @@ class SimpleBlockMatcher(vararg val classes: Class<*>) : IBlockMatcher {
     }
 }
 
-class ConfigurableBlockMatcher(val location: ResourceLocation) : IBlockMatcher {
-    val logger = BetterFoliageMod.detailLogger(this)
-
+class ConfigurableBlockMatcher(val location: ResourceLocation) : HasLogger(), IBlockMatcher {
     val blackList = mutableListOf<Class<*>>()
     val whiteList = mutableListOf<Class<*>>()
 
@@ -47,7 +46,7 @@ class ConfigurableBlockMatcher(val location: ResourceLocation) : IBlockMatcher {
         blackList.clear()
         whiteList.clear()
         resourceManager.getAllResources(location).forEach { resource ->
-            logger.log(INFO, "Reading block class configuration $location from pack ${resource.packName}")
+            detailLogger.log(INFO, "Reading block class configuration $location from pack ${resource.packName}")
             resource.getLines().map{ it.trim() }.filter { !it.startsWith("//") && it.isNotEmpty() }.forEach { line ->
                 if (line.startsWith("-")) getJavaClass(line.substring(1))?.let { blackList.add(it) }
                 else getJavaClass(line)?.let { whiteList.add(it) }
@@ -61,13 +60,11 @@ data class ModelTextureList(val modelLocation: ResourceLocation, val textureName
     constructor(vararg args: String) : this(ResourceLocation(args[0]), listOf(*args).drop(1))
 }
 
-class ModelTextureListConfiguration(val location: ResourceLocation) {
-    val logger = BetterFoliageMod.detailLogger(this)
-
+class ModelTextureListConfiguration(val location: ResourceLocation) : HasLogger() {
     val modelList = mutableListOf<ModelTextureList>()
     fun readDefaults() {
         resourceManager.getAllResources(location).forEach { resource ->
-            logger.log(INFO, "Reading model/texture configuration $location from pack ${resource.packName}")
+            detailLogger.log(INFO, "Reading model/texture configuration $location from pack ${resource.packName}")
             resource.getLines().map{ it.trim() }.filter { !it.startsWith("//") && it.isNotEmpty() }.forEach { line ->
                 val elements = line.split(",")
                 modelList.add(ModelTextureList(ResourceLocation(elements.first()), elements.drop(1)))

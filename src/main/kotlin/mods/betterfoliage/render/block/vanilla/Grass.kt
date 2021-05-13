@@ -1,7 +1,7 @@
 package mods.betterfoliage.render.block.vanilla
 
 import mods.betterfoliage.BetterFoliageMod
-import mods.betterfoliage.Client
+import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.config.BlockConfig
 import mods.betterfoliage.config.Config
 import mods.betterfoliage.integration.ShadersModIntegration
@@ -26,8 +26,10 @@ import mods.betterfoliage.util.Atlas
 import mods.betterfoliage.util.LazyInvalidatable
 import mods.betterfoliage.util.LazyMapInvalidatable
 import mods.betterfoliage.util.averageColor
+import mods.betterfoliage.util.colorOverride
 import mods.betterfoliage.util.get
 import mods.betterfoliage.util.isSnow
+import mods.betterfoliage.util.logColorOverride
 import mods.betterfoliage.util.randomI
 import net.minecraft.util.Direction.DOWN
 import net.minecraft.util.Direction.UP
@@ -39,7 +41,7 @@ object StandardGrassDiscovery : ConfigurableModelDiscovery() {
 
     override fun processModel(ctx: ModelDiscoveryContext, textureMatch: List<ResourceLocation>) {
         ctx.addReplacement(StandardGrassKey(textureMatch[0], null))
-        Client.blockTypes.grass.add(ctx.blockState)
+        BetterFoliage.blockTypes.grass.add(ctx.blockState)
     }
 }
 
@@ -77,7 +79,7 @@ class StandardGrassModel(
         val isSnowed = stateAbove.isSnow
         val connected = Config.connectedGrass.enabled &&
                 (!isSnowed || Config.connectedGrass.snowEnabled) &&
-                Client.blockTypes.run { stateBelow in grass || stateBelow in dirt }
+                BetterFoliage.blockTypes.run { stateBelow in grass || stateBelow in dirt }
 
         if (connected) {
             ctx.renderQuads(if (isSnowed) snowFullBlockMeshes[ctx.random] else fullBlock[ctx.random])

@@ -33,8 +33,8 @@ object BetterFoliageMod {
 
     init {
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, Config.build())
-        Minecraft.getInstance().resourcePackList.addPackFinder(Client.generatedPack.finder)
+        Minecraft.getInstance().resourcePackList.addPackFinder(BetterFoliage.generatedPack.finder)
         bus.register(BlockConfig)
-        Client.init()
+        BetterFoliage.init()
     }
 }

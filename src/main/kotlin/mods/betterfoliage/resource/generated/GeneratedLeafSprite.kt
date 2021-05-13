@@ -21,7 +21,7 @@ import java.awt.image.BufferedImage
  *
  * @param[domain] Resource domain of generator
  */
-data class GeneratedLeaf(val baseSprite: ResourceLocation, val leafType: String, val atlas: Atlas = Atlas.BLOCKS) {
+data class GeneratedLeafSprite(val baseSprite: ResourceLocation, val leafType: String, val atlas: Atlas = Atlas.BLOCKS) {
 
     fun register(pack: GeneratedTexturePack) = pack.register(atlas, this, this::draw)
 
@@ -73,7 +73,7 @@ data class GeneratedLeaf(val baseSprite: ResourceLocation, val leafType: String,
      * @param[maxSize] Preferred mask size.
      */
     fun getLeafMask(type: String, maxSize: Int) = getMultisizeTexture(maxSize) { size ->
-        ResourceLocation(BetterFoliageMod.MOD_ID, "textures/blocks/leafmask_${size}_${type}.png")
+        Atlas.BLOCKS.file(ResourceLocation(BetterFoliageMod.MOD_ID, "blocks/leafmask_${size}_${type}"))
     }
 
     /**

@@ -31,7 +31,7 @@ abstract public class MixinModelBakery {
     }
 
     @Redirect(method = getBakedModel, at = @At(value = "INVOKE", target = bakeModel))
-    IBakedModel onStoreBakedModel(
+    IBakedModel onBakeModel(
             IUnbakedModel unbaked,
             ModelBakery bakery,
             Function<Material, TextureAtlasSprite> spriteGetter,

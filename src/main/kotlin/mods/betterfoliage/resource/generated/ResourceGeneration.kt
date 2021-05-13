@@ -2,6 +2,7 @@ package mods.betterfoliage.resource.generated
 
 import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.util.Atlas
+import mods.betterfoliage.util.HasLogger
 import net.minecraft.client.Minecraft
 import net.minecraft.client.resources.ClientResourcePackInfo
 import net.minecraft.resources.*
@@ -22,10 +23,7 @@ import java.util.function.Supplier
  */
 class GeneratedTexturePack(
     val nameSpace: String, val packName: String
-) : IResourcePack {
-
-    val logger = BetterFoliageMod.detailLogger(this)
-
+) : HasLogger(), IResourcePack {
     override fun getName() = packName
     override fun getResourceNamespaces(type: ResourcePackType) = setOf(nameSpace)
     override fun <T : Any?> getMetadata(deserializer: IMetadataSectionSerializer<T>) = null
@@ -47,7 +45,7 @@ class GeneratedTexturePack(
 
         identifiers[key] = id
         resources[fileName] = resource
-        logger.log(INFO, "generated resource $key -> $fileName")
+        detailLogger.log(INFO, "generated resource $key -> $fileName")
         return id
     }
 

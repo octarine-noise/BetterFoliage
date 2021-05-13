@@ -42,7 +42,7 @@ abstract class AbstractModelDiscovery : HasLogger(), ModelDiscovery {
                 processModel(ctx.copy(modelLocation = variant.modelLocation, replacements = scopedReplacements))
             }
             if (scopedReplacements.isNotEmpty()) {
-                ctx.addReplacement(SpecialRenderVariantList(scopedReplacements))
+                ctx.addReplacement(WeightedUnbakedKey(scopedReplacements), addToStateKeys = false)
             }
         }
     }

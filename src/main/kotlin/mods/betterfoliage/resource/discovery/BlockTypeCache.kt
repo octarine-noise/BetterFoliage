@@ -9,5 +9,6 @@ class BlockTypeCache {
 
     val stateKeys = mutableMapOf<BlockState, ModelBakingKey>()
 
-    inline fun <reified T> getTyped(state: BlockState) = stateKeys[state] as? T
+    inline fun <reified T> getTypedOrNull(state: BlockState) = stateKeys[state] as? T
+    inline fun <reified T> hasTyped(state: BlockState) = stateKeys[state] is T
 }

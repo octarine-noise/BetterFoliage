@@ -1,6 +1,6 @@
 package mods.betterfoliage.render.block.vanilla
 
-import mods.betterfoliage.Client
+import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.config.BlockConfig
 import mods.betterfoliage.config.Config
 import mods.betterfoliage.resource.discovery.ModelTextureList
@@ -31,23 +31,20 @@ interface RoundLogKey : ColumnBlockKey, ModelBakingKey {
 }
 
 object RoundLogOverlayLayer : ColumnRenderLayer() {
-    override fun getColumnKey(state: BlockState) = Client.blockTypes.getTyped<ColumnBlockKey>(state)
+    override fun getColumnKey(state: BlockState) = BetterFoliage.blockTypes.getTypedOrNull<ColumnBlockKey>(state)
     override val connectSolids: Boolean get() = Config.roundLogs.connectSolids
     override val lenientConnect: Boolean get() = Config.roundLogs.lenientConnect
     override val defaultToY: Boolean get() = Config.roundLogs.defaultY
 }
 
-object StandardLogDiscovery : ConfigurableModelDiscovery() {
+object StandardRoundLogDiscovery : ConfigurableModelDiscovery() {
     override val matchClasses: ConfigurableBlockMatcher get() = BlockConfig.logBlocks
     override val modelTextures: List<ModelTextureList> get() = BlockConfig.logModels.modelList
 
     override fun processModel(ctx: ModelDiscoveryContext, textureMatch: List<ResourceLocation>) {
         val axis = getAxis(ctx.blockState)
         detailLogger.log(INFO, "       axis $axis")
-        StandardRoundLogKey(axis, textureMatch[0], textureMatch[1]).let { key ->
-            ctx.addReplacement(key)
-            Client.blockTypes.stateKeys[ctx.blockState] = key
-        }
+        ctx.addReplacement(StandardRoundLogKey(axis, textureMatch[0], textureMatch[1]))
     }
 
     fun getAxis(state: BlockState): Axis? {

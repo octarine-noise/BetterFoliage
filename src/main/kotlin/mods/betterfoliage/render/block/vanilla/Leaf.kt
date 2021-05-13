@@ -1,11 +1,10 @@
 package mods.betterfoliage.render.block.vanilla
 
 import mods.betterfoliage.BetterFoliageMod
-import mods.betterfoliage.Client
+import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.config.BlockConfig
 import mods.betterfoliage.config.Config
 import mods.betterfoliage.model.Color
-import mods.betterfoliage.model.HSB
 import mods.betterfoliage.model.HalfBakedSpecialWrapper
 import mods.betterfoliage.model.HalfBakedWrapperKey
 import mods.betterfoliage.model.SpecialRenderModel
@@ -23,44 +22,31 @@ import mods.betterfoliage.resource.discovery.ConfigurableModelDiscovery
 import mods.betterfoliage.resource.discovery.ModelBakingContext
 import mods.betterfoliage.resource.discovery.ModelDiscoveryContext
 import mods.betterfoliage.resource.discovery.ModelTextureList
-import mods.betterfoliage.resource.generated.GeneratedLeaf
+import mods.betterfoliage.resource.generated.GeneratedLeafSprite
 import mods.betterfoliage.util.Atlas
 import mods.betterfoliage.util.LazyMapInvalidatable
 import mods.betterfoliage.util.averageColor
+import mods.betterfoliage.util.colorOverride
 import mods.betterfoliage.util.isSnow
+import mods.betterfoliage.util.logColorOverride
 import net.minecraft.util.Direction.UP
 import net.minecraft.util.ResourceLocation
-import org.apache.logging.log4j.Level.DEBUG
 import org.apache.logging.log4j.Level.INFO
-import org.apache.logging.log4j.Logger
 
 object StandardLeafDiscovery : ConfigurableModelDiscovery() {
     override val matchClasses: ConfigurableBlockMatcher get() = BlockConfig.leafBlocks
     override val modelTextures: List<ModelTextureList> get() = BlockConfig.leafModels.modelList
 
-
     override fun processModel(ctx: ModelDiscoveryContext, textureMatch: List<ResourceLocation>) {
         val leafType = LeafParticleRegistry.typeMappings.getType(textureMatch[0]) ?: "default"
-        val generated = GeneratedLeaf(textureMatch[0], leafType)
-            .register(Client.generatedPack)
+        val generated = GeneratedLeafSprite(textureMatch[0], leafType)
+            .register(BetterFoliage.generatedPack)
             .apply { ctx.sprites.add(this) }
 
         detailLogger.log(INFO, "     particle $leafType")
         ctx.addReplacement(StandardLeafKey(generated, leafType, null))
     }
 }
-
-fun logColorOverride(logger: Logger, threshold: Double, hsb: HSB) {
-    return if (hsb.saturation >= threshold) {
-        logger.log(INFO, "         brightness ${hsb.brightness}")
-        logger.log(INFO, "         saturation ${hsb.saturation} >= ${threshold}, will use texture color")
-    } else {
-        logger.log(INFO, "         saturation ${hsb.saturation} < ${threshold}, will use block color")
-    }
-}
-
-fun HSB.colorOverride(threshold: Double) =
-    if (saturation < threshold) null else copy(brightness = (brightness * 2.0f).coerceAtMost(0.9f)).asColor.let { Color(it) }
 
 data class StandardLeafKey(
     val roundLeafTexture: ResourceLocation,
@@ -74,7 +60,6 @@ data class StandardLeafKey(
             logColorOverride(BetterFoliageMod.detailLogger(this), Config.leaves.saturationThreshold, hsb)
             hsb.colorOverride(Config.leaves.saturationThreshold)
         }
-        detailLogger.log(DEBUG, "roundLeaf=$roundLeafTexture overrideColor=$leafSpriteColor")
         return StandardLeafModel(wrapped, this.copy(overrideColor = leafSpriteColor))
     }
 }

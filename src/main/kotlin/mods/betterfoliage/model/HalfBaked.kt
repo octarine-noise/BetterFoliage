@@ -24,9 +24,6 @@ data class HalfBakedQuad(
     val baked: BakedQuad
 )
 
-/**
- *
- */
 open class HalfBakedSimpleModelWrapper(baseModel: SimpleBakedModel): IBakedModel by baseModel, SpecialRenderModel {
     val baseQuads = baseModel.unbakeQuads()
 

@@ -1,7 +1,7 @@
 package mods.betterfoliage.render.block.vanilla
 
 import mods.betterfoliage.BetterFoliageMod
-import mods.betterfoliage.Client
+import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.config.Config
 import mods.betterfoliage.model.HalfBakedSpecialWrapper
 import mods.betterfoliage.model.HalfBakedWrapperKey
@@ -44,7 +44,7 @@ object StandardDirtDiscovery : AbstractModelDiscovery() {
 
     override fun processModel(ctx: ModelDiscoveryContext) {
         if (ctx.getUnbaked() is BlockModel && ctx.blockState.block in DIRT_BLOCKS) {
-            Client.blockTypes.dirt.add(ctx.blockState)
+            BetterFoliage.blockTypes.dirt.add(ctx.blockState)
             ctx.addReplacement(StandardDirtKey)
             RenderTypeLookup.setRenderLayer(ctx.blockState.block, ::canRenderInLayer)
         }
@@ -65,7 +65,7 @@ class StandardDirtModel(
         if (!Config.enabled || noDecorations) return super.render(ctx, noDecorations)
 
         val stateUp = ctx.offset(UP).state
-        val isConnectedGrass = Config.connectedGrass.enabled && stateUp in Client.blockTypes.grass
+        val isConnectedGrass = Config.connectedGrass.enabled && stateUp in BetterFoliage.blockTypes.grass
         if (isConnectedGrass) {
             (ctx.blockModelShapes.getModel(stateUp) as? SpecialRenderModel)?.let { grassModel ->
                 ctx.renderMasquerade(UP.offset) {
@@ -101,7 +101,7 @@ class StandardDirtModel(
         val reedSprites by SpriteSetDelegate(
             Atlas.BLOCKS,
             idFunc = { idx -> ResourceLocation(BetterFoliageMod.MOD_ID, "blocks/better_reed_$idx") },
-            idRegister = { id -> CenteredSprite(id, aspectHeight = 2).register(Client.generatedPack) }
+            idRegister = { id -> CenteredSprite(id, aspectHeight = 2).register(BetterFoliage.generatedPack) }
         )
         val algaeModels by LazyInvalidatable(BakeWrapperManager) {
             val shapes = Config.algae.let { tuftShapeSet(it.size, it.heightMin, it.heightMax, it.hOffset) }

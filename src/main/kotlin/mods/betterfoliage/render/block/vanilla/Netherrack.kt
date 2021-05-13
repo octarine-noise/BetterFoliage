@@ -1,7 +1,7 @@
 package mods.betterfoliage.render.block.vanilla
 
 import mods.betterfoliage.BetterFoliageMod
-import mods.betterfoliage.Client
+import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.config.Config
 import mods.betterfoliage.model.HalfBakedSpecialWrapper
 import mods.betterfoliage.model.HalfBakedWrapperKey
@@ -40,7 +40,7 @@ object StandardNetherrackDiscovery : AbstractModelDiscovery() {
 
     override fun processModel(ctx: ModelDiscoveryContext) {
         if (ctx.getUnbaked() is BlockModel && ctx.blockState.block in NETHERRACK_BLOCKS) {
-            Client.blockTypes.dirt.add(ctx.blockState)
+            BetterFoliage.blockTypes.dirt.add(ctx.blockState)
             ctx.addReplacement(StandardNetherrackKey)
             RenderTypeLookup.setRenderLayer(ctx.blockState.block, ::canRenderInLayer)
         }

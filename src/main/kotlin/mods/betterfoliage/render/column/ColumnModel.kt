@@ -25,8 +25,9 @@ abstract class ColumnModelBase(
     abstract fun getMeshSet(axis: Axis, quadrant: Int): ColumnMeshSet
 
     override fun render(ctx: RenderCtxBase, noDecorations: Boolean) {
+        if (!enabled) return super.render(ctx, noDecorations)
+        
         val roundLog = ChunkOverlayManager.get(overlayLayer, ctx)
-
         when(roundLog) {
             ColumnLayerData.SkipRender -> return
             NormalRender -> return super.render(ctx, noDecorations)

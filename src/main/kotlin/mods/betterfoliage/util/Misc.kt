@@ -50,6 +50,7 @@ fun nextPowerOf2(x: Int): Int {
     return 1 shl (if (x == 0) 0 else 32 - Integer.numberOfLeadingZeros(x - 1))
 }
 
+@Suppress("LeakingThis")
 abstract class HasLogger {
     val logger = BetterFoliageMod.logger(this)
     val detailLogger = BetterFoliageMod.detailLogger(this)
