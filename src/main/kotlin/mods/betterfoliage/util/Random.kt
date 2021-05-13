@@ -1,15 +1,18 @@
 package mods.betterfoliage.util
 
 import net.minecraft.util.math.BlockPos
-import kotlin.random.Random
+import java.util.Random
 
 val random = Random(System.nanoTime())
 
 fun randomB() = random.nextBoolean()
-fun randomI(min: Int = 0, max: Int = Int.MAX_VALUE) = random.nextInt(min, max)
-fun randomL(min: Long = 0, max: Long = Long.MAX_VALUE) = random.nextLong(min, max)
-fun randomF(min: Double = 0.0, max: Double = 1.0) = random.nextDouble(min, max).toFloat()
-fun randomD(min: Double = 0.0, max: Double = 1.0) = if (min == max) min else random.nextDouble(min, max)
+fun randomI(min: Int = 0, max: Int = Int.MAX_VALUE) = min + random.nextInt(max - min)
+fun randomF(min: Float = 0.0f, max: Float = 1.0f) = random.randomF(min, max)
+fun randomD(min: Double = 0.0, max: Double = 1.0) = random.randomD(min, max)
+
+fun Random.randomF(min: Float = 0.0f, max: Float = 1.0f) = nextFloat() * (max - min) + min
+fun Random.randomF(min: Double = 0.0, max: Double = 1.0) = randomF(min.toFloat(), max.toFloat())
+fun Random.randomD(min: Double = 0.0, max: Double = 1.0) = nextDouble() * (max - min) + min
 
 fun semiRandom(x: Int, y: Int, z: Int, seed: Int): Int {
     var value = (x * x + y * y + z * z + x * y + y * z + z * x + (seed * seed))

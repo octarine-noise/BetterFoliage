@@ -1,6 +1,7 @@
 @file:Suppress("NOTHING_TO_INLINE")
 package mods.betterfoliage.util
 
+import mods.betterfoliage.BetterFoliage
 import net.minecraft.text.LiteralText
 import net.minecraft.text.Style
 import net.minecraft.util.Formatting
@@ -63,13 +64,10 @@ fun nextPowerOf2(x: Int): Int {
 //    else -> false
 //}
 
-interface HasLogger {
-    val logger: Logger
-    val logName: String get() = this::class.simpleName!!
-    fun log(msg: String) = log(Level.INFO, msg)
-    fun log(level: Level, msg: String) = logger.log(level, "[$logName] $msg")
-    fun log(msg: String, e: Throwable) = log(Level.WARN, msg, e)
-    fun log(level: Level, msg: String, e: Throwable) = logger.log(level, "[$logName] $msg", e)
+@Suppress("LeakingThis")
+abstract class HasLogger {
+    val logger = BetterFoliage.logger(this)
+    val detailLogger = BetterFoliage.detailLogger(this)
 }
 
 fun textComponent(msg: String, color: Formatting = Formatting.GRAY): LiteralText {

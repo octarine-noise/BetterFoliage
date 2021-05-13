@@ -2,6 +2,7 @@ package mods.betterfoliage.render
 
 import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.render.lighting.getBufferBuilder
+import mods.betterfoliage.util.HasLogger
 import mods.betterfoliage.util.getAllMethods
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext
 import net.minecraft.block.BlockState
@@ -12,7 +13,7 @@ import net.minecraft.client.render.RenderLayer
 /**
  * Integration for ShadersMod.
  */
-object ShadersModIntegration {
+object ShadersModIntegration : HasLogger() {
 
     val BufferBuilder_SVertexBuilder = BufferBuilder::class.java.fields.find { it.name == "sVertexBuilder" }
     val SVertexBuilder_pushState = getAllMethods("net.optifine.shaders.SVertexBuilder", "pushEntity").find { it.parameterCount == 1 }
@@ -27,7 +28,7 @@ object ShadersModIntegration {
     val defaultGrass = Blocks.TALL_GRASS.defaultState
 
     init {
-        BetterFoliage.logger.info("[BetterFoliage] ShadersMod integration is ${if (isAvailable) "enabled" else "disabled" }")
+        logger.info("[BetterFoliage] ShadersMod integration is ${if (isAvailable) "enabled" else "disabled" }")
     }
 
     /** Quads rendered inside this block will use the given block entity data in shader programs. */

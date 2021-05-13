@@ -21,8 +21,8 @@ class FixedSpriteSet(val sprites: List<Sprite>) : SpriteSet {
     override fun get(idx: Int) = sprites[idx % num]
 
     constructor(atlas: Atlas, ids: List<Identifier>) : this(
-        ids.mapNotNull { atlas.atlas[it] }.let { sprites ->
-            if (sprites.isNotEmpty()) sprites else listOf(atlas.atlas[MissingSprite.getMissingSpriteId()]!!)
+        ids.mapNotNull { atlas[it] }.let { sprites ->
+            if (sprites.isNotEmpty()) sprites else listOf(atlas[MissingSprite.getMissingSpriteId()]!!)
         }
     )
 }
@@ -42,7 +42,7 @@ class SpriteDelegate(val atlas: Atlas, val idFunc: ()->Identifier) : ReadOnlyPro
         value?.let { return it }
         synchronized(this) {
             value?.let { return it }
-            atlas.atlas[id!!]!!.let { value = it; return it }
+            atlas[id!!]!!.let { value = it; return it }
         }
     }
 }
@@ -60,7 +60,7 @@ class SpriteSetDelegate(
     override fun registerSprites(atlasTexture: SpriteAtlasTexture, registry: ClientSpriteRegistryCallback.Registry) {
         spriteSet = null
         val manager = MinecraftClient.getInstance().resourceManager
-        idList = (0 until 16).map(idFunc).filter { manager.containsResource(atlas.wrap(it)) }.map(idRegister)
+        idList = (0 until 16).map(idFunc).filter { manager.containsResource(atlas.file(it)) }.map(idRegister)
         idList.forEach { registry.register(it) }
     }
 

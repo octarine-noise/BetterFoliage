@@ -4,6 +4,7 @@
   "refmap": "betterfoliage-refmap.json",
   "compatibilityLevel": "JAVA_8",
   "minVersion": "0.8-SNAPSHOT",
+  "plugin": "mods.betterfoliage.MixinConfigPlugin",
   "mixins": [
   ],
   "client": [
@@ -13,7 +14,9 @@
     "MixinClientWorld",
     "MixinClientChunkManager",
     "MixinClientChunkManagerChunkMap",
-    "MixinModelLoader"
+    "MixinModelLoader",
+    "MixinModelLoaderVanilla",
+    "MixinModelLoaderOptifine"
   ],
   "server": [
   ],

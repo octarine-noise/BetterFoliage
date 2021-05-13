@@ -2,8 +2,14 @@ package mods.betterfoliage.render.particle
 
 import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.ClientWorldLoadCallback
-import mods.betterfoliage.render.block.vanilla.LeafKey
-import mods.betterfoliage.util.*
+import mods.betterfoliage.render.block.vanilla.LeafParticleKey
+import mods.betterfoliage.util.Double3
+import mods.betterfoliage.util.PI2
+import mods.betterfoliage.util.minmax
+import mods.betterfoliage.util.randomB
+import mods.betterfoliage.util.randomD
+import mods.betterfoliage.util.randomF
+import mods.betterfoliage.util.randomI
 import net.fabricmc.fabric.api.event.world.WorldTickCallback
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.particle.ParticleTextureSheet
@@ -11,13 +17,13 @@ import net.minecraft.client.world.ClientWorld
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.MathHelper
 import net.minecraft.world.World
-import java.util.*
+import java.util.Random
 import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sin
 
 class FallingLeafParticle(
-    world: World, pos: BlockPos, leafKey: LeafKey
+    world: World, pos: BlockPos, leaf: LeafParticleKey, blockColor: Int, random: Random
 ) : AbstractParticle(
     world, pos.x.toDouble() + 0.5, pos.y.toDouble(), pos.z.toDouble() + 0.5
 ) {
@@ -26,12 +32,12 @@ class FallingLeafParticle(
         @JvmStatic val biomeBrightnessMultiplier = 0.5f
     }
 
-    var rotationSpeed = randomF(min = PI2 / 80.0, max = PI2 / 50.0)
+    var rotationSpeed = random.randomF(min = PI2 / 80.0, max = PI2 / 50.0)
     val isMirrored = randomB()
     var wasCollided = false
 
     init {
-        angle = randomF(max = PI2)
+        angle = random.randomF(max = PI2)
         prevAngle = angle - rotationSpeed
 
         maxAge = MathHelper.floor(randomD(0.6, 1.0) * BetterFoliage.config.fallingLeaves.lifetime * 20.0)
@@ -40,9 +46,9 @@ class FallingLeafParticle(
         scale = BetterFoliage.config.fallingLeaves.size.toFloat() * 0.1f
 
         val state = world.getBlockState(pos)
-        val blockColor = MinecraftClient.getInstance().blockColorMap.getColor(state, world, pos, 0)
-        sprite = LeafParticleRegistry[leafKey.leafType][randomI(max = 1024)]
-        setParticleColor(leafKey.overrideColor, blockColor)
+
+        setColor(leaf.overrideColor?.asInt ?: blockColor)
+        sprite = LeafParticleRegistry[leaf.leafType][randomI(max = 1024)]
     }
 
     override val isValid: Boolean get() = (sprite != null)

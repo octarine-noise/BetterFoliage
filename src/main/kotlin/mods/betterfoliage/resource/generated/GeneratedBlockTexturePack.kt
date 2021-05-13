@@ -10,6 +10,8 @@ import net.minecraft.resource.metadata.ResourceMetadataReader
 import net.minecraft.text.LiteralText
 import net.minecraft.util.Identifier
 import net.minecraft.util.profiler.Profiler
+import org.apache.logging.log4j.Level
+import org.apache.logging.log4j.Level.INFO
 import org.apache.logging.log4j.Logger
 import java.io.IOException
 import java.lang.IllegalStateException
@@ -29,7 +31,9 @@ import java.util.function.Supplier
  * @param[packDesc] Description of pack
  * @param[logger] Logger to log to when generating resources
  */
-class GeneratedBlockTexturePack(val reloadId: Identifier, val nameSpace: String, val packName: String, val packDesc: String, override val logger: Logger) : HasLogger, ResourcePack {
+class GeneratedBlockTexturePack(
+    val reloadId: Identifier, val nameSpace: String, val packName: String, val packDesc: String
+) : HasLogger(), ResourcePack {
 
     override fun getName() = reloadId.toString()
     override fun getNamespaces(type: ResourceType) = setOf(nameSpace)
@@ -51,8 +55,8 @@ class GeneratedBlockTexturePack(val reloadId: Identifier, val nameSpace: String,
         val resource = func(manager!!)
 
         identifiers[key] = id
-        resources[Atlas.BLOCKS.wrap(id)] = resource
-        log("generated resource $key -> $id")
+        resources[Atlas.BLOCKS.file(id)] = resource
+        detailLogger.log(INFO, "generated resource $key -> $id")
         return id
     }
 

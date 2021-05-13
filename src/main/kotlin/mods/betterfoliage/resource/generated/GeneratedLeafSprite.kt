@@ -20,7 +20,7 @@ data class GeneratedLeafSprite(val sprite: Identifier, val leafType: String, val
     fun register(pack: GeneratedBlockTexturePack) = pack.register(this, this::draw)
 
     fun draw(resourceManager: ResourceManager): ByteArray {
-        val baseTexture = resourceManager.loadSprite(atlas.wrap(sprite))
+        val baseTexture = resourceManager.loadSprite(atlas.file(sprite))
 
         val size = baseTexture.width
         val frames = baseTexture.height / size
@@ -67,7 +67,7 @@ data class GeneratedLeafSprite(val sprite: Identifier, val leafType: String, val
      * @param[maxSize] Preferred mask size.
      */
     fun getLeafMask(type: String, maxSize: Int) = getMultisizeTexture(maxSize) { size ->
-        Atlas.BLOCKS.wrap(Identifier(BetterFoliage.MOD_ID, "blocks/leafmask_${size}_${type}"))
+        Atlas.BLOCKS.file(Identifier(BetterFoliage.MOD_ID, "blocks/leafmask_${size}_${type}"))
     }
 
     /**

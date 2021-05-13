@@ -40,6 +40,7 @@ class LeavesConfig(node: ConfigNode) : DelegatingConfigGroup(node) {
     val vOffset by double(0.1, min = 0.0, max = 0.4, langKey = recurring)
     val size by double(1.4, min = 0.75, max = 2.5, langKey = recurring)
     val shaderWind by boolean(true, langKey = recurring)
+    val saturationThreshold by double(0.1, min = 0.0, max = 1.0)
 }
 
 class ShortGrassConfig(node: ConfigNode) : DelegatingConfigGroup(node), PopulationConfigData {
@@ -71,14 +72,14 @@ class RoundLogConfig(node: ConfigNode) : DelegatingConfigGroup(node) {
     val connectGrass by boolean(true)
 
     val radiusSmall by double(0.25, min = 0.0, max = 0.5)
-    val radiusLarge by double(0.25, min = 0.0, max = 0.5) { it.coerceAtLeast(radiusSmall) }
+    val radiusLarge by double(0.44, min = 0.0, max = 0.5) { it.coerceAtLeast(radiusSmall) }
     val dimming by double(0.7, min = 0.0, max = 1.0)
     val zProtection by double(0.99, min = 0.9, max = 1.0)
 }
 
 class CactusConfig(node: ConfigNode) : DelegatingConfigGroup(node) {
     val enabled by boolean(true, langKey = recurring)
-    val size by double(1.3, min = 0.5, max = 1.5, langKey = recurring)
+    val size by double(1.3, min = 1.0, max = 2.0, langKey = recurring)
     val sizeVariation by double(0.1, min = 0.0, max = 0.5)
     val hOffset by double(0.1, min = 0.0, max = 0.5, langKey = recurring)
 }

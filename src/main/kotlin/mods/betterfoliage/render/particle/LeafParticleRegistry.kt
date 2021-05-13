@@ -3,36 +3,70 @@ package mods.betterfoliage.render.particle
 import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.model.FixedSpriteSet
 import mods.betterfoliage.model.SpriteSet
-import mods.betterfoliage.util.*
+import mods.betterfoliage.resource.VeryEarlyReloadListener
+import mods.betterfoliage.util.Atlas
+import mods.betterfoliage.util.HasLogger
+import mods.betterfoliage.util.get
+import mods.betterfoliage.util.getLines
+import mods.betterfoliage.util.resourceManager
+import mods.betterfoliage.util.stripStart
 import net.fabricmc.fabric.api.event.client.ClientSpriteRegistryCallback
+import net.minecraft.client.texture.MissingSprite
 import net.minecraft.client.texture.SpriteAtlasTexture
+import net.minecraft.resource.ResourceManager
 import net.minecraft.util.Identifier
+import org.apache.logging.log4j.Level
+import kotlin.collections.MutableList
+import kotlin.collections.distinct
+import kotlin.collections.filter
+import kotlin.collections.firstOrNull
+import kotlin.collections.forEach
+import kotlin.collections.isNotEmpty
+import kotlin.collections.joinToString
+import kotlin.collections.listOf
+import kotlin.collections.map
+import kotlin.collections.mutableListOf
+import kotlin.collections.mutableMapOf
+import kotlin.collections.plus
+import kotlin.collections.set
 
-object LeafParticleRegistry : ClientSpriteRegistryCallback {
+object LeafParticleRegistry : HasLogger(), ClientSpriteRegistryCallback, VeryEarlyReloadListener {
     val typeMappings = TextureMatcher()
+    val allTypes get() = (typeMappings.mappings.map { it.type } + "default").distinct()
 
-    val ids = mutableMapOf<String, List<Identifier>>()
     val spriteSets = mutableMapOf<String, SpriteSet>()
 
-    override fun registerSprites(atlasTexture: SpriteAtlasTexture, registry: ClientSpriteRegistryCallback.Registry) {
-        ids.clear()
-        spriteSets.clear()
+    override fun getFabricId() = Identifier(BetterFoliage.MOD_ID, "leaf-particles")
+
+    override fun onReloadStarted(resourceManager: ResourceManager) {
         typeMappings.loadMappings(Identifier(BetterFoliage.MOD_ID, "leaf_texture_mappings.cfg"))
-        (typeMappings.mappings.map { it.type } + "default").distinct().forEach { leafType ->
+        detailLogger.log(Level.INFO, "Loaded leaf particle mappings, types = [${allTypes.joinToString(", ")}]")
+    }
+
+    override fun registerSprites(atlasTexture: SpriteAtlasTexture, registry: ClientSpriteRegistryCallback.Registry) {
+        spriteSets.clear()
+        allTypes.forEach { leafType ->
             val validIds = (0 until 16).map { idx -> Identifier(BetterFoliage.MOD_ID, "particle/falling_leaf_${leafType}_$idx") }
-                .filter { resourceManager.containsResource(Atlas.PARTICLES.wrap(it)) }
-            ids[leafType] = validIds
+                .filter { resourceManager.containsResource(Atlas.PARTICLES.file(it)) }
             validIds.forEach { registry.register(it) }
         }
     }
 
-    operator fun get(type: String): SpriteSet {
-        spriteSets[type]?.let { return it }
-        ids[type]?.let {
-            return FixedSpriteSet(Atlas.PARTICLES, it).apply { spriteSets[type] = this }
-        }
-        return if (type == "default") FixedSpriteSet(Atlas.PARTICLES, emptyList()).apply { spriteSets[type] = this }
-            else get("default")
+    operator fun get(leafType: String): SpriteSet {
+        spriteSets[leafType]?.let { return it }
+
+        val sprites = (0 until 16)
+            .map { idx -> Identifier(BetterFoliage.MOD_ID, "particle/falling_leaf_${leafType}_$idx") }
+            .map { Atlas.PARTICLES[it] }
+            .filter { it !is MissingSprite }
+
+        detailLogger.log(Level.INFO, "Leaf particle type [$leafType], ${sprites.size} sprites in atlas")
+        if (sprites.isNotEmpty()) return FixedSpriteSet(sprites).apply { spriteSets[leafType] = this }
+
+        return if (leafType == "default")
+            FixedSpriteSet(listOf(Atlas.PARTICLES[MissingSprite.getMissingSpriteId()])).apply { spriteSets[leafType] = this }
+        else
+            get("default").apply { spriteSets[leafType] = this }
     }
 
     init {

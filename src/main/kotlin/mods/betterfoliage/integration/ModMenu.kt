@@ -4,6 +4,7 @@ import io.github.prospector.modmenu.api.ModMenuApi
 import me.shedaniel.clothconfig2.api.ConfigBuilder
 import me.zeroeightsix.fiber.JanksonSettings
 import mods.betterfoliage.BetterFoliage
+import mods.betterfoliage.resource.discovery.BakeWrapperManager
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.client.resource.language.I18n
@@ -21,7 +22,7 @@ object ModMenu : ModMenuApi {
         }
         builder.savingRunnable = Runnable {
             JanksonSettings().serialize(BetterFoliage.config.fiberNode, BetterFoliage.configFile.outputStream(), false)
-            BetterFoliage.modelReplacer.invalidate()
+            BakeWrapperManager.invalidate()
             MinecraftClient.getInstance().worldRenderer.reload()
         }
         builder.build()

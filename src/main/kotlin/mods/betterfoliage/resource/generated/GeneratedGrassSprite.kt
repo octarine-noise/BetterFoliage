@@ -17,7 +17,7 @@ data class GeneratedGrassSprite(val sprite: Identifier, val isSnowed: Boolean, v
     fun register(pack: GeneratedBlockTexturePack) = pack.register(this, this::draw)
 
     fun draw(resourceManager: ResourceManager): ByteArray {
-        val baseTexture = resourceManager.loadSprite(atlas.wrap(sprite))
+        val baseTexture = resourceManager.loadSprite(atlas.file(sprite))
 
         val result = BufferedImage(baseTexture.width, baseTexture.height, BufferedImage.TYPE_4BYTE_ABGR)
         val graphics = result.createGraphics()

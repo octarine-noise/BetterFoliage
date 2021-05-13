@@ -13,7 +13,7 @@ data class CenteredSprite(val sprite: Identifier, val atlas: Atlas = Atlas.BLOCK
     fun register(pack: GeneratedBlockTexturePack) = pack.register(this, this::draw)
 
     fun draw(resourceManager: ResourceManager): ByteArray {
-        val baseTexture = resourceManager.loadSprite(atlas.wrap(sprite))
+        val baseTexture = resourceManager.loadSprite(atlas.file(sprite))
 
         val frameWidth = baseTexture.width
         val frameHeight = baseTexture.width * aspectHeight / aspectWidth

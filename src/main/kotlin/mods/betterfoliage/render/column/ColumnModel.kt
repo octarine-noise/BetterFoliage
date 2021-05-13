@@ -22,6 +22,7 @@ abstract class ColumnModelBase(wrapped: BakedModel) : WrappedBakedModel(wrapped)
     abstract fun getMeshSet(axis: Axis, quadrant: Int): ColumnMeshSet
 
     override fun emitBlockQuads(blockView: BlockRenderView, state: BlockState, pos: BlockPos, randomSupplier: Supplier<Random>, context: RenderContext) {
+        if (!enabled) return super.emitBlockQuads(blockView, state, pos, randomSupplier, context)
         val ctx = CachedBlockCtx(blockView, pos)
         val roundLog = ChunkOverlayManager.get(overlayLayer, ctx)
 

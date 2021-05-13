@@ -12,9 +12,9 @@ import net.minecraft.util.math.Direction
 import net.minecraft.util.math.Direction.*
 import java.lang.Math.max
 import java.lang.Math.min
+import java.util.Random
 import kotlin.math.cos
 import kotlin.math.sin
-import kotlin.random.Random
 
 /**
  * Vertex UV coordinates
@@ -172,7 +172,7 @@ fun List<Quad>.build(blendMode: BlendMode, noDiffuse: Boolean = false, flatLight
     val builder = renderer.meshBuilder()
     builder.emitter.apply {
         forEach { quad ->
-            val sprite = quad.sprite ?: Atlas.BLOCKS.atlas[MissingSprite.getMissingSpriteId()]!!
+            val sprite = quad.sprite ?: Atlas.BLOCKS[MissingSprite.getMissingSpriteId()]!!
             quad.verts.forEachIndexed { idx, vertex ->
                 pos(idx, (vertex.xyz + Double3(0.5, 0.5, 0.5)).asVec3f)
                 sprite(idx, 0,

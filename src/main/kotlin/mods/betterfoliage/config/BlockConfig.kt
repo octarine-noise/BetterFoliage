@@ -1,13 +1,13 @@
 package mods.betterfoliage.config
 
 import mods.betterfoliage.BetterFoliage
-import mods.betterfoliage.util.Invalidator
+import mods.betterfoliage.resource.VeryEarlyReloadListener
 import mods.betterfoliage.resource.discovery.ConfigurableBlockMatcher
 import mods.betterfoliage.resource.discovery.ModelTextureListConfiguration
 import net.minecraft.resource.ResourceManager
 import net.minecraft.util.Identifier
 
-class BlockConfig  {
+class BlockConfig : VeryEarlyReloadListener {
     private val list = mutableListOf<Any>()
 
     val leafBlocks = blocks("leaves_blocks_default.cfg")
@@ -24,10 +24,13 @@ class BlockConfig  {
 //    val cactus = blocks("cactus_default.cfg")
 //    val netherrack = blocks("netherrack_blocks_default.cfg")
 
-    private fun blocks(cfgName: String) = ConfigurableBlockMatcher(BetterFoliage.logDetail, Identifier(BetterFoliage.MOD_ID, cfgName)).apply { list.add(this) }
-    private fun models(cfgName: String) = ModelTextureListConfiguration(BetterFoliage.logDetail, Identifier(BetterFoliage.MOD_ID, cfgName)).apply { list.add(this) }
+    private fun blocks(cfgName: String) = ConfigurableBlockMatcher(Identifier(BetterFoliage.MOD_ID, cfgName)).apply { list.add(this) }
+    private fun models(cfgName: String) = ModelTextureListConfiguration(Identifier(BetterFoliage.MOD_ID, cfgName)).apply { list.add(this) }
 
-    fun reloadConfig(manager: ResourceManager) {
+
+    override fun getFabricId() = Identifier(BetterFoliage.MOD_ID, "block-config")
+
+    override fun onReloadStarted(manager: ResourceManager) {
         list.forEach { when(it) {
             is ConfigurableBlockMatcher -> it.readDefaults(manager)
             is ModelTextureListConfiguration -> it.readDefaults(manager)

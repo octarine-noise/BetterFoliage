@@ -1,10 +1,8 @@
 package mods.betterfoliage.model
 
-import mods.betterfoliage.WeightedBakedModelEntry_model
-import mods.betterfoliage.WeightedBakedModel_models
-import mods.betterfoliage.WeightedBakedModel_totalWeight
-import mods.betterfoliage.WeightedPickerEntry_weight
-import mods.betterfoliage.util.get
+import mods.betterfoliage.resource.discovery.ModelBakingContext
+import mods.betterfoliage.resource.discovery.ModelBakingKey
+import mods.betterfoliage.util.HasLogger
 import net.fabricmc.fabric.api.renderer.v1.material.BlendMode
 import net.fabricmc.fabric.api.renderer.v1.mesh.Mesh
 import net.fabricmc.fabric.api.renderer.v1.model.FabricBakedModel
@@ -13,13 +11,24 @@ import net.minecraft.block.BlockState
 import net.minecraft.client.render.RenderLayers
 import net.minecraft.client.render.model.BakedModel
 import net.minecraft.client.render.model.BasicBakedModel
-import net.minecraft.client.render.model.WeightedBakedModel
 import net.minecraft.item.ItemStack
 import net.minecraft.util.WeightedPicker
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.BlockRenderView
 import java.util.*
 import java.util.function.Supplier
+
+abstract class ModelWrapKey : ModelBakingKey, HasLogger() {
+    override fun bake(ctx: ModelBakingContext): BakedModel? {
+        val baseModel = super.bake(ctx)
+        if (baseModel is BasicBakedModel)
+            return bake(ctx, baseModel)
+        else
+            return baseModel
+    }
+
+    abstract fun bake(ctx: ModelBakingContext, wrapped: BasicBakedModel): BakedModel
+}
 
 abstract class WrappedBakedModel(val wrapped: BakedModel) : BakedModel by wrapped, FabricBakedModel {
     override fun isVanillaAdapter() = false
@@ -46,7 +55,7 @@ class WrappedMeshModel(wrapped: BasicBakedModel, val mesh: Mesh) : WrappedBakedM
          * @param noDiffuse disable diffuse lighting when baking the [Mesh]
          * @param blendModeOverride [BlockRenderLayer] to use instead of the one declared by the corresponding [Block]
          */
-        fun converter(state: BlockState, unshade: Boolean = false, noDiffuse: Boolean = true, blendModeOverride: BlendMode? = null) = BakedModelConverter.of { model, _ ->
+        fun converter(state: BlockState?, unshade: Boolean = false, noDiffuse: Boolean = true, blendModeOverride: BlendMode? = null) = BakedModelConverter.of { model ->
             if (model is BasicBakedModel) {
                 val mesh = unbakeQuads(model, state, Random(42L), unshade).build(
                     blendMode = blendModeOverride ?: BlendMode.fromRenderLayer(RenderLayers.getBlockLayer(state)),
@@ -59,23 +68,20 @@ class WrappedMeshModel(wrapped: BasicBakedModel, val mesh: Mesh) : WrappedBakedM
     }
 }
 
-class WrappedWeightedModel(wrapped: WeightedBakedModel, transformer: BakedModelConverter) : WrappedBakedModel(wrapped) {
-    val totalWeight = wrapped[WeightedBakedModel_totalWeight] as Int
-    val models = wrapped[WeightedBakedModel_models]!!.map { entry ->
-        Entry(transformer.convert(entry[WeightedBakedModelEntry_model]!!, transformer)!!, entry[WeightedPickerEntry_weight]!!)
-    }
+class WeightedModelWrapper(
+    val models: List<WeightedModel>, baseModel: BakedModel
+): WrappedBakedModel(baseModel), FabricBakedModel {
+
+    class WeightedModel(val model: BakedModel, val weight: Int) : WeightedPicker.Entry(weight)
+    fun getModel(random: Random) = WeightedPicker.getRandom(random, models).model
 
     override fun emitBlockQuads(blockView: BlockRenderView, state: BlockState, pos: BlockPos, randomSupplier: Supplier<Random>, context: RenderContext) {
-        (WeightedPicker.getRandom(randomSupplier.get(), models, totalWeight).model as FabricBakedModel).emitBlockQuads(blockView, state, pos, randomSupplier, context)
-    }
-
-    class Entry(val model: BakedModel, weight: Int) : WeightedPicker.Entry(weight)
-
-    companion object {
-        val converter = object : BakedModelConverter {
-            override fun convert(model: BakedModel, converter: BakedModelConverter) =
-                (model as? WeightedBakedModel)?.let { WrappedWeightedModel(it, converter) }
-        }
+        (getModel(randomSupplier.get()) as FabricBakedModel).emitBlockQuads(blockView, state, pos, randomSupplier, context)
     }
 }
 
+fun getUnderlyingModel(model: BakedModel, random: Random): BakedModel = when(model) {
+    is WeightedModelWrapper -> getUnderlyingModel(model.getModel(random), random)
+    is WrappedBakedModel -> model.wrapped
+    else -> model
+}

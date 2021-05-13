@@ -31,21 +31,21 @@ fun tuftQuadSingle(size: Double, height: Double, flipU: Boolean) =
     verticalRectangle(x1 = -0.5 * size, z1 = 0.5 * size, x2 = 0.5 * size, z2 = -0.5 * size, yBottom = 0.5, yTop = 0.5 + height)
         .mirrorUV(flipU, false)
 
-fun tuftModelSet(shapes: Array<TuftShapeKey>, overrideColor: Int?, spriteGetter: (Int)->Sprite) = shapes.mapIndexed { idx, shape ->
+fun tuftModelSet(shapes: Array<TuftShapeKey>, tintIndex: Int, spriteGetter: (Int)->Sprite) = shapes.mapIndexed { idx, shape ->
     listOf(
         tuftQuadSingle(shape.size, shape.height, shape.flipU1),
         tuftQuadSingle(shape.size, shape.height, shape.flipU2).rotate(rot(UP))
     ).map { it.move(shape.offset) }
-        .map { it.colorAndIndex(overrideColor) }
+        .map { it.colorIndex(tintIndex) }
         .map { it.sprite(spriteGetter(idx)) }
 }.toTypedArray()
 
-fun fullCubeTextured(spriteId: Identifier, overrideColor: Int?, scrambleUV: Boolean = true): Mesh {
-    val sprite = Atlas.BLOCKS.atlas[spriteId]!!
+fun fullCubeTextured(spriteId: Identifier, tintIndex: Int, scrambleUV: Boolean = true): Mesh {
+    val sprite = Atlas.BLOCKS[spriteId]!!
     return allDirections.map { faceQuad(it) }
         .map { if (!scrambleUV) it else it.rotateUV(randomI(max = 4)) }
         .map { it.sprite(sprite) }
-        .map { it.colorAndIndex(overrideColor) }
+        .map { it.colorIndex(tintIndex) }
         .build(BlendMode.SOLID)
 }
 
@@ -61,11 +61,20 @@ fun crossModelsRaw(num: Int, size: Double, hOffset: Double, vOffset: Double): Ar
     }
 }
 
-fun crossModelsTextured(leafBase: Array<List<Quad>>, overrideColor: Int?, scrambleUV: Boolean, spriteGetter: (Int)->Sprite) = leafBase.map { leaf ->
-    leaf.map { if (scrambleUV) it.scrambleUV(random, canFlipU = true, canFlipV = true, canRotate = true) else it }
-        .map { it.colorAndIndex(overrideColor) }
-        .mapIndexed { idx, quad -> quad.sprite(spriteGetter(idx)) }
-        .withOpposites().build(BlendMode.CUTOUT_MIPPED)
+fun crossModelSingle(base: List<Quad>, sprite: Sprite, tintIndex: Int,scrambleUV: Boolean) =
+    base.map { if (scrambleUV) it.scrambleUV(random, canFlipU = true, canFlipV = true, canRotate = true) else it }
+        .map { it.colorIndex(tintIndex) }
+        .mapIndexed { idx, quad -> quad.sprite(sprite) }
+        .withOpposites()
+        .build(BlendMode.CUTOUT_MIPPED)
+
+fun crossModelsTextured(
+    leafBase: Array<List<Quad>>,
+    tintIndex: Int,
+    scrambleUV: Boolean,
+    spriteGetter: (Int) -> Identifier
+) = leafBase.mapIndexed { idx, leaf ->
+    crossModelSingle(leaf, Atlas.BLOCKS[spriteGetter(idx)], tintIndex, scrambleUV)
 }.toTypedArray()
 
-fun Array<List<Quad>>.buildTufts() = withOpposites().build(BlendMode.CUTOUT_MIPPED)
+    fun Array<List<Quad>>.buildTufts() = withOpposites().build(BlendMode.CUTOUT_MIPPED)

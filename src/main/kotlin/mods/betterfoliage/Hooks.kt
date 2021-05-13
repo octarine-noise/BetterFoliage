@@ -2,15 +2,17 @@
 package mods.betterfoliage
 
 import mods.betterfoliage.chunk.ChunkOverlayManager
-import mods.betterfoliage.render.block.vanilla.LeafKey
+import mods.betterfoliage.render.block.vanilla.LeafParticleKey
 import mods.betterfoliage.render.block.vanilla.RoundLogKey
 import mods.betterfoliage.render.particle.FallingLeafParticle
 import mods.betterfoliage.render.particle.RisingSoulParticle
 import mods.betterfoliage.util.offset
 import mods.betterfoliage.util.plus
+import mods.betterfoliage.util.random
 import mods.betterfoliage.util.randomD
 import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
+import net.minecraft.client.MinecraftClient
 import net.minecraft.client.world.ClientWorld
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
@@ -21,7 +23,7 @@ import net.minecraft.world.BlockView
 fun getAmbientOcclusionLightValueOverride(original: Float, state: BlockState): Float {
     if (BetterFoliage.config.enabled &&
         BetterFoliage.config.roundLogs.enabled &&
-        BetterFoliage.modelReplacer.getTyped<RoundLogKey>(state) != null
+        BetterFoliage.blockTypes.hasTyped<RoundLogKey>(state)
     ) return BetterFoliage.config.roundLogs.dimming.toFloat()
     return original
 }
@@ -49,14 +51,15 @@ fun onRandomDisplayTick(world: ClientWorld, pos: BlockPos) {
         BetterFoliage.config.fallingLeaves.enabled &&
         world.isAir(pos + Direction.DOWN.offset) &&
         randomD() < BetterFoliage.config.fallingLeaves.chance) {
-            BetterFoliage.modelReplacer.getTyped<LeafKey>(state)?.let { key ->
-                FallingLeafParticle(world, pos, key).addIfValid()
+            BetterFoliage.blockTypes.getTyped<LeafParticleKey>(state)?.let { key ->
+                val blockColor = MinecraftClient.getInstance().blockColorMap.getColor(state, world, pos, 0)
+                FallingLeafParticle(world, pos, key, blockColor, random).addIfValid()
             }
     }
 }
 
 fun getVoxelShapeOverride(state: BlockState, reader: BlockView, pos: BlockPos, dir: Direction): VoxelShape {
-    if (BetterFoliage.modelReplacer[state] is RoundLogKey) {
+    if (BetterFoliage.blockTypes.hasTyped<RoundLogKey>(state)) {
         return VoxelShapes.empty()
     }
     // TODO ?

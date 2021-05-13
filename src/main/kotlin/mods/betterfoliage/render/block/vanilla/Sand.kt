@@ -2,23 +2,26 @@ package mods.betterfoliage.render.block.vanilla
 
 import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.chunk.CachedBlockCtx
-import mods.betterfoliage.render.SALTWATER_BIOMES
-import mods.betterfoliage.render.SAND_BLOCKS
-import mods.betterfoliage.render.lighting.grassTuftLighting
-import mods.betterfoliage.render.lighting.withLighting
-import mods.betterfoliage.resource.discovery.BlockRenderKey
-import mods.betterfoliage.resource.discovery.ModelDiscoveryBase
-import mods.betterfoliage.resource.discovery.ModelDiscoveryContext
+import mods.betterfoliage.config.SALTWATER_BIOMES
+import mods.betterfoliage.config.SAND_BLOCKS
 import mods.betterfoliage.model.Color
+import mods.betterfoliage.model.ModelWrapKey
 import mods.betterfoliage.model.SpriteSetDelegate
 import mods.betterfoliage.model.WrappedBakedModel
 import mods.betterfoliage.model.build
 import mods.betterfoliage.model.horizontalRectangle
+import mods.betterfoliage.model.meshifySolid
 import mods.betterfoliage.model.meshifyStandard
 import mods.betterfoliage.model.transform
 import mods.betterfoliage.model.tuftModelSet
 import mods.betterfoliage.model.tuftShapeSet
 import mods.betterfoliage.model.withOpposites
+import mods.betterfoliage.render.lighting.grassTuftLighting
+import mods.betterfoliage.render.lighting.withLighting
+import mods.betterfoliage.resource.discovery.AbstractModelDiscovery
+import mods.betterfoliage.resource.discovery.BakeWrapperManager
+import mods.betterfoliage.resource.discovery.ModelBakingContext
+import mods.betterfoliage.resource.discovery.ModelDiscoveryContext
 import mods.betterfoliage.util.Atlas
 import mods.betterfoliage.util.LazyInvalidatable
 import mods.betterfoliage.util.Rotation
@@ -30,28 +33,36 @@ import mods.betterfoliage.util.randomI
 import net.fabricmc.fabric.api.renderer.v1.material.BlendMode
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext
 import net.minecraft.block.BlockState
+import net.minecraft.block.Blocks
 import net.minecraft.block.Material
 import net.minecraft.client.render.model.BakedModel
+import net.minecraft.client.render.model.BasicBakedModel
+import net.minecraft.client.render.model.json.JsonUnbakedModel
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction.UP
 import net.minecraft.world.BlockRenderView
 import java.util.Random
-import java.util.function.Consumer
 import java.util.function.Supplier
 
-object SandKey : BlockRenderKey {
-    override fun replace(model: BakedModel, state: BlockState) = SandModel(meshifyStandard(model, state))
+object StandardSandDiscovery : AbstractModelDiscovery() {
+
+
+    override fun processModel(ctx: ModelDiscoveryContext) {
+        if (ctx.getUnbaked() is JsonUnbakedModel && ctx.blockState.block in SAND_BLOCKS) {
+            BetterFoliage.blockTypes.dirt.add(ctx.blockState)
+            ctx.addReplacement(StandardSandKey)
+//            RenderTypeLookup.setRenderLayer(ctx.blockState.block, RenderType.getCutoutMipped())
+        }
+        super.processModel(ctx)
+    }
 }
 
-object SandDiscovery : ModelDiscoveryBase() {
-    override val logger = BetterFoliage.logDetail
-
-    override fun processModel(ctx: ModelDiscoveryContext, atlas: Consumer<Identifier>) =
-        if (ctx.state.block in SAND_BLOCKS) SandKey else null
+object StandardSandKey : ModelWrapKey() {
+    override fun bake(ctx: ModelBakingContext, wrapped: BasicBakedModel) = StandardSandModel(meshifySolid(wrapped))
 }
 
-class SandModel(wrapped: BakedModel) : WrappedBakedModel(wrapped) {
+class StandardSandModel(wrapped: BakedModel) : WrappedBakedModel(wrapped) {
 
     val coralLighting = allDirections.map { grassTuftLighting(it) }.toTypedArray()
 
@@ -85,7 +96,7 @@ class SandModel(wrapped: BakedModel) : WrappedBakedModel(wrapped) {
         val coralCrustSprites by SpriteSetDelegate(Atlas.BLOCKS) { idx ->
             Identifier(BetterFoliage.MOD_ID, "blocks/better_crust_$idx")
         }
-        val coralTuftModels by LazyInvalidatable(BetterFoliage.modelReplacer) {
+        val coralTuftModels by LazyInvalidatable(BakeWrapperManager) {
             val shapes = BetterFoliage.config.coral.let { tuftShapeSet(it.size, 1.0, 1.0, it.hOffset) }
             allDirections.map { face ->
                 tuftModelSet(shapes, Color.white.asInt) { coralTuftSprites[randomI()] }
@@ -94,7 +105,7 @@ class SandModel(wrapped: BakedModel) : WrappedBakedModel(wrapped) {
                     .build(BlendMode.CUTOUT_MIPPED)
             }.toTypedArray()
         }
-        val coralCrustModels by LazyInvalidatable(BetterFoliage.modelReplacer) {
+        val coralCrustModels by LazyInvalidatable(BakeWrapperManager) {
             allDirections.map { face ->
                 Array(64) { idx ->
                     listOf(horizontalRectangle(x1 = -0.5, x2 = 0.5, z1 = -0.5, z2 = 0.5, y = 0.0)

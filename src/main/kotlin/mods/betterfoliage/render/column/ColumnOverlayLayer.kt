@@ -19,6 +19,7 @@ import mods.betterfoliage.util.Int3
 import mods.betterfoliage.util.Rotation
 import mods.betterfoliage.util.allDirections
 import mods.betterfoliage.util.face
+import mods.betterfoliage.util.get
 import mods.betterfoliage.util.plus
 import net.minecraft.block.BlockState
 import net.minecraft.util.math.BlockPos
@@ -89,8 +90,9 @@ abstract class ColumnRenderLayer : ChunkOverlayLayer<ColumnLayerData> {
     }
 
     override fun calculate(ctx: BlockCtx): ColumnLayerData {
-        if (allDirections.all { dir -> ctx.offset(dir).let { it.isNormalCube && BetterFoliage.modelReplacer[it.state] !is RoundLogKey } }) return ColumnLayerData.SkipRender
-//        val columnTextures = registry[ctx] ?: return ColumnLayerData.ResolveError
+        if (allDirections.all { dir ->
+                ctx.offset(dir).let { it.isNormalCube && !BetterFoliage.blockTypes.hasTyped<RoundLogKey>(it.state) }
+        }) return ColumnLayerData.SkipRender
         val columnTextures = getColumnKey(ctx.state) ?: return ColumnLayerData.ResolveError
 
         // if log axis is not defined and "Default to vertical" config option is not set, render normally

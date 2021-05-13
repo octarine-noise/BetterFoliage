@@ -3,6 +3,7 @@ package mods.betterfoliage.util
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 import net.fabricmc.loader.api.FabricLoader
+import net.fabricmc.mappings.EntryTriple
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
 import java.lang.Exception
@@ -22,7 +23,7 @@ fun <T> Any.reflectField(name: String) = getFieldRecursive(this::class.java, nam
 fun getFieldRecursive(cls: Class<*>, name: String): Field = try {
     cls.getDeclaredField(name)
 } catch (e: NoSuchFieldException) {
-    cls.superclass?.let { getFieldRecursive(it, name) } ?: throw e
+    cls.superclass?.let { getFieldRecursive(it, name) } ?: throw IllegalArgumentException(e)
 }
 
 /** Get the method on the class with the given name.
@@ -31,7 +32,7 @@ fun getFieldRecursive(cls: Class<*>, name: String): Field = try {
 fun getMethodRecursive(cls: Class<*>, name: String): Method = try {
     cls.declaredMethods.find { it.name == name } ?: throw NoSuchMethodException()
 } catch (e: NoSuchMethodException) {
-    cls.superclass?.let { getMethodRecursive(it, name) } ?: throw e
+    cls.superclass?.let { getMethodRecursive(it, name) } ?: throw IllegalArgumentException(e)
 }
 
 fun getAllMethods(className: String, methodName: String): List<Method> =
@@ -68,7 +69,7 @@ object YarnHelper {
     val resolver = FabricLoader.getInstance().mappingResolver
 
     fun <T> requiredField(className: String, fieldName: String, descriptor: String) = Field<T>(false, className, fieldName, descriptor)
-    fun <T> requiredMethod(className: String, methodName: String, descriptor: String, vararg params: String) = Method<T>(false, className, methodName, descriptor)
+    fun <T> requiredMethod(className: String, methodName: String, descriptor: String) = Method<T>(false, className, methodName, descriptor)
 
     class Field<T>(val optional: Boolean, val className: String, val fieldName: String, descriptor: String) : FieldRef<T> {
         override val field = FabricLoader.getInstance().mappingResolver.let { resolver ->
@@ -102,8 +103,6 @@ object YarnHelper {
         }
     }
 }
-
-//fun Any.isInstance(cls: ClassRefOld<*>) = cls.isInstance(this)
 
 interface ReflectionCallable<T> {
     operator fun invoke(vararg args: Any): T

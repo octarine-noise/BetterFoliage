@@ -8,11 +8,13 @@ import mods.betterfoliage.render.ShadersModIntegration
 import mods.betterfoliage.render.block.vanilla.*
 import mods.betterfoliage.render.particle.LeafParticleRegistry
 import mods.betterfoliage.render.particle.RisingSoulParticle
-import mods.betterfoliage.resource.discovery.BakedModelReplacer
+import mods.betterfoliage.resource.discovery.BakeWrapperManager
+import mods.betterfoliage.resource.discovery.BlockTypeCache
 import mods.betterfoliage.resource.generated.GeneratedBlockTexturePack
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper
 import net.fabricmc.loader.api.FabricLoader
+import net.minecraft.block.BlockState
 import net.minecraft.client.MinecraftClient
 import net.minecraft.resource.ResourceType
 import net.minecraft.util.Identifier
@@ -28,18 +30,14 @@ import java.util.*
 object BetterFoliage : ClientModInitializer {
     const val MOD_ID = "betterfoliage"
 
-    var logger = LogManager.getLogger()
-    var logDetail = SimpleLogger(
-        "BetterFoliage",
-        Level.DEBUG,
-        false, false, true, false,
-        "yyyy-MM-dd HH:mm:ss",
-        null,
-        PropertiesUtil(Properties()),
-        PrintStream(File(FabricLoader.getInstance().gameDirectory, "logs/betterfoliage.log").apply {
-            parentFile.mkdirs()
-            if (!exists()) createNewFile()
-        })
+    val detailLogStream = PrintStream(File("logs/betterfoliage.log").apply {
+        parentFile.mkdirs()
+        if (!exists()) createNewFile()
+    })
+
+    fun logger(obj: Any) = LogManager.getLogger(obj)
+    fun detailLogger(obj: Any) = SimpleLogger(
+        obj::class.java.simpleName, Level.DEBUG, false, true, true, false, "yyyy-MM-dd HH:mm:ss", null, PropertiesUtil(Properties()), detailLogStream
     )
 
     val configFile get() = File(FabricLoader.getInstance().configDirectory, "BetterFoliage.json")
@@ -50,39 +48,43 @@ object BetterFoliage : ClientModInitializer {
     }
 
     val blockConfig = BlockConfig()
-    val generatedPack = GeneratedBlockTexturePack(Identifier(MOD_ID, "generated"), "betterfoliage-generated", "Better Foliage", "Generated leaf textures", logDetail)
-    val modelReplacer = BakedModelReplacer()
+    val generatedPack = GeneratedBlockTexturePack(Identifier(MOD_ID, "generated"), "betterfoliage-generated", "Better Foliage", "Generated leaf textures")
+
+    /** List of recognized [BlockState]s */
+    var blockTypes = BlockTypeCache()
 
     override fun onInitializeClient() {
         // Register generated resource pack
         ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(generatedPack.reloader)
         MinecraftClient.getInstance().resourcePackManager.registerProvider(generatedPack.finder)
 
+        ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(blockConfig)
+
         // Add standard block support
-        modelReplacer.discoverers.add(StandardLeafDiscovery)
-        modelReplacer.discoverers.add(StandardGrassDiscovery)
-        modelReplacer.discoverers.add(StandardLogDiscovery)
-        modelReplacer.discoverers.add(StandardCactusDiscovery)
-        modelReplacer.discoverers.add(LilyPadDiscovery)
-        modelReplacer.discoverers.add(DirtDiscovery)
-        modelReplacer.discoverers.add(SandDiscovery)
-        modelReplacer.discoverers.add(MyceliumDiscovery)
-        modelReplacer.discoverers.add(NetherrackDiscovery)
+        BakeWrapperManager.discoverers.add(StandardCactusDiscovery)
+        BakeWrapperManager.discoverers.add(StandardDirtDiscovery)
+        BakeWrapperManager.discoverers.add(StandardGrassDiscovery)
+        BakeWrapperManager.discoverers.add(StandardLeafDiscovery)
+        BakeWrapperManager.discoverers.add(StandardLilypadDiscovery)
+        BakeWrapperManager.discoverers.add(StandardMyceliumDiscovery)
+        BakeWrapperManager.discoverers.add(StandardNetherrackDiscovery)
+        BakeWrapperManager.discoverers.add(StandardRoundLogDiscovery)
+        BakeWrapperManager.discoverers.add(StandardSandDiscovery)
 
         // Init overlay layers
         ChunkOverlayManager.layers.add(RoundLogOverlayLayer)
 
         // Init singletons
         LeafParticleRegistry
-        NormalLeavesModel.Companion
-        GrassBlockModel.Companion
-        RoundLogModel.Companion
-        CactusModel.Companion
-        LilypadModel.Companion
+        StandardLeafModel.Companion
+        StandardGrassModel.Companion
+        StandardRoundLogModel.Companion
+        StandardCactusModel.Companion
+        StandardLilypadModel.Companion
         DirtModel.Companion
-        SandModel.Companion
-        MyceliumModel.Companion
-        NetherrackModel.Companion
+        StandardSandModel.Companion
+        StandardMyceliumModel.Companion
+        StandardNetherrackModel.Companion
         RisingSoulParticle.Companion
         ShadersModIntegration
     }

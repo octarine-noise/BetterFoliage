@@ -9,13 +9,12 @@ import net.minecraft.block.Block
 import net.minecraft.resource.ResourceManager
 import net.minecraft.util.Identifier
 import org.apache.logging.log4j.Level
+import org.apache.logging.log4j.Level.INFO
 import org.apache.logging.log4j.Logger
 
 interface IBlockMatcher {
     fun matchesClass(block: Block): Boolean
     fun matchingClass(block: Block): Class<*>?
-
-    fun describe(logger: HasLogger)
 }
 
 class SimpleBlockMatcher(vararg val classes: Class<*>) : IBlockMatcher {
@@ -26,15 +25,9 @@ class SimpleBlockMatcher(vararg val classes: Class<*>) : IBlockMatcher {
         classes.forEach { if (it.isAssignableFrom(blockClass)) return it }
         return null
     }
-
-    override fun describe(logger: HasLogger) {
-        classes.forEach { klass ->
-            logger.log(Level.DEBUG, "    class whitelist: ${klass.name}")
-        }
-    }
 }
 
-class ConfigurableBlockMatcher(val logger: Logger, val location: Identifier) : IBlockMatcher {
+class ConfigurableBlockMatcher(val location: Identifier) : HasLogger(), IBlockMatcher {
 
     val blackList = mutableListOf<Class<*>>()
     val whiteList = mutableListOf<Class<*>>()
@@ -57,7 +50,7 @@ class ConfigurableBlockMatcher(val logger: Logger, val location: Identifier) : I
         blackList.clear()
         whiteList.clear()
         manager.getAllResources(location).forEach { resource ->
-            logger.info("Reading class list $location from pack ${resource.resourcePackName}")
+            detailLogger.log(INFO, "Reading class list $location from pack ${resource.resourcePackName}")
             resource.getLines().map{ it.trim() }.filter { !it.startsWith("//") && it.isNotEmpty() }.forEach { line ->
                 val name = if (line.startsWith("-")) line.substring(1) else line
                 val mappedName = FabricLoader.getInstance().mappingResolver.mapClassName(INTERMEDIARY, name)
@@ -75,26 +68,17 @@ class ConfigurableBlockMatcher(val logger: Logger, val location: Identifier) : I
             }
         }
     }
-
-    override fun describe(logger: HasLogger) {
-        whiteList.forEach { klass ->
-            logger.log(Level.DEBUG, "    class whitelist: ${klass.name}")
-        }
-        blackList.forEach { klass ->
-            logger.log(Level.DEBUG, "    class blacklist: ${klass.name}")
-        }
-    }
 }
 
 data class ModelTextureList(val modelLocation: Identifier, val textureNames: List<String>) {
     constructor(vararg args: String) : this(Identifier(args[0]), listOf(*args).drop(1))
 }
 
-class ModelTextureListConfiguration(val logger: Logger, val location: Identifier) {
+class ModelTextureListConfiguration(val location: Identifier) : HasLogger() {
     val modelList = mutableListOf<ModelTextureList>()
     fun readDefaults(manager: ResourceManager) {
         manager.getAllResources(location).forEach { resource ->
-            logger.info("Reading model configuration $location from pack ${resource.resourcePackName}")
+            detailLogger.log(INFO, "Reading model configuration $location from pack ${resource.resourcePackName}")
             resource.getLines().map{ it.trim() }.filter { !it.startsWith("//") && it.isNotEmpty() }.forEach { line ->
                 val elements = line.split(",")
                 modelList.add(ModelTextureList(Identifier(elements.first()), elements.drop(1)))

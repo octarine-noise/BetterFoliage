@@ -1,36 +1,51 @@
 package mods.betterfoliage.render.block.vanilla
 
 import mods.betterfoliage.BetterFoliage
-import mods.betterfoliage.render.column.*
-import mods.betterfoliage.util.Atlas
-import mods.betterfoliage.resource.discovery.*
+import mods.betterfoliage.model.ModelWrapKey
+import mods.betterfoliage.model.meshifySolid
 import mods.betterfoliage.model.meshifyStandard
+import mods.betterfoliage.render.column.ColumnBlockKey
+import mods.betterfoliage.render.column.ColumnMeshSet
+import mods.betterfoliage.render.column.ColumnModelBase
+import mods.betterfoliage.render.column.ColumnRenderLayer
+import mods.betterfoliage.resource.discovery.BakeWrapperManager
+import mods.betterfoliage.resource.discovery.ConfigurableBlockMatcher
+import mods.betterfoliage.resource.discovery.ConfigurableModelDiscovery
+import mods.betterfoliage.resource.discovery.ModelBakingContext
+import mods.betterfoliage.resource.discovery.ModelBakingKey
+import mods.betterfoliage.resource.discovery.ModelDiscoveryContext
+import mods.betterfoliage.resource.discovery.ModelTextureList
+import mods.betterfoliage.util.Atlas
 import mods.betterfoliage.util.LazyMap
-import mods.betterfoliage.util.get
 import mods.betterfoliage.util.tryDefault
 import net.minecraft.block.BlockState
 import net.minecraft.block.LogBlock
 import net.minecraft.client.render.model.BakedModel
+import net.minecraft.client.render.model.BasicBakedModel
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.Direction.Axis
-import java.util.function.Consumer
+import org.apache.logging.log4j.Level
+
+interface RoundLogKey : ColumnBlockKey, ModelBakingKey {
+    val barkSprite: Identifier
+    val endSprite: Identifier
+}
 
 object RoundLogOverlayLayer : ColumnRenderLayer() {
-    override fun getColumnKey(state: BlockState) = BetterFoliage.modelReplacer.getTyped<ColumnBlockKey>(state)
+    override fun getColumnKey(state: BlockState) = BetterFoliage.blockTypes.getTyped<ColumnBlockKey>(state)
     override val connectSolids: Boolean get() = BetterFoliage.config.roundLogs.connectSolids
     override val lenientConnect: Boolean get() = BetterFoliage.config.roundLogs.lenientConnect
     override val defaultToY: Boolean get() = BetterFoliage.config.roundLogs.defaultY
 }
 
-object StandardLogDiscovery : ConfigurableModelDiscovery() {
-    override val logger = BetterFoliage.logDetail
+object StandardRoundLogDiscovery : ConfigurableModelDiscovery() {
     override val matchClasses: ConfigurableBlockMatcher get() = BetterFoliage.blockConfig.logBlocks
     override val modelTextures: List<ModelTextureList> get() = BetterFoliage.blockConfig.logModels.modelList
 
-    override fun processModel(state: BlockState, textures: List<Identifier>, atlas: Consumer<Identifier>): BlockRenderKey? {
-        val axis = getAxis(state)
-        log("       axis $axis")
-        return RoundLogModel.Key(axis, textures[0], textures[1])
+    override fun processModel(ctx: ModelDiscoveryContext, textureMatch: List<Identifier>) {
+        val axis = getAxis(ctx.blockState)
+        detailLogger.log(Level.INFO, "       axis $axis")
+        ctx.addReplacement(StandardRoundLogKey(axis, textureMatch[0], textureMatch[1]))
     }
 
     fun getAxis(state: BlockState): Axis? {
@@ -45,12 +60,15 @@ object StandardLogDiscovery : ConfigurableModelDiscovery() {
     }
 }
 
-interface RoundLogKey : ColumnBlockKey, BlockRenderKey {
-    val barkSprite: Identifier
-    val endSprite: Identifier
+data class StandardRoundLogKey(
+    override val axis: Axis?,
+    override val barkSprite: Identifier,
+    override val endSprite: Identifier
+) : RoundLogKey, ModelWrapKey() {
+    override fun bake(ctx: ModelBakingContext, wrapped: BasicBakedModel) = StandardRoundLogModel(meshifySolid(wrapped), this)
 }
 
-class RoundLogModel(val key: Key, wrapped: BakedModel) : ColumnModelBase(wrapped) {
+class StandardRoundLogModel(wrapped: BakedModel, val key: StandardRoundLogKey) : ColumnModelBase(wrapped) {
     override val enabled: Boolean get() = BetterFoliage.config.enabled && BetterFoliage.config.roundLogs.enabled
     override val overlayLayer: ColumnRenderLayer get() = RoundLogOverlayLayer
     override val connectPerpendicular: Boolean get() = BetterFoliage.config.roundLogs.connectPerpendicular
@@ -58,18 +76,10 @@ class RoundLogModel(val key: Key, wrapped: BakedModel) : ColumnModelBase(wrapped
     val modelSet by modelSets.delegate(key)
     override fun getMeshSet(axis: Axis, quadrant: Int) = modelSet
 
-    data class Key(
-        override val axis: Axis?,
-        override val barkSprite: Identifier,
-        override val endSprite: Identifier
-    ) : RoundLogKey {
-        override fun replace(model: BakedModel, state: BlockState) = RoundLogModel(this, meshifyStandard(model, state))
-    }
-
     companion object {
-        val modelSets = LazyMap(BetterFoliage.modelReplacer) { key: Key ->
-            val barkSprite = Atlas.BLOCKS.atlas[key.barkSprite]!!
-            val endSprite = Atlas.BLOCKS.atlas[key.endSprite]!!
+        val modelSets = LazyMap(BakeWrapperManager) { key: StandardRoundLogKey ->
+            val barkSprite = Atlas.BLOCKS[key.barkSprite]!!
+            val endSprite = Atlas.BLOCKS[key.endSprite]!!
             BetterFoliage.config.roundLogs.let { config ->
                 ColumnMeshSet(
                     config.radiusSmall, config.radiusLarge, config.zProtection,
