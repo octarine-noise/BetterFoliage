@@ -23,7 +23,7 @@ import net.minecraft.block.BlockState
 import net.minecraft.util.Direction
 import net.minecraft.util.Direction.Axis
 import net.minecraft.util.math.BlockPos
-import net.minecraft.world.ILightReader
+import net.minecraft.world.IBlockDisplayReader
 
 /** Index of SOUTH-EAST quadrant. */
 const val SE = 0
@@ -83,13 +83,13 @@ abstract class ColumnRenderLayer : ChunkOverlayLayer<ColumnLayerData> {
 
     val allNeighborOffsets = (-1..1).flatMap { offsetX -> (-1..1).flatMap { offsetY -> (-1..1).map { offsetZ -> Int3(offsetX, offsetY, offsetZ) }}}
 
-    override fun onBlockUpdate(world: ILightReader, pos: BlockPos) {
+    override fun onBlockUpdate(world: IBlockDisplayReader, pos: BlockPos) {
         allNeighborOffsets.forEach { offset -> ChunkOverlayManager.clear(world.dimType, this, pos + offset) }
     }
 
     override fun calculate(ctx: BlockCtx): ColumnLayerData {
         // TODO detect round logs
-        if (allDirections.all { dir -> ctx.offset(dir).let { it.isNormalCube } }) return ColumnLayerData.SkipRender
+        if (allDirections.all { dir -> ctx.offset(dir).let { it.isFullBlock } }) return ColumnLayerData.SkipRender
         val columnTextures = getColumnKey(ctx.state) ?: return ColumnLayerData.ResolveError
 
         // if log axis is not defined and "Default to vertical" config option is not set, render normally
@@ -185,7 +185,7 @@ abstract class ColumnRenderLayer : ChunkOverlayLayer<ColumnLayerData> {
         val offsetRot = offset.rotate(rotation)
         val key = getColumnKey(state(offsetRot))
         return if (key == null) {
-            if (offset(offsetRot).isNormalCube) SOLID else NONSOLID
+            if (offset(offsetRot).isFullBlock) SOLID else NONSOLID
         } else {
             (key.axis ?: if (Config.roundLogs.defaultY) Axis.Y else null)?.let {
                 if (it == axis) PARALLEL else PERPENDICULAR

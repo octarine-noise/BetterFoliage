@@ -21,7 +21,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  */
 @Mixin(Block.class)
 public class MixinBlock {
-    private static final String shouldSideBeRendered = "Lnet/minecraft/block/Block;shouldSideBeRendered(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/IBlockReader;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/Direction;)Z";
+    private static final String shouldSideBeRendered = "Lnet/minecraft/block/Block;shouldRenderFace(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/IBlockReader;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/Direction;)Z";
     private static final String getVoxelShape = "Lnet/minecraft/block/BlockState;func_215702_a(Lnet/minecraft/world/IBlockReader;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/Direction;)Lnet/minecraft/util/math/shapes/VoxelShape;";
     private static final String getFaceOcclusionShape = "Lnet/minecraft/block/BlockState;getFaceOcclusionShape(Lnet/minecraft/world/IBlockReader;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/Direction;)Lnet/minecraft/util/math/shapes/VoxelShape;";
     private static final String isOpaqueCube = "Lnet/minecraft/block/Block;isOpaqueCube(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/IBlockReader;Lnet/minecraft/util/math/BlockPos;)Z";

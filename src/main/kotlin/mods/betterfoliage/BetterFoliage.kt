@@ -31,6 +31,7 @@ import mods.betterfoliage.resource.discovery.ModelDefinitionsLoadedEvent
 import mods.betterfoliage.resource.generated.GeneratedTexturePack
 import mods.betterfoliage.render.particle.LeafParticleRegistry
 import mods.betterfoliage.render.particle.RisingSoulParticle
+import mods.betterfoliage.util.resourceManager
 import net.minecraft.block.BlockState
 import net.minecraft.client.Minecraft
 import net.minecraft.resources.IReloadableResourceManager
@@ -51,7 +52,7 @@ object BetterFoliage {
         // discoverers
         BetterFoliageMod.bus.register(BakeWrapperManager)
         BetterFoliageMod.bus.register(LeafParticleRegistry)
-        (Minecraft.getInstance().resourceManager as IReloadableResourceManager).addReloadListener(LeafParticleRegistry)
+        resourceManager.registerReloadListener(LeafParticleRegistry)
 
         ChunkOverlayManager.layers.add(RoundLogOverlayLayer)
 

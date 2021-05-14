@@ -17,11 +17,11 @@ import net.minecraft.client.renderer.model.ModelBakery
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.util.ResourceLocation
 import net.minecraft.util.math.BlockPos
+import net.minecraft.world.IBlockDisplayReader
 import net.minecraft.world.IBlockReader
-import net.minecraft.world.ILightReader
 import net.minecraftforge.client.model.pipeline.BlockInfo
 import net.minecraftforge.client.model.pipeline.VertexLighterFlat
-import java.util.*
+import java.util.Random
 
 // Java
 val String = ClassRef<String>("java.lang.String")
@@ -32,7 +32,7 @@ fun <K, V> mapRefMutable() = ClassRef<MutableMap<K, V>>("java.util.Map")
 
 // Minecraft
 val IBlockReader = ClassRef<IBlockReader>("net.minecraft.world.IBlockReader")
-val ILightReader = ClassRef<ILightReader>("net.minecraft.world.ILightReader")
+val ILightReader = ClassRef<IBlockDisplayReader>("net.minecraft.world.IBlockDisplayReader")
 val BlockState = ClassRef<BlockState>("net.minecraft.block.BlockState")
 val BlockPos = ClassRef<BlockPos>("net.minecraft.util.math.BlockPos")
 val Block = ClassRef<Block>("net.minecraft.block.Block")

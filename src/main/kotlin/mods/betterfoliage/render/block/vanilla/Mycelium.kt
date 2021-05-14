@@ -31,7 +31,7 @@ object StandardMyceliumDiscovery : AbstractModelDiscovery() {
     override fun processModel(ctx: ModelDiscoveryContext) {
         if (ctx.getUnbaked() is BlockModel && ctx.blockState.block in MYCELIUM_BLOCKS) {
             ctx.addReplacement(StandardMyceliumKey)
-            RenderTypeLookup.setRenderLayer(ctx.blockState.block, RenderType.getCutout())
+            RenderTypeLookup.setRenderLayer(ctx.blockState.block, RenderType.cutout())
         }
         super.processModel(ctx)
     }

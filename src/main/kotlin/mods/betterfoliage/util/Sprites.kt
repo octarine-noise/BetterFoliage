@@ -3,7 +3,6 @@ package mods.betterfoliage.util
 import mods.betterfoliage.model.Color
 import mods.betterfoliage.model.HSB
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.model.Material
 import net.minecraft.client.renderer.texture.AtlasTexture
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.resources.IResource
@@ -20,8 +19,8 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 enum class Atlas(val resourceId: ResourceLocation) {
-    BLOCKS(AtlasTexture.LOCATION_BLOCKS_TEXTURE),
-    PARTICLES(AtlasTexture.LOCATION_PARTICLES_TEXTURE);
+    BLOCKS(AtlasTexture.LOCATION_BLOCKS),
+    PARTICLES(AtlasTexture.LOCATION_PARTICLES);
 
     /** Get the fully-qualified resource name for sprites belonging to this atlas */
     fun file(resource: ResourceLocation) = ResourceLocation(resource.namespace, "textures/${resource.path}.png")
@@ -33,7 +32,7 @@ enum class Atlas(val resourceId: ResourceLocation) {
     operator fun get(location: ResourceLocation) = atlas.getSprite(location)
 }
 
-val Material.atlas: Atlas get() = Atlas.values().find { it.resourceId == atlasLocation } ?: Atlas.BLOCKS
+//val Spr.atlas: Atlas get() = Atlas.values().find { it.resourceId == atlasLocation } ?: Atlas.BLOCKS
 
 inline operator fun AtlasTexture.get(res: ResourceLocation): TextureAtlasSprite? = this.getSprite(res)
 inline operator fun AtlasTexture.get(name: String): TextureAtlasSprite? = get(ResourceLocation(name))

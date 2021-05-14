@@ -68,8 +68,8 @@ fun List<Quad>.bake(applyDiffuseLighting: Boolean) = map { quad ->
                 )
                 // don't fill lightmap UV coords
                 element.usage == VertexFormatElement.Usage.UV && element.type == VertexFormatElement.Type.FLOAT -> builder.put(idx,
-                    quad.sprite.minU + (quad.sprite.maxU - quad.sprite.minU) * (vertex.uv.u + 0.5).toFloat(),
-                    quad.sprite.minV + (quad.sprite.maxV - quad.sprite.minV) * (vertex.uv.v + 0.5).toFloat(),
+                    quad.sprite.u0 + (quad.sprite.u1 - quad.sprite.u0) * (vertex.uv.u + 0.5).toFloat(),
+                    quad.sprite.v0 + (quad.sprite.v1 - quad.sprite.v0) * (vertex.uv.v + 0.5).toFloat(),
                     0.0f, 1.0f
                 )
                 element.usage == VertexFormatElement.Usage.COLOR -> builder.put(idx,
@@ -96,18 +96,18 @@ fun Array<List<Quad>>.bake(applyDiffuseLighting: Boolean) = mapArray { it.bake(a
 fun BakedQuad.unbake(): HalfBakedQuad {
     val size = DefaultVertexFormats.BLOCK.integerSize
     val verts = Array(4) { vIdx ->
-        val x = java.lang.Float.intBitsToFloat(vertexData[vIdx * size + 0])
-        val y = java.lang.Float.intBitsToFloat(vertexData[vIdx * size + 1])
-        val z = java.lang.Float.intBitsToFloat(vertexData[vIdx * size + 2])
-        val color = vertexData[vIdx * size + 3]
-        val u = java.lang.Float.intBitsToFloat(vertexData[vIdx * size + 4])
-        val v = java.lang.Float.intBitsToFloat(vertexData[vIdx * size + 5])
+        val x = java.lang.Float.intBitsToFloat(vertices[vIdx * size + 0])
+        val y = java.lang.Float.intBitsToFloat(vertices[vIdx * size + 1])
+        val z = java.lang.Float.intBitsToFloat(vertices[vIdx * size + 2])
+        val color = vertices[vIdx * size + 3]
+        val u = java.lang.Float.intBitsToFloat(vertices[vIdx * size + 4])
+        val v = java.lang.Float.intBitsToFloat(vertices[vIdx * size + 5])
         Vertex(Double3(x, y, z), UV(u.toDouble(), v.toDouble()), Color(color))
     }
     val unbaked = Quad(
         verts[0], verts[1], verts[2], verts[3],
-        colorIndex = if (hasTintIndex()) tintIndex else -1,
-        face = face
+        colorIndex = if (isTinted) tintIndex else -1,
+        face = direction
     )
     return HalfBakedQuad(unbaked, this)
 }

@@ -20,7 +20,7 @@ class WeightedUnbakedKey(
         if (unbaked !is VariantList) return super.bake(ctx)
 
         // bake all variants, replace as needed
-        val bakedModels = unbaked.variantList.mapNotNull {
+        val bakedModels = unbaked.variants.mapNotNull {
             val variantCtx = ctx.copy(location = it.modelLocation, transform = it)
             val replacement = replacements[it.modelLocation]
             val baked = replacement?.let { replacement ->
@@ -40,10 +40,10 @@ class WeightedUnbakedKey(
         // let it through unchanged
         if (bakedModels.isEmpty()) return super.bake(ctx)
 
-        if (bakedModels.size < unbaked.variantList.size) {
+        if (bakedModels.size < unbaked.variants.size) {
             detailLogger.log(
                 WARN,
-                "Dropped ${unbaked.variantList.size - bakedModels.size} variants from model ${ctx.location}"
+                "Dropped ${unbaked.variants.size - bakedModels.size} variants from model ${ctx.location}"
             )
         }
         val weightedSpecials = bakedModels.map { (variant, model) ->

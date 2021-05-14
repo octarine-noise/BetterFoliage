@@ -230,6 +230,8 @@ betterfoliage.connectedGrass.enabled.tooltip=If there is a grass block on top of
 
 betterfoliage.roundLogs=Round Logs
 betterfoliage.roundLogs.tooltip=Connect round blocks to solid full blocks?
+betterfoliage.roundLogs.plantsOnly=Plant materials only
+betterfoliage.roundLogs.plantsOnly.tooltip=Only apply to wood and hay, not all column blocks?
 betterfoliage.roundLogs.connectSolids=Connect to solid
 betterfoliage.roundLogs.connectSolids.tooltip=Connect round blocks to solid full blocks?
 betterfoliage.roundLogs.connectPerpendicular=Connect to perpendicular logs

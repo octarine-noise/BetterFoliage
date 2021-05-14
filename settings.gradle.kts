@@ -1,6 +1,6 @@
 pluginManagement {
     repositories {
-        maven("http://files.minecraftforge.net/maven")
+        maven("https://files.minecraftforge.net/maven")
         maven("https://repo.spongepowered.org/maven")
         gradlePluginPortal()
     }

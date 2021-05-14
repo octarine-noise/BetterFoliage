@@ -5,7 +5,7 @@ import net.minecraft.block.BlockState
 import net.minecraft.client.renderer.BlockModelRenderer
 import net.minecraft.util.Direction
 import net.minecraft.util.math.BlockPos
-import net.minecraft.world.ILightReader
+import net.minecraft.world.IBlockDisplayReader
 
 data class LightingData(
     @JvmField var packedLight: Int = 0,
@@ -29,7 +29,7 @@ data class LightingData(
  * Not thread-safe, always use a [ThreadLocal] instance
  */
 class VanillaAoCalculator {
-    lateinit var world: ILightReader
+    lateinit var world: IBlockDisplayReader
 
     /** [blockPos] is used to get block-related information (i.e. tint, opacity, etc.)
      *  [lightPos] is used to get light-related information
@@ -37,7 +37,7 @@ class VanillaAoCalculator {
     lateinit var blockPos: BlockPos
     lateinit var lightPos: BlockPos
 
-    private val probe = LightProbe(BlockModelRenderer.CACHE_COMBINED_LIGHT.get())
+    private val probe = LightProbe(BlockModelRenderer.CACHE.get())
 
     val isValid = BooleanArray(6)
     val aoData = Array(24) { LightingData() }
@@ -70,13 +70,13 @@ class VanillaAoCalculator {
 
         // Bit 0 of the bitset in vanilla calculations
         // true if the block model is planar with the block boundary
-        val isFullBlock = forceFull ?: world.getBlockState(blockPos).isCollisionShapeOpaque(world, blockPos)
+        val isFullBlock = forceFull ?: world.getBlockState(blockPos).isCollisionShapeFullBlock(world, blockPos)
 
-        val lightOrigin = if (isFullBlock) lightPos.offset(lightFace) else lightPos
+        val lightOrigin = if (isFullBlock) lightPos.relative(lightFace) else lightPos
 
         // AO calculation for the face center
-        probe.position { setPos(lightOrigin) }.writeTo(centerAo)
-        if (!isFullBlock && !probe.position { move(lightFace) }.state.isOpaqueCube(world, probe.pos)) {
+        probe.position { set(lightOrigin) }.writeTo(centerAo)
+        if (!isFullBlock && !probe.position { move(lightFace) }.state.isSolidRender(world, probe.pos)) {
             // if the neighboring block in the lightface direction is
             // transparent (non-opaque), use its packed light instead of our own
             // (if our block is a full block, we are already using this value)
@@ -86,7 +86,7 @@ class VanillaAoCalculator {
         // AO calculation for the 4 sides
         sideHelper.sides.forEachIndexed { sideIdx, sideDir ->
             // record light data in the block 1 step to the side
-            probe.position { setPos(lightOrigin).move(sideDir) }.writeTo(sideAo[sideIdx])
+            probe.position { set(lightOrigin).move(sideDir) }.writeTo(sideAo[sideIdx])
             // side is considered occluded if the block 1 step to that side and
             // 1 step forward (in the lightface direction) is not fully transparent
             isOccluded[sideIdx] = probe.position { move(lightFace) }.isNonTransparent
@@ -103,7 +103,7 @@ class VanillaAoCalculator {
             else {
                 // lookup actual packed light from the cornering block in the world
                 probe.position {
-                    setPos(lightOrigin)
+                    set(lightOrigin)
                         .move(sideHelper.sides[sideIndices.first])
                         .move(sideHelper.sides[sideIndices.second])
                 }.writeTo(cornerAo[cornerIdx])
@@ -129,9 +129,9 @@ class VanillaAoCalculator {
         lateinit var state: BlockState
         val pos = BlockPos.Mutable()
 
-        val packedLight: Int get() = cache.getPackedLight(state, world, pos)
-        val colorMultiplier: Float get() = cache.getBrightness(state, world, pos)
-        val isNonTransparent: Boolean get() = state.getOpacity(world, pos) > 0
+        val packedLight: Int get() = cache.getLightColor(state, world, pos)
+        val colorMultiplier: Float get() = cache.getShadeBrightness(state, world, pos)
+        val isNonTransparent: Boolean get() = state.getLightBlock(world, pos) > 0
 
         fun writeTo(data: LightingData) {
             data.packedLight = packedLight

@@ -1,10 +1,8 @@
 package mods.betterfoliage.resource.generated
 
-import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.util.Atlas
 import mods.betterfoliage.util.HasLogger
 import net.minecraft.client.Minecraft
-import net.minecraft.client.resources.ClientResourcePackInfo
 import net.minecraft.resources.*
 import net.minecraft.resources.ResourcePackType.CLIENT_RESOURCES
 import net.minecraft.resources.data.IMetadataSectionSerializer
@@ -12,6 +10,7 @@ import net.minecraft.util.ResourceLocation
 import net.minecraft.util.text.StringTextComponent
 import org.apache.logging.log4j.Level.INFO
 import java.util.*
+import java.util.function.Consumer
 import java.util.function.Predicate
 import java.util.function.Supplier
 
@@ -25,10 +24,10 @@ class GeneratedTexturePack(
     val nameSpace: String, val packName: String
 ) : HasLogger(), IResourcePack {
     override fun getName() = packName
-    override fun getResourceNamespaces(type: ResourcePackType) = setOf(nameSpace)
-    override fun <T : Any?> getMetadata(deserializer: IMetadataSectionSerializer<T>) = null
-    override fun getRootResourceStream(id: String) = null
-    override fun getAllResourceLocations(type: ResourcePackType, namespace:String, path: String, maxDepth: Int, filter: Predicate<String>) = emptyList<ResourceLocation>()
+    override fun getNamespaces(type: ResourcePackType) = setOf(nameSpace)
+    override fun <T : Any?> getMetadataSection(deserializer: IMetadataSectionSerializer<T>) = null
+    override fun getRootResource(id: String) = null
+    override fun getResources(type: ResourcePackType, namespace:String, path: String, maxDepth: Int, filter: Predicate<String>) = emptyList<ResourceLocation>()
 
     override fun close() {}
 
@@ -49,21 +48,22 @@ class GeneratedTexturePack(
         return id
     }
 
-    override fun getResourceStream(type: ResourcePackType, id: ResourceLocation) =
+    override fun getResource(type: ResourcePackType, id: ResourceLocation) =
         if (type != CLIENT_RESOURCES) null else resources[id]?.inputStream()
 
-    override fun resourceExists(type: ResourcePackType, id: ResourceLocation) =
+    override fun hasResource(type: ResourcePackType, id: ResourceLocation) =
         type == CLIENT_RESOURCES && resources.containsKey(id)
 
     val finder = object : IPackFinder {
-        val packInfo = ClientResourcePackInfo(
+        val packInfo = ResourcePackInfo(
             packName, true, Supplier { this@GeneratedTexturePack },
             StringTextComponent(packName),
             StringTextComponent("Generated block textures resource pack"),
             PackCompatibility.COMPATIBLE, ResourcePackInfo.Priority.TOP, true, null, true
         )
-        override fun <T : ResourcePackInfo> addPackInfosToMap(nameToPackMap: MutableMap<String, T>, packInfoFactory: ResourcePackInfo.IFactory<T>) {
-            (nameToPackMap as MutableMap<String, ResourcePackInfo>).put(packName, packInfo)
+
+        override fun loadPacks(p0: Consumer<ResourcePackInfo>, p1: ResourcePackInfo.IFactory) {
+            p0.accept(packInfo)
         }
     }
 }

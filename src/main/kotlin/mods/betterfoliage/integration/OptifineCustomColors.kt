@@ -34,7 +34,7 @@ object OptifineCustomColors {
     val fakeQuad = BakedQuad(IntArray(0), 1, UP, null, true)
 
     fun getBlockColor(ctx: BlockCtx, resolver: ColorResolver): Int {
-        val ofColor = if (isColorAvailable && Minecraft.getInstance().gameSettings.reflectField<Boolean>("ofCustomColors") == true) {
+        val ofColor = if (isColorAvailable && Minecraft.getInstance().options.reflectField<Boolean>("ofCustomColors") == true) {
             renderEnv.reset(ctx.state, ctx.pos)
             CustomColors.getColorMultiplier.invokeStatic(fakeQuad, ctx.state, ctx.world, ctx.pos, renderEnv.wrapped) as? Int
         } else null

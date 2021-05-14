@@ -14,5 +14,7 @@ val MYCELIUM_BLOCKS = listOf(Blocks.MYCELIUM)
 
 val SALTWATER_BIOMES = listOf(Biome.Category.BEACH, Biome.Category.OCEAN)
 
-val SNOW_MATERIALS = listOf(Material.SNOW_BLOCK, Material.SNOW)
+val SNOW_MATERIALS = listOf(Material.TOP_SNOW, Material.SNOW)
 val BlockState.isSnow: Boolean get() = material in SNOW_MATERIALS
+
+val ACCEPTED_ROUND_LOG_MATERIALS = listOf(Material.WOOD, Material.GRASS)

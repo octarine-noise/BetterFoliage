@@ -18,9 +18,9 @@ abstract class AbstractModelDiscovery : HasLogger(), ModelDiscovery {
         replacements: MutableMap<ResourceLocation, ModelBakingKey>
     ) {
         ForgeRegistries.BLOCKS
-            .flatMap { block -> block.stateContainer.validStates }
+            .flatMap { block -> block.stateDefinition.possibleStates }
             .forEach { state ->
-                val location = BlockModelShapes.getModelLocation(state)
+                val location = BlockModelShapes.stateToModelLocation(state)
                 val ctx = ModelDiscoveryContext(bakery, state, location, sprites, replacements, detailLogger)
                 try {
                     processModel(ctx)
@@ -38,7 +38,7 @@ abstract class AbstractModelDiscovery : HasLogger(), ModelDiscovery {
             // per-location replacements need to be scoped to the variant list, as replacement models
             // may need information from the BlockState which is not available at baking time
             val scopedReplacements = mutableMapOf<ResourceLocation, ModelBakingKey>()
-            model.variantList.forEach { variant ->
+            model.variants.forEach { variant ->
                 processModel(ctx.copy(modelLocation = variant.modelLocation, replacements = scopedReplacements))
             }
             if (scopedReplacements.isNotEmpty()) {
@@ -73,15 +73,18 @@ abstract class ConfigurableModelDiscovery : AbstractModelDiscovery() {
             matches.forEach { match ->
                     detailLogger.log(Level.INFO, "      model $model matches ${match.modelLocation}")
 
-                    val materials = match.textureNames.map { it to model.resolveTextureName(it) }
-                    val texMapString = Joiner.on(", ").join(materials.map { "${it.first}=${it.second.textureLocation}" })
-                    detailLogger.log(Level.INFO, "    sprites [$texMapString]")
+                val materials = match.textureNames.map { it to model.getMaterial(it) }
+                val texMapString = Joiner.on(", ").join(materials.map { "${it.first}=${it.second.texture()}" })
+                detailLogger.log(Level.INFO, "    sprites [$texMapString]")
 
-                    if (materials.all { it.second.textureLocation != MissingTextureSprite.getLocation() }) {
-                        // found a valid model (all required textures exist)
-                        processModel(ctx, materials.map { it.second.textureLocation })
-                    }
+                if (materials.all { it.second.texture() != MissingTextureSprite.getLocation() }) {
+                    // found a valid model (all required textures exist)
+                    processModel(ctx, materials.map { it.second.texture() })
                 }
+            }
+            if (matches.isEmpty()) {
+                detailLogger.log(Level.INFO, "      no matches for model ${ctx.modelLocation}, inheritance chain ${ancestry.joinToString(" -> ")}")
+            }
         }
         return super.processModel(ctx)
     }
@@ -90,12 +93,12 @@ abstract class ConfigurableModelDiscovery : AbstractModelDiscovery() {
 fun ModelBakery.modelDerivesFrom(model: BlockModel, location: ResourceLocation, target: ResourceLocation): Boolean =
     if (location == target) true
     else model.parentLocation
-        ?.let { getUnbakedModel(it) as? BlockModel }
+        ?.let { getModel(it) as? BlockModel }
         ?.let { parent -> modelDerivesFrom(parent, model.parentLocation!!, target) }
         ?: false
 
 fun ModelBakery.getAncestry(location: ResourceLocation): List<ResourceLocation> {
-    val model = getUnbakedModel(location) as? BlockModel ?: return listOf(location)
+    val model = getModel(location) as? BlockModel ?: return listOf(location)
     val parentAncestry = model.parentLocation?.let { getAncestry(it) } ?: emptyList()
     return listOf(location) + parentAncestry
 }

@@ -43,7 +43,7 @@ object StandardSandDiscovery : AbstractModelDiscovery() {
         if (ctx.getUnbaked() is BlockModel && ctx.blockState.block in SAND_BLOCKS) {
             BetterFoliage.blockTypes.dirt.add(ctx.blockState)
             ctx.addReplacement(StandardSandKey)
-            RenderTypeLookup.setRenderLayer(ctx.blockState.block, RenderType.getCutoutMipped())
+            RenderTypeLookup.setRenderLayer(ctx.blockState.block, RenderType.cutoutMipped())
         }
         super.processModel(ctx)
     }
@@ -61,7 +61,7 @@ class StandardSandModel(
     override fun render(ctx: RenderCtxBase, noDecorations: Boolean) {
         super.render(ctx, noDecorations)
         if (noDecorations || !Config.enabled || !Config.coral.enabled(ctx.random)) return
-        if (ctx.biome?.category !in SALTWATER_BIOMES) return
+        if (ctx.biome?.biomeCategory !in SALTWATER_BIOMES) return
 
         allDirections.filter { ctx.random.nextInt(64) < Config.coral.chance }.forEach { face ->
             val isWater = ctx.state(face).material == Material.WATER

@@ -1,20 +1,20 @@
 package mods.betterfoliage.render.pipeline
 
 import com.mojang.blaze3d.matrix.MatrixStack
+import mods.betterfoliage.model.HalfBakedQuad
 import mods.betterfoliage.model.SpecialRenderModel
 import mods.betterfoliage.render.lighting.ForgeVertexLighter
 import mods.betterfoliage.render.lighting.ForgeVertexLighterAccess
-import mods.betterfoliage.model.HalfBakedQuad
 import net.minecraft.block.BlockState
 import net.minecraft.client.renderer.LightTexture
 import net.minecraft.util.math.BlockPos
-import net.minecraft.world.ILightReader
+import net.minecraft.world.IBlockDisplayReader
 import net.minecraftforge.client.model.data.IModelData
 import net.minecraftforge.client.model.pipeline.VertexLighterFlat
 import java.util.Random
 
 class RenderCtxForge(
-    world: ILightReader,
+    world: IBlockDisplayReader,
     pos: BlockPos,
     val lighter: VertexLighterFlat,
     matrixStack: MatrixStack,
@@ -33,8 +33,8 @@ class RenderCtxForge(
     var vIdx = 0
     override fun updateVertexLightmap(normal: FloatArray, lightmap: FloatArray, x: Float, y: Float, z: Float) {
         lightingData.packedLight[vIdx].let { packedLight ->
-            lightmap[0] = LightTexture.getLightBlock(packedLight) / 0xF.toFloat()
-            lightmap[1] = LightTexture.getLightSky(packedLight) / 0xF.toFloat()
+            lightmap[0] = LightTexture.block(packedLight) / 0xF.toFloat()
+            lightmap[1] = LightTexture.sky(packedLight) / 0xF.toFloat()
         }
     }
 
@@ -49,7 +49,7 @@ class RenderCtxForge(
         @JvmStatic
         fun render(
             lighter: VertexLighterFlat,
-            world: ILightReader,
+            world: IBlockDisplayReader,
             model: SpecialRenderModel,
             state: BlockState,
             pos: BlockPos,

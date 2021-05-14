@@ -2,7 +2,6 @@ package mods.betterfoliage
 
 import mods.betterfoliage.config.BlockConfig
 import mods.betterfoliage.config.Config
-import net.alexwells.kottle.FMLKotlinModLoadingContext
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.ModLoadingContext
 import net.minecraftforge.fml.common.Mod
@@ -11,6 +10,7 @@ import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.simple.SimpleLogger
 import org.apache.logging.log4j.util.PropertiesUtil
+import thedarkcolour.kotlinforforge.forge.MOD_BUS
 import java.io.File
 import java.io.PrintStream
 import java.util.Properties
@@ -19,7 +19,7 @@ import java.util.Properties
 object BetterFoliageMod {
     const val MOD_ID = "betterfoliage"
 
-    val bus = FMLKotlinModLoadingContext.get().modEventBus
+    val bus = MOD_BUS
 
     val detailLogStream = PrintStream(File("logs/betterfoliage.log").apply {
         parentFile.mkdirs()
@@ -33,7 +33,7 @@ object BetterFoliageMod {
 
     init {
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, Config.build())
-        Minecraft.getInstance().resourcePackList.addPackFinder(BetterFoliage.generatedPack.finder)
+        Minecraft.getInstance().resourcePackRepository.addPackFinder(BetterFoliage.generatedPack.finder)
         bus.register(BlockConfig)
         BetterFoliage.init()
     }

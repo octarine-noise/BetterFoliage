@@ -32,9 +32,9 @@ import net.minecraft.util.ResourceLocation
 
 object StandardNetherrackDiscovery : AbstractModelDiscovery() {
     fun canRenderInLayer(layer: RenderType) = when {
-        !Config.enabled -> layer == RenderType.getSolid()
-        !Config.netherrack.enabled -> layer == RenderType.getSolid()
-        else -> layer == RenderType.getCutoutMipped()
+        !Config.enabled -> layer == RenderType.solid()
+        !Config.netherrack.enabled -> layer == RenderType.solid()
+        else -> layer == RenderType.cutoutMipped()
     }
 
     override fun processModel(ctx: ModelDiscoveryContext) {

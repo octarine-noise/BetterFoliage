@@ -1,10 +1,11 @@
 package mods.betterfoliage.render.block.vanilla
 
-import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.BetterFoliage
+import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.config.Config
 import mods.betterfoliage.config.DIRT_BLOCKS
 import mods.betterfoliage.config.SALTWATER_BIOMES
+import mods.betterfoliage.config.isSnow
 import mods.betterfoliage.integration.ShadersModIntegration
 import mods.betterfoliage.model.HalfBakedSpecialWrapper
 import mods.betterfoliage.model.HalfBakedWrapperKey
@@ -15,7 +16,6 @@ import mods.betterfoliage.model.tuftModelSet
 import mods.betterfoliage.model.tuftShapeSet
 import mods.betterfoliage.render.lighting.LightingPreferredFace
 import mods.betterfoliage.render.pipeline.RenderCtxBase
-import mods.betterfoliage.render.pipeline.RenderCtxVanilla
 import mods.betterfoliage.resource.discovery.AbstractModelDiscovery
 import mods.betterfoliage.resource.discovery.BakeWrapperManager
 import mods.betterfoliage.resource.discovery.ModelBakingContext
@@ -27,20 +27,18 @@ import mods.betterfoliage.util.LazyInvalidatable
 import mods.betterfoliage.util.get
 import mods.betterfoliage.util.offset
 import mods.betterfoliage.util.randomI
-import net.minecraft.block.Blocks
 import net.minecraft.block.material.Material
 import net.minecraft.client.renderer.RenderType
 import net.minecraft.client.renderer.RenderTypeLookup
 import net.minecraft.client.renderer.model.BlockModel
 import net.minecraft.util.Direction.UP
 import net.minecraft.util.ResourceLocation
-import net.minecraft.world.biome.Biome
 
 object StandardDirtDiscovery : AbstractModelDiscovery() {
     fun canRenderInLayer(layer: RenderType) = when {
-        !Config.enabled -> layer == RenderType.getSolid()
-        !Config.connectedGrass.enabled && !Config.algae.enabled && !Config.reed.enabled -> layer == RenderType.getSolid()
-        else -> layer == RenderType.getCutoutMipped()
+        !Config.enabled -> layer == RenderType.solid()
+        !Config.connectedGrass.enabled && !Config.algae.enabled && !Config.reed.enabled -> layer == RenderType.solid()
+        else -> layer == RenderType.cutoutMipped()
     }
 
     override fun processModel(ctx: ModelDiscoveryContext) {
@@ -67,9 +65,12 @@ class StandardDirtModel(
 
         val stateUp = ctx.state(UP)
         val state2Up = ctx.state(Int3(0, 2, 0))
-        val isConnectedGrass = Config.connectedGrass.enabled && stateUp in BetterFoliage.blockTypes.grass
+        val isConnectedGrass = Config.connectedGrass.enabled &&
+                stateUp in BetterFoliage.blockTypes.grass &&
+                (Config.connectedGrass.snowEnabled || !state2Up.isSnow)
+
         if (isConnectedGrass) {
-            (ctx.blockModelShapes.getModel(stateUp) as? SpecialRenderModel)?.let { grassModel ->
+            (ctx.blockModelShapes.getBlockModel(stateUp) as? SpecialRenderModel)?.let { grassModel ->
                 ctx.renderMasquerade(UP.offset) {
                     grassModel.render(ctx, true)
                 }
@@ -81,9 +82,9 @@ class StandardDirtModel(
         super.render(ctx, false)
 
         val isWater = stateUp.material == Material.WATER
-        val isDeepWater = isWater && ctx.offset(Int3(2 to UP)).state.material == Material.WATER
-        val isShallowWater = isWater && ctx.offset(Int3(2 to UP)).state.isAir
-        val isSaltWater = isWater && ctx.biome?.category in SALTWATER_BIOMES
+        val isDeepWater = isWater && state2Up.material == Material.WATER
+        val isShallowWater = isWater && state2Up.isAir
+        val isSaltWater = isWater && ctx.biome?.biomeCategory in SALTWATER_BIOMES
 
         if (Config.algae.enabled(ctx.random) && isDeepWater) {
             ctx.vertexLighter = vanillaTuftLighting

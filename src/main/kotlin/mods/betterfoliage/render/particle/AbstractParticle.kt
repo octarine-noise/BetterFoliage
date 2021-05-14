@@ -5,12 +5,12 @@ import mods.betterfoliage.util.Double3
 import net.minecraft.client.Minecraft
 import net.minecraft.client.particle.SpriteTexturedParticle
 import net.minecraft.client.renderer.ActiveRenderInfo
-import net.minecraft.client.renderer.Vector3f
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
+import net.minecraft.client.world.ClientWorld
 import net.minecraft.util.math.MathHelper
-import net.minecraft.world.World
+import net.minecraft.util.math.vector.Vector3f
 
-abstract class AbstractParticle(world: World, x: Double, y: Double, z: Double) : SpriteTexturedParticle(world, x, y, z) {
+abstract class AbstractParticle(world: ClientWorld, x: Double, y: Double, z: Double) : SpriteTexturedParticle(world, x, y, z) {
 
     companion object {
 //        @JvmStatic val sin = Array(64) { idx -> Math.sin(PI2 / 64.0 * idx) }
@@ -24,12 +24,12 @@ abstract class AbstractParticle(world: World, x: Double, y: Double, z: Double) :
 
     override fun tick() {
         super.tick()
-        currentPos.setTo(posX, posY, posZ)
-        prevPos.setTo(prevPosX, prevPosY, prevPosZ)
-        velocity.setTo(motionX, motionY, motionZ)
+        currentPos.setTo(x, y, z)
+        prevPos.setTo(xo, yo, zo)
+        velocity.setTo(xd, yd, zd)
         update()
-        posX = currentPos.x; posY = currentPos.y; posZ = currentPos.z;
-        motionX = velocity.x; motionY = velocity.y; motionZ = velocity.z;
+        x = currentPos.x; y = currentPos.y; z = currentPos.z;
+        xd = velocity.x; yd = velocity.y; zd = velocity.z;
     }
 
     /** Update particle on world tick. */
@@ -39,10 +39,10 @@ abstract class AbstractParticle(world: World, x: Double, y: Double, z: Double) :
     abstract val isValid: Boolean
 
     /** Add the particle to the effect renderer if it is valid. */
-    fun addIfValid() { if (isValid) Minecraft.getInstance().particles.addEffect(this) }
+    fun addIfValid() { if (isValid) Minecraft.getInstance().particleEngine.add(this) }
 
-    override fun renderParticle(vertexBuilder: IVertexBuilder, camera: ActiveRenderInfo, tickDelta: Float) {
-        super.renderParticle(vertexBuilder, camera, tickDelta)
+    override fun render(vertexBuilder: IVertexBuilder, camera: ActiveRenderInfo, tickDelta: Float) {
+        super.render(vertexBuilder, camera, tickDelta)
     }
 
     /**
@@ -63,39 +63,39 @@ abstract class AbstractParticle(world: World, x: Double, y: Double, z: Double) :
                            tickDelta: Float,
                            currentPos: Double3 = this.currentPos,
                            prevPos: Double3 = this.prevPos,
-                           size: Double = particleScale.toDouble(),
-                           currentAngle: Float = this.particleAngle,
-                           prevAngle: Float = this.prevParticleAngle,
+                           size: Double = quadSize.toDouble(),
+                           currentAngle: Float = this.roll,
+                           prevAngle: Float = this.oRoll,
                            sprite: TextureAtlasSprite = this.sprite,
-                           alpha: Float = this.particleAlpha) {
+                           alpha: Float = this.alpha) {
 
         val center = Double3.lerp(tickDelta.toDouble(), prevPos, currentPos)
         val angle = MathHelper.lerp(tickDelta, prevAngle, currentAngle)
-        val rotation = camera.rotation.copy().apply { multiply(Vector3f.ZP.rotation(angle)) }
-        val lightmapCoord = getBrightnessForRender(tickDelta)
+        val rotation = camera.rotation().copy().apply { mul(Vector3f.ZP.rotation(angle)) }
+        val lightmapCoord = getLightColor(tickDelta)
 
         val coords = arrayOf(
             Double3(-1.0, -1.0, 0.0),
             Double3(-1.0, 1.0, 0.0),
             Double3(1.0, 1.0, 0.0),
             Double3(1.0, -1.0, 0.0)
-        ).map { it.rotate(rotation).mul(size).add(center).sub(camera.projectedView.x, camera.projectedView.y, camera.projectedView.z) }
+        ).map { it.rotate(rotation).mul(size).add(center).sub(camera.position.x, camera.position.y, camera.position.z) }
 
         fun renderVertex(vertex: Double3, u: Float, v: Float) = vertexConsumer
-            .pos(vertex.x, vertex.y, vertex.z).tex(u, v)
-            .color(particleRed, particleGreen, particleBlue, alpha).lightmap(lightmapCoord)
+            .vertex(vertex.x, vertex.y, vertex.z).uv(u, v)
+            .color(rCol, gCol, bCol, alpha).uv2(lightmapCoord)
             .endVertex()
 
-        renderVertex(coords[0], sprite.maxU, sprite.maxV)
-        renderVertex(coords[1], sprite.maxU, sprite.minV)
-        renderVertex(coords[2], sprite.minU, sprite.minV)
-        renderVertex(coords[3], sprite.minU, sprite.maxV)
+        renderVertex(coords[0], sprite.u1, sprite.v1)
+        renderVertex(coords[1], sprite.u1, sprite.v0)
+        renderVertex(coords[2], sprite.u0, sprite.v0)
+        renderVertex(coords[3], sprite.u0, sprite.v1)
     }
 
     fun setColor(color: Int) {
-        particleBlue = (color and 255) / 256.0f
-        particleGreen = ((color shr 8) and 255) / 256.0f
-        particleRed = ((color shr 16) and 255) / 256.0f
+        bCol = (color and 255) / 256.0f
+        gCol = ((color shr 8) and 255) / 256.0f
+        rCol = ((color shr 16) and 255) / 256.0f
     }
 }
 

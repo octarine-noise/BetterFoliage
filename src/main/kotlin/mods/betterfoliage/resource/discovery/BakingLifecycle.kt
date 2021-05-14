@@ -8,8 +8,8 @@ import net.minecraft.block.BlockState
 import net.minecraft.client.renderer.model.IBakedModel
 import net.minecraft.client.renderer.model.IModelTransform
 import net.minecraft.client.renderer.model.IUnbakedModel
-import net.minecraft.client.renderer.model.Material
 import net.minecraft.client.renderer.model.ModelBakery
+import net.minecraft.client.renderer.model.RenderMaterial
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.event.ModelBakeEvent
@@ -30,7 +30,7 @@ data class ModelDefinitionsLoadedEvent(
 
 interface ModelBakingKey {
     fun bake(ctx: ModelBakingContext): IBakedModel? =
-        ctx.getUnbaked().bakeModel(ctx.bakery, ctx.spriteGetter, ctx.transform, ctx.location)
+        ctx.getUnbaked().bake(ctx.bakery, ctx.spriteGetter, ctx.transform, ctx.location)
 }
 
 interface ModelDiscovery {
@@ -49,7 +49,7 @@ data class ModelDiscoveryContext(
     val replacements: MutableMap<ResourceLocation, ModelBakingKey>,
     val logger: Logger
 ) {
-    fun getUnbaked(location: ResourceLocation = modelLocation) = bakery.getUnbakedModel(location)
+    fun getUnbaked(location: ResourceLocation = modelLocation) = bakery.getModel(location)
     fun addReplacement(key: ModelBakingKey, addToStateKeys: Boolean = true) {
         replacements[modelLocation] = key
         if (addToStateKeys) BetterFoliage.blockTypes.stateKeys[blockState] = key
@@ -59,12 +59,12 @@ data class ModelDiscoveryContext(
 
 data class ModelBakingContext(
     val bakery: ModelBakery,
-    val spriteGetter: Function<Material, TextureAtlasSprite>,
+    val spriteGetter: Function<RenderMaterial, TextureAtlasSprite>,
     val location: ResourceLocation,
     val transform: IModelTransform,
     val logger: Logger
 ) {
-    fun getUnbaked() = bakery.getUnbakedModel(location)
+    fun getUnbaked() = bakery.getModel(location)
     fun getBaked() = bakery.getBakedModel(location, transform, spriteGetter)
 }
 
@@ -94,7 +94,7 @@ object BakeWrapperManager : Invalidator, HasLogger() {
 
     @SubscribeEvent
     fun handleStitch(event: TextureStitchEvent.Pre) {
-        if (event.map.textureLocation == Atlas.BLOCKS.resourceId) {
+        if (event.map.location() == Atlas.BLOCKS.resourceId) {
             logger.log(INFO, "Adding ${sprites.size} sprites to block atlas")
             sprites.forEach { event.addSprite(it) }
             sprites.clear()
@@ -109,7 +109,7 @@ object BakeWrapperManager : Invalidator, HasLogger() {
     fun onBake(
         unbaked: IUnbakedModel,
         bakery: ModelBakery,
-        spriteGetter: Function<Material, TextureAtlasSprite>,
+        spriteGetter: Function<RenderMaterial, TextureAtlasSprite>,
         transform: IModelTransform,
         location: ResourceLocation
     ): IBakedModel? {
@@ -124,6 +124,6 @@ object BakeWrapperManager : Invalidator, HasLogger() {
                 logger.log(WARN, "Error while baking $replacement", e)
             }
         }
-        return unbaked.bakeModel(bakery, spriteGetter, transform, location)
+        return unbaked.bake(bakery, spriteGetter, transform, location)
     }
 }

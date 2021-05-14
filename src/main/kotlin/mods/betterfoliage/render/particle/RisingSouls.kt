@@ -13,6 +13,7 @@ import mods.betterfoliage.util.randomD
 import mods.betterfoliage.util.randomI
 import net.minecraft.client.particle.IParticleRenderType
 import net.minecraft.client.renderer.ActiveRenderInfo
+import net.minecraft.client.world.ClientWorld
 import net.minecraft.util.ResourceLocation
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.MathHelper
@@ -23,7 +24,7 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 class RisingSoulParticle(
-    world: World, pos: BlockPos
+    world: ClientWorld, pos: BlockPos
 ) : AbstractParticle(
     world, pos.x.toDouble() + 0.5, pos.y.toDouble() + 1.0, pos.z.toDouble() + 0.5
 ) {
@@ -32,10 +33,10 @@ class RisingSoulParticle(
     val initialPhase = randomD(max = PI2)
 
     init {
-        motionY = 0.1
-        particleGravity = 0.0f
+        yd = 0.1
+        gravity = 0.0f
         sprite = headIcons[randomI(max = 1024)]
-        maxAge = MathHelper.floor((0.6 + 0.4 * randomD()) * Config.risingSoul.lifetime * 20.0)
+        lifetime = MathHelper.floor((0.6 + 0.4 * randomD()) * Config.risingSoul.lifetime * 20.0)
     }
 
     override val isValid: Boolean get() = true
@@ -49,12 +50,12 @@ class RisingSoulParticle(
         particleTrail.addFirst(currentPos.copy())
         while (particleTrail.size > Config.risingSoul.trailLength) particleTrail.removeLast()
 
-        if (!Config.enabled) setExpired()
+        if (!Config.enabled) remove()
     }
 
-    override fun renderParticle(vertexBuilder: IVertexBuilder, camera: ActiveRenderInfo, tickDelta: Float) {
+    override fun render(vertexBuilder: IVertexBuilder, camera: ActiveRenderInfo, tickDelta: Float) {
         var alpha = Config.risingSoul.opacity.toFloat()
-        if (age > maxAge - 40) alpha *= (maxAge - age) / 40.0f
+        if (age > lifetime - 40) alpha *= (lifetime - age) / 40.0f
 
         renderParticleQuad(
             vertexBuilder, camera, tickDelta,

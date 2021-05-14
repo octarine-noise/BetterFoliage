@@ -1,12 +1,12 @@
 package mods.betterfoliage.mixin;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import mods.betterfoliage.render.pipeline.RenderCtxForge;
 import mods.betterfoliage.model.SpecialRenderModel;
+import mods.betterfoliage.render.pipeline.RenderCtxForge;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.ILightReader;
+import net.minecraft.world.IBlockDisplayReader;
 import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.client.model.pipeline.ForgeBlockModelRenderer;
 import net.minecraftforge.client.model.pipeline.VertexLighterFlat;
@@ -19,14 +19,14 @@ import java.util.Random;
 @Mixin(ForgeBlockModelRenderer.class)
 public class MixinForgeBlockModelRenderer {
 
-    private static final String renderModelFlat = "renderModelFlat(Lnet/minecraft/world/ILightReader;Lnet/minecraft/client/renderer/model/IBakedModel;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lcom/mojang/blaze3d/matrix/MatrixStack;Lcom/mojang/blaze3d/vertex/IVertexBuilder;ZLjava/util/Random;JILnet/minecraftforge/client/model/data/IModelData;)Z";
-    private static final String renderModelSmooth = "renderModelSmooth(Lnet/minecraft/world/ILightReader;Lnet/minecraft/client/renderer/model/IBakedModel;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lcom/mojang/blaze3d/matrix/MatrixStack;Lcom/mojang/blaze3d/vertex/IVertexBuilder;ZLjava/util/Random;JILnet/minecraftforge/client/model/data/IModelData;)Z";
-    private static final String render = "Lnet/minecraftforge/client/model/pipeline/ForgeBlockModelRenderer;render(Lnet/minecraftforge/client/model/pipeline/VertexLighterFlat;Lnet/minecraft/world/ILightReader;Lnet/minecraft/client/renderer/model/IBakedModel;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lcom/mojang/blaze3d/matrix/MatrixStack;ZLjava/util/Random;JLnet/minecraftforge/client/model/data/IModelData;)Z";
+    private static final String renderModelFlat = "Lnet/minecraftforge/client/model/pipeline/ForgeBlockModelRenderer;renderModelFlat(Lnet/minecraft/world/IBlockDisplayReader;Lnet/minecraft/client/renderer/model/IBakedModel;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lcom/mojang/blaze3d/matrix/MatrixStack;Lcom/mojang/blaze3d/vertex/IVertexBuilder;ZLjava/util/Random;JILnet/minecraftforge/client/model/data/IModelData;)Z";
+    private static final String renderModelSmooth = "Lnet/minecraftforge/client/model/pipeline/ForgeBlockModelRenderer;renderModelSmooth(Lnet/minecraft/world/IBlockDisplayReader;Lnet/minecraft/client/renderer/model/IBakedModel;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lcom/mojang/blaze3d/matrix/MatrixStack;Lcom/mojang/blaze3d/vertex/IVertexBuilder;ZLjava/util/Random;JILnet/minecraftforge/client/model/data/IModelData;)Z";
+    private static final String render = "Lnet/minecraftforge/client/model/pipeline/ForgeBlockModelRenderer;render(Lnet/minecraftforge/client/model/pipeline/VertexLighterFlat;Lnet/minecraft/world/IBlockDisplayReader;Lnet/minecraft/client/renderer/model/IBakedModel;Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;Lcom/mojang/blaze3d/matrix/MatrixStack;ZLjava/util/Random;JLnet/minecraftforge/client/model/data/IModelData;)Z";
 
     @Redirect(method = {renderModelFlat, renderModelSmooth}, at = @At(value = "INVOKE", target = render), remap = false)
     public boolean render(
             VertexLighterFlat lighter,
-            ILightReader world,
+            IBlockDisplayReader world,
             IBakedModel model,
             BlockState state,
             BlockPos pos,

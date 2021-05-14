@@ -1,32 +1,26 @@
 package mods.betterfoliage.chunk
 
-import mods.octarinecore.ChunkCacheOF
 import mods.betterfoliage.util.get
 import mods.betterfoliage.util.isInstance
+import mods.octarinecore.ChunkCacheOF
 import net.minecraft.client.renderer.chunk.ChunkRenderCache
 import net.minecraft.client.world.ClientWorld
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.ChunkPos
-import net.minecraft.world.ILightReader
+import net.minecraft.world.DimensionType
+import net.minecraft.world.IBlockDisplayReader
 import net.minecraft.world.IWorldReader
-import net.minecraft.world.dimension.DimensionType
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.event.world.ChunkEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.eventbus.api.SubscribeEvent
 import java.util.*
-import kotlin.collections.List
-import kotlin.collections.MutableMap
-import kotlin.collections.associateWith
-import kotlin.collections.forEach
-import kotlin.collections.mutableListOf
-import kotlin.collections.mutableMapOf
 import kotlin.collections.set
 
-val ILightReader.dimType: DimensionType get() = when {
-    this is IWorldReader -> dimension.type
-    this is ChunkRenderCache -> world.dimension.type
-    this.isInstance(ChunkCacheOF) -> this[ChunkCacheOF.chunkCache].world.dimension.type
+val IBlockDisplayReader.dimType: DimensionType get() = when {
+    this is IWorldReader -> dimensionType()
+    this is ChunkRenderCache -> level.dimensionType()
+    this.isInstance(ChunkCacheOF) -> this[ChunkCacheOF.chunkCache].level.dimensionType()
     else -> throw IllegalArgumentException("DimensionType of world with class ${this::class.qualifiedName} cannot be determined!")
 }
 
@@ -35,7 +29,7 @@ val ILightReader.dimType: DimensionType get() = when {
  */
 interface ChunkOverlayLayer<T> {
     fun calculate(ctx: BlockCtx): T
-    fun onBlockUpdate(world: ILightReader, pos: BlockPos)
+    fun onBlockUpdate(world: IBlockDisplayReader, pos: BlockPos)
 }
 
 /**

@@ -1,12 +1,12 @@
 package mods.betterfoliage.util
 
-import net.minecraft.client.renderer.Quaternion
 import net.minecraft.util.Direction
 import net.minecraft.util.Direction.*
 import net.minecraft.util.Direction.Axis.*
 import net.minecraft.util.Direction.AxisDirection.NEGATIVE
 import net.minecraft.util.Direction.AxisDirection.POSITIVE
 import net.minecraft.util.math.BlockPos
+import net.minecraft.util.math.vector.Quaternion
 
 val EPSILON_ZERO = 0.05
 val EPSILON_ONE = 0.95
@@ -55,15 +55,15 @@ val ROTATION_MATRIX: Array<IntArray> get() = arrayOf(
 // Vectors
 // ================================
 operator fun Direction.times(scale: Double) =
-    Double3(directionVec.x.toDouble() * scale, directionVec.y.toDouble() * scale, directionVec.z.toDouble() * scale)
-val Direction.vec: Double3 get() = Double3(directionVec.x.toDouble(), directionVec.y.toDouble(), directionVec.z.toDouble())
+    Double3(normal.x.toDouble() * scale, normal.y.toDouble() * scale, normal.z.toDouble() * scale)
+val Direction.vec: Double3 get() = Double3(normal.x.toDouble(), normal.y.toDouble(), normal.z.toDouble())
 
 operator fun BlockPos.plus(other: Int3) = BlockPos(x + other.x, y + other.y, z + other.z)
 
 /** 3D vector of [Double]s. Offers both mutable operations, and immutable operations in operator notation. */
 data class Double3(var x: Double, var y: Double, var z: Double) {
     constructor(x: Float, y: Float, z: Float) : this(x.toDouble(), y.toDouble(), z.toDouble())
-    constructor(dir: Direction) : this(dir.directionVec.x.toDouble(), dir.directionVec.y.toDouble(), dir.directionVec.z.toDouble())
+    constructor(dir: Direction) : this(dir.normal.x.toDouble(), dir.normal.y.toDouble(), dir.normal.z.toDouble())
     companion object {
         val zero: Double3 get() = Double3(0.0, 0.0, 0.0)
         fun weight(v1: Double3, weight1: Double, v2: Double3, weight2: Double) =
@@ -88,9 +88,9 @@ data class Double3(var x: Double, var y: Double, var z: Double) {
     /** Rotate vector by the given [Quaternion] */
     fun rotate(quat: Quaternion) =
         quat.copy()
-            .apply { multiply(Quaternion(x, y, z, 0.0F)) }
-            .apply { multiply(quat.copy().apply(Quaternion::conjugate)) }
-            .let { Double3(it.x, it.y, it.z) }
+            .apply { mul(Quaternion(x.toFloat(), y.toFloat(), z.toFloat(), 0.0F)) }
+            .apply { mul(quat.copy().apply(Quaternion::conj)) }
+            .let { Double3(it.i().toDouble(), it.j().toDouble(), it.k().toDouble()) }
 
     // mutable operations
     fun setTo(other: Double3): Double3 { x = other.x; y = other.y; z = other.z; return this }
@@ -120,11 +120,11 @@ data class Double3(var x: Double, var y: Double, var z: Double) {
 
 /** 3D vector of [Int]s. Offers both mutable operations, and immutable operations in operator notation. */
 data class Int3(var x: Int, var y: Int, var z: Int) {
-    constructor(dir: Direction) : this(dir.directionVec.x, dir.directionVec.y, dir.directionVec.z)
+    constructor(dir: Direction) : this(dir.normal.x, dir.normal.y, dir.normal.z)
     constructor(offset: Pair<Int, Direction>) : this(
-        offset.first * offset.second.directionVec.x,
-        offset.first * offset.second.directionVec.y,
-        offset.first * offset.second.directionVec.z
+        offset.first * offset.second.normal.x,
+        offset.first * offset.second.normal.y,
+        offset.first * offset.second.normal.z
     )
     companion object {
         val zero = Int3(0, 0, 0)
@@ -133,9 +133,9 @@ data class Int3(var x: Int, var y: Int, var z: Int) {
     // immutable operations
     operator fun plus(other: Int3) = Int3(x + other.x, y + other.y, z + other.z)
     operator fun plus(other: Pair<Int, Direction>) = Int3(
-        x + other.first * other.second.directionVec.x,
-        y + other.first * other.second.directionVec.y,
-        z + other.first * other.second.directionVec.z
+        x + other.first * other.second.normal.x,
+        y + other.first * other.second.normal.y,
+        z + other.first * other.second.normal.z
     )
     operator fun unaryMinus() = Int3(-x, -y, -z)
     operator fun minus(other: Int3) = Int3(x - other.x, y - other.y, z - other.z)

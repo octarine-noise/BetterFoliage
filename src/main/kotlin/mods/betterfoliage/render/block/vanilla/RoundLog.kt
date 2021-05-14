@@ -1,9 +1,9 @@
 package mods.betterfoliage.render.block.vanilla
 
 import mods.betterfoliage.BetterFoliage
+import mods.betterfoliage.config.ACCEPTED_ROUND_LOG_MATERIALS
 import mods.betterfoliage.config.BlockConfig
 import mods.betterfoliage.config.Config
-import mods.betterfoliage.resource.discovery.ModelTextureList
 import mods.betterfoliage.model.HalfBakedWrapperKey
 import mods.betterfoliage.model.SpecialRenderModel
 import mods.betterfoliage.render.column.ColumnBlockKey
@@ -16,11 +16,12 @@ import mods.betterfoliage.resource.discovery.ConfigurableModelDiscovery
 import mods.betterfoliage.resource.discovery.ModelBakingContext
 import mods.betterfoliage.resource.discovery.ModelBakingKey
 import mods.betterfoliage.resource.discovery.ModelDiscoveryContext
+import mods.betterfoliage.resource.discovery.ModelTextureList
 import mods.betterfoliage.util.Atlas
 import mods.betterfoliage.util.LazyMapInvalidatable
 import mods.betterfoliage.util.tryDefault
 import net.minecraft.block.BlockState
-import net.minecraft.block.LogBlock
+import net.minecraft.block.RotatedPillarBlock
 import net.minecraft.util.Direction.Axis
 import net.minecraft.util.ResourceLocation
 import org.apache.logging.log4j.Level.INFO
@@ -43,13 +44,15 @@ object StandardRoundLogDiscovery : ConfigurableModelDiscovery() {
 
     override fun processModel(ctx: ModelDiscoveryContext, textureMatch: List<ResourceLocation>) {
         val axis = getAxis(ctx.blockState)
-        detailLogger.log(INFO, "       axis $axis")
-        ctx.addReplacement(StandardRoundLogKey(axis, textureMatch[0], textureMatch[1]))
+
+        detailLogger.log(INFO, "       axis $axis, material ${ctx.blockState.material}")
+        if (!Config.roundLogs.plantsOnly || ctx.blockState.material in ACCEPTED_ROUND_LOG_MATERIALS)
+            ctx.addReplacement(StandardRoundLogKey(axis, textureMatch[0], textureMatch[1]))
     }
 
     fun getAxis(state: BlockState): Axis? {
-        val axis = tryDefault(null) { state.get(LogBlock.AXIS).toString() } ?:
-        state.values.entries.find { it.key.getName().toLowerCase() == "axis" }?.value?.toString()
+        val axis = tryDefault(null) { state.getValue(RotatedPillarBlock.AXIS).toString() } ?:
+        state.values.entries.find { it.key.name.toLowerCase() == "axis" }?.value?.toString()
         return when (axis) {
             "x" -> Axis.X
             "y" -> Axis.Y

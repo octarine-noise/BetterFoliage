@@ -55,6 +55,7 @@ object Config : DelegatingConfig(BetterFoliageMod.MOD_ID, BetterFoliageMod.MOD_I
 
     object roundLogs : ConfigCategory(){
         val enabled by featureEnable()
+        val plantsOnly by boolean(true)
         val radiusSmall by double(max=0.5, default=0.25)
         val radiusLarge by double(max=0.5, default=0.44)
         val dimming by double(default = 0.7)

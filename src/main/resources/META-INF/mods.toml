@@ -1,7 +1,7 @@
-modLoader="kotlinfml"
-loaderVersion="[1.4,)"
+modLoader="kotlinforforge"
+loaderVersion="[1,)"
 issueTrackerURL="https://github.com/octarine-noise/BetterFoliage/issues"
-
+license="MIT"
 [[mods]]
     modId="betterfoliage"
     version="${version}"

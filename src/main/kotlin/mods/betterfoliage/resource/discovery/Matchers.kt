@@ -1,6 +1,5 @@
 package mods.betterfoliage.resource.discovery
 
-import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.util.HasLogger
 import mods.betterfoliage.util.getJavaClass
 import mods.betterfoliage.util.getLines
@@ -45,8 +44,8 @@ class ConfigurableBlockMatcher(val location: ResourceLocation) : HasLogger(), IB
     fun readDefaults() {
         blackList.clear()
         whiteList.clear()
-        resourceManager.getAllResources(location).forEach { resource ->
-            detailLogger.log(INFO, "Reading block class configuration $location from pack ${resource.packName}")
+        resourceManager.getResources(location).forEach { resource ->
+            detailLogger.log(INFO, "Reading block class configuration $location from pack ${resource.sourceName}")
             resource.getLines().map{ it.trim() }.filter { !it.startsWith("//") && it.isNotEmpty() }.forEach { line ->
                 if (line.startsWith("-")) getJavaClass(line.substring(1))?.let { blackList.add(it) }
                 else getJavaClass(line)?.let { whiteList.add(it) }
@@ -63,8 +62,8 @@ data class ModelTextureList(val modelLocation: ResourceLocation, val textureName
 class ModelTextureListConfiguration(val location: ResourceLocation) : HasLogger() {
     val modelList = mutableListOf<ModelTextureList>()
     fun readDefaults() {
-        resourceManager.getAllResources(location).forEach { resource ->
-            detailLogger.log(INFO, "Reading model/texture configuration $location from pack ${resource.packName}")
+        resourceManager.getResources(location).forEach { resource ->
+            detailLogger.log(INFO, "Reading model/texture configuration $location from pack ${resource.sourceName}")
             resource.getLines().map{ it.trim() }.filter { !it.startsWith("//") && it.isNotEmpty() }.forEach { line ->
                 val elements = line.split(",")
                 modelList.add(ModelTextureList(ResourceLocation(elements.first()), elements.drop(1)))

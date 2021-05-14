@@ -20,7 +20,7 @@ interface VeryEarlyReloadListener : IFutureReloadListener {
         gameExecutor: Executor
     ): CompletableFuture<Void> {
         onReloadStarted()
-        return stage.markCompleteAwaitingOthers(null)
+        return stage.wait(null)
     }
 
     fun onReloadStarted() {}

@@ -1,26 +1,28 @@
 plugins {
-    kotlin("jvm").version("1.3.61")
-    id("net.minecraftforge.gradle").version("3.0.194")
+    kotlin("jvm").version("1.4.20")
+    id("net.minecraftforge.gradle").version("4.1.12")
     id("org.spongepowered.mixin").version("0.7-SNAPSHOT")
 }
-apply(plugin = "org.spongepowered.mixin")
+//apply(plugin = "org.spongepowered.mixin")
 
 repositories {
-    maven("http://files.minecraftforge.net/maven")
+    maven("https://files.minecraftforge.net/maven")
     maven("https://repo.spongepowered.org/maven")
     maven("https://minecraft.curseforge.com/api/maven")
     maven("https://maven.shedaniel.me/")
     maven("https://www.cursemaven.com")
+    maven("https://thedarkcolour.github.io/KotlinForForge/")
 }
 
 dependencies {
     "minecraft"("net.minecraftforge:forge:${properties["mcVersion"]}-${properties["forgeVersion"]}")
 
-    "api"(fg.deobf("curse.maven:clothconfig-348521:2938583"))
+//    "api"(fg.deobf("curse.maven:clothconfig-348521:2938583"))
 
-    "implementation"(fg.deobf("curse.maven:biomesoplenty-220318:2988999"))
-    "implementation"("kottle:Kottle:${properties["kottleVersion"]}")
-//    "implementation"("org.spongepowered:mixin:0.8-SNAPSHOT")
+//    "implementation"(fg.deobf("curse.maven:biomesoplenty-220318:2988999"))
+    "implementation"("thedarkcolour:kotlinforforge:1.7.0")
+
+    "implementation"("org.spongepowered:mixin:0.8-SNAPSHOT")
 }
 
 configurations["annotationProcessor"].extendsFrom(configurations["implementation"])

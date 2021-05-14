@@ -41,7 +41,7 @@ object LeafParticleRegistry : HasLogger(), VeryEarlyReloadListener {
 
     @SubscribeEvent
     fun handlePreStitch(event: TextureStitchEvent.Pre) {
-        if (event.map.textureLocation == Atlas.PARTICLES.resourceId) {
+        if (event.map.location() == Atlas.PARTICLES.resourceId) {
             allTypes.forEach { leafType ->
                 val locations = (0 until 16).map { idx ->
                     ResourceLocation(BetterFoliageMod.MOD_ID, "particle/falling_leaf_${leafType}_$idx")
@@ -55,7 +55,7 @@ object LeafParticleRegistry : HasLogger(), VeryEarlyReloadListener {
 
     @SubscribeEvent
     fun handlePostStitch(event: TextureStitchEvent.Post) {
-        if (event.map.textureLocation == Atlas.PARTICLES.resourceId) {
+        if (event.map.location() == Atlas.PARTICLES.resourceId) {
             (typeMappings.mappings.map { it.type } + "default").distinct().forEach { leafType ->
                 val sprites = (0 until 16).map { idx ->
                     ResourceLocation(BetterFoliageMod.MOD_ID, "particle/falling_leaf_${leafType}_$idx")

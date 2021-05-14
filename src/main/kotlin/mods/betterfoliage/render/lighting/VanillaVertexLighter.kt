@@ -69,7 +69,7 @@ object VanillaFullBlockLighting : VanillaVertexLighter() {
         lighting.calc.fillLightData(face, true)
         lighting.updateWithCornerAo(quad) { nearestCornerOnFace(it, face) }
         lighting.updateBlockTint(quad.baked.tintIndex)
-        if (quad.baked.shouldApplyDiffuseLighting()) lighting.applyDiffuseLighting(face)
+        if (quad.baked.isShade) lighting.applyDiffuseLighting(face)
     }
 }
 

@@ -2,18 +2,18 @@ package mods.betterfoliage.render.pipeline
 
 import com.mojang.blaze3d.matrix.MatrixStack
 import com.mojang.blaze3d.vertex.IVertexBuilder
-import mods.betterfoliage.model.SpecialRenderModel
 import mods.betterfoliage.model.HalfBakedQuad
+import mods.betterfoliage.model.SpecialRenderModel
 import net.minecraft.block.BlockState
 import net.minecraft.client.renderer.BlockModelRenderer
 import net.minecraft.util.math.BlockPos
-import net.minecraft.world.ILightReader
+import net.minecraft.world.IBlockDisplayReader
 import net.minecraftforge.client.model.data.IModelData
 import java.util.Random
 
 class RenderCtxVanilla(
     val renderer: BlockModelRenderer,
-    world: ILightReader,
+    world: IBlockDisplayReader,
     pos: BlockPos,
     val buffer: IVertexBuilder,
     val combinedOverlay: Int,
@@ -27,8 +27,8 @@ class RenderCtxVanilla(
 
     override fun renderQuad(quad: HalfBakedQuad) {
         vertexLighter.updateLightmapAndColor(quad, lightingData)
-        buffer.addQuad(
-            matrixStack.last, quad.baked,
+        buffer.putBulkData(
+            matrixStack.last(), quad.baked,
             lightingData.colorMultiplier,
             lightingData.tint[0], lightingData.tint[1], lightingData.tint[2],
             lightingData.packedLight, combinedOverlay, true
@@ -39,7 +39,7 @@ class RenderCtxVanilla(
         @JvmStatic
         fun render(
             renderer: BlockModelRenderer,
-            world: ILightReader,
+            world: IBlockDisplayReader,
             model: SpecialRenderModel,
             state: BlockState,
             pos: BlockPos,
