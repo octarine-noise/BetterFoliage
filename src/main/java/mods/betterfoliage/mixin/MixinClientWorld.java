@@ -1,16 +1,16 @@
 package mods.betterfoliage.mixin;
 
 import mods.betterfoliage.Hooks;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Random;
 
@@ -26,10 +26,9 @@ public class MixinClientWorld {
     /**
      * Inject a callback to call for every random display tick. Used for adding custom particle effects to blocks.
      */
-    @Redirect(method = worldAnimateTick, at = @At(value = "INVOKE", target = blockAnimateTick))
-    void onAnimateTick(Block block, BlockState state, World world, BlockPos pos, Random random) {
-        Hooks.onRandomDisplayTick(block, state, (ClientWorld) world, pos, random);
-        block.animateTick(state, world, pos, random);
+    @Inject(method = worldAnimateTick, at = @At(value = "INVOKE", target = blockAnimateTick))
+    void onAnimateTick(int x, int y, int z, int range, Random random, boolean doBarrier, BlockPos.Mutable pos, CallbackInfo ci) {
+        Hooks.onRandomDisplayTick((ClientWorld) (Object) this, pos, random);
     }
 
     /**

@@ -35,7 +35,8 @@ fun onClientBlockChanged(worldClient: ClientWorld, pos: BlockPos, oldState: Bloc
     ChunkOverlayManager.onBlockChange(worldClient, pos)
 }
 
-fun onRandomDisplayTick(block: Block, state: BlockState, world: ClientWorld, pos: BlockPos, random: Random) {
+fun onRandomDisplayTick(world: ClientWorld, pos: BlockPos, random: Random) {
+    val state = world.getBlockState(pos)
     if (Config.enabled &&
         Config.risingSoul.enabled &&
         state.block == Blocks.SOUL_SAND &&
