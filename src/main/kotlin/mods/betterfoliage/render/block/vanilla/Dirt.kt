@@ -3,6 +3,9 @@ package mods.betterfoliage.render.block.vanilla
 import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.config.Config
+import mods.betterfoliage.config.DIRT_BLOCKS
+import mods.betterfoliage.config.SALTWATER_BIOMES
+import mods.betterfoliage.integration.ShadersModIntegration
 import mods.betterfoliage.model.HalfBakedSpecialWrapper
 import mods.betterfoliage.model.HalfBakedWrapperKey
 import mods.betterfoliage.model.SpecialRenderModel
@@ -34,8 +37,6 @@ import net.minecraft.util.ResourceLocation
 import net.minecraft.world.biome.Biome
 
 object StandardDirtDiscovery : AbstractModelDiscovery() {
-    val DIRT_BLOCKS = listOf(Blocks.DIRT, Blocks.COARSE_DIRT, Blocks.PODZOL)
-
     fun canRenderInLayer(layer: RenderType) = when {
         !Config.enabled -> layer == RenderType.getSolid()
         !Config.connectedGrass.enabled && !Config.algae.enabled && !Config.reed.enabled -> layer == RenderType.getSolid()
@@ -64,7 +65,8 @@ class StandardDirtModel(
     override fun render(ctx: RenderCtxBase, noDecorations: Boolean) {
         if (!Config.enabled || noDecorations) return super.render(ctx, noDecorations)
 
-        val stateUp = ctx.offset(UP).state
+        val stateUp = ctx.state(UP)
+        val state2Up = ctx.state(Int3(0, 2, 0))
         val isConnectedGrass = Config.connectedGrass.enabled && stateUp in BetterFoliage.blockTypes.grass
         if (isConnectedGrass) {
             (ctx.blockModelShapes.getModel(stateUp) as? SpecialRenderModel)?.let { grassModel ->
@@ -84,17 +86,19 @@ class StandardDirtModel(
         val isSaltWater = isWater && ctx.biome?.category in SALTWATER_BIOMES
 
         if (Config.algae.enabled(ctx.random) && isDeepWater) {
-            (ctx as? RenderCtxVanilla)?.vertexLighter = vanillaTuftLighting
-            ctx.renderQuads(algaeModels[ctx.random])
+            ctx.vertexLighter = vanillaTuftLighting
+            ShadersModIntegration.grass(ctx, Config.algae.shaderWind) {
+                ctx.renderQuads(algaeModels[ctx.random])
+            }
         } else if (Config.reed.enabled(ctx.random) && isShallowWater && !isSaltWater) {
-            (ctx as? RenderCtxVanilla)?.vertexLighter = vanillaTuftLighting
-            ctx.renderQuads(reedModels[ctx.random])
+            ctx.vertexLighter = vanillaTuftLighting
+            ShadersModIntegration.grass(ctx, Config.reed.shaderWind) {
+                ctx.renderQuads(reedModels[ctx.random])
+            }
         }
     }
 
     companion object {
-        val SALTWATER_BIOMES = listOf(Biome.Category.BEACH, Biome.Category.OCEAN)
-
         val algaeSprites by SpriteSetDelegate(Atlas.BLOCKS) { idx ->
             ResourceLocation(BetterFoliageMod.MOD_ID, "blocks/better_algae_$idx")
         }

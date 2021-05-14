@@ -1,9 +1,11 @@
 package mods.betterfoliage.render.block.vanilla
 
-import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.BetterFoliage
+import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.config.BlockConfig
 import mods.betterfoliage.config.Config
+import mods.betterfoliage.config.isSnow
+import mods.betterfoliage.integration.ShadersModIntegration
 import mods.betterfoliage.model.Color
 import mods.betterfoliage.model.HalfBakedSpecialWrapper
 import mods.betterfoliage.model.HalfBakedWrapperKey
@@ -27,7 +29,6 @@ import mods.betterfoliage.util.Atlas
 import mods.betterfoliage.util.LazyMapInvalidatable
 import mods.betterfoliage.util.averageColor
 import mods.betterfoliage.util.colorOverride
-import mods.betterfoliage.util.isSnow
 import mods.betterfoliage.util.logColorOverride
 import net.minecraft.util.Direction.UP
 import net.minecraft.util.ResourceLocation
@@ -72,13 +73,15 @@ class StandardLeafModel(
     val leafSnowed by leafModelsSnowed.delegate(key)
 
     override fun render(ctx: RenderCtxBase, noDecorations: Boolean) {
-        super.render(ctx, noDecorations)
-        if (!Config.enabled || !Config.leaves.enabled || noDecorations) return
+        ShadersModIntegration.leaves(ctx, true) {
+            super.render(ctx, noDecorations)
+            if (!Config.enabled || !Config.leaves.enabled || noDecorations) return
 
-        ctx.vertexLighter = RoundLeafLightingPreferUp
-        val leafIdx = ctx.random.nextInt(64)
-        ctx.renderQuads(leafNormal[leafIdx])
-        if (ctx.state(UP).isSnow) ctx.renderQuads(leafSnowed[leafIdx])
+            ctx.vertexLighter = RoundLeafLightingPreferUp
+            val leafIdx = ctx.random.nextInt(64)
+            ctx.renderQuads(leafNormal[leafIdx])
+            if (ctx.state(UP).isSnow) ctx.renderQuads(leafSnowed[leafIdx])
+        }
     }
 
     companion object {

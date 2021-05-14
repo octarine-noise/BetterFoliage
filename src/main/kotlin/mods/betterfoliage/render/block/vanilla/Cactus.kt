@@ -2,6 +2,7 @@ package mods.betterfoliage.render.block.vanilla
 
 import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.BetterFoliage
+import mods.betterfoliage.config.CACTUS_BLOCKS
 import mods.betterfoliage.config.Config
 import mods.betterfoliage.model.HalfBakedSpecialWrapper
 import mods.betterfoliage.model.HalfBakedWrapperKey
@@ -33,8 +34,6 @@ import net.minecraft.util.Direction.DOWN
 import net.minecraft.util.ResourceLocation
 
 object StandardCactusDiscovery : AbstractModelDiscovery() {
-    val CACTUS_BLOCKS = listOf(Blocks.CACTUS)
-
     override fun processModel(ctx: ModelDiscoveryContext) {
         val model = ctx.getUnbaked()
         if (model is BlockModel && ctx.blockState.block in CACTUS_BLOCKS) {

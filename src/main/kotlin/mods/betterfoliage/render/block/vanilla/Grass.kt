@@ -1,9 +1,10 @@
 package mods.betterfoliage.render.block.vanilla
 
-import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.BetterFoliage
+import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.config.BlockConfig
 import mods.betterfoliage.config.Config
+import mods.betterfoliage.config.isSnow
 import mods.betterfoliage.integration.ShadersModIntegration
 import mods.betterfoliage.model.Color
 import mods.betterfoliage.model.HalfBakedSpecialWrapper
@@ -28,7 +29,6 @@ import mods.betterfoliage.util.LazyMapInvalidatable
 import mods.betterfoliage.util.averageColor
 import mods.betterfoliage.util.colorOverride
 import mods.betterfoliage.util.get
-import mods.betterfoliage.util.isSnow
 import mods.betterfoliage.util.logColorOverride
 import mods.betterfoliage.util.randomI
 import net.minecraft.util.Direction.DOWN

@@ -1,8 +1,10 @@
 package mods.betterfoliage.render.block.vanilla
 
-import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.BetterFoliage
+import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.config.Config
+import mods.betterfoliage.config.SALTWATER_BIOMES
+import mods.betterfoliage.config.SAND_BLOCKS
 import mods.betterfoliage.model.HalfBakedSpecialWrapper
 import mods.betterfoliage.model.HalfBakedWrapperKey
 import mods.betterfoliage.model.Quad
@@ -13,7 +15,6 @@ import mods.betterfoliage.model.buildTufts
 import mods.betterfoliage.model.transform
 import mods.betterfoliage.model.tuftModelSet
 import mods.betterfoliage.model.tuftShapeSet
-import mods.betterfoliage.render.block.vanilla.StandardDirtModel.Companion.SALTWATER_BIOMES
 import mods.betterfoliage.render.lighting.LightingPreferredFace
 import mods.betterfoliage.render.pipeline.RenderCtxBase
 import mods.betterfoliage.resource.discovery.AbstractModelDiscovery
@@ -29,7 +30,6 @@ import mods.betterfoliage.util.mapArray
 import mods.betterfoliage.util.randomB
 import mods.betterfoliage.util.randomD
 import mods.betterfoliage.util.randomI
-import net.minecraft.block.Blocks
 import net.minecraft.block.material.Material
 import net.minecraft.client.renderer.RenderType
 import net.minecraft.client.renderer.RenderTypeLookup
@@ -39,8 +39,6 @@ import net.minecraft.util.Direction.UP
 import net.minecraft.util.ResourceLocation
 
 object StandardSandDiscovery : AbstractModelDiscovery() {
-    val SAND_BLOCKS = listOf(Blocks.SAND, Blocks.RED_SAND)
-
     override fun processModel(ctx: ModelDiscoveryContext) {
         if (ctx.getUnbaked() is BlockModel && ctx.blockState.block in SAND_BLOCKS) {
             BetterFoliage.blockTypes.dirt.add(ctx.blockState)

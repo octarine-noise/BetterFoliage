@@ -3,6 +3,7 @@ package mods.betterfoliage.render.block.vanilla
 import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.config.Config
+import mods.betterfoliage.config.NETHERRACK_BLOCKS
 import mods.betterfoliage.model.HalfBakedSpecialWrapper
 import mods.betterfoliage.model.HalfBakedWrapperKey
 import mods.betterfoliage.model.SpecialRenderModel
@@ -30,8 +31,6 @@ import net.minecraft.util.Direction.DOWN
 import net.minecraft.util.ResourceLocation
 
 object StandardNetherrackDiscovery : AbstractModelDiscovery() {
-    val NETHERRACK_BLOCKS = listOf(Blocks.NETHERRACK)
-
     fun canRenderInLayer(layer: RenderType) = when {
         !Config.enabled -> layer == RenderType.getSolid()
         !Config.netherrack.enabled -> layer == RenderType.getSolid()

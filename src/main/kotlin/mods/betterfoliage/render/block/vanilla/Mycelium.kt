@@ -2,6 +2,7 @@ package mods.betterfoliage.render.block.vanilla
 
 import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.config.Config
+import mods.betterfoliage.config.MYCELIUM_BLOCKS
 import mods.betterfoliage.model.HalfBakedSpecialWrapper
 import mods.betterfoliage.model.HalfBakedWrapperKey
 import mods.betterfoliage.model.SpecialRenderModel
@@ -27,8 +28,6 @@ import net.minecraft.util.Direction
 import net.minecraft.util.ResourceLocation
 
 object StandardMyceliumDiscovery : AbstractModelDiscovery() {
-    val MYCELIUM_BLOCKS = listOf(Blocks.MYCELIUM)
-
     override fun processModel(ctx: ModelDiscoveryContext) {
         if (ctx.getUnbaked() is BlockModel && ctx.blockState.block in MYCELIUM_BLOCKS) {
             ctx.addReplacement(StandardMyceliumKey)

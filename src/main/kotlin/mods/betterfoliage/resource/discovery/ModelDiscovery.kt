@@ -66,9 +66,11 @@ abstract class ConfigurableModelDiscovery : AbstractModelDiscovery() {
             detailLogger.log(Level.INFO, "      model ${ctx.modelLocation}")
             detailLogger.log(Level.INFO, "      class ${ctx.blockState.block.javaClass.name} matches ${matchClass.name}")
 
-            modelTextures
-                .filter { matcher -> ctx.bakery.modelDerivesFrom(model, ctx.modelLocation, matcher.modelLocation) }
-                .forEach { match ->
+            val ancestry = ctx.bakery.getAncestry(ctx.modelLocation)
+            val matches = modelTextures.filter { matcher ->
+                matcher.modelLocation in ancestry
+            }
+            matches.forEach { match ->
                     detailLogger.log(Level.INFO, "      model $model matches ${match.modelLocation}")
 
                     val materials = match.textureNames.map { it to model.resolveTextureName(it) }
@@ -91,3 +93,9 @@ fun ModelBakery.modelDerivesFrom(model: BlockModel, location: ResourceLocation, 
         ?.let { getUnbakedModel(it) as? BlockModel }
         ?.let { parent -> modelDerivesFrom(parent, model.parentLocation!!, target) }
         ?: false
+
+fun ModelBakery.getAncestry(location: ResourceLocation): List<ResourceLocation> {
+    val model = getUnbakedModel(location) as? BlockModel ?: return listOf(location)
+    val parentAncestry = model.parentLocation?.let { getAncestry(it) } ?: emptyList()
+    return listOf(location) + parentAncestry
+}
