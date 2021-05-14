@@ -7,10 +7,11 @@ import net.minecraft.client.render.Camera
 import net.minecraft.client.render.VertexConsumer
 import net.minecraft.client.texture.Sprite
 import net.minecraft.client.util.math.Vector3f
+import net.minecraft.client.world.ClientWorld
 import net.minecraft.util.math.MathHelper
 import net.minecraft.world.World
 
-abstract class AbstractParticle(world: World, x: Double, y: Double, z: Double) : SpriteBillboardParticle(world, x, y, z) {
+abstract class AbstractParticle(world: ClientWorld, x: Double, y: Double, z: Double) : SpriteBillboardParticle(world, x, y, z) {
 
     companion object {
 //        @JvmStatic val sin = Array(64) { idx -> Math.sin(PI2 / 64.0 * idx) }

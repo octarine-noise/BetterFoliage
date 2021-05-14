@@ -73,9 +73,9 @@ data class Double3(var x: Double, var y: Double, var z: Double) {
     /** Rotate vector by the given [Quaternion] */
     fun rotate(quat: Quaternion) =
         quat.copy()
-            .apply { hamiltonProduct(Quaternion(x.toFloat(), y.toFloat(), z.toFloat(), 0.0F)) }
+            .apply { hamiltonProduct(Quaternion(this@Double3.x.toFloat(), this@Double3.y.toFloat(), this@Double3.z.toFloat(), 0.0F)) }
             .apply { hamiltonProduct(quat.copy().apply(Quaternion::conjugate)) }
-            .let { Double3(it.b, it.c, it.d) }
+            .let { Double3(it.x, it.y, it.z) }
 
     // mutable operations
     fun setTo(other: Double3): Double3 { x = other.x; y = other.y; z = other.z; return this }

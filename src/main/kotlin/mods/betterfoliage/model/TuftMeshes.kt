@@ -46,7 +46,7 @@ fun fullCubeTextured(spriteId: Identifier, tintIndex: Int, scrambleUV: Boolean =
         .map { if (!scrambleUV) it else it.rotateUV(randomI(max = 4)) }
         .map { it.sprite(sprite) }
         .map { it.colorIndex(tintIndex) }
-        .build(BlendMode.SOLID)
+        .build(BlendMode.SOLID, noDiffuse = true)
 }
 
 fun crossModelsRaw(num: Int, size: Double, hOffset: Double, vOffset: Double): Array<List<Quad>> {

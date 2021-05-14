@@ -109,7 +109,7 @@ class StandardGrassModel(wrapped: BakedModel, val key: StandardGrassKey) : Wrapp
             Array(64) { fullCubeTextured(key.grassLocation, key.tintIndex) }
         }
         val snowFullBlockMeshes by LazyInvalidatable(BakeWrapperManager) {
-            Array(64) { fullCubeTextured(Identifier("block/snow"), Color.white.asInt) }
+            Array(64) { fullCubeTextured(Identifier("block/snow"), -1) }
         }
     }
 }

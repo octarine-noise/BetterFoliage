@@ -3,7 +3,6 @@ package mods.betterfoliage.render.block.vanilla
 import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.model.ModelWrapKey
 import mods.betterfoliage.model.meshifySolid
-import mods.betterfoliage.model.meshifyStandard
 import mods.betterfoliage.render.column.ColumnBlockKey
 import mods.betterfoliage.render.column.ColumnMeshSet
 import mods.betterfoliage.render.column.ColumnModelBase
@@ -19,7 +18,7 @@ import mods.betterfoliage.util.Atlas
 import mods.betterfoliage.util.LazyMap
 import mods.betterfoliage.util.tryDefault
 import net.minecraft.block.BlockState
-import net.minecraft.block.LogBlock
+import net.minecraft.block.PillarBlock
 import net.minecraft.client.render.model.BakedModel
 import net.minecraft.client.render.model.BasicBakedModel
 import net.minecraft.util.Identifier
@@ -49,7 +48,7 @@ object StandardRoundLogDiscovery : ConfigurableModelDiscovery() {
     }
 
     fun getAxis(state: BlockState): Axis? {
-        val axis = tryDefault(null) { state.get(LogBlock.AXIS).toString() } ?:
+        val axis = tryDefault(null) { state.get(PillarBlock.AXIS).toString() } ?:
         state.entries.entries.find { it.key.getName().toLowerCase() == "axis" }?.value?.toString()
         return when (axis) {
             "x" -> Axis.X

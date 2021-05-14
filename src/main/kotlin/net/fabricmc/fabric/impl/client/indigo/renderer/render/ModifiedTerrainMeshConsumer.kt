@@ -18,7 +18,7 @@ import net.minecraft.util.math.Direction
 
 val AoCalculator_computeFace = YarnHelper.requiredMethod<Any>(
     "net.fabricmc.fabric.impl.client.indigo.renderer.aocalc.AoCalculator", "computeFace",
-    "(Lnet/minecraft/util/math/Direction;Z)Lnet/fabricmc/fabric/impl/client/indigo/renderer/aocalc/AoFaceData;"
+    "(Lnet/minecraft/util/math/Direction;ZZ)Lnet/fabricmc/fabric/impl/client/indigo/renderer/aocalc/AoFaceData;"
 )
 val AoFaceData_toArray = YarnHelper.requiredMethod<Unit>(
     "net.fabricmc.fabric.impl.client.indigo.renderer.aocalc.AoFaceData", "toArray",
@@ -78,7 +78,7 @@ open class ModifiedTerrainMeshConsumer(
     override fun fillAoData(lightFace: Direction) {
         if (!aoValid[lightFace.ordinal]) {
             AoFaceData_toArray.invoke(
-                AoCalculator_computeFace.invoke(aoCalc, lightFace, true),
+                AoCalculator_computeFace.invoke(aoCalc, lightFace, true, false),
                 aoFull,
                 lightFull,
                 cornerDirFromAo[lightFace.ordinal]

@@ -3,20 +3,26 @@ package mods.betterfoliage.render.particle
 import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.model.SpriteDelegate
 import mods.betterfoliage.model.SpriteSetDelegate
-import mods.betterfoliage.util.*
+import mods.betterfoliage.util.Atlas
+import mods.betterfoliage.util.Double3
+import mods.betterfoliage.util.PI2
+import mods.betterfoliage.util.forEachPairIndexed
+import mods.betterfoliage.util.randomD
+import mods.betterfoliage.util.randomI
 import net.minecraft.client.particle.ParticleTextureSheet
 import net.minecraft.client.render.Camera
 import net.minecraft.client.render.VertexConsumer
+import net.minecraft.client.world.ClientWorld
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.MathHelper
-import net.minecraft.world.World
-import java.util.*
+import java.util.Deque
+import java.util.LinkedList
 import kotlin.math.cos
 import kotlin.math.sin
 
 class RisingSoulParticle(
-    world: World, pos: BlockPos
+    world: ClientWorld, pos: BlockPos
 ) : AbstractParticle(
     world, pos.x.toDouble() + 0.5, pos.y.toDouble() + 1.0, pos.z.toDouble() + 0.5
 ) {

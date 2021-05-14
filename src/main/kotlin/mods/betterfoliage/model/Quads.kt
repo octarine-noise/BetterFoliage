@@ -167,7 +167,7 @@ fun Array<List<Quad>>.withOpposites() = map { it.withOpposites() }.toTypedArray(
  * Pour quad data into a fabric-renderer-api Mesh
  */
 fun List<Quad>.build(blendMode: BlendMode, noDiffuse: Boolean = false, flatLighting: Boolean = false): Mesh {
-    val renderer = RendererAccess.INSTANCE.renderer
+    val renderer = RendererAccess.INSTANCE.renderer!!
     val material = renderer.materialFinder().blendMode(0, blendMode).disableAo(0, flatLighting).disableDiffuse(0, noDiffuse).find()
     val builder = renderer.meshBuilder()
     builder.emitter.apply {

@@ -18,8 +18,8 @@ import javax.imageio.ImageIO
 import kotlin.math.atan2
 
 enum class Atlas(val resourceId: Identifier) {
-    BLOCKS(SpriteAtlasTexture.BLOCK_ATLAS_TEX),
-    PARTICLES(SpriteAtlasTexture.PARTICLE_ATLAS_TEX);
+    BLOCKS(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE),
+    PARTICLES(SpriteAtlasTexture.PARTICLE_ATLAS_TEXTURE);
 
     /** Get the fully-qualified resource name for sprites belonging to this atlas */
     fun file(resource: Identifier) = Identifier(resource.namespace, "textures/${resource.path}.png")
@@ -62,7 +62,7 @@ val Sprite.averageColor: HSB get() {
     var sumBrightness = 0.0f
     for (x in 0 until width)
         for (y in 0 until height) {
-            val pixel = this[Sprite_images]!![0].getPixelRgba(x, y)
+            val pixel = this[Sprite_images]!![0].getPixelColor(x, y)
             val alpha = (pixel shr 24) and 255
             val hsb = HSB.fromColor(pixel)
             if (alpha == 255) {

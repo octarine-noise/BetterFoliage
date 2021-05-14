@@ -8,11 +8,15 @@ import me.zeroeightsix.fiber.tree.ConfigLeaf
 import me.zeroeightsix.fiber.tree.ConfigNode
 import me.zeroeightsix.fiber.tree.ConfigValue
 import net.minecraft.client.resource.language.I18n
+import net.minecraft.text.LiteralText
 import java.util.*
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
 const val MAX_LINE_LEN = 30
+
+fun textify(string: String) = LiteralText(string)
+fun textify(strings: Array<String>) = strings.map(::LiteralText).toTypedArray()
 
 sealed class DelegatingConfigNode<N: ConfigLeaf>(val fiberNode: N) {
     abstract fun createClothNode(names: List<String>): AbstractConfigListEntry<*>
@@ -24,9 +28,9 @@ open class DelegatingConfigGroup(fiberNode: ConfigNode) : DelegatingConfigNode<C
     val children = mutableListOf<DelegatingConfigNode<*>>()
     override fun createClothNode(names: List<String>): SubCategoryListEntry {
         val builder = ConfigEntryBuilder.create()
-            .startSubCategory(names.joinToString(".").translate())
-            .setTooltip(*names.joinToString(".").translateTooltip())
-            .setExpended(false)
+            .startSubCategory(textify(names.joinToString(".").translate()))
+            .setTooltip(*textify(names.joinToString(".").translateTooltip()))
+            .setExpanded(false)
         children.forEach { builder.add(it.createClothNode(names + it.fiberNode.name!!)) }
         return builder.build()
     }
@@ -85,8 +89,8 @@ fun boolean(
         .build()
 
     override fun createClothNode(node: ConfigValue<Boolean>, names: List<String>) = ConfigEntryBuilder.create()
-        .startBooleanToggle(langKey(names).translate(), node.value!!)
-        .setTooltip(langKey(names).let { if (I18n.hasTranslation("$it.tooltip")) Optional.of(it.translateTooltip()) else Optional.empty() })
+        .startBooleanToggle(textify(langKey(names).translate()), node.value!!)
+        .setTooltip(langKey(names).let { if (I18n.hasTranslation("$it.tooltip")) Optional.of(textify(it.translateTooltip())) else Optional.empty() })
         .setSaveConsumer { node.value = valueOverride(it) }
         .build()
 }
@@ -104,8 +108,8 @@ fun integer(
         .build()
 
     override fun createClothNode(node: ConfigValue<Int>, names: List<String>) = ConfigEntryBuilder.create()
-        .startIntField(langKey(names).translate(), node.value!!)
-        .setTooltip(langKey(names).let { if (I18n.hasTranslation("$it.tooltip")) Optional.of(it.translateTooltip()) else Optional.empty() })
+        .startIntField(textify(langKey(names).translate()), node.value!!)
+        .setTooltip(langKey(names).let { if (I18n.hasTranslation("$it.tooltip")) Optional.of(textify(it.translateTooltip())) else Optional.empty() })
         .setMin(min).setMax(max)
         .setSaveConsumer { node.value = valueOverride(it) }
         .build()
@@ -124,8 +128,8 @@ fun double(
         .build()
 
     override fun createClothNode(node: ConfigValue<Double>, names: List<String>) = ConfigEntryBuilder.create()
-        .startDoubleField(langKey(names).translate(), node.value!!)
-        .setTooltip(langKey(names).let { if (I18n.hasTranslation("$it.tooltip")) Optional.of(it.translateTooltip()) else Optional.empty() })
+        .startDoubleField(textify(langKey(names).translate()), node.value!!)
+        .setTooltip(langKey(names).let { if (I18n.hasTranslation("$it.tooltip")) Optional.of(textify(it.translateTooltip())) else Optional.empty() })
         .setMin(min).setMax(max)
         .setSaveConsumer { node.value = valueOverride(it) }
         .build()

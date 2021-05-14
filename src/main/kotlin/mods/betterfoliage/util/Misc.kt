@@ -8,8 +8,6 @@ import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
-import org.apache.logging.log4j.Level
-import org.apache.logging.log4j.Logger
 import java.lang.Math.*
 import kotlin.reflect.KProperty
 
@@ -71,6 +69,6 @@ abstract class HasLogger {
 }
 
 fun textComponent(msg: String, color: Formatting = Formatting.GRAY): LiteralText {
-    val style = Style().apply { this.color = color }
+    val style = Style.EMPTY.withColor(color)
     return LiteralText(msg).apply { this.style = style }
 }

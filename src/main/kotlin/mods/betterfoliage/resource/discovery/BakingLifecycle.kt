@@ -66,7 +66,7 @@ interface ModelBakingKey {
 object BakeWrapperManager : HasLogger(), Invalidator, ModelLoadingCallback, ClientSpriteRegistryCallback, BlockModelsReloadCallback {
     init {
         ModelLoadingCallback.EVENT.register(this)
-        ClientSpriteRegistryCallback.event(SpriteAtlasTexture.BLOCK_ATLAS_TEX).register(this)
+        ClientSpriteRegistryCallback.event(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE).register(this)
     }
     val discoverers = mutableListOf<ModelDiscovery>()
     override val callbacks = mutableListOf<WeakReference<()->Unit>>()

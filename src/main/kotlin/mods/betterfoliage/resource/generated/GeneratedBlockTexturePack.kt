@@ -3,24 +3,20 @@ package mods.betterfoliage.resource.generated
 import mods.betterfoliage.util.Atlas
 import mods.betterfoliage.util.HasLogger
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener
-import net.minecraft.client.resource.ClientResourcePackProfile
 import net.minecraft.resource.*
 import net.minecraft.resource.ResourceType.CLIENT_RESOURCES
 import net.minecraft.resource.metadata.ResourceMetadataReader
 import net.minecraft.text.LiteralText
 import net.minecraft.util.Identifier
 import net.minecraft.util.profiler.Profiler
-import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.Level.INFO
-import org.apache.logging.log4j.Logger
 import java.io.IOException
-import java.lang.IllegalStateException
 import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.Executor
+import java.util.function.Consumer
 import java.util.function.Predicate
-import java.util.function.Supplier
 
 /**
  * [ResourcePack] containing generated block textures
@@ -69,21 +65,18 @@ class GeneratedBlockTexturePack(
         type == CLIENT_RESOURCES && resources.containsKey(id)
 
     /**
-     * Supplier for this resource pack. Adds pack as always-on and hidden.
+     * Provider for this resource pack. Adds pack as always-on and hidden.
      */
     val finder = object : ResourcePackProvider {
-        val packInfo = ClientResourcePackProfile(
-            packName, true, Supplier { this@GeneratedBlockTexturePack },
+        val packInfo = ResourcePackProfile(
+            packName, true, { this@GeneratedBlockTexturePack },
             LiteralText(packName),
             LiteralText(packDesc),
             ResourcePackCompatibility.COMPATIBLE, ResourcePackProfile.InsertionPosition.TOP, true, null
         )
 
-        override fun <T : ResourcePackProfile> register(
-            registry: MutableMap<String, T>,
-            factory: ResourcePackProfile.Factory<T>
-        ) {
-            (registry as MutableMap<String, ResourcePackProfile>)[reloadId.toString()] = packInfo
+        override fun register(consumer: Consumer<ResourcePackProfile>, factory: ResourcePackProfile.Factory) {
+            consumer.accept(packInfo)
         }
     }
 

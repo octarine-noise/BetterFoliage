@@ -13,6 +13,7 @@ import mods.betterfoliage.resource.discovery.BlockTypeCache
 import mods.betterfoliage.resource.generated.GeneratedBlockTexturePack
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper
+import net.fabricmc.fabric.mixin.resource.loader.ResourcePackManagerAccessor
 import net.fabricmc.loader.api.FabricLoader
 import net.minecraft.block.BlockState
 import net.minecraft.client.MinecraftClient
@@ -56,7 +57,8 @@ object BetterFoliage : ClientModInitializer {
     override fun onInitializeClient() {
         // Register generated resource pack
         ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(generatedPack.reloader)
-        MinecraftClient.getInstance().resourcePackManager.registerProvider(generatedPack.finder)
+        (MinecraftClient.getInstance().resourcePackManager as ResourcePackManagerAccessor)
+            .providers.add(generatedPack.finder)
 
         ResourceManagerHelper.get(ResourceType.CLIENT_RESOURCES).registerReloadListener(blockConfig)
 

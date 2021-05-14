@@ -11,7 +11,6 @@ import mods.betterfoliage.util.randomD
 import mods.betterfoliage.util.randomF
 import mods.betterfoliage.util.randomI
 import net.fabricmc.fabric.api.event.world.WorldTickCallback
-import net.minecraft.client.MinecraftClient
 import net.minecraft.client.particle.ParticleTextureSheet
 import net.minecraft.client.world.ClientWorld
 import net.minecraft.util.math.BlockPos
@@ -23,7 +22,7 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 class FallingLeafParticle(
-    world: World, pos: BlockPos, leaf: LeafParticleKey, blockColor: Int, random: Random
+    world: ClientWorld, pos: BlockPos, leaf: LeafParticleKey, blockColor: Int, random: Random
 ) : AbstractParticle(
     world, pos.x.toDouble() + 0.5, pos.y.toDouble(), pos.z.toDouble() + 0.5
 ) {

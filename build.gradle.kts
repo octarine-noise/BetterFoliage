@@ -2,7 +2,7 @@ import net.fabricmc.loom.task.RemapJarTask
 import org.ajoberstar.grgit.Grgit
 
 plugins {
-    id("fabric-loom").version("0.2.6-SNAPSHOT")
+    id("fabric-loom").version("0.6-SNAPSHOT")
     kotlin("jvm").version("1.4.31")
     id("org.ajoberstar.grgit").version("3.1.1")
 }
@@ -13,9 +13,10 @@ val semVer = "${project.version}+$gitHash"
 val jarName = "BetterFoliage-$semVer-Fabric-${properties["mcVersion"]}"
 
 repositories {
-    maven("http://maven.fabricmc.net/")
+    maven("https://maven.fabricmc.net/")
     maven("https://minecraft.curseforge.com/api/maven")
-    maven("http://maven.modmuss50.me/")
+    maven("https://maven.modmuss50.me/")
+    maven("https://maven.shedaniel.me/")
     maven("https://grondag-repo.appspot.com").credentials { username = "guest"; password = "" }
     maven("https://jitpack.io")
 }
@@ -32,7 +33,7 @@ dependencies {
     // configuration handling
     "modImplementation"("io.github.prospector:modmenu:${properties["modMenuVersion"]}")
     listOf("modImplementation", "include").forEach { configuration ->
-        configuration("me.shedaniel.cloth:config-2:${properties["clothConfigVersion"]}")
+        configuration("me.shedaniel.cloth:cloth-config-fabric:${properties["clothConfigVersion"]}")
         configuration("me.zeroeightsix:fiber:${properties["fiberVersion"]}")
     }
 

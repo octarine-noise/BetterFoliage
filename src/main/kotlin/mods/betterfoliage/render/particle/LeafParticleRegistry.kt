@@ -70,7 +70,7 @@ object LeafParticleRegistry : HasLogger(), ClientSpriteRegistryCallback, VeryEar
     }
 
     init {
-        ClientSpriteRegistryCallback.event(SpriteAtlasTexture.PARTICLE_ATLAS_TEX).register(this)
+        ClientSpriteRegistryCallback.event(SpriteAtlasTexture.PARTICLE_ATLAS_TEXTURE).register(this)
     }
 }
 

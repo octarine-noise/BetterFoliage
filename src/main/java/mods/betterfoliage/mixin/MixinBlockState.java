@@ -1,6 +1,7 @@
 package mods.betterfoliage.mixin;
 
 import mods.betterfoliage.Hooks;
+import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
@@ -14,10 +15,11 @@ import org.spongepowered.asm.mixin.injection.Redirect;
  *
  * Needed to avoid excessive darkening of Round Logs at the corners, now that they are not full blocks.
  */
-@Mixin(BlockState.class)
-@SuppressWarnings({"UnnecessaryQualifiedMemberReference", "deprecation"})
+@Mixin(AbstractBlock.AbstractBlockState.class)
+@SuppressWarnings({"deprecation"})
 public class MixinBlockState {
-    private static final String callFrom = "Lnet/minecraft/block/BlockState;getAmbientOcclusionLightLevel(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;)F";
+    private static final String callFrom = "Lnet/minecraft/block/AbstractBlock$AbstractBlockState;getAmbientOcclusionLightLevel(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;)F";
+    // why is the INVOKEVIRTUAL target class Block in the bytecode, not AbstractBlock?
     private static final String callTo = "Lnet/minecraft/block/Block;getAmbientOcclusionLightLevel(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;)F";
 
     @Redirect(method = callFrom, at = @At(value = "INVOKE", target = callTo))

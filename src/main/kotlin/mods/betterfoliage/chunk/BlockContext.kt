@@ -34,7 +34,7 @@ interface BlockCtx {
         (world as? WorldView)?.getBiome(pos) ?:
         (world as? ChunkRendererRegion)?.let { ChunkRendererRegion_world[it]?.getBiome(pos) }
 
-    val isNormalCube: Boolean get() = state.isSimpleFullBlock(world, pos)
+    val isNormalCube: Boolean get() = state.isOpaqueFullCube(world, pos)
 
     fun shouldSideBeRendered(side: Direction) = Block.shouldDrawSide(state, world, pos, side)
 

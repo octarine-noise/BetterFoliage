@@ -52,7 +52,7 @@ fun onRandomDisplayTick(world: ClientWorld, pos: BlockPos) {
         world.isAir(pos + Direction.DOWN.offset) &&
         randomD() < BetterFoliage.config.fallingLeaves.chance) {
             BetterFoliage.blockTypes.getTyped<LeafParticleKey>(state)?.let { key ->
-                val blockColor = MinecraftClient.getInstance().blockColorMap.getColor(state, world, pos, 0)
+                val blockColor = MinecraftClient.getInstance().blockColors.getColor(state, world, pos, 0)
                 FallingLeafParticle(world, pos, key, blockColor, random).addIfValid()
             }
     }

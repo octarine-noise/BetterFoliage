@@ -22,8 +22,8 @@ import kotlin.collections.mutableMapOf
 import kotlin.collections.set
 
 val BlockRenderView.dimType: DimensionType get() = when {
-    this is WorldView -> dimension.type
-    this is ChunkRendererRegion -> this[ChunkRendererRegion_world]!!.dimension.type
+    this is WorldView -> dimension
+    this is ChunkRendererRegion -> this[ChunkRendererRegion_world]!!.dimension
 //    this.isInstance(ChunkCacheOF) -> this[ChunkCacheOF.chunkCache]!!.dimType
     else -> throw IllegalArgumentException("DimensionType of world with class ${this::class.qualifiedName} cannot be determined!")
 }

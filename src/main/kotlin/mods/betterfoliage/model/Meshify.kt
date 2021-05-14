@@ -100,7 +100,7 @@ fun unbakeQuads(model: BakedModel, state: BlockState?, random: Random, unshade: 
 /** Get the byte offset of the [VertexFormatElement] matching the given criteria */
 fun VertexFormat.getByteOffset(type: VertexFormatElement.Type, format: VertexFormatElement.Format, count: Int, index: Int = 0): Int? {
     elements.forEachIndexed { idx, element ->
-        if (element.type == type && element.format == format && element.count == count && element.index == index)
+        if (element == VertexFormatElement(index, format, type, count))
             return VertexFormat_offsets[this]!!.getInt(idx)
     }
     return null

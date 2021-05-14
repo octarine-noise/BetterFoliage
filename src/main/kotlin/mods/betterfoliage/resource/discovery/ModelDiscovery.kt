@@ -4,6 +4,7 @@ import com.google.common.base.Joiner
 import mods.betterfoliage.util.HasLogger
 import mods.betterfoliage.util.YarnHelper
 import mods.betterfoliage.util.get
+import net.minecraft.block.Block
 import net.minecraft.client.render.block.BlockModels
 import net.minecraft.client.render.model.ModelLoader
 import net.minecraft.client.render.model.json.JsonUnbakedModel
@@ -19,7 +20,7 @@ abstract class AbstractModelDiscovery : HasLogger(), ModelDiscovery {
         sprites: MutableSet<Identifier>,
         replacements: MutableMap<Identifier, ModelBakingKey>
     ) {
-        Registry.BLOCK
+        (Registry.BLOCK as Iterable<Block>)
             .flatMap { block -> block.stateManager.states }
             .forEach { state ->
                 val location = BlockModels.getModelId(state)
