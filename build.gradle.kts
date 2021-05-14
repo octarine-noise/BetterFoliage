@@ -3,25 +3,17 @@ plugins {
     id("net.minecraftforge.gradle").version("4.1.12")
     id("org.spongepowered.mixin").version("0.7-SNAPSHOT")
 }
-//apply(plugin = "org.spongepowered.mixin")
 
 repositories {
     maven("https://files.minecraftforge.net/maven")
     maven("https://repo.spongepowered.org/maven")
-    maven("https://minecraft.curseforge.com/api/maven")
-    maven("https://maven.shedaniel.me/")
     maven("https://www.cursemaven.com")
     maven("https://thedarkcolour.github.io/KotlinForForge/")
 }
 
 dependencies {
     "minecraft"("net.minecraftforge:forge:${properties["mcVersion"]}-${properties["forgeVersion"]}")
-
-//    "api"(fg.deobf("curse.maven:clothconfig-348521:2938583"))
-
-//    "implementation"(fg.deobf("curse.maven:biomesoplenty-220318:2988999"))
     "implementation"("thedarkcolour:kotlinforforge:1.7.0")
-
     "implementation"("org.spongepowered:mixin:0.8-SNAPSHOT")
 }
 
