@@ -23,6 +23,10 @@ data class LightingData(
     }
 }
 
+// Vanilla has a very suspicious-looking offset here, which Indigo gets rid of and calls it a fix
+// Naturally, we're going to believe Indigo, it's a hardcoded option for now
+const val OCCLUSION_OFFSET_FIX = true
+
 /**
  * Replacement for [BlockModelRenderer.AmbientOcclusionFace]
  * This gets called on a LOT, so object instantiation is avoided.
@@ -89,7 +93,8 @@ class VanillaAoCalculator {
             probe.position { set(lightOrigin).move(sideDir) }.writeTo(sideAo[sideIdx])
             // side is considered occluded if the block 1 step to that side and
             // 1 step forward (in the lightface direction) is not fully transparent
-            isOccluded[sideIdx] = probe.position { move(lightFace) }.isNonTransparent
+            if (!OCCLUSION_OFFSET_FIX) probe.position { move(lightFace) }
+            isOccluded[sideIdx] = probe.isNonTransparent
         }
 
         // AO Calculation for the 4 corners

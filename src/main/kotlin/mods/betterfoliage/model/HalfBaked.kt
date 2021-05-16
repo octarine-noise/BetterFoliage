@@ -96,9 +96,9 @@ fun Array<List<Quad>>.bake(applyDiffuseLighting: Boolean) = mapArray { it.bake(a
 fun BakedQuad.unbake(): HalfBakedQuad {
     val size = DefaultVertexFormats.BLOCK.integerSize
     val verts = Array(4) { vIdx ->
-        val x = java.lang.Float.intBitsToFloat(vertices[vIdx * size + 0])
-        val y = java.lang.Float.intBitsToFloat(vertices[vIdx * size + 1])
-        val z = java.lang.Float.intBitsToFloat(vertices[vIdx * size + 2])
+        val x = java.lang.Float.intBitsToFloat(vertices[vIdx * size + 0]) - 0.5f
+        val y = java.lang.Float.intBitsToFloat(vertices[vIdx * size + 1]) - 0.5f
+        val z = java.lang.Float.intBitsToFloat(vertices[vIdx * size + 2]) - 0.5f
         val color = vertices[vIdx * size + 3]
         val u = java.lang.Float.intBitsToFloat(vertices[vIdx * size + 4])
         val v = java.lang.Float.intBitsToFloat(vertices[vIdx * size + 5])

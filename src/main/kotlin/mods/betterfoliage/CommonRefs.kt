@@ -77,6 +77,13 @@ object CustomColors : ClassRef<Any>("net.optifine.CustomColors") {
 }
 
 // Optifine shaders
+object Shaders : ClassRef<Any>("net.optifine.shaders.Shaders") {
+    val shaderPackLoaded = FieldRef(this, "shaderPackLoaded", boolean)
+    val blockLightLevel05 = FieldRef(this, "blockLightLevel05", float)
+    val blockLightLevel06 = FieldRef(this, "blockLightLevel06", float)
+    val blockLightLevel08 = FieldRef(this, "blockLightLevel08", float)
+}
+
 object SVertexBuilder : ClassRef<Any>("net.optifine.shaders.SVertexBuilder") {
     val pushState = MethodRef(this, "pushEntity", void, long)
     val popState = MethodRef(this, "popEntity", void)
