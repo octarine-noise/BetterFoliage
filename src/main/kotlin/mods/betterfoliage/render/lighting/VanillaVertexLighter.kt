@@ -1,15 +1,15 @@
 package mods.betterfoliage.render.lighting
 
+import mods.betterfoliage.integration.ShadersModIntegration
 import mods.betterfoliage.model.HalfBakedQuad
 import mods.betterfoliage.util.Double3
 import mods.betterfoliage.util.EPSILON_ONE
 import mods.betterfoliage.util.EPSILON_ZERO
+import mods.betterfoliage.util.get
 import mods.betterfoliage.util.minBy
 import net.minecraft.client.renderer.color.BlockColors
 import net.minecraft.util.Direction
 import net.minecraft.util.Direction.*
-import net.minecraft.util.Direction.Axis
-import net.minecraftforge.client.model.pipeline.LightUtil
 import kotlin.math.abs
 
 class VanillaQuadLighting {
@@ -34,7 +34,7 @@ class VanillaQuadLighting {
     }
 
     fun applyDiffuseLighting(face: Direction) {
-        val factor = LightUtil.diffuseLight(face)
+        val factor = ShadersModIntegration.diffuseShades[face]
         tint[0] *= factor; tint[1] *= factor; tint[2] *= factor
     }
 }
