@@ -1,0 +1,342 @@
+key.betterfoliage.gui=打开BF设置
+
+betterfoliage.global.enabled=模组使用
+betterfoliage.global.enabled.tooltip=如果关闭,BetterFoliage不会呈现任何东西
+betterfoliage.global.nVidia=nVidia GPU
+betterfoliage.global.nVidia.tooltip=明确你是否有一个nVidia GPU
+
+betterfoliage.enabled=启用
+betterfoliage.enabled.tooltip=要启用这个功能吗?
+betterfoliage.hOffset=水平偏移
+betterfoliage.hOffset.tooltip=在方块中这个元素是横向距离移动的
+betterfoliage.vOffset=垂直偏移
+betterfoliage.vOffset.tooltip=在方块中这个元素是横向距离移动的
+betterfoliage.size=尺寸
+betterfoliage.size.tooltip=该元素的尺寸
+betterfoliage.heightMin=最小高度
+betterfoliage.heightMin.tooltip=最小元素的高度
+betterfoliage.heightMax=最大高度
+betterfoliage.heightMax.tooltip=最大元素的高度
+betterfoliage.population=物体密度
+betterfoliage.population.tooltip=生成的概率为64分之1
+betterfoliage.shaderWind=光影水反中的 风的影响
+betterfoliage.shaderWind.tooltip=能适用于光影水反中的"风的影响" 这一元素?
+betterfoliage.distance=距离限制
+betterfoliage.distance.tooltip=离游戏者的最大距离,在这个范围内呈现这个特征 
+
+betterfoliage.rendererror=§a[BF更好的叶子]§f 错误:渲染方块 %s 此位置 %s
+
+betterfoliage.blocks=方块类型
+betterfoliage.blocks.tooltip=配置方块类型,那里有特定的功能(见表格)
+
+betterfoliage.blocks.dirtWhitelist=需要开启泥土效果的名单
+betterfoliage.blocks.dirtBlacklist=需要关闭泥土效果的名单
+betterfoliage.blocks.dirtWhitelist.arrayEntry=%d 条目
+betterfoliage.blocks.dirtBlacklist.arrayEntry=%d 条目
+betterfoliage.blocks.dirtWhitelist.tooltip=这些方块将被视为泥土块 将影响芦苇,藻类,草的出现
+betterfoliage.blocks.dirtBlacklist.tooltip=这些方块不会将被视为泥土块 芦苇,藻类,草不会出现
+
+betterfoliage.blocks.grassClassesWhitelist=需要开启草方块效果的名单
+betterfoliage.blocks.grassClassesBlacklist=需要关闭草方块效果的名单
+betterfoliage.blocks.grassClassesWhitelist.arrayEntry=%d 条目
+betterfoliage.blocks.grassClassesBlacklist.arrayEntry=%d 条目
+betterfoliage.blocks.grassModels=草方块的模型
+betterfoliage.blocks.grassModels.arrayEntry=%d 条目
+betterfoliage.blocks.grassWhitelist.tooltip=这些方块将被视为草方块 将影响短草效果、草方块的连接
+betterfoliage.blocks.grassBlacklist.tooltip=这些方块不会将被视为草方块 短草效果、草方块的连接不会出现
+betterfoliage.blocks.grassModels.tooltip=这些模型和材质将被认为是草方块
+
+betterfoliage.blocks.leavesClassesWhitelist=需要开启树叶效果的名单
+betterfoliage.blocks.leavesClassesBlacklist=需要关闭树叶效果的名单
+betterfoliage.blocks.leavesClassesWhitelist.arrayEntry=%d 条目
+betterfoliage.blocks.leavesClassesBlacklist.arrayEntry=%d 条目
+betterfoliage.blocks.leavesModels=叶子的模型
+betterfoliage.blocks.leavesModels.arrayEntry=%d 条目
+betterfoliage.blocks.leavesWhitelist.tooltip=这些方块将被视为叶子 将有额外的叶片、产生飘落的树叶(这些方块会在光影水反中使用与叶子同一ID)
+betterfoliage.blocks.leavesBlacklist.tooltip=这些方块将不会被视为叶子 将关闭额外的叶片、不会产生飘落的树叶(这些方块会在光影水反中使用与叶子同一ID)
+betterfoliage.blocks.leavesModels.tooltip=这些模型和材质将被认为是叶方块
+
+betterfoliage.blocks.cropsWhitelist=需要开启作物效果的名单
+betterfoliage.blocks.cropsBlacklist=需要关闭作物效果的名单
+betterfoliage.blocks.cropsWhitelist.arrayEntry=%d 条目
+betterfoliage.blocks.cropsBlacklist.arrayEntry=%d 条目
+betterfoliage.blocks.cropsWhitelist.tooltip=这些植物将被视为是作物 作物将与高草在光影水反中使用同一ID
+betterfoliage.blocks.cropsBlacklist.tooltip=这些植物将不会被视为是作物 作物将不会与高草在光影水反中使用同一ID 
+
+betterfoliage.blocks.logsWhitelist=需要开启圆木效果的名单
+betterfoliage.blocks.logsBlacklist=需要关闭圆木效果的名单
+betterfoliage.blocks.logsWhitelist.arrayEntry=%d 条目
+betterfoliage.blocks.logsBlacklist.arrayEntry=%d 条目
+betterfoliage.blocks.logModels=圆木模型
+betterfoliage.blocks.logModels.arrayEntry=%d 条目
+betterfoliage.blocks.logsWhitelist.tooltip=这些方块将被视为原木 将产生圆木效果
+betterfoliage.blocks.logsBlacklist.tooltip=这些方块将不会被视为原木 将不会产生圆木效果
+betterfoliage.blocks.logModels.tooltip=这些模型和材质将被认为是原木方块
+
+betterfoliage.blocks.sandWhitelist=需要开启珊瑚效果的名单
+betterfoliage.blocks.sandBlacklist=需要关闭珊瑚效果的名单
+betterfoliage.blocks.sandWhitelist.arrayEntry=%d 条目
+betterfoliage.blocks.sandBlacklist.arrayEntry=%d 条目
+betterfoliage.blocks.sandWhitelist.tooltip=这些方块将被视作沙子 将产生珊瑚
+betterfoliage.blocks.sandBlacklist.tooltip=这些方块将不会被视为沙子 将不会产生珊瑚
+
+betterfoliage.blocks.lilypadWhitelist=需要开启更好的莲叶与荷花的名单
+betterfoliage.blocks.lilypadBlacklist=需要关闭更好的莲叶与荷花的名单
+betterfoliage.blocks.lilypadWhitelist.arrayEntry=%d 条目
+betterfoliage.blocks.lilypadBlacklist.arrayEntry=%d 条目
+betterfoliage.blocks.lilypadWhitelist.tooltip=这些方块将被视为莲叶 将开启更好的莲叶与荷花效果
+betterfoliage.blocks.lilypadBlacklist.tooltip=这些方块将不会被视为莲叶 将不会产生更好的莲叶与荷花效果
+
+betterfoliage.blocks.cactusWhitelist=需要开启更好的仙人掌的名单
+betterfoliage.blocks.cactusBlacklist=需要关闭更好的仙人掌的名单
+betterfoliage.blocks.cactusWhitelist.arrayEntry=%d 条目
+betterfoliage.blocks.cactusBlacklist.arrayEntry=%d 条目
+betterfoliage.blocks.cactusWhitelist.tooltip=这些植物将被视作仙人掌 将开启更好的仙人掌的效果
+betterfoliage.blocks.cactusBlacklist.tooltip=这些植物将不会被视作仙人掌 将不会产生更好的仙人掌的效果
+
+betterfoliage.blocks.myceliumWhitelist=需要开启更好的菌丝体的名单
+betterfoliage.blocks.myceliumBlacklist=需要关闭更好的菌丝体的名单
+betterfoliage.blocks.myceliumWhitelist.arrayEntry=%d 条目
+betterfoliage.blocks.myceliumBlacklist.arrayEntry=%d 条目
+betterfoliage.blocks.myceliumWhitelist.tooltip=这些方块将被视作菌丝体 将影响菌丝体上"短草"的效果
+betterfoliage.blocks.myceliumBlacklist.tooltip=这些方块将不会被视作菌丝体 菌丝体上"短草"的效果不会产生
+
+betterfoliage.blocks.netherrackWhitelist=需要开启下界岩下端藤蔓的名单
+betterfoliage.blocks.netherrackBlacklist=需要关闭下界岩下端藤蔓的名单
+betterfoliage.blocks.netherrackWhitelist.arrayEntry=%d 条目
+betterfoliage.blocks.netherrackBlacklist.arrayEntry=%d 条目
+betterfoliage.blocks.netherrackWhitelist.tooltip=方块将被视作下界岩 下界岩下端将长出藤蔓
+betterfoliage.blocks.netherrackBlacklist.tooltip=方块将不会被视作下界岩 下界岩下端将不会长出藤蔓
+
+betterfoliage.shaders=着色器配置
+betterfoliage.shaders.tooltip=Configure integration with shaders
+betterfoliage.shaders.leavesId=叶子 ID
+betterfoliage.shaders.leavesId.tooltip=方块 ID 将作为所有叶片都使用的相同ID提供给光影水反 如果你的光影水反文件使用了一个 §6block.properties§e 文件, 你可能需要修改这个以匹配光影水反的映射
+betterfoliage.shaders.grassId=草 ID
+betterfoliage.shaders.grassId.tooltip=方块 ID 将作为所有的草和作物都使用的相同ID提供给光影水反 如果你的光影水反文件使用了一个 §6block.properties§e 文件, 你可能需要修改这个以匹配光影水反的映射
+
+betterfoliage.leaves=额外的叶片
+betterfoliage.leaves.tooltip=叶方块上额外的密叶
+betterfoliage.leaves.dense=浓密模式
+betterfoliage.leaves.dense.tooltip=浓密的叶子会有更多额外的叶片
+betterfoliage.leaves.snowEnabled=启用雪覆盖叶片
+betterfoliage.leaves.snowEnabled.tooltip=是否启用被雪覆盖的额外叶片?
+betterfoliage.leaves.hideInternal=隐藏内部的叶片
+betterfoliage.leaves.hideInternal.tooltip=如果该叶方块完全被其他叶方块或者固体方块包围,将不渲染额外的叶片
+
+betterfoliage.shortGrass=短草和菌丝
+betterfoliage.shortGrass.tooltip=一簇小草或者一丛菌丝长在合适的方块的顶部
+betterfoliage.shortGrass.useGenerated=为草使用mod创建的材质
+betterfoliage.shortGrass.useGenerated.tooltip=mod创建的材质指的是将已选用的资源包中高草的材质切一半来用
+betterfoliage.shortGrass.myceliumEnabled=使用在菌丝上
+betterfoliage.shortGrass.myceliumEnabled.tooltip=将这个特性利用到菌丝中吗?
+betterfoliage.shortGrass.grassEnabled=使用在草方块上
+betterfoliage.shortGrass.grassEnabled.tooltip=将这个特性利用到草方块中吗?
+betterfoliage.shortGrass.snowEnabled=使用在雪地里
+betterfoliage.shortGrass.snowEnabled.tooltip=使用到被雪覆盖的草方块中去?
+betterfoliage.shortGrass.saturationThreshold=饱和度阈值
+betterfoliage.shortGrass.saturationThreshold.tooltip=色彩饱和度将介于"无色"方块(使用生物群系的颜色)和"有色"方块(使用材质特定颜色)之间
+
+betterfoliage.connectedGrass.snowEnabled=使用在被雪覆盖的草方块上
+betterfoliage.connectedGrass.snowEnabled.tooltip=是否应用于被雪覆盖的草方块上?
+ 
+betterfoliage.hangingGrass=悬挂的草
+betterfoliage.hangingGrass.tooltip=草会在边缘的草方块上垂下来
+betterfoliage.hangingGrass.separation=垂下来的距离
+betterfoliage.hangingGrass.separation.tooltip=有多长的挂草会从草方块上垂下来
+
+betterfoliage.cactus=更好的仙人掌
+betterfoliage.cactus.tooltip=用额外的仙人掌刺和圆润的形状来提高仙人掌的真实性
+betterfoliage.cactus.sizeVariation=尺寸变化
+betterfoliage.cactus.sizeVariation.tooltip=仙人掌的尺寸随机变化的范围
+
+betterfoliage.lilypad=更好的莲叶与荷花
+betterfoliage.lilypad.tooltip=用莲叶的根和随机的莲花以提高莲叶的真实性
+betterfoliage.lilypad.flowerChance=花的生成概率
+betterfoliage.lilypad.flowerChance.tooltip=(64个莲叶中 N 个)莲叶具有花了
+
+betterfoliage.reed=芦苇
+betterfoliage.reed.tooltip=芦苇会生成在浅水中的泥土块上
+betterfoliage.reed.biomes=生物群系的列表
+betterfoliage.reed.biomes.tooltip=配置允许出现芦苇的生物群系
+betterfoliage.reed.biomes.tooltip.element=芦苇应该出现在%s生物群落?
+
+betterfoliage.algae=藻类
+betterfoliage.algae.tooltip=藻类会生成在深水中的泥土块上
+betterfoliage.algae.biomes=生物群系的列表
+betterfoliage.algae.biomes.tooltip=配置允许出现藻类的生物群系
+betterfoliage.algae.biomes.tooltip.element=藻类应该出现在%s生物群落?
+
+betterfoliage.coral=珊瑚
+betterfoliage.coral.tooltip=珊瑚会生成在深水中的沙块上
+betterfoliage.coral.size=珊瑚的大小
+betterfoliage.coral.size.tooltip=珊瑚伸出的部分的大小
+betterfoliage.coral.crustSize=外壳尺寸
+betterfoliage.coral.crustSize.tooltip=珊瑚的平的部分的尺寸
+betterfoliage.coral.chance=珊瑚的生成概率
+betterfoliage.coral.chance.tooltip=64个特殊表面的方块中有N个有机会出现珊瑚
+betterfoliage.coral.biomes=生物群落的列表
+betterfoliage.coral.biomes.tooltip=配置允许出现珊瑚的生物群系
+betterfoliage.coral.biomes.tooltip.element=珊瑚应该出现在%s生物群落?
+betterfoliage.coral.shallowWater=浅海珊瑚
+betterfoliage.coral.shallowWater.tooltip=珊瑚应该生成在深水1格?
+
+betterfoliage.netherrack=下界岩下面的藤蔓
+betterfoliage.netherrack.tooltip=下界岩下面将挂上藤蔓
+
+betterfoliage.fallingLeaves=落叶
+betterfoliage.fallingLeaves.tooltip=落叶粒子效果 FX 会从叶方块底部下落
+betterfoliage.fallingLeaves.speed=粒子速度
+betterfoliage.fallingLeaves.speed.tooltip=总体的粒子速度
+betterfoliage.fallingLeaves.windStrength=柔风的强度
+betterfoliage.fallingLeaves.windStrength.tooltip=在晴天中体现的风的效果(默认以0为中心散播)
+betterfoliage.fallingLeaves.stormStrength=风暴的强度
+betterfoliage.fallingLeaves.stormStrength.tooltip=附加在阴天里体现的风的效果(默认以0为中心散播)
+betterfoliage.fallingLeaves.size=粒子大小
+betterfoliage.fallingLeaves.chance=粒子生成机率
+betterfoliage.fallingLeaves.chance.tooltip=随机渲染刻激发叶方块生成粒子的概率
+betterfoliage.fallingLeaves.perturb=扰动
+betterfoliage.fallingLeaves.perturb.tooltip=扰动的大小.增加了一个与之旋转同步的螺旋状动量
+betterfoliage.fallingLeaves.lifetime=最长存在时间
+betterfoliage.fallingLeaves.lifetime.tooltip=粒子的最长存在时间,仅在几秒内,最短时间为这个值60%%
+betterfoliage.fallingLeaves.opacityHack=粒子不透明
+betterfoliage.fallingLeaves.opacityHack.tooltip=阻止透明方块隐藏粒子,即使粒子已经在前面了.警告:可能会导致错误
+
+betterfoliage.risingSoul=灵魂沙上飘起的魂灵
+betterfoliage.risingSoul.tooltip=灵魂沙的顶部飘出灵魂粒子 FX
+betterfoliage.risingSoul.chance=粒子的生成机率
+betterfoliage.risingSoul.chance.tooltip=随机渲染刻激发灵魂沙生成一个粒子的概率
+betterfoliage.risingSoul.speed=粒子速度
+betterfoliage.risingSoul.speed.tooltip=灵颗粒的垂直速度
+betterfoliage.risingSoul.perturb=扰动
+betterfoliage.risingSoul.perturb.tooltip=动的大小.增加了一个与之旋转同步的螺旋状动量
+betterfoliage.risingSoul.headSize=魂灵的大小
+betterfoliage.risingSoul.headSize.tooltip=灵魂粒子的大小
+betterfoliage.risingSoul.trailSize=魂灵轨迹的大小
+betterfoliage.risingSoul.trailSize.tooltip=灵魂粒子的轨迹的初始大小
+betterfoliage.risingSoul.opacity=不透明度
+betterfoliage.risingSoul.opacity.tooltip=粒子效果的不透明度
+betterfoliage.risingSoul.sizeDecay=大小的衰减
+betterfoliage.risingSoul.sizeDecay.tooltip=灵魂轨迹粒子大小与前一刻他的大小相关
+betterfoliage.risingSoul.opacityDecay=不透明度的衰减
+betterfoliage.risingSoul.opacityDecay.tooltip=灵魂轨迹粒子不透明度与前一刻他的不透明度相关
+betterfoliage.risingSoul.lifetime=最长存在时间
+betterfoliage.risingSoul.lifetime.tooltip=粒子的最长存在时间,仅在几秒内,最短时间为这个值60%%
+betterfoliage.risingSoul.trailLength=魂灵轨迹长度
+betterfoliage.risingSoul.trailLength.tooltip=在游戏刻内粒子记录的轨迹位置的数量
+betterfoliage.risingSoul.trailDensity=魂灵轨迹密集程度
+betterfoliage.risingSoul.trailDensity.tooltip=整条轨迹中渲染每第N个轨迹位置
+
+betterfoliage.connectedGrass=草的纹理的连接
+betterfoliage.connectedGrass.enabled=启用
+betterfoliage.connectedGrass.enabled.tooltip=如果泥土上有草方块:所有的草方块的侧面换成草方块顶部的材质,
+
+betterfoliage.roundLogs=圆木
+betterfoliage.roundLogs.tooltip=使木方块拥有八角形的横截面
+betterfoliage.roundLogs.plantsOnly=仅仅应用于植物性材料
+betterfoliage.roundLogs.plantsOnly.tooltip=是否仅仅应用于木质材料和干草堆，而不是所有圆柱方块?
+betterfoliage.roundLogs.connectSolids=连接到固体方块上
+betterfoliage.roundLogs.connectSolids.tooltip=要使圆木连接到完整的固体方块上吗?
+betterfoliage.roundLogs.connectPerpendicular=连接到垂直的圆木上
+betterfoliage.roundLogs.connectPerpendicular.tooltip=要使圆木根据它的角度连接到垂直圆木上吗?
+betterfoliage.roundLogs.lenientConnect=巨大的圆木
+betterfoliage.roundLogs.lenientConnect.tooltip=在L形中也连接成巨大的圆木, 不只是2x2形
+betterfoliage.roundLogs.connectGrass=连接到草方块上
+betterfoliage.roundLogs.connectGrass.tooltip=如果树木下的泥土附近有草方块,那么它也会被渲染成草方块
+betterfoliage.roundLogs.radiusSmall=圆木斜面的半径
+betterfoliage.roundLogs.radiusSmall.tooltip=从圆木的外角砍掉多大的部分
+betterfoliage.roundLogs.radiusLarge=连接圆木的斜面半径
+betterfoliage.roundLogs.radiusLarge.tooltip=从连接着的巨大圆木的外角砍掉多大的部分
+betterfoliage.roundLogs.dimming=调光变暗
+betterfoliage.roundLogs.dimming.tooltip=将圆木阴暗面变黑的程度
+betterfoliage.roundLogs.zProtection=Z-Protection [Z保护]
+betterfoliage.roundLogs.zProtection.tooltip=用多少倍放大平行圆木连接处的面 去停止 Z-fighting (闪烁）[斑驳,两个多边形共面所出现的效果].在没有发生故障的情况下,试着将这个值设置得尽可能的高[这是Z-fighting出现的原因:多个多面体的面重叠在一起,会一直闪烁]
+betterfoliage.roundLogs.defaultY=默认垂直
+betterfoliage.roundLogs.defaultY.tooltip=如果开启, 方向不确定的圆木将会渲染成垂直的.否则, 它们仅仅渲染为cube型方块.
+
+betterfoliage.connectedGrass.tooltip=使得草方块侧面拥有像顶面的材质
+betterfoliage.leaves.saturationThreshold=饱和度阈值
+betterfoliage.leaves.saturationThreshold.tooltip=色彩饱和度将介于"无色"方块(使用生物群系的颜色)和"有色"方块(使用材质特定颜色)之间
+
+##########应用翻译##########
+true=开启:true
+false=关闭:false
+
+##########以下生态系统的翻译来自中文Minecraft Wiki##########
+Ocean=海洋
+Plains=草原
+Sunflower Plains=向日葵草原
+Desert=沙漠
+Desert M=沙漠 M
+Extreme Hills=峭壁
+Extreme Hills M=峭壁 M
+Forest=森林
+Flower Forest=繁花森林
+Taiga=针叶林
+Taiga M=针叶林 M
+Swampland=沼泽
+Swampland M=沼泽 M
+River=河流
+Hell=下界
+The End=末路之地
+FrozenOcean=冻洋
+FrozenRiver=冻河
+Ice Plains=冰原
+Ice Plains Spikes=冰刺平原
+Ice Mountains=雪山
+MushroomIsland=蘑菇岛
+MushroomIslandShore=蘑菇岛岸
+Beach=沙滩
+DesertHills=沙漠山丘
+ForestHills=森林山丘
+TaigaHills=针叶林山丘
+Extreme Hills Edge=悬崖
+Jungle=丛林
+Jungle M=丛林 M
+JungleHills=丛林山丘
+JungleEdge=丛林边缘
+JungleEdge M=丛林边缘 M
+Deep Ocean=深海
+Stone Beach=石滩
+Cold Beach=寒冷沙滩
+Birch Forest=桦木森林
+Birch Forest M=桦木森林 M
+Birch Forest Hills=桦木森林山丘
+Birch Forest Hills M=桦木森林山丘
+Roofed Forest=黑森林
+Roofed Forest M=黑森林 M
+Cold Taiga=冷针叶林
+Cold Taiga M=冷针叶林 M
+Cold Taiga Hills=冷针叶林山丘
+Mega Taiga=大型针叶林
+Mega Spruce Taiga=红木森林
+Mega Taiga Hills=大型针叶林山丘
+Redwood Taiga Hills M=红木山丘
+Extreme Hills+=峭壁+
+Extreme Hills+ M=峭壁+ M
+Savanna=热带草原
+Savanna M=热带草原 
+Savanna Plateau=热带高原
+Savanna Plateau M=热带高原
+Mesa=平顶山
+Mesa (Bryce)=平顶山(岩柱)
+Mesa Plateau F=平顶山高原 F
+Mesa Plateau F M=平顶山高原 F M
+Mesa Plateau=平顶山高原
+Mesa Plateau M=平顶山高原 M
+
+##########下面是Forge的部分翻译##########
+fml.configgui.applyGlobally=全部应用
+fml.configgui.tooltip.addNewEntryAbove=在这上面设置新条目
+fml.configgui.tooltip.applyGlobally=全部应用撤销或重置.
+fml.configgui.tooltip.removeEntry=删除条目
+fml.configgui.tooltip.resetAll=重置. 如果在初始页面选中全部应用的复选框,那么将所有更改全部重置.
+fml.configgui.tooltip.resetToDefault=重置
+fml.configgui.tooltip.undoAll=撤销. 如果在初始页面选中全部应用的复选框,那么将撤销新一次的所有更改.
+fml.configgui.tooltip.undoChanges=撤销
+fml.configgui.tooltip.default=[默认值: %s]
+fml.configgui.tooltip.defaultNumeric=[范围: %s ~ %s, 默认值: %s]
+
+fml.menu.mods=模组
+fml.menu.mods.normal=普通排序
+fml.menu.mods.search=搜索:       
