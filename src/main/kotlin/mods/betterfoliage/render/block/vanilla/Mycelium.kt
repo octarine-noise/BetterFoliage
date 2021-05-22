@@ -50,9 +50,8 @@ class StandardMyceliumModel(
     override fun render(ctx: RenderCtxBase, noDecorations: Boolean) {
         super.render(ctx, noDecorations)
 
-        if (Config.shortGrass.enabled &&
+        if (Config.shortGrass.enabled(ctx.random) &&
             Config.shortGrass.myceliumEnabled &&
-            Config.shortGrass.enabled(ctx.random) &&
             ctx.state(Direction.UP).isAir(ctx.world, ctx.pos)
         ) {
             ctx.vertexLighter = tuftLighting

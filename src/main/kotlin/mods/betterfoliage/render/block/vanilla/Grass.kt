@@ -87,7 +87,7 @@ class StandardGrassModel(
             super.render(ctx, noDecorations)
         }
 
-        if (Config.shortGrass.enabled(ctx.random) && (isAir || isSnowed)) {
+        if (Config.shortGrass.enabled(ctx.random) && Config.shortGrass.grassEnabled && (isAir || isSnowed)) {
             ctx.vertexLighter = tuftLighting
             ShadersModIntegration.grass(ctx, Config.shortGrass.shaderWind) {
                 ctx.renderQuads(if (isSnowed) tuftSnowed[ctx.random] else tuftNormal[ctx.random])

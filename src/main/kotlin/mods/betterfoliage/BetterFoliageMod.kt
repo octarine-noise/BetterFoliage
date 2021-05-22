@@ -3,8 +3,8 @@ package mods.betterfoliage
 import mods.betterfoliage.config.BlockConfig
 import mods.betterfoliage.config.MainConfig
 import mods.betterfoliage.util.tryDefault
-import mods.octarinecore.common.config.clothGuiRoot
-import mods.octarinecore.common.config.forgeSpecRoot
+import mods.betterfoliage.config.clothGuiRoot
+import mods.betterfoliage.config.forgeSpecRoot
 import net.alexwells.kottle.FMLKotlinModLoadingContext
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screen.Screen

@@ -1,4 +1,4 @@
-package mods.octarinecore.common.config
+package mods.betterfoliage.config
 
 import me.shedaniel.forge.clothconfig2.api.AbstractConfigListEntry
 import me.shedaniel.forge.clothconfig2.api.ConfigBuilder
