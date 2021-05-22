@@ -3,8 +3,8 @@ package mods.betterfoliage
 import mods.betterfoliage.config.BlockConfig
 import mods.betterfoliage.config.MainConfig
 import mods.betterfoliage.util.tryDefault
-import mods.octarinecore.common.config.clothGuiRoot
-import mods.octarinecore.common.config.forgeSpecRoot
+import mods.betterfoliage.config.clothGuiRoot
+import mods.betterfoliage.config.forgeSpecRoot
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.util.ResourceLocation
@@ -50,7 +50,7 @@ object BetterFoliageMod {
         ctx.registerConfig(ModConfig.Type.CLIENT, configSpec)
 
         // Add config GUI extension if Cloth Config is available
-        val clothLoaded = tryDefault(false) { Class.forName("me.shedaniel.forge.clothconfig2.api.ConfigBuilder"); true }
+        val clothLoaded = tryDefault(false) { Class.forName("me.shedaniel.clothconfig2.forge.api.ConfigBuilder"); true }
         if (clothLoaded) {
             logger(this).log(Level.INFO, "Cloth Config found, registering GUI")
             ctx.registerExtensionPoint(CONFIGGUIFACTORY) { BiFunction<Minecraft, Screen, Screen> { client, parent ->

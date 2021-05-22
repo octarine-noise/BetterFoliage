@@ -1,12 +1,6 @@
 package mods.betterfoliage.config
 
 import mods.betterfoliage.BetterFoliageMod
-import mods.octarinecore.common.config.DelegatingConfigGroup
-import mods.octarinecore.common.config.boolean
-import mods.octarinecore.common.config.double
-import mods.octarinecore.common.config.integer
-import mods.octarinecore.common.config.recurring
-import mods.octarinecore.common.config.subNode
 import java.util.Random
 
 fun featureEnable(default: Boolean = true) = boolean(default, langKey = recurring)
@@ -70,6 +64,7 @@ class ConnectedGrassConfig() : DelegatingConfigGroup() {
 
 class RoundLogConfig() : DelegatingConfigGroup() {
     val enabled by featureEnable()
+    val plantsOnly by boolean(true)
     val radiusSmall by double(max=0.5, default=0.25)
     val radiusLarge by double(max=0.5, default=0.44)
     val dimming by double(default = 0.7)

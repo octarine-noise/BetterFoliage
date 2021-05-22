@@ -1,14 +1,15 @@
-package mods.octarinecore.common.config
+package mods.betterfoliage.config
 
-import me.shedaniel.forge.clothconfig2.api.AbstractConfigListEntry
-import me.shedaniel.forge.clothconfig2.api.ConfigBuilder
-import me.shedaniel.forge.clothconfig2.api.ConfigEntryBuilder
-import me.shedaniel.forge.clothconfig2.gui.entries.SubCategoryListEntry
+import me.shedaniel.clothconfig2.forge.api.AbstractConfigListEntry
+import me.shedaniel.clothconfig2.forge.api.ConfigBuilder
+import me.shedaniel.clothconfig2.forge.api.ConfigEntryBuilder
+import me.shedaniel.clothconfig2.forge.gui.entries.SubCategoryListEntry
+import mods.betterfoliage.util.asText
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.client.resources.I18n
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.common.ForgeConfigSpec
-import java.util.*
+import java.util.Optional
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
@@ -26,12 +27,12 @@ fun DelegatingConfigGroup.clothGuiRoot(
     saveAction: ()->Unit
 ) = ConfigBuilder.create()
     .setParentScreen(parentScreen)
-    .setTitle(I18n.format((prefix + "title").joinToString(".")))
+    .setTitle(I18n.get((prefix + "title").joinToString(".")).asText())
     .setDefaultBackgroundTexture(background)
     .setSavingRunnable(saveAction)
     .also { builder ->
         createClothNode(prefix).value.forEach { rootCategory ->
-            builder.getOrCreateCategory("main").addEntry(rootCategory)
+            builder.getOrCreateCategory("main".asText()).addEntry(rootCategory)
         }
     }
     .build()
@@ -79,9 +80,7 @@ fun <T: DelegatingConfigGroup> subNode(factory: ()->T) = object : DelegatingConf
     override operator fun provideDelegate(parent: DelegatingConfigGroup, property: KProperty<*>): ReadOnlyProperty<DelegatingConfigGroup, T> {
         val child = factory()
         parent.children[property.name] = child
-        return object : ReadOnlyProperty<DelegatingConfigGroup, T> {
-            override fun getValue(thisRef: DelegatingConfigGroup, property: KProperty<*>) = child
-        }
+        return ReadOnlyProperty { _, _ -> child }
     }
 }
 
@@ -107,17 +106,16 @@ abstract class CachingConfigProperty<T>(parent: DelegatingConfigGroup, property:
         value ?: forgeValue.get().apply { value = this }
 }
 
-fun String.translate() = I18n.format(this)
-fun String.translateTooltip(lineLength: Int = MAX_LINE_LEN) = ("$this.tooltip").translate().let { tooltip ->
-    tooltip.splitToSequence(" ").fold(mutableListOf("")) { tooltips, word ->
+fun String.translate() = I18n.get(this).asText()
+fun String.translateTooltip(lineLength: Int = MAX_LINE_LEN) =
+    I18n.get("$this.tooltip").splitToSequence(" ").fold(mutableListOf("")) { tooltips, word ->
         if (tooltips.last().length + word.length < lineLength) {
             tooltips[tooltips.lastIndex] += "$word "
         } else {
             tooltips.add("$word ")
         }
         tooltips
-    }.map { it.trim() }.toTypedArray()
-}
+    }.map { it.trim().asText() }.toTypedArray()
 
 fun boolean(
     default: Boolean,
@@ -129,7 +127,7 @@ fun boolean(
 
     override fun createClothNode(prop: CachingConfigProperty<Boolean>, path: List<String>) = ConfigEntryBuilder.create()
         .startBooleanToggle(langKey(path).translate(), prop.forgeValue.get())
-        .setTooltip(langKey(path).let { if (I18n.hasKey("$it.tooltip")) Optional.of(it.translateTooltip()) else Optional.empty() })
+        .setTooltip(langKey(path).let { if (I18n.exists("$it.tooltip")) Optional.of(it.translateTooltip()) else Optional.empty() })
         .setSaveConsumer { prop.forgeValue.set(valueOverride(it)); prop.value = null }
         .build()
 }
@@ -144,7 +142,7 @@ fun integer(
 
     override fun createClothNode(prop: CachingConfigProperty<Int>, path: List<String>) = ConfigEntryBuilder.create()
         .startIntField(langKey(path).translate(), prop.forgeValue.get())
-        .setTooltip(langKey(path).let { if (I18n.hasKey("$it.tooltip")) Optional.of(it.translateTooltip()) else Optional.empty() })
+        .setTooltip(langKey(path).let { if (I18n.exists("$it.tooltip")) Optional.of(it.translateTooltip()) else Optional.empty() })
         .setMin(min).setMax(max)
         .setSaveConsumer { prop.forgeValue.set(valueOverride(it)); prop.value = null }
         .build()
@@ -160,7 +158,7 @@ fun double(
 
     override fun createClothNode(prop: CachingConfigProperty<Double>, path: List<String>) = ConfigEntryBuilder.create()
         .startDoubleField(langKey(path).translate(), prop.forgeValue.get())
-        .setTooltip(langKey(path).let { if (I18n.hasKey("$it.tooltip")) Optional.of(it.translateTooltip()) else Optional.empty() })
+        .setTooltip(langKey(path).let { if (I18n.exists("$it.tooltip")) Optional.of(it.translateTooltip()) else Optional.empty() })
         .setMin(min).setMax(max)
         .setSaveConsumer { prop.forgeValue.set(valueOverride(it)); prop.value = null }
         .build()

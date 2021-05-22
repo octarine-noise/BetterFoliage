@@ -20,3 +20,6 @@ import net.minecraft.util.text.TextFormatting.GRAY
 //    val style = Style().apply { this.color = color }
 //    return StringTextComponent(msg).apply { this.style = style }
 //}
+val styleGray = Style.EMPTY.applyFormats(GRAY)
+
+fun String.asText() = StringTextComponent(this).setStyle(styleGray)
