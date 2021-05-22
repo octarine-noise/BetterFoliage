@@ -11,6 +11,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.fml.ExtensionPoint.CONFIGGUIFACTORY
+import net.minecraftforge.fml.ExtensionPoint.DISPLAYTEST
 import net.minecraftforge.fml.ModLoadingContext
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.config.ModConfig
@@ -41,6 +42,13 @@ object BetterFoliageMod {
             )
         } }
 
+        // Accept-all version tester (we are client-only)
+        ctx.registerExtensionPoint(DISPLAYTEST) {
+            Pair.of(
+                Supplier { "Honk if you see this!" },
+                BiPredicate<String, Boolean> { _, _ -> true }
+            )
+        }
 
         Minecraft.getInstance().resourcePackList.addPackFinder(BetterFoliage.asyncPack.finder)
         bus.register(BlockConfig)
