@@ -6,9 +6,10 @@ plugins {
 apply(plugin = "org.spongepowered.mixin")
 
 repositories {
-    maven("http://files.minecraftforge.net/maven")
+    maven("https://files.minecraftforge.net/maven")
     maven("https://repo.spongepowered.org/maven")
     maven("https://minecraft.curseforge.com/api/maven")
+    maven("https://www.cursemaven.com")
 }
 
 dependencies {
@@ -16,6 +17,8 @@ dependencies {
 
     "implementation"("kottle:Kottle:${properties["kottleVersion"]}")
     "implementation"("org.spongepowered:mixin:0.8-SNAPSHOT")
+
+    "api"(fg.deobf("curse.maven:clothconfig-348521:2813656"))
 }
 
 configurations["annotationProcessor"].extendsFrom(configurations["implementation"])
@@ -45,6 +48,7 @@ java {
 kotlin {
     target.compilations.configureEach {
         kotlinOptions.freeCompilerArgs += listOf("-Xno-param-assertions", "-Xno-call-assertions")
+        kotlinOptions.jvmTarget = "1.8"
     }
 }
 
