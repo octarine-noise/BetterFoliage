@@ -6,10 +6,9 @@ plugins {
 apply(plugin = "org.spongepowered.mixin")
 
 repositories {
-    maven("http://files.minecraftforge.net/maven")
+    maven("https://files.minecraftforge.net/maven")
     maven("https://repo.spongepowered.org/maven")
     maven("https://minecraft.curseforge.com/api/maven")
-    maven("https://maven.shedaniel.me/")
     maven("https://www.cursemaven.com")
 }
 
@@ -51,7 +50,6 @@ kotlin {
     target.compilations.configureEach {
         kotlinOptions.jvmTarget = "1.8"
         kotlinOptions.freeCompilerArgs += listOf("-Xno-param-assertions", "-Xno-call-assertions")
-
     }
 }
 

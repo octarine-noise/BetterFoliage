@@ -23,6 +23,8 @@ import net.minecraftforge.client.model.pipeline.BlockInfo
 import net.minecraftforge.client.model.pipeline.VertexLighterFlat
 import java.util.*
 
+typealias Sprite = TextureAtlasSprite
+
 // Java
 val String = ClassRef<String>("java.lang.String")
 val List = ClassRef<List<*>>("java.util.List")
