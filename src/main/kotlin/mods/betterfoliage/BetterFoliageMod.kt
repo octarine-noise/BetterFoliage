@@ -51,14 +51,17 @@ object BetterFoliageMod {
 
         // Add config GUI extension if Cloth Config is available
         val clothLoaded = tryDefault(false) { Class.forName("me.shedaniel.forge.clothconfig2.api.ConfigBuilder"); true }
-        if (clothLoaded) ctx.registerExtensionPoint(CONFIGGUIFACTORY) { BiFunction<Minecraft, Screen, Screen> { client, parent ->
-            config.clothGuiRoot(
-                parentScreen = parent,
-                prefix = listOf(MOD_ID),
-                background = ResourceLocation("minecraft:textures/block/spruce_log.png"),
-                saveAction = { configSpec.save() }
-            )
-        } }
+        if (clothLoaded) {
+            logger(this).log(Level.INFO, "Cloth Config found, registering GUI")
+            ctx.registerExtensionPoint(CONFIGGUIFACTORY) { BiFunction<Minecraft, Screen, Screen> { client, parent ->
+                config.clothGuiRoot(
+                    parentScreen = parent,
+                    prefix = listOf(MOD_ID),
+                    background = ResourceLocation("minecraft:textures/block/spruce_log.png"),
+                    saveAction = { configSpec.save() }
+                )
+            } }
+        }
 
         // Accept-all version tester (we are client-only)
         ctx.registerExtensionPoint(DISPLAYTEST) {
