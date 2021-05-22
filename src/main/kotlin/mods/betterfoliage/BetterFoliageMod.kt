@@ -6,6 +6,7 @@ import mods.betterfoliage.client.config.BlockConfig
 import mods.betterfoliage.client.config.MainConfig
 import mods.octarinecore.common.config.clothGuiRoot
 import mods.octarinecore.common.config.forgeSpecRoot
+import mods.octarinecore.tryDefault
 import net.alexwells.kottle.FMLKotlinModLoadingContext
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screen.Screen
@@ -30,14 +31,16 @@ object BetterFoliageMod {
     init {
         val ctx = ModLoadingContext.get()
 
-        // Config instance + GUI handler
         val configSpec = config.forgeSpecRoot()
         ctx.registerConfig(ModConfig.Type.CLIENT, configSpec)
-        ctx.registerExtensionPoint(CONFIGGUIFACTORY) { BiFunction<Minecraft, Screen, Screen> { client, parent ->
+
+        // Add config GUI extension if Cloth Config is available
+        val clothLoaded = tryDefault(false) { Class.forName("me.shedaniel.forge.clothconfig2.api.ConfigBuilder"); true }
+        if (clothLoaded) ctx.registerExtensionPoint(CONFIGGUIFACTORY) { BiFunction<Minecraft, Screen, Screen> { client, parent ->
             config.clothGuiRoot(
                 parentScreen = parent,
                 prefix = listOf(MOD_ID),
-                background = ResourceLocation("minecraft:textures/block/spruce_wood.png"),
+                background = ResourceLocation("minecraft:textures/block/spruce_log.png"),
                 saveAction = { configSpec.save() }
             )
         } }
