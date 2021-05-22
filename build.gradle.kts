@@ -14,7 +14,7 @@ repositories {
 dependencies {
     "minecraft"("net.minecraftforge:forge:${properties["mcVersion"]}-${properties["forgeVersion"]}")
     "implementation"("thedarkcolour:kotlinforforge:1.7.0")
-    "implementation"("org.spongepowered:mixin:0.8-SNAPSHOT")
+    "api"(fg.deobf("curse.maven:clothconfig-348521:3311352"))
 }
 
 configurations["annotationProcessor"].extendsFrom(configurations["implementation"])
@@ -45,7 +45,6 @@ kotlin {
     target.compilations.configureEach {
         kotlinOptions.jvmTarget = "1.8"
         kotlinOptions.freeCompilerArgs += listOf("-Xno-param-assertions", "-Xno-call-assertions")
-
     }
 }
 
