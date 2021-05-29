@@ -59,7 +59,7 @@ class GeneratedTexturePack(
             packName, true, Supplier { this@GeneratedTexturePack },
             StringTextComponent(packName),
             StringTextComponent("Generated block textures resource pack"),
-            PackCompatibility.COMPATIBLE, ResourcePackInfo.Priority.TOP, true, null, true
+            PackCompatibility.COMPATIBLE, ResourcePackInfo.Priority.TOP, true, IPackNameDecorator.DEFAULT, true
         )
 
         override fun loadPacks(p0: Consumer<ResourcePackInfo>, p1: ResourcePackInfo.IFactory) {
