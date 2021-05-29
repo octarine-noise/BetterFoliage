@@ -22,67 +22,8 @@
     "betterfoliage.shaderWind.tooltip": "Применить эффекты ветра с ShaderMod для этого элемента?",
     "betterfoliage.distance": "Лимит дистанции",
     "betterfoliage.distance.tooltip": "Максимальное расстояние от игрока для рендеринга этой функции",
-
-    "betterfoliage.blocks": "Типы блоков",
-    "betterfoliage.blocks.tooltip": "Настройки списка классов блоков, которые будут иметь примененные к ним функции",
-
-    "betterfoliage.blocks.dirtWhitelist": "Белый список земли",
-    "betterfoliage.blocks.dirtBlacklist": "Черный список земли",
-    "betterfoliage.blocks.dirtWhitelist.arrayEntry": "%d записей",
-    "betterfoliage.blocks.dirtBlacklist.arrayEntry": "%d записей",
-
-    "betterfoliage.blocks.grassWhitelist": "Белый список травы",
-    "betterfoliage.blocks.grassBlacklist": "Черный список травы",
-    "betterfoliage.blocks.grassWhitelist.arrayEntry": "%d записей",
-    "betterfoliage.blocks.grassBlacklist.arrayEntry": "%d записей",
-
-    "betterfoliage.blocks.leavesWhitelist": "Белый список листвы",
-    "betterfoliage.blocks.leavesBlacklist": "Черный список листвы",
-    "betterfoliage.blocks.leavesWhitelist.arrayEntry": "%d записей",
-    "betterfoliage.blocks.leavesBlacklist.arrayEntry": "%d записей",
-
-    "betterfoliage.blocks.cropsWhitelist": "Белый список урожая",
-    "betterfoliage.blocks.cropsBlacklist": "Черный список урожая",
-    "betterfoliage.blocks.cropsWhitelist.arrayEntry": "%d записей",
-    "betterfoliage.blocks.cropsBlacklist.arrayEntry": "%d записей",
-
-    "betterfoliage.blocks.logsWhitelist": "Белый список древесины",
-    "betterfoliage.blocks.logsBlacklist": "Черный список древесины",
-    "betterfoliage.blocks.logsWhitelist.arrayEntry": "%d записей",
-    "betterfoliage.blocks.logsBlacklist.arrayEntry": "%d записей",
-
-    "betterfoliage.blocks.sandWhitelist": "Белый список песка",
-    "betterfoliage.blocks.sandBlacklist": "Черный список песка",
-    "betterfoliage.blocks.sandWhitelist.arrayEntry": "%d записей",
-    "betterfoliage.blocks.sandBlacklist.arrayEntry": "%d записей",
-
-    "betterfoliage.blocks.lilypadWhitelist": "Белый список кувшинок",
-    "betterfoliage.blocks.lilypadBlacklist": "Черный список кувшинок",
-    "betterfoliage.blocks.lilypadWhitelist.arrayEntry": "%d записей",
-    "betterfoliage.blocks.lilypadBlacklist.arrayEntry": "%d записей",
-
-    "betterfoliage.blocks.cactusWhitelist": "Белый список кактусов",
-    "betterfoliage.blocks.cactusBlacklist": "Черный список кактусов",
-    "betterfoliage.blocks.cactusWhitelist.arrayEntry": "%d записей",
-    "betterfoliage.blocks.cactusBlacklist.arrayEntry": "%d записей",
-
-
-    "betterfoliage.blocks.dirtWhitelist.tooltip": "Блоки, которые будут восприниматься в качестве земли. Влияет на камыши, водоросли, соединенную траву.",
-    "betterfoliage.blocks.dirtBlacklist.tooltip": "Блоки, которые не будут восприниматься в качестве земли. Влияет на камыши, водоросли, соединенную траву.",
-    "betterfoliage.blocks.grassWhitelist.tooltip": "Блоки, которые будут восприниматься в качестве травы. Влияет на короткую и соединенную траву.",
-    "betterfoliage.blocks.grassBlacklist.tooltip": "Блоки, которые не будут восприниматься в качестве травы. Влияет на короткую и соединенную траву.",
-    "betterfoliage.blocks.leavesWhitelist.tooltip": "Блоки, которые будут восприниматься в качестве листвы. Влияет на дополнительную листву, падающую листву. Листва будут рендериться с ID листвы в шейдер-программах.",
-    "betterfoliage.blocks.leavesBlacklist.tooltip": "Блоки, которые никогда не будут восприниматься как листва. Влияет на дополнительную листву, падающую листву. Листва будут рендериться с ID листвы в шейдер-программах.",
-    "betterfoliage.blocks.cropsWhitelist.tooltip": "Блоки, которые будут восприниматься как культуры. Культуры будут рендериться с ID высокой травы в шейдер-программах.",
-    "betterfoliage.blocks.cropsBlacklist.tooltip": " Блоки, которые никогда не будут восприниматься как культуры. Культуры будут рендериться с ID высокой травы в шейдер-программах.",
-    "betterfoliage.blocks.logsWhitelist.tooltip": "Блоки, которые будут восприниматься в качестве деревянных брёвен. Влияет на цилиндрические брёвна.",
-    "betterfoliage.blocks.logsBlacklist.tooltip": "Блоки, которые никогда не будут восприниматься в качестве деревянных брёвен. Влияет на цилиндрические брёвна.",
-    "betterfoliage.blocks.sandWhitelist.tooltip": "Блоки, которые будут восприниматься в качестве песка. Влияет на кораллы.",
-    "betterfoliage.blocks.sandBlacklist.tooltip": "Блоки, которые никогда не будут восприниматься в качестве песка. Влияет на кораллы.",
-    "betterfoliage.blocks.lilypadWhitelist.tooltip": "Блоки, которые будут восприниматься в качестве кувшинок. Влияет на улучшенные кувшинки.",
-    "betterfoliage.blocks.lilypadBlacklist.tooltip": "Блоки, которые никогда не будут восприниматься в качестве кувшинок. Влияет на улучшенные кувшинки.",
-    "betterfoliage.blocks.cactusWhitelist.tooltip": "Блоки, которые будут восприниматься в качестве кактусов. Влияет на улучшенные кактусы.",
-    "betterfoliage.blocks.cactusBlacklist.tooltip": "Блоки, которые никогда не будут восприниматься в качестве кувшинок. Влияет на улучшенные кактусы.",
+    "betterfoliage.saturationThreshold": "Порог насыщения",
+    "betterfoliage.saturationThreshold.tooltip": "Насыщенность цвета разделяется на: \"обесцвеченные\" блоки (используя цвет биома) и \"цветные\" блоки (используя их собственный цвет)",
 
     "betterfoliage.leaves": "Улучшенная листва",
     "betterfoliage.leaves.tooltip": "Дополнительное округление листьев на блоках листвы.",
@@ -99,8 +40,6 @@
     "betterfoliage.shortGrass.grassEnabled.tooltip": "Включить эту особенность для блоков травы?",
     "betterfoliage.shortGrass.snowEnabled": "Включить траву под снегом",
     "betterfoliage.shortGrass.snowEnabled.tooltip": "Включить эту особенность для заснеженных блоков травы?",
-    "betterfoliage.shortGrass.saturationThreshold": "Порог насыщения",
-    "betterfoliage.shortGrass.saturationThreshold.tooltip": "Насыщенность цвета разделяется на: \"обесцвеченные\" блоки (используя цвет биома) и \"цветные\" блоки (используя их собственный цвет)",
 
     "betterfoliage.hangingGrass": "Висячая трава",
     "betterfoliage.hangingGrass.tooltip": "Пучки травы свисают вниз с верхних краев блока травы.",

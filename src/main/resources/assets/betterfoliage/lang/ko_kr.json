@@ -22,67 +22,8 @@
     "betterfoliage.shaderWind.tooltip": "바람효과를 쉐이더에 적용시키겠습니까?",
     "betterfoliage.distance": "거리 제한",
     "betterfoliage.distance.tooltip": "이 기능을 렌더링하는 플레이어의 최대거리",
-
-    "betterfoliage.blocks": "블록 타입",
-    "betterfoliage.blocks.tooltip": "세팅 된 것에 따라 블록이 바뀔 것입니다.",
-
-    "betterfoliage.blocks.dirtWhitelist": "흙 허용목록",
-    "betterfoliage.blocks.dirtBlacklist": "흙 차단목록",
-    "betterfoliage.blocks.dirtWhitelist.arrayEntry": "%d entries",
-    "betterfoliage.blocks.dirtBlacklist.arrayEntry": "%d entries",
-
-    "betterfoliage.blocks.grassWhitelist": "잔디 허용목록",
-    "betterfoliage.blocks.grassBlacklist": "잔디 차단목록",
-    "betterfoliage.blocks.grassWhitelist.arrayEntry": "%d entries",
-    "betterfoliage.blocks.grassBlacklist.arrayEntry": "%d entries",
-
-    "betterfoliage.blocks.leavesWhitelist": "잎 허용목록",
-    "betterfoliage.blocks.leavesBlacklist": "잎 차단목록",
-    "betterfoliage.blocks.leavesWhitelist.arrayEntry": "%d entries",
-    "betterfoliage.blocks.leavesBlacklist.arrayEntry": "%d entries",
-
-    "betterfoliage.blocks.cropsWhitelist": "농작물 허용목록",
-    "betterfoliage.blocks.cropsBlacklist": "농작물 차단목록",
-    "betterfoliage.blocks.cropsWhitelist.arrayEntry": "%d entries",
-    "betterfoliage.blocks.cropsBlacklist.arrayEntry": "%d entries",
-
-    "betterfoliage.blocks.logsWhitelist": "나무 허용목록",
-    "betterfoliage.blocks.logsBlacklist": "나무 차단목록",
-    "betterfoliage.blocks.logsWhitelist.arrayEntry": "%d entries",
-    "betterfoliage.blocks.logsBlacklist.arrayEntry": "%d entries",
-
-    "betterfoliage.blocks.sandWhitelist": "모래 허용목록",
-    "betterfoliage.blocks.sandBlacklist": "모래 차단목록",
-    "betterfoliage.blocks.sandWhitelist.arrayEntry": "%d entries",
-    "betterfoliage.blocks.sandBlacklist.arrayEntry": "%d entries",
-
-    "betterfoliage.blocks.lilypadWhitelist": "연꽃 허용목록",
-    "betterfoliage.blocks.lilypadBlacklist": "연꽃 차단목록",
-    "betterfoliage.blocks.lilypadWhitelist.arrayEntry": "%d entries",
-    "betterfoliage.blocks.lilypadBlacklist.arrayEntry": "%d entries",
-
-    "betterfoliage.blocks.cactusWhitelist": "선인장 허용목록",
-    "betterfoliage.blocks.cactusBlacklist": "선인장 차단목록",
-    "betterfoliage.blocks.cactusWhitelist.arrayEntry": "%d entries",
-    "betterfoliage.blocks.cactusBlacklist.arrayEntry": "%d entries",
-
-
-    "betterfoliage.blocks.dirtWhitelist.tooltip": "흙으로 인식됩니다. 갈대, 조류, 잔디 텍스쳐 연결에 영향을 줍니다.",
-    "betterfoliage.blocks.dirtBlacklist.tooltip": "흙으로 인식 되지 않습니다. 갈대, 조류, 잔디 텍스쳐 연결에 영향을 주지 않습니다.",
-    "betterfoliage.blocks.grassWhitelist.tooltip": "잔디로 인식됩니다. 짧은 잔디, 잔디 텍스쳐 연결에 영향을 줍니다.",
-    "betterfoliage.blocks.grassBlacklist.tooltip": "잔디로 인식 되지 않습니다. 짧은 잔디, 잔디 텍스쳐 연결에 영향을 주지 않습니다.",
-    "betterfoliage.blocks.leavesWhitelist.tooltip": "잎으로 인식됩니다. 추가 잎, 떨어지는 잎에 영향을 줍니다. ",
-    "betterfoliage.blocks.leavesBlacklist.tooltip": "잎으로 인식 되지 않습니다. 추가 잎, 떨어지는 잎에 영향을 주지 않습니다.",
-    "betterfoliage.blocks.cropsWhitelist.tooltip": "농작물로 인식됩니다. 농작물은 쉐이더 적용하면 큰잔디로 렌더링 됩니다. ",
-    "betterfoliage.blocks.cropsBlacklist.tooltip": "농작물로 인식 되지 않습니다. 농작물은 쉐이더 적용하면 큰잔디로 렌더링 되지 않습니다.",
-    "betterfoliage.blocks.logsWhitelist.tooltip": "나무로 인식됩니다. 둥근 나무에 영향을 줍니다.",
-    "betterfoliage.blocks.logsBlacklist.tooltip": "나무로 인식 되지 않습니다. 둥근 나무에 영향을 주지 않습니다.",
-    "betterfoliage.blocks.sandWhitelist.tooltip": "모래로 인식됩니다. 산호에 영향을 줍니다",
-    "betterfoliage.blocks.sandBlacklist.tooltip": "모래로 인식되지 않습니다. 산호에 영향을 주지 않습니다.",
-    "betterfoliage.blocks.lilypadWhitelist.tooltip": "연꽃으로 인식됩니다. 보다 나은 연꽃에 영향을 줍니다.",
-    "betterfoliage.blocks.lilypadBlacklist.tooltip": "연꽃으로 인식되지 않습니다. 보다 나은 연꽃에 영향을 주지 않습니다.",
-    "betterfoliage.blocks.cactusWhitelist.tooltip": "선인장으로 인식됩니다. 보다 나은 선인장에 영향을 줍니다.",
-    "betterfoliage.blocks.cactusBlacklist.tooltip": "선인장으로 인식되지 않습니다. 보다 나은 선인장에 영향을 주지 않습니다.",
+    "betterfoliage.saturationThreshold": "채도 임계값",
+    "betterfoliage.saturationThreshold.tooltip": "(특정 색상을 사용하여)\"무채색\"블록과 (바이옴 색을 사용하여)\"화려한\"블록 사이의 채도 차단",
 
     "betterfoliage.leaves": "잎 추가",
     "betterfoliage.leaves.tooltip": "둥글게 나뭇잎을 추가시켜줍니다.",
@@ -99,8 +40,6 @@
     "betterfoliage.shortGrass.grassEnabled.tooltip": "잔디 블록에 있는 기능을 활성화 시키겠습니까?",
     "betterfoliage.shortGrass.snowEnabled": "눈 활성화",
     "betterfoliage.shortGrass.snowEnabled.tooltip": "잔디 블록위에 있는 눈을 활성화 시키겠습니까?",
-    "betterfoliage.shortGrass.saturationThreshold": "채도 임계값",
-    "betterfoliage.shortGrass.saturationThreshold.tooltip": "(특정 색상을 사용하여)\"무채색\"블록과 (바이옴 색을 사용하여)\"화려한\"블록 사이의 채도 차단",
 
     "betterfoliage.hangingGrass": "매달려있는 잔디",
     "betterfoliage.hangingGrass.tooltip": "잔디 블록 상단 가장자리에서 아래로 매달려 있는 잔디 다발",
