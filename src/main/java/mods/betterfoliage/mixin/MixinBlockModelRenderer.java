@@ -36,6 +36,6 @@ public class MixinBlockModelRenderer {
         if (model instanceof SpecialRenderModel)
             return RenderCtxVanilla.render(renderer, world, (SpecialRenderModel) model, state, pos, matrixStack, buffer, checkSides, random, rand, combinedOverlay, modelData, false);
         else
-            return renderer.renderModelSmooth(world, model, state, pos, matrixStack, buffer, checkSides, random, rand, combinedOverlay, modelData);
+            return renderer.renderModelFlat(world, model, state, pos, matrixStack, buffer, checkSides, random, rand, combinedOverlay, modelData);
     }
 }
