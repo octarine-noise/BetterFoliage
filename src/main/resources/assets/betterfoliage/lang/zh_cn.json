@@ -173,5 +173,5 @@
   "betterfoliage.roundLogs.zProtection": "Z-Protection [Z保护]",
   "betterfoliage.roundLogs.zProtection.tooltip": "用多少倍放大平行圆木连接处的面 去停止 Z-fighting (闪烁）[斑驳,两个多边形共面所出现的效果].在没有发生故障的情况下,试着将这个值设置得尽可能的高[这是Z-fighting出现的原因:多个多面体的面重叠在一起,会一直闪烁]",
   "betterfoliage.roundLogs.defaultY": "默认垂直",
-  "betterfoliage.roundLogs.defaultY.tooltip": "如果开启, 方向不确定的圆木将会渲染成垂直的.否则, 它们仅仅渲染为cube型方块.",
+  "betterfoliage.roundLogs.defaultY.tooltip": "如果开启, 方向不确定的圆木将会渲染成垂直的.否则, 它们仅仅渲染为cube型方块."
 }
