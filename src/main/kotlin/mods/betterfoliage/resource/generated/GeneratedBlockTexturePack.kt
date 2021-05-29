@@ -72,7 +72,7 @@ class GeneratedBlockTexturePack(
             packName, true, { this@GeneratedBlockTexturePack },
             LiteralText(packName),
             LiteralText(packDesc),
-            ResourcePackCompatibility.COMPATIBLE, ResourcePackProfile.InsertionPosition.TOP, true, null
+            ResourcePackCompatibility.COMPATIBLE, ResourcePackProfile.InsertionPosition.TOP, true, ResourcePackSource.field_25347
         )
 
         override fun register(consumer: Consumer<ResourcePackProfile>, factory: ResourcePackProfile.Factory) {
