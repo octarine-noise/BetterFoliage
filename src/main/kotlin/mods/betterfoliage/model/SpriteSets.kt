@@ -59,7 +59,7 @@ class SpriteSetDelegate(
 
     @SubscribeEvent
     fun handlePreStitch(event: TextureStitchEvent.Pre) {
-        if (event.map.location() != Atlas.BLOCKS.resourceId) return
+        if (event.map.location() != atlas.resourceId) return
         spriteSet = null
         idList = (0 until 16)
             .map(idFunc)
