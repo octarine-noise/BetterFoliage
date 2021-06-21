@@ -73,7 +73,7 @@ class WeightedModelWrapper(
 ): WrappedBakedModel(baseModel), FabricBakedModel {
 
     class WeightedModel(val model: BakedModel, val weight: Int) : WeightedPicker.Entry(weight)
-    fun getModel(random: Random) = WeightedPicker.getRandom(random, models).model
+    fun getModel(random: Random) = WeightedPicker.getRandom(random, models).get().model
 
     override fun emitBlockQuads(blockView: BlockRenderView, state: BlockState, pos: BlockPos, randomSupplier: Supplier<Random>, context: RenderContext) {
         (getModel(randomSupplier.get()) as FabricBakedModel).emitBlockQuads(blockView, state, pos, randomSupplier, context)

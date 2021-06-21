@@ -2,7 +2,7 @@ import net.fabricmc.loom.task.RemapJarTask
 import org.ajoberstar.grgit.Grgit
 
 plugins {
-    id("fabric-loom").version("0.6-SNAPSHOT")
+    id("fabric-loom").version("0.8-SNAPSHOT")
     kotlin("jvm").version("1.4.31")
     id("org.ajoberstar.grgit").version("3.1.1")
 }
@@ -19,6 +19,7 @@ repositories {
     maven("https://maven.shedaniel.me/")
     maven("https://grondag-repo.appspot.com").credentials { username = "guest"; password = "" }
     maven("https://jitpack.io")
+    maven("https://maven.terraformersmc.com/releases")
 }
 
 dependencies {
@@ -31,7 +32,7 @@ dependencies {
     "modImplementation"("net.fabricmc:fabric-language-kotlin:${properties["fabricKotlinVersion"]}")
 
     // configuration handling
-    "modImplementation"("io.github.prospector:modmenu:${properties["modMenuVersion"]}")
+    "modImplementation"("com.terraformersmc:modmenu:${properties["modMenuVersion"]}")
     listOf("modImplementation", "include").forEach { configuration ->
         configuration("me.shedaniel.cloth:cloth-config-fabric:${properties["clothConfigVersion"]}")
         configuration("me.zeroeightsix:fiber:${properties["fiberVersion"]}")
@@ -52,6 +53,10 @@ sourceSets {
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+minecraft {
+    accessWidener =  file("src/main/resources/betterfoliage.accesswidener")
 }
 
 kotlin {

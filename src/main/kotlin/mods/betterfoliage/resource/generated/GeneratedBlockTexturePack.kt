@@ -72,7 +72,7 @@ class GeneratedBlockTexturePack(
             packName, true, { this@GeneratedBlockTexturePack },
             LiteralText(packName),
             LiteralText(packDesc),
-            ResourcePackCompatibility.COMPATIBLE, ResourcePackProfile.InsertionPosition.TOP, true, ResourcePackSource.field_25347
+            ResourcePackCompatibility.COMPATIBLE, ResourcePackProfile.InsertionPosition.TOP, true, ResourcePackSource.PACK_SOURCE_NONE
         )
 
         override fun register(consumer: Consumer<ResourcePackProfile>, factory: ResourcePackProfile.Factory) {
@@ -83,7 +83,7 @@ class GeneratedBlockTexturePack(
     val reloader = object : IdentifiableResourceReloadListener {
         override fun getFabricId() = reloadId
 
-        override fun reload(synchronizer: ResourceReloadListener.Synchronizer, manager: ResourceManager, prepareProfiler: Profiler, applyProfiler: Profiler, prepareExecutor: Executor, applyExecutor: Executor): CompletableFuture<Void> {
+        override fun reload(synchronizer: ResourceReloader.Synchronizer, manager: ResourceManager, prepareProfiler: Profiler, applyProfiler: Profiler, prepareExecutor: Executor, applyExecutor: Executor): CompletableFuture<Void> {
             this@GeneratedBlockTexturePack.manager = manager
             return synchronizer.whenPrepared(null).thenRun {
                 this@GeneratedBlockTexturePack.manager = null

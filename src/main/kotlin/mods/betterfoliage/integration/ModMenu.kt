@@ -1,5 +1,6 @@
 package mods.betterfoliage.integration
 
+import io.github.prospector.modmenu.api.ConfigScreenFactory
 import io.github.prospector.modmenu.api.ModMenuApi
 import me.shedaniel.clothconfig2.api.ConfigBuilder
 import me.zeroeightsix.fiber.JanksonSettings
@@ -12,12 +13,11 @@ import net.minecraft.text.LiteralText
 import java.util.function.Function
 
 object ModMenu : ModMenuApi {
-    override fun getModId() = BetterFoliage.MOD_ID
 
-    override fun getConfigScreenFactory() = Function { screen: Screen ->
+    override fun getModConfigScreenFactory() = ConfigScreenFactory {
         val builder = ConfigBuilder.create()
-            .setParentScreen(screen)
-            .setTitle(LiteralText(I18n.translate("betterfoliage.title")))
+                .setParentScreen(it)
+                .setTitle(LiteralText(I18n.translate("betterfoliage.title")))
         BetterFoliage.config.createClothNode(listOf("betterfoliage")).value.forEach { rootOption ->
             builder.getOrCreateCategory(LiteralText("main")).addEntry(rootOption)
         }
@@ -28,4 +28,5 @@ object ModMenu : ModMenuApi {
         }
         builder.build()
     }
+
 }

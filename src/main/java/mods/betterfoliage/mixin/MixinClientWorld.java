@@ -46,8 +46,8 @@ public class MixinClientWorld {
     /**
      * Inject a callback to call for every random display tick. Used for adding custom particle effects to blocks.
      */
-    @Inject(method = worldDisplayTick, at = @At(value = "INVOKE", target = blockDisplayTick))
-    void onRandomDisplayTick(int xCenter, int yCenter, int zCenter, int radius, Random random, boolean spawnBarrierParticles, BlockPos.Mutable mutable, CallbackInfo ci) {
-        Hooks.onRandomDisplayTick((ClientWorld) (Object) this, mutable);
+    @Inject(method = "randomBlockDisplayTick", at = @At(value = "INVOKE", target = blockDisplayTick))
+    void onRandomDisplayTick(int centerX, int centerY, int centerZ, int radius, Random random, ClientWorld.BlockParticle blockParticle, BlockPos.Mutable pos, CallbackInfo ci) {
+        Hooks.onRandomDisplayTick((ClientWorld) (Object) this, pos);
     }
 }

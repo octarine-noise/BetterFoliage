@@ -6,7 +6,7 @@ import net.minecraft.client.particle.SpriteBillboardParticle
 import net.minecraft.client.render.Camera
 import net.minecraft.client.render.VertexConsumer
 import net.minecraft.client.texture.Sprite
-import net.minecraft.client.util.math.Vector3f
+import net.minecraft.util.math.Vec3f
 import net.minecraft.client.world.ClientWorld
 import net.minecraft.util.math.MathHelper
 import net.minecraft.world.World
@@ -72,8 +72,8 @@ abstract class AbstractParticle(world: ClientWorld, x: Double, y: Double, z: Dou
 
         val center = Double3.lerp(tickDelta.toDouble(), prevPos, currentPos)
         val angle = MathHelper.lerp(tickDelta, prevAngle, currentAngle)
-        val rotation = camera.rotation.copy().apply { hamiltonProduct(Vector3f.POSITIVE_Z.getRadialQuaternion(angle)) }
-        val lightmapCoord = getColorMultiplier(tickDelta)
+        val rotation = camera.rotation.copy().apply { hamiltonProduct(Vec3f.POSITIVE_Z.getRadialQuaternion(angle)) }
+        val lightmapCoord = getBrightness(tickDelta)
 
         val coords = arrayOf(
             Double3(-1.0, -1.0, 0.0),

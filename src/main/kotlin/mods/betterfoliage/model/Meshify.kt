@@ -10,8 +10,6 @@ import net.fabricmc.fabric.api.renderer.v1.material.BlendMode
 import net.minecraft.block.BlockState
 import net.minecraft.client.render.VertexFormat
 import net.minecraft.client.render.VertexFormatElement
-import net.minecraft.client.render.VertexFormatElement.Format.FLOAT
-import net.minecraft.client.render.VertexFormatElement.Format.UBYTE
 import net.minecraft.client.render.VertexFormatElement.Type.*
 import net.minecraft.client.render.VertexFormatElement.Type.UV
 import net.minecraft.client.render.VertexFormats
@@ -71,19 +69,19 @@ fun unbakeQuads(model: BakedModel, state: BlockState?, random: Random, unshade: 
 
             val format = quadVertexFormat(bakedQuad)
             val stride = format.vertexSizeInteger
-            format.getIntOffset(POSITION, FLOAT, 3)?.let { posOffset ->
+            format.getIntOffset(POSITION, VertexFormatElement.DataType.FLOAT, 3)?.let { posOffset ->
                 quad = quad.transformVI { vertex, vIdx -> vertex.copy(xyz = Double3(
                     x = java.lang.Float.intBitsToFloat(bakedQuad.vertexData[vIdx * stride + posOffset + 0]).toDouble(),
                     y = java.lang.Float.intBitsToFloat(bakedQuad.vertexData[vIdx * stride + posOffset + 1]).toDouble(),
                     z = java.lang.Float.intBitsToFloat(bakedQuad.vertexData[vIdx * stride + posOffset + 2]).toDouble()
                 )) }
             }
-            format.getIntOffset(COLOR, UBYTE, 4)?.let { colorOffset ->
+            format.getIntOffset(COLOR, VertexFormatElement.DataType.UBYTE, 4)?.let { colorOffset ->
                 quad = quad.transformVI { vertex, vIdx -> vertex.copy(
                     color = Color(bakedQuad.vertexData[vIdx * stride + colorOffset])
                 ) }
             }
-            format.getIntOffset(UV, FLOAT, 2, 0)?.let { uvOffset ->
+            format.getIntOffset(UV, VertexFormatElement.DataType.FLOAT, 2, 0)?.let { uvOffset ->
                 quad = quad.transformVI { vertex, vIdx -> vertex.copy(uv = UV(
                     u = java.lang.Float.intBitsToFloat(bakedQuad.vertexData[vIdx * stride + uvOffset + 0]).toDouble(),
                     v = java.lang.Float.intBitsToFloat(bakedQuad.vertexData[vIdx * stride + uvOffset + 1]).toDouble()
@@ -98,7 +96,7 @@ fun unbakeQuads(model: BakedModel, state: BlockState?, random: Random, unshade: 
 }
 
 /** Get the byte offset of the [VertexFormatElement] matching the given criteria */
-fun VertexFormat.getByteOffset(type: VertexFormatElement.Type, format: VertexFormatElement.Format, count: Int, index: Int = 0): Int? {
+fun VertexFormat.getByteOffset(type: VertexFormatElement.Type, format: VertexFormatElement.DataType, count: Int, index: Int = 0): Int? {
     elements.forEachIndexed { idx, element ->
         if (element == VertexFormatElement(index, format, type, count))
             return VertexFormat_offsets[this]!!.getInt(idx)
@@ -110,7 +108,7 @@ fun VertexFormat.getByteOffset(type: VertexFormatElement.Type, format: VertexFor
  * Get the int (32 bit) offset of the [VertexFormatElement] matching the given criteria
  * Returns null if the element is not properly aligned
  */
-fun VertexFormat.getIntOffset(type: VertexFormatElement.Type, format: VertexFormatElement.Format, count: Int, index: Int = 0) =
+fun VertexFormat.getIntOffset(type: VertexFormatElement.Type, format: VertexFormatElement.DataType, count: Int, index: Int = 0) =
     getByteOffset(type, format, count, index)?.let { if (it % 4 == 0) it / 4 else null }
 
 /** Function to determine [VertexFormat] used by [BakedQuad] */
