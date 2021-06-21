@@ -36,7 +36,7 @@ interface BlockCtx {
 
     val isNormalCube: Boolean get() = state.isOpaqueFullCube(world, pos)
 
-    fun shouldSideBeRendered(side: Direction) = Block.shouldDrawSide(state, world, pos, side)
+    fun shouldSideBeRendered(side: Direction) = Block.shouldDrawSide(state, world, pos, side,  pos)
 
     fun isNeighborSolid(dir: Direction) = offset(dir).let { it.state.isSideSolidFullSquare(it.world, it.pos, dir.opposite) }
 
