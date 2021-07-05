@@ -13,6 +13,7 @@ import mods.betterfoliage.render.column.ColumnLayerData.SpecialRender.QuadrantTy
 import mods.betterfoliage.render.column.ColumnLayerData.SpecialRender.QuadrantType.SQUARE
 import mods.betterfoliage.render.lighting.ColumnLighting
 import mods.betterfoliage.render.pipeline.RenderCtxBase
+import net.minecraft.client.renderer.RenderType
 import net.minecraft.util.Direction.Axis
 
 abstract class ColumnModelBase(
@@ -24,21 +25,21 @@ abstract class ColumnModelBase(
     abstract val connectPerpendicular: Boolean
     abstract fun getMeshSet(axis: Axis, quadrant: Int): ColumnMeshSet
 
-    override fun render(ctx: RenderCtxBase, noDecorations: Boolean) {
-        if (!enabled) return super.render(ctx, noDecorations)
+    override fun renderLayer(ctx: RenderCtxBase, data: Any, layer: RenderType) {
+        if (!enabled) return super.renderLayer(ctx, data, layer)
         
         val roundLog = ChunkOverlayManager.get(overlayLayer, ctx)
         when(roundLog) {
             ColumnLayerData.SkipRender -> return
-            NormalRender -> return super.render(ctx, noDecorations)
+            NormalRender -> return super.renderLayer(ctx, data, layer)
             ColumnLayerData.ResolveError, null -> {
-                return super.render(ctx, noDecorations)
+                return super.renderLayer(ctx, data, layer)
             }
         }
 
         // if log axis is not defined and "Default to vertical" config option is not set, render normally
         if ((roundLog as ColumnLayerData.SpecialRender).column.axis == null && !overlayLayer.defaultToY) {
-            return super.render(ctx, noDecorations)
+            return super.renderLayer(ctx, data, layer)
         }
 
         ctx.vertexLighter = ColumnLighting

@@ -10,6 +10,7 @@ import net.minecraft.block.BlockState
 import net.minecraft.client.renderer.BlockModelRenderer
 import net.minecraft.client.renderer.BlockRendererDispatcher
 import net.minecraft.client.renderer.BufferBuilder
+import net.minecraft.client.renderer.RenderType
 import net.minecraft.client.renderer.chunk.ChunkRenderCache
 import net.minecraft.client.renderer.model.BakedQuad
 import net.minecraft.client.renderer.model.IUnbakedModel
@@ -21,7 +22,9 @@ import net.minecraft.world.IBlockDisplayReader
 import net.minecraft.world.IBlockReader
 import net.minecraftforge.client.model.pipeline.BlockInfo
 import net.minecraftforge.client.model.pipeline.VertexLighterFlat
+import net.minecraftforge.registries.IRegistryDelegate
 import java.util.Random
+import java.util.function.Predicate
 
 typealias Sprite = TextureAtlasSprite
 
@@ -59,6 +62,10 @@ val BlockInfo_shz = FieldRef(BlockInfo, "shz", float)
 object ModelBakery : ClassRef<ModelBakery>("net.minecraft.client.renderer.model.ModelBakery") {
     val unbakedModels = FieldRef(this, "unbakedModels", mapRefMutable<ResourceLocation, IUnbakedModel>())
     val topUnbakedModels = FieldRef(this, "topUnbakedModels", mapRefMutable<ResourceLocation, IUnbakedModel>())
+}
+
+object RenderTypeLookup : ClassRef<RenderTypeLookup>("net.minecraft.client.renderer.RenderTypeLookup") {
+    val blockRenderChecks = FieldRef(this, "blockRenderChecks", mapRefMutable<IRegistryDelegate<Block>, Predicate<RenderType>>())
 }
 
 // Optifine

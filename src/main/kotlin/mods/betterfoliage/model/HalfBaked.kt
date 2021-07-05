@@ -1,12 +1,19 @@
 package mods.betterfoliage.model
 
+import mods.betterfoliage.chunk.BlockCtx
 import mods.betterfoliage.render.pipeline.RenderCtxBase
+import mods.betterfoliage.render.pipeline.WrappedLayerPredicate
+import mods.betterfoliage.render.pipeline.layerPredicate
 import mods.betterfoliage.resource.discovery.ModelBakingContext
 import mods.betterfoliage.resource.discovery.ModelBakingKey
 import mods.betterfoliage.util.Double3
 import mods.betterfoliage.util.HasLogger
 import mods.betterfoliage.util.directionsAndNull
 import mods.betterfoliage.util.mapArray
+import net.minecraft.block.Block
+import net.minecraft.block.BlockState
+import net.minecraft.client.renderer.RenderType
+import net.minecraft.client.renderer.RenderTypeLookup
 import net.minecraft.client.renderer.model.BakedQuad
 import net.minecraft.client.renderer.model.IBakedModel
 import net.minecraft.client.renderer.model.SimpleBakedModel
@@ -27,15 +34,23 @@ data class HalfBakedQuad(
 open class HalfBakedSimpleModelWrapper(baseModel: SimpleBakedModel): IBakedModel by baseModel, SpecialRenderModel {
     val baseQuads = baseModel.unbakeQuads()
 
-    override fun render(ctx: RenderCtxBase, noDecorations: Boolean) {
-        ctx.renderQuads(baseQuads)
+    override fun prepare(ctx: BlockCtx, random: Random) = Unit
+
+    override fun renderLayer(ctx: RenderCtxBase, data: Any, layer: RenderType) {
+        // if the passed data is a BlockState, render on the same layer(s) as that block
+        val testState = (data as? BlockState) ?: ctx.state
+
+        // this could get called for more layers than the underlying model is on
+        // ignore extra decoration layers
+        val shouldRender = when(val predicate = testState.block.layerPredicate) {
+            is WrappedLayerPredicate -> predicate.original.test(layer)
+            else -> RenderTypeLookup.canRenderInLayer(testState, layer)
+        }
+        if (shouldRender) ctx.renderQuads(baseQuads)
     }
 }
 
-open class HalfBakedSpecialWrapper(val baseModel: SpecialRenderModel): IBakedModel by baseModel, SpecialRenderModel {
-    override fun render(ctx: RenderCtxBase, noDecorations: Boolean) {
-        baseModel.render(ctx, noDecorations)
-    }
+open class HalfBakedSpecialWrapper(val baseModel: SpecialRenderModel): SpecialRenderModel by baseModel {
 }
 
 abstract class HalfBakedWrapperKey : ModelBakingKey, HasLogger() {

@@ -30,6 +30,7 @@ import mods.betterfoliage.util.LazyMapInvalidatable
 import mods.betterfoliage.util.averageColor
 import mods.betterfoliage.util.colorOverride
 import mods.betterfoliage.util.logColorOverride
+import net.minecraft.client.renderer.RenderType
 import net.minecraft.util.Direction.UP
 import net.minecraft.util.ResourceLocation
 import org.apache.logging.log4j.Level.INFO
@@ -72,10 +73,10 @@ class StandardLeafModel(
     val leafNormal by leafModelsNormal.delegate(key)
     val leafSnowed by leafModelsSnowed.delegate(key)
 
-    override fun render(ctx: RenderCtxBase, noDecorations: Boolean) {
+    override fun renderLayer(ctx: RenderCtxBase, data: Any, layer: RenderType) {
         ShadersModIntegration.leaves(ctx, true) {
-            super.render(ctx, noDecorations)
-            if (!Config.enabled || !Config.leaves.enabled || noDecorations) return
+            super.renderLayer(ctx, data, layer)
+            if (!Config.enabled || !Config.leaves.enabled) return
 
             ctx.vertexLighter = RoundLeafLightingPreferUp
             val leafIdx = ctx.random.nextInt(64)

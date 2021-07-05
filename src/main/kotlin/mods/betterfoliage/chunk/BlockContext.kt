@@ -22,6 +22,8 @@ interface BlockCtx {
     val world: IBlockDisplayReader
     val pos: BlockPos
 
+    val seed: Long get() = state.getSeed(pos)
+
     fun offset(dir: Direction) = offset(dir.offset)
     fun offset(offset: Int3): BlockCtx
 

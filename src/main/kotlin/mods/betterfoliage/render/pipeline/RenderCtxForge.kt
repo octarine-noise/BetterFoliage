@@ -1,27 +1,31 @@
 package mods.betterfoliage.render.pipeline
 
 import com.mojang.blaze3d.matrix.MatrixStack
+import mods.betterfoliage.chunk.BasicBlockCtx
+import mods.betterfoliage.chunk.BlockCtx
 import mods.betterfoliage.model.HalfBakedQuad
 import mods.betterfoliage.model.SpecialRenderModel
 import mods.betterfoliage.render.lighting.ForgeVertexLighter
 import mods.betterfoliage.render.lighting.ForgeVertexLighterAccess
+import mods.betterfoliage.util.getWithDefault
 import net.minecraft.block.BlockState
 import net.minecraft.client.renderer.LightTexture
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.IBlockDisplayReader
+import net.minecraftforge.client.ForgeHooksClient
+import net.minecraftforge.client.MinecraftForgeClient
 import net.minecraftforge.client.model.data.IModelData
 import net.minecraftforge.client.model.pipeline.VertexLighterFlat
 import java.util.Random
 
 class RenderCtxForge(
-    world: IBlockDisplayReader,
-    pos: BlockPos,
+    blockCtx: BlockCtx,
     val lighter: VertexLighterFlat,
     matrixStack: MatrixStack,
     checkSides: Boolean,
     random: Random,
-    modelData: IModelData
-): RenderCtxBase(world, pos, matrixStack, checkSides, random, modelData), ForgeVertexLighter {
+    modelData: IModelData,
+) : RenderCtxBase(blockCtx, matrixStack, checkSides, random, modelData), ForgeVertexLighter {
 
     override fun renderQuad(quad: HalfBakedQuad) {
         // set Forge lighter AO calculator to us
@@ -38,7 +42,15 @@ class RenderCtxForge(
         }
     }
 
-    override fun updateVertexColor(normal: FloatArray, color: FloatArray, x: Float, y: Float, z: Float, tint: Float, multiplier: Int) {
+    override fun updateVertexColor(
+        normal: FloatArray,
+        color: FloatArray,
+        x: Float,
+        y: Float,
+        z: Float,
+        tint: Float,
+        multiplier: Int
+    ) {
         color[0] = lightingData.tint[0] * lightingData.colorMultiplier[vIdx]
         color[1] = lightingData.tint[1] * lightingData.colorMultiplier[vIdx]
         color[2] = lightingData.tint[2] * lightingData.colorMultiplier[vIdx]
@@ -55,17 +67,21 @@ class RenderCtxForge(
             pos: BlockPos,
             matrixStack: MatrixStack,
             checkSides: Boolean,
-            rand: Random, seed: Long,
+            random: Random, seed: Long,
             modelData: IModelData
         ): Boolean {
-            lighter.setWorld(world)
-            lighter.setState(state)
-            lighter.setBlockPos(pos)
-            rand.setSeed(seed)
-            lighter.updateBlockInfo()
-            return RenderCtxForge(world, pos, lighter, matrixStack, checkSides, rand, modelData).let {
+            val blockCtx = BasicBlockCtx(world, pos)
+            val ctx = RenderCtxForge(blockCtx, lighter, matrixStack, checkSides, random, modelData).apply {
+                lighter.setWorld(world)
+                lighter.setState(state)
+                lighter.setBlockPos(pos)
+                lighter.updateBlockInfo()
+            }
+
+            // render layer
+            return ctx.let {
                 (lighter as ForgeVertexLighterAccess).vertexLighter = it
-                model.render(it, false)
+                model.renderLayer(it, specialRenderData.get()!!, MinecraftForgeClient.getRenderLayer())
                 lighter.resetBlockInfo()
                 it.hasRendered
             }

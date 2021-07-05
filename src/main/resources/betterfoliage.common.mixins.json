@@ -10,6 +10,7 @@
     "MixinBlock",
     "MixinBlockState",
     "MixinBlockModelRenderer",
+    "MixinChunkRendererDispatcher",
     "MixinClientWorld",
     "MixinModelBakery",
     "MixinForgeBlockModelRenderer",

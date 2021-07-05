@@ -18,7 +18,6 @@ import kotlin.math.sin
 
 fun xzDisk(modelIdx: Int) = (PI2 * modelIdx.toDouble() / 64.0).let { Double3(cos(it), 0.0, sin(it)) }
 
-
 data class TuftShapeKey(
     val size: Double,
     val height: Double,

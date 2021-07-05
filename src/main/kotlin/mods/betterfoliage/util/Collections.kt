@@ -65,6 +65,9 @@ inline fun <T> MutableList<T>.exchange(idx1: Int, idx2: Int) {
 /** Return a random element from the array using the provided random generator */
 inline operator fun <T> Array<T>.get(random: Random) = get(random.nextInt(Int.MAX_VALUE) % size)
 
+inline fun Random.idx(array: Array<*>) = nextInt(Int.MAX_VALUE) % array.size
+inline fun Random.idxOrNull(array: Array<*>, predicate: ()->Boolean) = if (predicate()) idx(array) else null
+
 fun <T> Iterable<T>.toImmutableList() = ImmutableList.builder<T>().let { builder ->
     forEach { builder.add(it) }
     builder.build()

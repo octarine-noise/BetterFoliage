@@ -1,6 +1,7 @@
 package mods.betterfoliage.render.block.vanilla
 
 import mods.betterfoliage.BetterFoliageMod
+import mods.betterfoliage.chunk.BlockCtx
 import mods.betterfoliage.config.Config
 import mods.betterfoliage.config.LILYPAD_BLOCKS
 import mods.betterfoliage.integration.ShadersModIntegration
@@ -21,12 +22,16 @@ import mods.betterfoliage.resource.discovery.ModelDiscoveryContext
 import mods.betterfoliage.util.Atlas
 import mods.betterfoliage.util.LazyInvalidatable
 import mods.betterfoliage.util.get
+import mods.betterfoliage.util.idx
+import mods.betterfoliage.util.idxOrNull
 import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
+import net.minecraft.client.renderer.RenderType
 import net.minecraft.client.renderer.model.BlockModel
 import net.minecraft.client.renderer.model.ModelBakery
 import net.minecraft.util.Direction.DOWN
 import net.minecraft.util.ResourceLocation
+import java.util.Random
 
 object StandardLilypadDiscovery : AbstractModelDiscovery() {
     override fun processModel(ctx: ModelDiscoveryContext) {
@@ -41,18 +46,32 @@ object StandardLilypadKey : HalfBakedWrapperKey() {
     override fun bake(ctx: ModelBakingContext, wrapped: SpecialRenderModel) = StandardLilypadModel(wrapped)
 }
 
+class LilypadRenderData(
+    val rootIdx: Int,
+    val flowerIdx: Int?
+)
+
 class StandardLilypadModel(
     wrapped: SpecialRenderModel
 ) : HalfBakedSpecialWrapper(wrapped) {
-    override fun render(ctx: RenderCtxBase, noDecorations: Boolean) {
-        ctx.checkSides = false
-        super.render(ctx, noDecorations)
-        if (!Config.enabled || !Config.lilypad.enabled) return
 
-        ShadersModIntegration.grass(ctx, Config.lilypad.shaderWind) {
-            ctx.renderQuads(lilypadRootModels[ctx.random])
+    override fun prepare(ctx: BlockCtx, random: Random): Any {
+        if (!Config.enabled) return Unit
+        return LilypadRenderData(
+            rootIdx = random.idx(lilypadRootModels),
+            flowerIdx = random.idxOrNull(lilypadFlowerModels) { Config.lilypad.enabled(random) }
+        )
+    }
+
+    override fun renderLayer(ctx: RenderCtxBase, data: Any, layer: RenderType) {
+        ctx.checkSides = false
+        super.renderLayer(ctx, data, layer)
+        if (data is LilypadRenderData) {
+            data.flowerIdx?.let { ctx.renderQuads(lilypadFlowerModels[it]) }
+            ShadersModIntegration.grass(ctx, Config.lilypad.shaderWind) {
+                ctx.renderQuads(lilypadRootModels[data.rootIdx])
+            }
         }
-        if (Config.lilypad.enabled(ctx.random)) ctx.renderQuads(lilypadFlowerModels[ctx.random])
     }
 
     companion object {

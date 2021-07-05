@@ -2,6 +2,8 @@
 package mods.betterfoliage.util
 
 import mods.betterfoliage.BetterFoliageMod
+import net.minecraft.block.BlockState
+import net.minecraft.client.Minecraft
 import net.minecraft.util.ResourceLocation
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
@@ -31,6 +33,11 @@ class ThreadLocalDelegate<T>(init: () -> T) {
     operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T) { tlVal.set(value) }
 }
 
+fun <T> ThreadLocal<T?>.getWithDefault(factory: ()->T): T {
+    get()?.let { return it }
+    return factory().apply { set(this) }
+}
+
 /** Call the supplied lambda and return its result, or the given default value if an exception is thrown. */
 fun <T> tryDefault(default: T, work: ()->T) = try { work() } catch (e: Throwable) { default }
 
@@ -56,6 +63,7 @@ abstract class HasLogger {
     val detailLogger = BetterFoliageMod.detailLogger(this)
 }
 
+fun getBlockModel(state: BlockState) = Minecraft.getInstance().blockRenderer.blockModelShaper.getBlockModel(state)
 /**
  * Check if the Chunk containing the given [BlockPos] is loaded.
  * Works for both [World] and [ChunkCache] (vanilla and OptiFine) instances.

@@ -1,11 +1,13 @@
 package mods.betterfoliage.render.block.vanilla
 
-import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.BetterFoliage
+import mods.betterfoliage.BetterFoliageMod
+import mods.betterfoliage.chunk.BlockCtx
 import mods.betterfoliage.config.CACTUS_BLOCKS
 import mods.betterfoliage.config.Config
 import mods.betterfoliage.model.HalfBakedSpecialWrapper
 import mods.betterfoliage.model.HalfBakedWrapperKey
+import mods.betterfoliage.model.SpecialRenderData
 import mods.betterfoliage.model.SpecialRenderModel
 import mods.betterfoliage.model.SpriteSetDelegate
 import mods.betterfoliage.model.buildTufts
@@ -24,14 +26,15 @@ import mods.betterfoliage.resource.discovery.ModelDiscoveryContext
 import mods.betterfoliage.util.Atlas
 import mods.betterfoliage.util.LazyInvalidatable
 import mods.betterfoliage.util.Rotation
-import mods.betterfoliage.util.get
 import mods.betterfoliage.util.horizontalDirections
+import mods.betterfoliage.util.idx
 import mods.betterfoliage.util.randomD
 import mods.betterfoliage.util.randomI
-import net.minecraft.block.Blocks
+import net.minecraft.client.renderer.RenderType
 import net.minecraft.client.renderer.model.BlockModel
 import net.minecraft.util.Direction.DOWN
 import net.minecraft.util.ResourceLocation
+import java.util.Random
 
 object StandardCactusDiscovery : AbstractModelDiscovery() {
     override fun processModel(ctx: ModelDiscoveryContext) {
@@ -49,22 +52,30 @@ object StandardCactusKey : HalfBakedWrapperKey() {
     override fun bake(ctx: ModelBakingContext, wrapped: SpecialRenderModel) = StandardCactusModel(wrapped)
 }
 
+class CactusRenderData(val armSide: Int, val armIdx: Int, val crossIdx: Int)
+
 class StandardCactusModel(
     wrapped: SpecialRenderModel
 ) : HalfBakedSpecialWrapper(wrapped) {
+    override fun prepare(ctx: BlockCtx, random: Random): Any = when {
+        !Config.enabled || !Config.cactus.enabled -> Unit
+        else -> CactusRenderData(
+            armSide = random.nextInt() and 3,
+            armIdx = random.idx(cactusArmModels),
+            crossIdx = random.idx(cactusCrossModels)
+        )
+    }
 
     val armLighting = horizontalDirections.map { LightingPreferredFace(it) }.toTypedArray()
 
-    override fun render(ctx: RenderCtxBase, noDecorations: Boolean) {
-        ctx.checkSides = false
-        super.render(ctx, noDecorations)
-        if (!Config.enabled || !Config.cactus.enabled) return
-
-        val armSide = ctx.random.nextInt() and 3
-        ctx.vertexLighter = armLighting[armSide]
-        ctx.renderQuads(cactusArmModels[armSide][ctx.random])
-        ctx.vertexLighter = RoundLeafLighting
-        ctx.renderQuads(cactusCrossModels[ctx.random])
+    override fun renderLayer(ctx: RenderCtxBase, data: Any, layer: RenderType) {
+        super.renderLayer(ctx, data, layer)
+        if (data is CactusRenderData) {
+            ctx.vertexLighter = armLighting[data.armSide]
+            ctx.renderQuads(cactusArmModels[data.armSide][data.armIdx])
+            ctx.vertexLighter = RoundLeafLighting
+            ctx.renderQuads(cactusCrossModels[data.crossIdx])
+        }
     }
 
     companion object {
