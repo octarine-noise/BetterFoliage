@@ -43,3 +43,6 @@ match block.name.matches("minecraft:cactus") setParam("type", "cactus") end
 match block.name.matches("minecraft:lilypad") setParam("type", "lilypad") end
 match block.name.matches("minecraft:mycelium") setParam("type", "mycelium") end
 match block.name.matches("minecraft:netherrack") setParam("type", "netherrack") end
+
+// Crops
+match block.class.extends(classOf("minecraft:wheat")) setParam("type", "crop") end
