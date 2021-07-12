@@ -47,17 +47,17 @@ object StandardGrassDiscovery : ParametrizedModelDiscovery() {
 }
 
 data class StandardGrassKey(
-    val grassLocation: ResourceLocation,
+    val sprite: ResourceLocation,
     val overrideColor: Color?
 ) : HalfBakedWrapperKey() {
     val tintIndex: Int get() = if (overrideColor == null) 0 else -1
 
     override fun bake(ctx: ModelBakingContext, wrapped: SpecialRenderModel): SpecialRenderModel {
-        val grassSpriteColor = Atlas.BLOCKS[grassLocation].averageColor.let { hsb ->
+        val grassColor = Atlas.BLOCKS[sprite].averageColor.let { hsb ->
             logColorOverride(BetterFoliageMod.detailLogger(this), Config.shortGrass.saturationThreshold, hsb)
             hsb.colorOverride(Config.shortGrass.saturationThreshold)
         }
-        return StandardGrassModel(wrapped, this.copy(overrideColor = grassSpriteColor))
+        return StandardGrassModel(wrapped, this.copy(overrideColor = grassColor))
     }
 }
 
@@ -136,7 +136,7 @@ class StandardGrassModel(
             tuftModelSet(grassTuftShapes, null) { idx -> grassTuftSprites[randomI()] }.buildTufts()
         }
         val grassFullBlockMeshes = BetterFoliage.modelManager.lazyMap { key: StandardGrassKey ->
-            Array(64) { fullCubeTextured(key.grassLocation, key.tintIndex) }
+            Array(64) { fullCubeTextured(key.sprite, key.tintIndex) }
         }
         val snowFullBlockMeshes by BetterFoliage.modelManager.lazy {
             Array(64) { fullCubeTextured(ResourceLocation("block/snow"), -1) }

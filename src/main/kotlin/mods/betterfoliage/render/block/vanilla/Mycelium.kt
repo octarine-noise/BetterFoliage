@@ -21,8 +21,12 @@ import mods.betterfoliage.resource.discovery.ModelBakingContext
 import mods.betterfoliage.resource.discovery.ModelDiscoveryContext
 import mods.betterfoliage.resource.discovery.ParametrizedModelDiscovery
 import mods.betterfoliage.util.Atlas
+import mods.betterfoliage.util.averageColor
+import mods.betterfoliage.util.colorOverride
 import mods.betterfoliage.util.idxOrNull
 import mods.betterfoliage.util.lazy
+import mods.betterfoliage.util.lazyMap
+import mods.betterfoliage.util.logColorOverride
 import mods.betterfoliage.util.randomI
 import net.minecraft.client.renderer.RenderType
 import net.minecraft.util.Direction
@@ -31,13 +35,23 @@ import java.util.Random
 
 object StandardMyceliumDiscovery : ParametrizedModelDiscovery() {
     override fun processModel(ctx: ModelDiscoveryContext, params: Map<String, String>) {
-        ctx.addReplacement(StandardMyceliumKey)
+        val textureMycelium = params.texture("texture-mycelium") ?: return
+        ctx.addReplacement(StandardMyceliumKey(textureMycelium, null))
         ctx.blockState.block.extendLayers()
     }
 }
 
-object StandardMyceliumKey : HalfBakedWrapperKey() {
-    override fun bake(ctx: ModelBakingContext, wrapped: SpecialRenderModel) = StandardMyceliumModel(wrapped)
+data class StandardMyceliumKey(
+    val sprite: ResourceLocation,
+    val overrideColor: Color?
+) : HalfBakedWrapperKey() {
+    override fun bake(ctx: ModelBakingContext, wrapped: SpecialRenderModel): SpecialRenderModel {
+        val myceliumColor = Atlas.BLOCKS[sprite].averageColor.let { hsb ->
+            logColorOverride(BetterFoliageMod.detailLogger(this), Config.shortGrass.saturationThreshold, hsb)
+            hsb.colorOverride(Config.shortGrass.saturationThreshold)
+        }
+        return StandardMyceliumModel(wrapped, copy(overrideColor = myceliumColor))
+    }
 }
 
 class MyceliumRenderData(
@@ -47,15 +61,17 @@ class MyceliumRenderData(
 }
 
 class StandardMyceliumModel(
-    wrapped: SpecialRenderModel
+    wrapped: SpecialRenderModel,
+    key: StandardMyceliumKey
 ) : HalfBakedSpecialWrapper(wrapped) {
 
+    val tuftModels by myceliumTuftModels.delegate(key)
     val tuftLighting = LightingPreferredFace(Direction.UP)
 
     override fun prepare(ctx: BlockCtx, random: Random): Any {
         if (!Config.enabled) return Unit
         return MyceliumRenderData(
-            random.idxOrNull(myceliumTuftModels) {
+            random.idxOrNull(tuftModels) {
                 Config.shortGrass.enabled(random) &&
                 Config.shortGrass.myceliumEnabled &&
                 ctx.state(Direction.UP).isAir(ctx.world, ctx.pos)
@@ -67,7 +83,7 @@ class StandardMyceliumModel(
         super.renderLayer(ctx, data, layer)
         if (data is MyceliumRenderData && data.tuftIndex != null && layer == Layers.tufts) {
             ctx.vertexLighter = tuftLighting
-            ctx.renderQuads(myceliumTuftModels[data.tuftIndex])
+            ctx.renderQuads(tuftModels[data.tuftIndex])
         }
     }
 
@@ -75,9 +91,11 @@ class StandardMyceliumModel(
         val myceliumTuftSprites by SpriteSetDelegate(Atlas.BLOCKS) { idx ->
             ResourceLocation(BetterFoliageMod.MOD_ID, "blocks/better_mycel_$idx")
         }
-        val myceliumTuftModels by BetterFoliage.modelManager.lazy {
-            val shapes = Config.shortGrass.let { tuftShapeSet(it.size, it.heightMin, it.heightMax, it.hOffset) }
-            tuftModelSet(shapes, Color.white) { idx -> myceliumTuftSprites[randomI()] }.buildTufts()
+        val myceliumTuftShapes by BetterFoliage.modelManager.lazy {
+            Config.shortGrass.let { tuftShapeSet(it.size, it.heightMin, it.heightMax, it.hOffset) }
+        }
+        val myceliumTuftModels = BetterFoliage.modelManager.lazyMap { key: StandardMyceliumKey ->
+            tuftModelSet(myceliumTuftShapes, key.overrideColor) { idx -> myceliumTuftSprites[randomI()] }.buildTufts()
         }
     }
 }

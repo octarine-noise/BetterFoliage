@@ -17,6 +17,14 @@ model.extends("minecraft:block/grass_block", "minecraft:block/cube_bottom_top")
 setParam("texture-grass", model.texture("top"))
 end
 
+// Mycelium & Nylium
+match block.name.matches("minecraft:mycelium", "minecraft:crimson_nylium", "minecraft:warped_nylium") setParam("type", "mycelium") end
+
+match isParam("type", "mycelium")
+model.extends("minecraft:block/cube_bottom_top")
+setParam("texture-mycelium", model.texture("top"))
+end
+
 // Dirt
 match block.name.matches("minecraft:dirt") setParam("type", "dirt") end
 
@@ -38,10 +46,9 @@ end
 // Sand & Dirt
 match block.name.matches("minecraft:sand", "minecraft:red_sand") setParam("type", "sand") end
 
-// Cactus, Lilypad, Mycelium, Netherrack
+// Cactus, Lilypad, Netherrack
 match block.name.matches("minecraft:cactus") setParam("type", "cactus") end
 match block.name.matches("minecraft:lilypad") setParam("type", "lilypad") end
-match block.name.matches("minecraft:mycelium") setParam("type", "mycelium") end
 match block.name.matches("minecraft:netherrack") setParam("type", "netherrack") end
 
 // Crops
