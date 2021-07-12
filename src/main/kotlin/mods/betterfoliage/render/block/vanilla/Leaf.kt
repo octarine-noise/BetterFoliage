@@ -2,7 +2,7 @@ package mods.betterfoliage.render.block.vanilla
 
 import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.BetterFoliageMod
-import mods.betterfoliage.config.BlockConfig
+import mods.betterfoliage.config.BlockConfigOld
 import mods.betterfoliage.config.Config
 import mods.betterfoliage.config.isSnow
 import mods.betterfoliage.integration.ShadersModIntegration
@@ -18,30 +18,28 @@ import mods.betterfoliage.render.particle.LeafBlockModel
 import mods.betterfoliage.render.particle.LeafParticleKey
 import mods.betterfoliage.render.particle.LeafParticleRegistry
 import mods.betterfoliage.render.pipeline.RenderCtxBase
-import mods.betterfoliage.resource.discovery.BakeWrapperManager
 import mods.betterfoliage.resource.discovery.ConfigurableBlockMatcher
 import mods.betterfoliage.resource.discovery.ConfigurableModelDiscovery
 import mods.betterfoliage.resource.discovery.ModelBakingContext
 import mods.betterfoliage.resource.discovery.ModelDiscoveryContext
 import mods.betterfoliage.resource.discovery.ModelTextureList
+import mods.betterfoliage.resource.discovery.ParametrizedModelDiscovery
 import mods.betterfoliage.resource.generated.GeneratedLeafSprite
 import mods.betterfoliage.util.Atlas
-import mods.betterfoliage.util.LazyMapInvalidatable
 import mods.betterfoliage.util.averageColor
 import mods.betterfoliage.util.colorOverride
+import mods.betterfoliage.util.lazyMap
 import mods.betterfoliage.util.logColorOverride
 import net.minecraft.client.renderer.RenderType
 import net.minecraft.util.Direction.UP
 import net.minecraft.util.ResourceLocation
 import org.apache.logging.log4j.Level.INFO
 
-object StandardLeafDiscovery : ConfigurableModelDiscovery() {
-    override val matchClasses: ConfigurableBlockMatcher get() = BlockConfig.leafBlocks
-    override val modelTextures: List<ModelTextureList> get() = BlockConfig.leafModels.modelList
-
-    override fun processModel(ctx: ModelDiscoveryContext, textureMatch: List<ResourceLocation>) {
-        val leafType = LeafParticleRegistry.typeMappings.getType(textureMatch[0]) ?: "default"
-        val generated = GeneratedLeafSprite(textureMatch[0], leafType)
+object StandardLeafDiscovery : ParametrizedModelDiscovery() {
+    override fun processModel(ctx: ModelDiscoveryContext, params: Map<String, String>) {
+        val leafSprite = params.texture("texture-leaf") ?: return
+        val leafType = LeafParticleRegistry.typeMappings.getType(leafSprite) ?: "default"
+        val generated = GeneratedLeafSprite(leafSprite, leafType)
             .register(BetterFoliage.generatedPack)
             .apply { ctx.sprites.add(this) }
 
@@ -89,13 +87,13 @@ class StandardLeafModel(
         val leafSpritesSnowed by SpriteSetDelegate(Atlas.BLOCKS) { idx ->
             ResourceLocation(BetterFoliageMod.MOD_ID, "blocks/better_leaves_snowed_$idx")
         }
-        val leafModelsBase = LazyMapInvalidatable(BakeWrapperManager) { key: StandardLeafKey ->
+        val leafModelsBase = BetterFoliage.modelManager.lazyMap { key: StandardLeafKey ->
             Config.leaves.let { crossModelsRaw(64, it.size, it.hOffset, it.vOffset) }
         }
-        val leafModelsNormal = LazyMapInvalidatable(BakeWrapperManager) { key: StandardLeafKey ->
+        val leafModelsNormal = BetterFoliage.modelManager.lazyMap { key: StandardLeafKey ->
             crossModelsTextured(leafModelsBase[key], key.tintIndex, true) { key.roundLeafTexture }
         }
-        val leafModelsSnowed = LazyMapInvalidatable(BakeWrapperManager) { key: StandardLeafKey ->
+        val leafModelsSnowed = BetterFoliage.modelManager.lazyMap { key: StandardLeafKey ->
             crossModelsTextured(leafModelsBase[key], -1, false) { leafSpritesSnowed[it].name }
         }
     }

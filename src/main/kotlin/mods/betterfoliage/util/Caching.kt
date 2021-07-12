@@ -62,3 +62,6 @@ open class LazyMapInvalidatable<K, V>(val invalidator: Invalidator, val valueFac
         }
     }
 }
+
+fun <V> Invalidator.lazy(valueFactory: ()->V) = LazyInvalidatable(this, valueFactory)
+fun <K, V> Invalidator.lazyMap(valueFactory: (K)->V) = LazyMapInvalidatable(this, valueFactory)

@@ -2,7 +2,7 @@ package mods.betterfoliage.render.block.vanilla
 
 import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.config.ACCEPTED_ROUND_LOG_MATERIALS
-import mods.betterfoliage.config.BlockConfig
+import mods.betterfoliage.config.BlockConfigOld
 import mods.betterfoliage.config.Config
 import mods.betterfoliage.model.HalfBakedWrapperKey
 import mods.betterfoliage.model.SpecialRenderModel
@@ -17,14 +17,17 @@ import mods.betterfoliage.resource.discovery.ModelBakingContext
 import mods.betterfoliage.resource.discovery.ModelBakingKey
 import mods.betterfoliage.resource.discovery.ModelDiscoveryContext
 import mods.betterfoliage.resource.discovery.ModelTextureList
+import mods.betterfoliage.resource.discovery.ParametrizedModelDiscovery
 import mods.betterfoliage.util.Atlas
 import mods.betterfoliage.util.LazyMapInvalidatable
+import mods.betterfoliage.util.lazyMap
 import mods.betterfoliage.util.tryDefault
 import net.minecraft.block.BlockState
 import net.minecraft.block.RotatedPillarBlock
 import net.minecraft.util.Direction.Axis
 import net.minecraft.util.ResourceLocation
 import org.apache.logging.log4j.Level.INFO
+import org.apache.logging.log4j.Level.WARN
 
 interface RoundLogKey : ColumnBlockKey, ModelBakingKey {
     val barkSprite: ResourceLocation
@@ -38,16 +41,15 @@ object RoundLogOverlayLayer : ColumnRenderLayer() {
     override val defaultToY: Boolean get() = Config.roundLogs.defaultY
 }
 
-object StandardRoundLogDiscovery : ConfigurableModelDiscovery() {
-    override val matchClasses: ConfigurableBlockMatcher get() = BlockConfig.logBlocks
-    override val modelTextures: List<ModelTextureList> get() = BlockConfig.logModels.modelList
-
-    override fun processModel(ctx: ModelDiscoveryContext, textureMatch: List<ResourceLocation>) {
+object StandardRoundLogDiscovery : ParametrizedModelDiscovery() {
+    override fun processModel(ctx: ModelDiscoveryContext, params: Map<String, String>) {
+        val barkSprite = params.texture("texture-side") ?: return
+        val endSprite = params.texture("texture-end") ?: return
         val axis = getAxis(ctx.blockState)
 
         detailLogger.log(INFO, "       axis $axis, material ${ctx.blockState.material}")
         if (!Config.roundLogs.plantsOnly || ctx.blockState.material in ACCEPTED_ROUND_LOG_MATERIALS)
-            ctx.addReplacement(StandardRoundLogKey(axis, textureMatch[0], textureMatch[1]))
+            ctx.addReplacement(StandardRoundLogKey(axis, barkSprite, endSprite))
     }
 
     fun getAxis(state: BlockState): Axis? {
@@ -82,7 +84,7 @@ class StandardRoundLogModel(
     override fun getMeshSet(axis: Axis, quadrant: Int) = modelSet
 
     companion object {
-        val modelSets = LazyMapInvalidatable(BakeWrapperManager) { key: StandardRoundLogKey ->
+        val modelSets = BetterFoliage.modelManager.lazyMap { key: StandardRoundLogKey ->
             val barkSprite = Atlas.BLOCKS[key.barkSprite]
             val endSprite = Atlas.BLOCKS[key.endSprite]
             Config.roundLogs.let { config ->

@@ -1,5 +1,6 @@
 package mods.betterfoliage.mixin;
 
+import mods.betterfoliage.BetterFoliage;
 import mods.betterfoliage.BetterFoliageMod;
 import mods.betterfoliage.resource.discovery.BakeWrapperManager;
 import mods.betterfoliage.resource.discovery.ModelDefinitionsLoadedEvent;
@@ -38,6 +39,6 @@ abstract public class MixinModelBakery {
             IModelTransform transform,
             ResourceLocation locationIn
     ) {
-        return BakeWrapperManager.INSTANCE.onBake(unbaked, bakery, spriteGetter, transform, locationIn);
+        return BetterFoliage.INSTANCE.getModelManager().onBake(unbaked, bakery, spriteGetter, transform, locationIn);
     }
 }

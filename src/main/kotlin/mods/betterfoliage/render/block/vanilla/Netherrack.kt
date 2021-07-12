@@ -5,6 +5,7 @@ import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.chunk.BlockCtx
 import mods.betterfoliage.config.Config
 import mods.betterfoliage.config.NETHERRACK_BLOCKS
+import mods.betterfoliage.model.Color
 import mods.betterfoliage.model.HalfBakedSpecialWrapper
 import mods.betterfoliage.model.HalfBakedWrapperKey
 import mods.betterfoliage.model.SpecialRenderData
@@ -22,11 +23,13 @@ import mods.betterfoliage.resource.discovery.AbstractModelDiscovery
 import mods.betterfoliage.resource.discovery.BakeWrapperManager
 import mods.betterfoliage.resource.discovery.ModelBakingContext
 import mods.betterfoliage.resource.discovery.ModelDiscoveryContext
+import mods.betterfoliage.resource.discovery.ParametrizedModelDiscovery
 import mods.betterfoliage.util.Atlas
 import mods.betterfoliage.util.LazyInvalidatable
 import mods.betterfoliage.util.Rotation
 import mods.betterfoliage.util.get
 import mods.betterfoliage.util.idxOrNull
+import mods.betterfoliage.util.lazy
 import mods.betterfoliage.util.randomI
 import net.minecraft.block.Blocks
 import net.minecraft.client.renderer.RenderType
@@ -37,14 +40,10 @@ import net.minecraft.util.Direction.DOWN
 import net.minecraft.util.ResourceLocation
 import java.util.Random
 
-object StandardNetherrackDiscovery : AbstractModelDiscovery() {
-    override fun processModel(ctx: ModelDiscoveryContext) {
-        if (ctx.getUnbaked() is BlockModel && ctx.blockState.block in NETHERRACK_BLOCKS) {
-            BetterFoliage.blockTypes.dirt.add(ctx.blockState)
-            ctx.addReplacement(StandardNetherrackKey)
-            ctx.blockState.block.extendLayers()
-        }
-        super.processModel(ctx)
+object StandardNetherrackDiscovery : ParametrizedModelDiscovery() {
+    override fun processModel(ctx: ModelDiscoveryContext, params: Map<String, String>) {
+        ctx.addReplacement(StandardNetherrackKey)
+        ctx.blockState.block.extendLayers()
     }
 }
 
@@ -86,9 +85,9 @@ class StandardNetherrackModel(
         val netherrackTuftSprites by SpriteSetDelegate(Atlas.BLOCKS) { idx ->
             ResourceLocation(BetterFoliageMod.MOD_ID, "blocks/better_netherrack_$idx")
         }
-        val netherrackTuftModels by LazyInvalidatable(BakeWrapperManager) {
+        val netherrackTuftModels by BetterFoliage.modelManager.lazy {
             val shapes = Config.netherrack.let { tuftShapeSet(it.size, it.heightMin, it.heightMax, it.hOffset) }
-            tuftModelSet(shapes, -1) { netherrackTuftSprites[randomI()] }
+            tuftModelSet(shapes, Color.white) { netherrackTuftSprites[randomI()] }
                 .transform { rotate(Rotation.fromUp[DOWN.ordinal]).rotateUV(2) }
                 .buildTufts()
         }

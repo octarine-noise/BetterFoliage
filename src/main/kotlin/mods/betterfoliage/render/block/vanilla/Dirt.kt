@@ -8,6 +8,7 @@ import mods.betterfoliage.config.DIRT_BLOCKS
 import mods.betterfoliage.config.SALTWATER_BIOMES
 import mods.betterfoliage.config.isSnow
 import mods.betterfoliage.integration.ShadersModIntegration
+import mods.betterfoliage.model.Color
 import mods.betterfoliage.model.HalfBakedSpecialWrapper
 import mods.betterfoliage.model.HalfBakedWrapperKey
 import mods.betterfoliage.model.SpecialRenderData
@@ -24,6 +25,7 @@ import mods.betterfoliage.resource.discovery.AbstractModelDiscovery
 import mods.betterfoliage.resource.discovery.BakeWrapperManager
 import mods.betterfoliage.resource.discovery.ModelBakingContext
 import mods.betterfoliage.resource.discovery.ModelDiscoveryContext
+import mods.betterfoliage.resource.discovery.ParametrizedModelDiscovery
 import mods.betterfoliage.resource.generated.CenteredSprite
 import mods.betterfoliage.util.Atlas
 import mods.betterfoliage.util.Int3
@@ -31,6 +33,7 @@ import mods.betterfoliage.util.LazyInvalidatable
 import mods.betterfoliage.util.get
 import mods.betterfoliage.util.getBlockModel
 import mods.betterfoliage.util.idxOrNull
+import mods.betterfoliage.util.lazy
 import mods.betterfoliage.util.offset
 import mods.betterfoliage.util.randomI
 import net.minecraft.block.material.Material
@@ -42,14 +45,11 @@ import net.minecraft.util.Direction.UP
 import net.minecraft.util.ResourceLocation
 import java.util.Random
 
-object StandardDirtDiscovery : AbstractModelDiscovery() {
-    override fun processModel(ctx: ModelDiscoveryContext) {
-        if (ctx.getUnbaked() is BlockModel && ctx.blockState.block in DIRT_BLOCKS) {
-            BetterFoliage.blockTypes.dirt.add(ctx.blockState)
-            ctx.addReplacement(StandardDirtKey)
-            ctx.blockState.block.extendLayers()
-        }
-        super.processModel(ctx)
+object StandardDirtDiscovery : ParametrizedModelDiscovery() {
+    override fun processModel(ctx: ModelDiscoveryContext, params: Map<String, String>) {
+        BetterFoliage.blockTypes.dirt.add(ctx.blockState)
+        ctx.addReplacement(StandardDirtKey)
+        ctx.blockState.block.extendLayers()
     }
 }
 
@@ -97,10 +97,8 @@ class StandardDirtModel(
     override fun renderLayer(ctx: RenderCtxBase, data: Any, layer: RenderType) {
         if (data is DirtRenderData) {
             if (data.connectedGrassModel != null) {
-                if (layer == Layers.connectedDirt) {
-                    ctx.renderMasquerade(UP.offset) {
-                        data.connectedGrassModel.renderLayer(ctx, ctx.state(UP), layer)
-                    }
+                ctx.renderMasquerade(UP.offset) {
+                    data.connectedGrassModel.renderLayer(ctx, ctx.state(UP), layer)
                 }
             } else {
                 // render non-connected grass
@@ -133,13 +131,13 @@ class StandardDirtModel(
             idFunc = { idx -> ResourceLocation(BetterFoliageMod.MOD_ID, "blocks/better_reed_$idx") },
             idRegister = { id -> CenteredSprite(id, aspectHeight = 2).register(BetterFoliage.generatedPack) }
         )
-        val algaeModels by LazyInvalidatable(BakeWrapperManager) {
+        val algaeModels by BetterFoliage.modelManager.lazy {
             val shapes = Config.algae.let { tuftShapeSet(it.size, it.heightMin, it.heightMax, it.hOffset) }
-            tuftModelSet(shapes, -1) { algaeSprites[randomI()] }.buildTufts()
+            tuftModelSet(shapes, Color.white) { algaeSprites[randomI()] }.buildTufts()
         }
-        val reedModels by LazyInvalidatable(BakeWrapperManager) {
+        val reedModels by BetterFoliage.modelManager.lazy {
             val shapes = Config.reed.let { tuftShapeSet(2.0, it.heightMin, it.heightMax, it.hOffset) }
-            tuftModelSet(shapes, -1) { reedSprites[randomI()] }.buildTufts()
+            tuftModelSet(shapes, Color.white) { reedSprites[randomI()] }.buildTufts()
         }
     }
 }

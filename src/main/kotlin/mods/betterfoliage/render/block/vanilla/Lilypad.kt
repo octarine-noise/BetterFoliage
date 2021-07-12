@@ -1,10 +1,12 @@
 package mods.betterfoliage.render.block.vanilla
 
+import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.chunk.BlockCtx
 import mods.betterfoliage.config.Config
 import mods.betterfoliage.config.LILYPAD_BLOCKS
 import mods.betterfoliage.integration.ShadersModIntegration
+import mods.betterfoliage.model.Color
 import mods.betterfoliage.model.HalfBakedSpecialWrapper
 import mods.betterfoliage.model.HalfBakedWrapperKey
 import mods.betterfoliage.model.SpecialRenderModel
@@ -19,11 +21,13 @@ import mods.betterfoliage.resource.discovery.BakeWrapperManager
 import mods.betterfoliage.resource.discovery.ModelBakingContext
 import mods.betterfoliage.resource.discovery.ModelBakingKey
 import mods.betterfoliage.resource.discovery.ModelDiscoveryContext
+import mods.betterfoliage.resource.discovery.ParametrizedModelDiscovery
 import mods.betterfoliage.util.Atlas
 import mods.betterfoliage.util.LazyInvalidatable
 import mods.betterfoliage.util.get
 import mods.betterfoliage.util.idx
 import mods.betterfoliage.util.idxOrNull
+import mods.betterfoliage.util.lazy
 import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
 import net.minecraft.client.renderer.RenderType
@@ -33,12 +37,9 @@ import net.minecraft.util.Direction.DOWN
 import net.minecraft.util.ResourceLocation
 import java.util.Random
 
-object StandardLilypadDiscovery : AbstractModelDiscovery() {
-    override fun processModel(ctx: ModelDiscoveryContext) {
-        if (ctx.getUnbaked() is BlockModel && ctx.blockState.block in LILYPAD_BLOCKS) {
-            ctx.addReplacement(StandardLilypadKey)
-        }
-        super.processModel(ctx)
+object StandardLilypadDiscovery : ParametrizedModelDiscovery() {
+    override fun processModel(ctx: ModelDiscoveryContext, params: Map<String, String>) {
+        ctx.addReplacement(StandardLilypadKey)
     }
 }
 
@@ -81,15 +82,15 @@ class StandardLilypadModel(
         val lilypadFlowerSprites by SpriteSetDelegate(Atlas.BLOCKS) { idx ->
             ResourceLocation(BetterFoliageMod.MOD_ID, "blocks/better_lilypad_flower_$idx")
         }
-        val lilypadRootModels by LazyInvalidatable(BakeWrapperManager) {
+        val lilypadRootModels by BetterFoliage.modelManager.lazy {
             val shapes = tuftShapeSet(1.0, 1.0, 1.0, Config.lilypad.hOffset)
-            tuftModelSet(shapes, -1) { lilypadRootSprites[it] }
+            tuftModelSet(shapes, Color.white) { lilypadRootSprites[it] }
                 .transform { move(2.0 to DOWN) }
                 .buildTufts()
         }
-        val lilypadFlowerModels by LazyInvalidatable(BakeWrapperManager) {
+        val lilypadFlowerModels by BetterFoliage.modelManager.lazy {
             val shapes = tuftShapeSet(0.5, 0.5, 0.5, Config.lilypad.hOffset)
-            tuftModelSet(shapes, -1) { lilypadFlowerSprites[it] }
+            tuftModelSet(shapes, Color.white) { lilypadFlowerSprites[it] }
                 .transform { move(1.0 to DOWN) }
                 .buildTufts()
         }

@@ -1,9 +1,11 @@
 package mods.betterfoliage.resource.discovery
 
 import mods.betterfoliage.BetterFoliage
+import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.util.Atlas
 import mods.betterfoliage.util.HasLogger
 import mods.betterfoliage.util.Invalidator
+import mods.betterfoliage.util.resourceManager
 import net.minecraft.block.BlockState
 import net.minecraft.client.renderer.model.IBakedModel
 import net.minecraft.client.renderer.model.IModelTransform
@@ -68,7 +70,7 @@ data class ModelBakingContext(
     fun getBaked() = bakery.getBakedModel(location, transform, spriteGetter)
 }
 
-object BakeWrapperManager : Invalidator, HasLogger() {
+class BakeWrapperManager : Invalidator, HasLogger() {
     val discoverers = mutableListOf<ModelDiscovery>()
     override val callbacks = mutableListOf<WeakReference<()->Unit>>()
 
@@ -79,6 +81,7 @@ object BakeWrapperManager : Invalidator, HasLogger() {
     fun handleModelLoad(event: ModelDefinitionsLoadedEvent) {
         val startTime = System.currentTimeMillis()
         invalidate()
+        BetterFoliage.blockConfig.readConfig(resourceManager)
         BetterFoliage.blockTypes = BlockTypeCache()
 
         StartupMessageManager.addModMessage("BetterFoliage: discovering models")

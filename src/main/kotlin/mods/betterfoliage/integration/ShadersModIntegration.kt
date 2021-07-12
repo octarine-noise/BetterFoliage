@@ -1,5 +1,6 @@
 package mods.betterfoliage.integration
 
+import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.render.pipeline.RenderCtxBase
 import mods.betterfoliage.render.pipeline.RenderCtxVanilla
 import mods.betterfoliage.resource.discovery.BakeWrapperManager
@@ -50,8 +51,8 @@ object ShadersModIntegration : HasLogger() {
         logger.log(INFO, "ShadersMod diffuse shading integration is ${if (isDiffuseAvailable) "enabled" else "disabled" }")
         logger.log(INFO, "ShadersMod vertex shader integration is ${if (isEffectsAvailable) "enabled" else "disabled" }")
 
-        // Recalculate the diffsuse shading values used when resources are reloaded
-        if (isDiffuseAvailable) BakeWrapperManager.onInvalidate {
+        // Recalculate the diffuse shading values used when resources are reloaded
+        if (isDiffuseAvailable) BetterFoliage.modelManager.onInvalidate {
             if (Shaders.shaderPackLoaded.getStatic()) {
                 diffuseShades = Direction.values().mapArray { face ->
                     when(face) {

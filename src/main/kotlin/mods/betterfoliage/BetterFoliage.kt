@@ -2,6 +2,7 @@ package mods.betterfoliage
 
 import mods.betterfoliage.chunk.ChunkOverlayManager
 import mods.betterfoliage.config.BlockConfig
+import mods.betterfoliage.config.BlockConfigOld
 import mods.betterfoliage.integration.OptifineCustomColors
 import mods.betterfoliage.integration.ShadersModIntegration
 import mods.betterfoliage.render.block.vanilla.RoundLogOverlayLayer
@@ -27,15 +28,12 @@ import mods.betterfoliage.render.lighting.AoSideHelper
 import mods.betterfoliage.render.particle.LeafWindTracker
 import mods.betterfoliage.resource.discovery.BakeWrapperManager
 import mods.betterfoliage.resource.discovery.BlockTypeCache
-import mods.betterfoliage.resource.discovery.ModelDefinitionsLoadedEvent
 import mods.betterfoliage.resource.generated.GeneratedTexturePack
 import mods.betterfoliage.render.particle.LeafParticleRegistry
 import mods.betterfoliage.render.particle.RisingSoulParticle
+import mods.betterfoliage.resource.discovery.RuleBasedDiscovery
 import mods.betterfoliage.util.resourceManager
 import net.minecraft.block.BlockState
-import net.minecraft.client.Minecraft
-import net.minecraft.resources.IReloadableResourceManager
-import net.minecraftforge.eventbus.api.SubscribeEvent
 
 /**
  * Object responsible for initializing (and holding a reference to) all the infrastructure of the mod
@@ -48,9 +46,26 @@ object BetterFoliage {
     /** List of recognized [BlockState]s */
     var blockTypes = BlockTypeCache()
 
+    val blockConfig = BlockConfig()
+
+    val standardModelSupport = RuleBasedDiscovery().apply {
+        discoverers["cactus"] = StandardCactusDiscovery
+        discoverers["dirt"] = StandardDirtDiscovery
+        discoverers["grass"] = StandardGrassDiscovery
+        discoverers["leaf"] = StandardLeafDiscovery
+        discoverers["lilypad"] = StandardLilypadDiscovery
+        discoverers["mycelium"] = StandardMyceliumDiscovery
+        discoverers["netherrack"] = StandardNetherrackDiscovery
+        discoverers["round-log"] = StandardRoundLogDiscovery
+        discoverers["sand"] = StandardSandDiscovery
+    }
+    val modelManager = BakeWrapperManager().apply {
+        discoverers.add(standardModelSupport)
+    }
+
     fun init() {
         // discoverers
-        BetterFoliageMod.bus.register(BakeWrapperManager)
+        BetterFoliageMod.bus.register(modelManager)
         BetterFoliageMod.bus.register(LeafParticleRegistry)
         resourceManager.registerReloadListener(LeafParticleRegistry)
 
@@ -58,22 +73,15 @@ object BetterFoliage {
 
         listOf(
             StandardLeafDiscovery,
-            StandardGrassDiscovery,
-            StandardDirtDiscovery,
-            StandardMyceliumDiscovery,
             StandardSandDiscovery,
-            StandardLilypadDiscovery,
-            StandardCactusDiscovery,
-            StandardNetherrackDiscovery,
-            StandardRoundLogDiscovery
+            StandardRoundLogDiscovery,
         ).forEach {
-            BakeWrapperManager.discoverers.add(it)
         }
 
         // init singletons
         val singletons = listOf(
             AoSideHelper,
-            BlockConfig,
+            BlockConfigOld,
             ChunkOverlayManager,
             LeafWindTracker
         )

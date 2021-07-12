@@ -6,6 +6,7 @@ import mods.betterfoliage.chunk.BlockCtx
 import mods.betterfoliage.config.Config
 import mods.betterfoliage.config.SALTWATER_BIOMES
 import mods.betterfoliage.config.SAND_BLOCKS
+import mods.betterfoliage.model.Color
 import mods.betterfoliage.model.HalfBakedSpecialWrapper
 import mods.betterfoliage.model.HalfBakedWrapperKey
 import mods.betterfoliage.model.Quad
@@ -25,12 +26,15 @@ import mods.betterfoliage.resource.discovery.AbstractModelDiscovery
 import mods.betterfoliage.resource.discovery.BakeWrapperManager
 import mods.betterfoliage.resource.discovery.ModelBakingContext
 import mods.betterfoliage.resource.discovery.ModelDiscoveryContext
+import mods.betterfoliage.resource.discovery.ParametrizedModelDiscovery
 import mods.betterfoliage.util.Atlas
 import mods.betterfoliage.util.LazyInvalidatable
 import mods.betterfoliage.util.Rotation
 import mods.betterfoliage.util.allDirections
 import mods.betterfoliage.util.get
 import mods.betterfoliage.util.idx
+import mods.betterfoliage.util.lazy
+import mods.betterfoliage.util.lazyMap
 import mods.betterfoliage.util.mapArray
 import mods.betterfoliage.util.randomB
 import mods.betterfoliage.util.randomD
@@ -44,14 +48,10 @@ import net.minecraft.util.Direction.UP
 import net.minecraft.util.ResourceLocation
 import java.util.Random
 
-object StandardSandDiscovery : AbstractModelDiscovery() {
-    override fun processModel(ctx: ModelDiscoveryContext) {
-        if (ctx.getUnbaked() is BlockModel && ctx.blockState.block in SAND_BLOCKS) {
-            BetterFoliage.blockTypes.dirt.add(ctx.blockState)
-            ctx.addReplacement(StandardSandKey)
-            ctx.blockState.block.extendLayers()
-        }
-        super.processModel(ctx)
+object StandardSandDiscovery : ParametrizedModelDiscovery() {
+    override fun processModel(ctx: ModelDiscoveryContext, params: Map<String, String>) {
+        ctx.addReplacement(StandardSandKey)
+        ctx.blockState.block.extendLayers()
     }
 }
 
@@ -110,15 +110,15 @@ class StandardSandModel(
         val coralCrustSprites by SpriteSetDelegate(Atlas.BLOCKS) { idx ->
             ResourceLocation(BetterFoliageMod.MOD_ID, "blocks/better_crust_$idx")
         }
-        val coralTuftModels by LazyInvalidatable(BakeWrapperManager) {
+        val coralTuftModels by BetterFoliage.modelManager.lazy {
             val shapes = Config.coral.let { tuftShapeSet(it.size, 1.0, 1.0, it.hOffset) }
             allDirections.mapArray { face ->
-                tuftModelSet(shapes, -1) { coralTuftSprites[randomI()] }
+                tuftModelSet(shapes, Color.white) { coralTuftSprites[randomI()] }
                     .transform { rotate(Rotation.fromUp[face]) }
                     .buildTufts()
             }
         }
-        val coralCrustModels by LazyInvalidatable(BakeWrapperManager) {
+        val coralCrustModels by BetterFoliage.modelManager.lazy {
             allDirections.map { face ->
                 Array(64) { idx ->
                     listOf(
