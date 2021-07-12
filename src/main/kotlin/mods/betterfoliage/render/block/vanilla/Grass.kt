@@ -3,7 +3,6 @@ package mods.betterfoliage.render.block.vanilla
 import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.chunk.BlockCtx
-import mods.betterfoliage.config.BlockConfigOld
 import mods.betterfoliage.config.Config
 import mods.betterfoliage.config.isSnow
 import mods.betterfoliage.integration.ShadersModIntegration
@@ -21,16 +20,10 @@ import mods.betterfoliage.render.lighting.LightingPreferredFace
 import mods.betterfoliage.render.pipeline.Layers
 import mods.betterfoliage.render.pipeline.RenderCtxBase
 import mods.betterfoliage.render.pipeline.extendLayers
-import mods.betterfoliage.resource.discovery.BakeWrapperManager
-import mods.betterfoliage.resource.discovery.ConfigurableBlockMatcher
-import mods.betterfoliage.resource.discovery.ConfigurableModelDiscovery
 import mods.betterfoliage.resource.discovery.ModelBakingContext
 import mods.betterfoliage.resource.discovery.ModelDiscoveryContext
-import mods.betterfoliage.resource.discovery.ModelTextureList
 import mods.betterfoliage.resource.discovery.ParametrizedModelDiscovery
 import mods.betterfoliage.util.Atlas
-import mods.betterfoliage.util.LazyInvalidatable
-import mods.betterfoliage.util.LazyMapInvalidatable
 import mods.betterfoliage.util.averageColor
 import mods.betterfoliage.util.colorOverride
 import mods.betterfoliage.util.idxOrNull

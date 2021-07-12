@@ -1,10 +1,9 @@
 package mods.betterfoliage.render.block.vanilla
 
-import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.BetterFoliage
+import mods.betterfoliage.BetterFoliageMod
 import mods.betterfoliage.chunk.BlockCtx
 import mods.betterfoliage.config.Config
-import mods.betterfoliage.config.NETHERRACK_BLOCKS
 import mods.betterfoliage.model.Color
 import mods.betterfoliage.model.HalfBakedSpecialWrapper
 import mods.betterfoliage.model.HalfBakedWrapperKey
@@ -19,23 +18,15 @@ import mods.betterfoliage.render.lighting.LightingPreferredFace
 import mods.betterfoliage.render.pipeline.Layers
 import mods.betterfoliage.render.pipeline.RenderCtxBase
 import mods.betterfoliage.render.pipeline.extendLayers
-import mods.betterfoliage.resource.discovery.AbstractModelDiscovery
-import mods.betterfoliage.resource.discovery.BakeWrapperManager
 import mods.betterfoliage.resource.discovery.ModelBakingContext
 import mods.betterfoliage.resource.discovery.ModelDiscoveryContext
 import mods.betterfoliage.resource.discovery.ParametrizedModelDiscovery
 import mods.betterfoliage.util.Atlas
-import mods.betterfoliage.util.LazyInvalidatable
 import mods.betterfoliage.util.Rotation
-import mods.betterfoliage.util.get
 import mods.betterfoliage.util.idxOrNull
 import mods.betterfoliage.util.lazy
 import mods.betterfoliage.util.randomI
-import net.minecraft.block.Blocks
 import net.minecraft.client.renderer.RenderType
-import net.minecraft.client.renderer.RenderTypeLookup
-import net.minecraft.client.renderer.model.BlockModel
-import net.minecraft.util.Direction
 import net.minecraft.util.Direction.DOWN
 import net.minecraft.util.ResourceLocation
 import java.util.Random

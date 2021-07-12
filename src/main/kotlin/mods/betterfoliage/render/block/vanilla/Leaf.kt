@@ -2,7 +2,6 @@ package mods.betterfoliage.render.block.vanilla
 
 import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.BetterFoliageMod
-import mods.betterfoliage.config.BlockConfigOld
 import mods.betterfoliage.config.Config
 import mods.betterfoliage.config.isSnow
 import mods.betterfoliage.integration.ShadersModIntegration
@@ -18,11 +17,8 @@ import mods.betterfoliage.render.particle.LeafBlockModel
 import mods.betterfoliage.render.particle.LeafParticleKey
 import mods.betterfoliage.render.particle.LeafParticleRegistry
 import mods.betterfoliage.render.pipeline.RenderCtxBase
-import mods.betterfoliage.resource.discovery.ConfigurableBlockMatcher
-import mods.betterfoliage.resource.discovery.ConfigurableModelDiscovery
 import mods.betterfoliage.resource.discovery.ModelBakingContext
 import mods.betterfoliage.resource.discovery.ModelDiscoveryContext
-import mods.betterfoliage.resource.discovery.ModelTextureList
 import mods.betterfoliage.resource.discovery.ParametrizedModelDiscovery
 import mods.betterfoliage.resource.generated.GeneratedLeafSprite
 import mods.betterfoliage.util.Atlas

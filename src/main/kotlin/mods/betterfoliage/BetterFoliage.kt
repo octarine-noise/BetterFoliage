@@ -2,7 +2,6 @@ package mods.betterfoliage
 
 import mods.betterfoliage.chunk.ChunkOverlayManager
 import mods.betterfoliage.config.BlockConfig
-import mods.betterfoliage.config.BlockConfigOld
 import mods.betterfoliage.integration.OptifineCustomColors
 import mods.betterfoliage.integration.ShadersModIntegration
 import mods.betterfoliage.render.block.vanilla.RoundLogOverlayLayer
@@ -16,22 +15,22 @@ import mods.betterfoliage.render.block.vanilla.StandardLeafDiscovery
 import mods.betterfoliage.render.block.vanilla.StandardLeafModel
 import mods.betterfoliage.render.block.vanilla.StandardLilypadDiscovery
 import mods.betterfoliage.render.block.vanilla.StandardLilypadModel
-import mods.betterfoliage.render.block.vanilla.StandardRoundLogDiscovery
 import mods.betterfoliage.render.block.vanilla.StandardMyceliumDiscovery
 import mods.betterfoliage.render.block.vanilla.StandardMyceliumModel
 import mods.betterfoliage.render.block.vanilla.StandardNetherrackDiscovery
 import mods.betterfoliage.render.block.vanilla.StandardNetherrackModel
+import mods.betterfoliage.render.block.vanilla.StandardRoundLogDiscovery
 import mods.betterfoliage.render.block.vanilla.StandardRoundLogModel
 import mods.betterfoliage.render.block.vanilla.StandardSandDiscovery
 import mods.betterfoliage.render.block.vanilla.StandardSandModel
 import mods.betterfoliage.render.lighting.AoSideHelper
+import mods.betterfoliage.render.particle.LeafParticleRegistry
 import mods.betterfoliage.render.particle.LeafWindTracker
+import mods.betterfoliage.render.particle.RisingSoulParticle
 import mods.betterfoliage.resource.discovery.BakeWrapperManager
 import mods.betterfoliage.resource.discovery.BlockTypeCache
-import mods.betterfoliage.resource.generated.GeneratedTexturePack
-import mods.betterfoliage.render.particle.LeafParticleRegistry
-import mods.betterfoliage.render.particle.RisingSoulParticle
 import mods.betterfoliage.resource.discovery.RuleBasedDiscovery
+import mods.betterfoliage.resource.generated.GeneratedTexturePack
 import mods.betterfoliage.util.resourceManager
 import net.minecraft.block.BlockState
 
@@ -81,7 +80,6 @@ object BetterFoliage {
         // init singletons
         val singletons = listOf(
             AoSideHelper,
-            BlockConfigOld,
             ChunkOverlayManager,
             LeafWindTracker
         )

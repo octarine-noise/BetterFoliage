@@ -2,7 +2,6 @@ package mods.betterfoliage.render.block.vanilla
 
 import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.config.ACCEPTED_ROUND_LOG_MATERIALS
-import mods.betterfoliage.config.BlockConfigOld
 import mods.betterfoliage.config.Config
 import mods.betterfoliage.model.HalfBakedWrapperKey
 import mods.betterfoliage.model.SpecialRenderModel
@@ -10,16 +9,11 @@ import mods.betterfoliage.render.column.ColumnBlockKey
 import mods.betterfoliage.render.column.ColumnMeshSet
 import mods.betterfoliage.render.column.ColumnModelBase
 import mods.betterfoliage.render.column.ColumnRenderLayer
-import mods.betterfoliage.resource.discovery.BakeWrapperManager
-import mods.betterfoliage.resource.discovery.ConfigurableBlockMatcher
-import mods.betterfoliage.resource.discovery.ConfigurableModelDiscovery
 import mods.betterfoliage.resource.discovery.ModelBakingContext
 import mods.betterfoliage.resource.discovery.ModelBakingKey
 import mods.betterfoliage.resource.discovery.ModelDiscoveryContext
-import mods.betterfoliage.resource.discovery.ModelTextureList
 import mods.betterfoliage.resource.discovery.ParametrizedModelDiscovery
 import mods.betterfoliage.util.Atlas
-import mods.betterfoliage.util.LazyMapInvalidatable
 import mods.betterfoliage.util.lazyMap
 import mods.betterfoliage.util.tryDefault
 import net.minecraft.block.BlockState
@@ -27,7 +21,6 @@ import net.minecraft.block.RotatedPillarBlock
 import net.minecraft.util.Direction.Axis
 import net.minecraft.util.ResourceLocation
 import org.apache.logging.log4j.Level.INFO
-import org.apache.logging.log4j.Level.WARN
 
 interface RoundLogKey : ColumnBlockKey, ModelBakingKey {
     val barkSprite: ResourceLocation
