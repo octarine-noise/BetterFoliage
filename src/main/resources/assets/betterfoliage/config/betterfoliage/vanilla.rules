@@ -1,0 +1,45 @@
+// Leaves
+match block.class.extends(classOf("minecraft:oak_leaves")) setParam("type", "leaf") end
+
+match isParam("type", "leaf")
+model.extends("minecraft:block/leaves", "minecraft:block/cube_all")
+setParam("texture-leaf", model.texture("all"))
+end
+
+// Podzol
+match block.name.matches("minecraft:podzol") setParam("type", "grass") end
+
+// Grass
+match block.class.extends(classOf("minecraft:grass_block")) setParam("type", "grass") end
+
+match isParam("type", "grass")
+model.extends("minecraft:block/grass_block", "minecraft:block/cube_bottom_top")
+setParam("texture-grass", model.texture("top"))
+end
+
+// Dirt
+match block.name.matches("minecraft:dirt") setParam("type", "dirt") end
+
+// Wood Log
+match block.class.extends(classOf("minecraft:oak_log")) setParam("type", "round-log") end
+
+match isParam("type", "round-log")
+model.extends("minecraft:block/cube_column", "minecraft:block/cube_column_horizontal")
+setParam("texture-side", model.texture("side"))
+setParam("texture-end", model.texture("end"))
+end
+
+match isParam("type", "round-log")
+model.extends("minecraft:block/cube_all")
+setParam("texture-side", model.texture("all"))
+setParam("texture-end", model.texture("all"))
+end
+
+// Sand & Dirt
+match block.name.matches("minecraft:sand", "minecraft:red_sand") setParam("type", "sand") end
+
+// Cactus, Lilypad, Mycelium, Netherrack
+match block.name.matches("minecraft:cactus") setParam("type", "cactus") end
+match block.name.matches("minecraft:lilypad") setParam("type", "lilypad") end
+match block.name.matches("minecraft:mycelium") setParam("type", "mycelium") end
+match block.name.matches("minecraft:netherrack") setParam("type", "netherrack") end

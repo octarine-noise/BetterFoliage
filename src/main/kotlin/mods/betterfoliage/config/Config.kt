@@ -7,7 +7,7 @@ import net.minecraft.util.ResourceLocation
 import net.minecraftforge.eventbus.api.SubscribeEvent
 import net.minecraftforge.fml.config.ModConfig
 
-object BlockConfig {
+object BlockConfigOld {
     private val list = mutableListOf<Any>()
 
     val leafBlocks = blocks("leaves_blocks_default.cfg")

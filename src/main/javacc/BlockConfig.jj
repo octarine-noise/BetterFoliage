@@ -1,0 +1,102 @@
+PARSER_BEGIN(BlockConfigParser)
+package mods.betterfoliage.config.match.parser;
+
+import java.util.List;
+import java.util.LinkedList;
+import mods.betterfoliage.config.match.*;
+
+public class BlockConfigParser {
+    public String configFile;
+
+    ConfigSource getSource(Token t) {
+        return new ConfigSource(configFile, t.beginLine, t.beginColumn);
+    }
+}
+
+PARSER_END(BlockConfigParser)
+
+// Whitespace definition
+SKIP : { " " | "\n" | "\t" | "\r" }
+
+// Single-line comment
+SPECIAL_TOKEN : { <lineComment: "//" (~["\n","\r"])* ("\n"|"\r"|"\r\n")> }
+
+// Lexical state for string literal in quotes
+SPECIAL_TOKEN : { < quoteStart : "\"" > : withinQuotes }
+<withinQuotes> SPECIAL_TOKEN : { < quoteEnd : "\"" > : DEFAULT }
+<withinQuotes> TOKEN : { < stringLiteral : (["a"-"z"] | ["0"-"9"] | "/" | "." | "_" | "-" | ":" )* > }
+
+// Symbol tokens
+TOKEN : {
+    < parenStart : "(" > |
+    < parenEnd : ")" > |
+    < dot : "." > |
+    < comma : "," >
+}
+
+void matchFile(List<Node.MatchAll> parent) : {
+    Token t;
+} {
+    (
+        t = "match"
+        { List<Node> nodes = new LinkedList<Node>(); }
+        (match(nodes))*
+        "end"
+        { parent.add(new Node.MatchAll(getSource(t), nodes)); }
+    )*
+}
+
+void match(List<Node> parent) : {
+    Token t; Token t2; MatchMethod mm; List<Node.Value> values; Node.Value v;
+} {
+    "block." matchBlock(parent)
+    |
+    t = "model." mm = matchMethod() <parenStart> values = matchValueList() <parenEnd>
+    { parent.add(new Node.MatchValueList(Node.MatchSource.MODEL_LOCATION, mm, getSource(t), values)); }
+    |
+    t = "isParam" <parenStart> t2 = <stringLiteral> <comma> values = matchValueList() <parenEnd>
+    { parent.add(new Node.MatchParam(t2.image, values, getSource(t))); }
+    |
+    t = "setParam" <parenStart> t2 = <stringLiteral> <comma> v = matchValue() <parenEnd>
+    { parent.add(new Node.SetParam(t2.image, v, getSource(t))); }
+}
+
+MatchMethod matchMethod() : {} {
+    "matches" { return MatchMethod.EXACT_MATCH; } |
+    "extends" { return MatchMethod.EXTENDS; } |
+    "contains" { return MatchMethod.CONTAINS; }
+}
+
+void matchBlock(List<Node> parent) : {
+    Token t; MatchMethod mm; List<Node.Value> values;
+} {
+    t = "class." mm = matchMethod() <parenStart> values = matchValueList() <parenEnd>
+    { parent.add(new Node.MatchValueList(Node.MatchSource.BLOCK_CLASS, mm, getSource(t), values)); }
+    |
+    t = "name." mm = matchMethod() <parenStart> values = matchValueList() <parenEnd>
+    { parent.add(new Node.MatchValueList(Node.MatchSource.BLOCK_NAME, mm, getSource(t), values)); }
+}
+
+List<Node.Value> matchValueList() : {
+    List<Node.Value> values = new LinkedList<Node.Value>();
+} {
+    matchValueToList(values) (<comma> matchValueToList(values))* { return values; }
+}
+
+void matchValueToList(List<Node.Value> values) : {
+    Node.Value v;
+} {
+    v = matchValue() { values.add(v); }
+}
+
+Node.Value matchValue() : {
+    Token t;
+} {
+    t = <stringLiteral> { return new Node.Value.Literal(t.image); }
+    |
+    "classOf" <parenStart> t = <stringLiteral> <parenEnd>
+    { return new Node.Value.ClassOf(t.image); }
+    |
+    "model.texture" <parenStart> t = <stringLiteral> <parenEnd>
+    { return new Node.Value.Texture(t.image); }
+}

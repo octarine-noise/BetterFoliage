@@ -2,6 +2,7 @@ plugins {
     kotlin("jvm").version("1.4.20")
     id("net.minecraftforge.gradle").version("4.1.12")
     id("org.spongepowered.mixin").version("0.7-SNAPSHOT")
+    id("com.intershop.gradle.javacc").version("4.0.0")
 }
 
 repositories {
@@ -20,6 +21,7 @@ dependencies {
 configurations["annotationProcessor"].extendsFrom(configurations["implementation"])
 sourceSets {
     get("main").ext["refMap"] = "betterfoliage.refmap.json"
+    get("main").java.srcDir("src/main/javacc/")
 }
 
 minecraft {
@@ -32,6 +34,17 @@ minecraft {
         properties["forge.logging.console.level"] = "debug"
         mods.create("betterfoliage") {
             source(sourceSets["main"])
+        }
+    }
+}
+
+javacc {
+    configs {
+        create("blockconfig") {
+            staticParam = "false"
+            inputFile = file("src/main/javacc/BlockConfig.jj")
+            outputDir = file("src/main/javacc/")
+            packageName = "mods.betterfoliage.config.match.parser"
         }
     }
 }

@@ -1,6 +1,7 @@
 package mods.betterfoliage
 
 import mods.betterfoliage.config.BlockConfig
+import mods.betterfoliage.config.BlockConfigOld
 import mods.betterfoliage.config.MainConfig
 import mods.betterfoliage.util.tryDefault
 import mods.betterfoliage.config.clothGuiRoot
@@ -72,7 +73,7 @@ object BetterFoliageMod {
         }
 
         Minecraft.getInstance().resourcePackRepository.addPackFinder(BetterFoliage.generatedPack.finder)
-        bus.register(BlockConfig)
+        bus.register(BlockConfigOld)
         BetterFoliage.init()
     }
 }

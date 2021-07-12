@@ -31,6 +31,10 @@ abstract class AbstractModelDiscovery : HasLogger(), ModelDiscovery {
     }
 
     open fun processModel(ctx: ModelDiscoveryContext) {
+        processContainerModel(ctx)
+    }
+
+    fun processContainerModel(ctx: ModelDiscoveryContext) {
         val model = ctx.getUnbaked()
 
         // built-in support for container models
