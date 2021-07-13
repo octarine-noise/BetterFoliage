@@ -82,6 +82,34 @@ val TextureAtlasSprite.averageColor: HSB get() {
     return HSB(avgHue, sumSaturation / numOpaque.toFloat(), sumBrightness / numOpaque.toFloat())
 }
 
+val ResourceLocation.averageHSB: HSB get() = resourceManager.loadSprite(this).let { image ->
+    var numOpaque = 0
+    var sumHueX = 0.0
+    var sumHueY = 0.0
+    var sumSaturation = 0.0f
+    var sumBrightness = 0.0f
+    for (x in 0 until image.width)
+        for (y in 0 until image.width) {
+            val pixel = image[x, y]
+            val alpha = (pixel shr 24) and 255
+            val hsb = HSB.fromColorBGRA(pixel)
+            if (alpha == 255) {
+                numOpaque++
+                sumHueX += cos((hsb.hue.toDouble() - 0.5) * PI2)
+                sumHueY += sin((hsb.hue.toDouble() - 0.5) * PI2)
+                sumSaturation += hsb.saturation
+                sumBrightness += hsb.brightness
+            }
+        }
+
+    // circular average - transform sum vector to polar angle
+    val avgHue = (atan2(sumHueY, sumHueX) / PI2 + 0.5).toFloat()
+    return HSB(avgHue, sumSaturation / numOpaque.toFloat(), sumBrightness / numOpaque.toFloat())
+}
+
+fun HSB.lighten(multiplier: Float = 2.0f, ceiling: Float = 0.9f) =
+    copy(brightness = (brightness * multiplier).coerceAtMost(ceiling)).asColor
+
 /** Weighted blend of 2 packed RGB colors */
 fun blendRGB(rgb1: Int, rgb2: Int, weight1: Int, weight2: Int): Int {
     val r = (((rgb1 shr 16) and 255) * weight1 + ((rgb2 shr 16) and 255) * weight2) / (weight1 + weight2)
@@ -102,4 +130,4 @@ fun logColorOverride(logger: Logger, threshold: Double, hsb: HSB) {
 }
 
 fun HSB.colorOverride(threshold: Double) =
-    if (saturation < threshold) null else copy(brightness = (brightness * 2.0f).coerceAtMost(0.9f)).asColor.let { Color(it) }
+    if (saturation < threshold) null else copy(brightness = (brightness * 2.0f).coerceAtMost(0.9f)).asInt.let { Color(it) }

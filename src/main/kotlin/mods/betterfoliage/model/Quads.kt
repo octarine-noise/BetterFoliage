@@ -89,8 +89,13 @@ data class HSB(var hue: Float, var saturation: Float, var brightness: Float) {
             val hsbVals = java.awt.Color.RGBtoHSB(color and 255, (color shr 8) and 255, (color shr 16) and 255, null)
             return HSB(hsbVals[0], hsbVals[1], hsbVals[2])
         }
+        fun fromColorBGRA(color: Int): HSB {
+            val hsbVals = java.awt.Color.RGBtoHSB((color shr 16) and 255, (color shr 8) and 255, color and 255, null)
+            return HSB(hsbVals[0], hsbVals[1], hsbVals[2])
+        }
     }
-    val asColor: Int get() = java.awt.Color.HSBtoRGB(hue, saturation, brightness)
+    val asInt: Int get() = java.awt.Color.HSBtoRGB(hue, saturation, brightness)
+    val asColor: Color get() = Color(asInt)
 }
 
 /**
