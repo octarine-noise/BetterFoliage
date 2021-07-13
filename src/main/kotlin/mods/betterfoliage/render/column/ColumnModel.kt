@@ -28,7 +28,7 @@ abstract class ColumnModelBase(
     override fun renderLayer(ctx: RenderCtxBase, data: Any, layer: RenderType) {
         if (!enabled) return super.renderLayer(ctx, data, layer)
         
-        val roundLog = ChunkOverlayManager.get(overlayLayer, ctx)
+        val roundLog = overlayLayer[ctx]
         when(roundLog) {
             ColumnLayerData.SkipRender -> return
             NormalRender -> return super.renderLayer(ctx, data, layer)

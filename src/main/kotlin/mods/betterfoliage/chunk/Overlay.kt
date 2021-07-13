@@ -27,92 +27,69 @@ val IBlockDisplayReader.dimType: DimensionType get() = when {
 /**
  * Represents some form of arbitrary non-persistent data that can be calculated and cached for each block position
  */
-interface ChunkOverlayLayer<T> {
-    fun calculate(ctx: BlockCtx): T
-    fun onBlockUpdate(world: IBlockDisplayReader, pos: BlockPos)
+abstract class ChunkOverlayLayer<T> {
+    val dimData = IdentityHashMap<DimensionType, SparseChunkedMap<T>>()
+    abstract fun calculate(ctx: BlockCtx): T
+    abstract fun onBlockUpdate(world: IBlockDisplayReader, pos: BlockPos)
+
+    operator fun get(ctx: BlockCtx): T {
+        return dimData
+            .getOrPut(ctx.world.dimType) { SparseChunkedMap() }
+            .getOrPut(ctx.pos) { calculate(ctx) }
+    }
+
+    fun remove(world: IBlockDisplayReader, pos: BlockPos) {
+        dimData[world.dimType]?.remove(pos)
+    }
 }
 
 /**
- * Query, lazy calculation and lifecycle management of multiple layers of chunk overlay data.
+ * Event forwarder for multiple layers of chunk overlay data.
  */
 object ChunkOverlayManager {
-
-    var tempCounter = 0
-
-    init {
-        MinecraftForge.EVENT_BUS.register(this)
-    }
-
-    val chunkData = IdentityHashMap<DimensionType, MutableMap<ChunkPos, ChunkOverlayData>>()
+    init { MinecraftForge.EVENT_BUS.register(this) }
     val layers = mutableListOf<ChunkOverlayLayer<*>>()
 
-    /**
-     * Get the overlay data for a given layer and position
-     *
-     * @param layer Overlay layer to query
-     * @param reader World to use if calculation of overlay value is necessary
-     * @param pos Block position
-     */
-    fun <T> get(layer: ChunkOverlayLayer<T>, ctx: BlockCtx): T? {
-        val data = chunkData[ctx.world.dimType]?.get(ChunkPos(ctx.pos)) ?: return null
-        data.get(layer, ctx.pos).let { value ->
-            if (value !== ChunkOverlayData.UNCALCULATED) return value
-            val newValue = layer.calculate(ctx)
-            data.set(layer, ctx.pos, newValue)
-            return newValue
-        }
-    }
-
-    /**
-     * Clear the overlay data for a given layer and position
-     *
-     * @param layer Overlay layer to clear
-     * @param pos Block position
-     */
-    fun <T> clear(dimension: DimensionType, layer: ChunkOverlayLayer<T>, pos: BlockPos) {
-        chunkData[dimension]?.get(ChunkPos(pos))?.clear(layer, pos)
-    }
-
     fun onBlockChange(world: ClientWorld, pos: BlockPos) {
-        if (chunkData[world.dimType]?.containsKey(ChunkPos(pos)) == true) {
-            layers.forEach { layer -> layer.onBlockUpdate(world, pos) }
-        }
-    }
-
-    @SubscribeEvent
-    fun handleLoadWorld(event: WorldEvent.Load) = (event.world as? ClientWorld)?.let { world ->
-        chunkData[world.dimType] = mutableMapOf()
+        layers.forEach { layer -> layer.onBlockUpdate(world, pos) }
     }
 
     @SubscribeEvent
     fun handleUnloadWorld(event: WorldEvent.Unload) = (event.world as? ClientWorld)?.let { world ->
-        chunkData.remove(world.dimType)
-    }
-
-    @SubscribeEvent
-    fun handleLoadChunk(event: ChunkEvent.Load) = (event.world as? ClientWorld)?.let { world ->
-        chunkData[world.dimType]?.let { chunks ->
-            // check for existence first because Optifine fires a TON of these
-            if (event.chunk.pos !in chunks.keys) chunks[event.chunk.pos] = ChunkOverlayData(layers)
-        }
+        layers.forEach { layer -> layer.dimData.remove(world.dimType) }
     }
 
     @SubscribeEvent
     fun handleUnloadChunk(event: ChunkEvent.Unload) = (event.world as? ClientWorld)?.let { world ->
-        chunkData[world.dimType]?.remove(event.chunk.pos)
+        layers.forEach { layer -> layer.dimData[world.dimType]?.removeChunk(event.chunk.pos) }
     }
 }
 
-class ChunkOverlayData(layers: List<ChunkOverlayLayer<*>>) {
-    val BlockPos.isValid: Boolean get() = y in validYRange
-    val rawData = layers.associateWith { emptyOverlay() }
-    fun <T> get(layer: ChunkOverlayLayer<T>, pos: BlockPos): T? = if (pos.isValid) rawData[layer]?.get(pos.x and 15)?.get(pos.z and 15)?.get(pos.y) as T? else null
-    fun <T> set(layer: ChunkOverlayLayer<T>, pos: BlockPos, data: T) = if (pos.isValid) rawData[layer]?.get(pos.x and 15)?.get(pos.z and 15)?.set(pos.y, data) else null
-    fun <T> clear(layer: ChunkOverlayLayer<T>, pos: BlockPos) = if (pos.isValid) rawData[layer]?.get(pos.x and 15)?.get(pos.z and 15)?.set(pos.y, UNCALCULATED) else null
+interface DoubleMap<K1, K2, V> {
+    val map1: MutableMap<K1, MutableMap<K2, V>>
+    fun createMap2(): MutableMap<K2, V>
 
-    companion object {
-        val UNCALCULATED = object {}
-        fun emptyOverlay() = Array(16) { Array(16) { Array<Any?>(256) { UNCALCULATED }}}
-        val validYRange = 0 until 256
+    fun remove(key1: K1) {
+        map1.remove(key1)
     }
+    fun remove(key1: K1, key2: K2) {
+        map1[key1]?.remove(key2)
+    }
+    fun contains(key1: K1) = map1.contains(key1)
+
+    fun getOrSet(key1: K1, key2: K2, factory: () -> V) =
+        (map1[key1] ?: createMap2().apply { map1[key1] = this }).let { subMap ->
+            subMap[key2] ?: factory().apply { subMap[key2] = this }
+        }
+}
+
+class SparseChunkedMap<V> {
+    val map = object : DoubleMap<ChunkPos, BlockPos, V> {
+        override val map1 = mutableMapOf<ChunkPos, MutableMap<BlockPos, V>>()
+        override fun createMap2() = mutableMapOf<BlockPos, V>()
+    }
+
+    fun getOrPut(pos: BlockPos, factory: () -> V) = map.getOrSet(ChunkPos(pos), pos, factory)
+    fun remove(pos: BlockPos) = map.remove(ChunkPos(pos), pos)
+    fun removeChunk(pos: ChunkPos) = map.map1.remove(pos)
 }
