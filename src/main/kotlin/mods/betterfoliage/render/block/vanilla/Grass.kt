@@ -133,7 +133,7 @@ class StandardGrassModel(
             tuftModelSet(grassTuftShapes, key.overrideColor) { idx -> grassTuftSprites[randomI()] }.buildTufts()
         }
         val grassTuftMeshesSnowed = BetterFoliage.modelManager.lazyMap { key: StandardGrassKey ->
-            tuftModelSet(grassTuftShapes, null) { idx -> grassTuftSprites[randomI()] }.buildTufts()
+            tuftModelSet(grassTuftShapes, Color.white) { idx -> grassTuftSprites[randomI()] }.buildTufts()
         }
         val grassFullBlockMeshes = BetterFoliage.modelManager.lazyMap { key: StandardGrassKey ->
             Array(64) { fullCubeTextured(key.sprite, key.tintIndex) }
