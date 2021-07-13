@@ -77,7 +77,7 @@ class StandardCactusModel(
         }
         val cactusArmModels by BetterFoliage.modelManager.lazy {
             val shapes = Config.cactus.let { tuftShapeSet(0.8, 0.8, 0.8, 0.2) }
-            val models = tuftModelSet(shapes, Color.white) { cactusArmSprites[randomI()] }
+            val models = tuftModelSet(shapes, Color.white, -1) { cactusArmSprites[randomI()] }
             horizontalDirections.map { side ->
                 models.transform { move(0.0625 to DOWN).rotate(Rotation.fromUp[side.ordinal]) }.buildTufts()
             }.toTypedArray()

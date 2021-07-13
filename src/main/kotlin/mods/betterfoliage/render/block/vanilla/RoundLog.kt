@@ -36,8 +36,8 @@ object RoundLogOverlayLayer : ColumnRenderLayer() {
 
 object StandardRoundLogDiscovery : ParametrizedModelDiscovery() {
     override fun processModel(ctx: ModelDiscoveryContext, params: Map<String, String>) {
-        val barkSprite = params.texture("texture-side") ?: return
-        val endSprite = params.texture("texture-end") ?: return
+        val barkSprite = params.location("texture-side") ?: return
+        val endSprite = params.location("texture-end") ?: return
         val axis = getAxis(ctx.blockState)
 
         detailLogger.log(INFO, "       axis $axis, material ${ctx.blockState.material}")

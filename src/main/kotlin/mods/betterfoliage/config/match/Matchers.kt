@@ -2,6 +2,7 @@ package mods.betterfoliage.config.match
 
 import mods.betterfoliage.resource.discovery.RuleProcessingContext
 import mods.betterfoliage.resource.discovery.getAncestry
+import mods.betterfoliage.util.findFirst
 import mods.betterfoliage.util.tryDefault
 import net.minecraft.block.Block
 import net.minecraft.client.renderer.model.BlockModel
@@ -29,7 +30,7 @@ object MatchRuleList {
             when (node.matchSource) {
                 Node.MatchSource.BLOCK_CLASS -> BlockMatchRules.visitClass(ctx, node, value)
                 Node.MatchSource.BLOCK_NAME -> BlockMatchRules.visitName(ctx, node, value)
-                Node.MatchSource.MODEL_LOCATION -> ModelMatchRules.visit(ctx, node, value)
+                Node.MatchSource.MODEL_LOCATION -> ModelMatchRules.visitModel(ctx, node, value)
             }
         } catch (e: Exception) {
             MatchResult.Error(node.configSource, e.message ?: "")
@@ -85,7 +86,7 @@ object BlockMatchRules {
 }
 
 object ModelMatchRules {
-    fun visit(ctx: RuleProcessingContext, node: Node.MatchValueList, value: Node.Value): MatchResult {
+    fun visitModel(ctx: RuleProcessingContext, node: Node.MatchValueList, value: Node.Value): MatchResult {
         val source = ctx.discovery.modelLocation.let { MatchValue.Found("model \"$it\"", it) }
         if (value !is Node.Value.Literal) return node.invalidValueType("model", value)
         val (namespace, path) = value.value.splitLocation()
@@ -137,14 +138,29 @@ object ParamMatchRules {
         val target = when(node.value) {
             is Node.Value.Literal -> node.value.value.let { MatchValue.Found("\"$it\"", it) }
             is Node.Value.Texture -> when(val model = ctx.discovery.getUnbaked()) {
-                is BlockModel -> model.getMaterial(node.value.value).texture().toString().let {
-                    MatchValue.Found("texture \"${node.value.value}\" = \"$it\"", it)
-                }
+                is BlockModel -> getModelTexture(model, node.value.value)
                 else -> return node.error("cannot get texture from ${model::class.java.name}")
+            }
+            is Node.Value.Tint -> when(val model = ctx.discovery.getUnbaked()) {
+                is BlockModel -> getModelTint(ctx.discovery.loadHierarchy(model), node.value.value)
+                else -> return node.error("cannot get tint index from ${model::class.java.name}")
             }
             else -> return node.invalidValueType("parameter", node.value)
         }
         ctx.params[node.name] = target.value
         return node.action("parameter \"${node.name}\" set to ${target.description}")
     }
+
+    fun getModelTexture(model: BlockModel, spriteName: String) =
+        model.getMaterial(spriteName).texture().toString().let {
+            MatchValue.Found("texture \"${spriteName}\" = \"$it\"", it)
+        }
+
+    fun getModelTint(model: BlockModel, spriteName: String) =
+        model.elements.findFirst { element ->
+            element.faces.entries.firstOrNull { (_, face) ->
+                face.texture == "#$spriteName"
+            }?.value?.tintIndex ?: -1
+        }?.let { MatchValue.Found("tint index \"$it\" for sprite \"${spriteName}\"", it.toString()) }
+        ?: MatchValue.Found("tint index \"-1\" for unused sprite \"${spriteName}\"", "-1")
 }

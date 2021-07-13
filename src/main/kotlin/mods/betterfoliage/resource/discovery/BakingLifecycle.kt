@@ -57,6 +57,9 @@ data class ModelDiscoveryContext(
         if (addToStateKeys) BetterFoliage.blockTypes.stateKeys[blockState] = key
         logger.log(INFO, "Adding model replacement $modelLocation -> $key")
     }
+    fun <T: IUnbakedModel> loadHierarchy(model: T) = model.apply {
+        getMaterials(this@ModelDiscoveryContext::getUnbaked, mutableSetOf())
+    }
 }
 
 data class ModelBakingContext(

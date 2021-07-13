@@ -4,6 +4,7 @@ match block.class.extends(classOf("minecraft:oak_leaves")) setParam("type", "lea
 match isParam("type", "leaf")
 model.extends("minecraft:block/leaves", "minecraft:block/cube_all")
 setParam("texture-leaf", model.texture("all"))
+setParam("tint-leaf", model.tint("all"))
 end
 
 // Podzol
@@ -14,7 +15,8 @@ match block.class.extends(classOf("minecraft:grass_block")) setParam("type", "gr
 
 match isParam("type", "grass")
 model.extends("minecraft:block/grass_block", "minecraft:block/cube_bottom_top")
-setParam("texture-grass", model.texture("top"))
+setParam("texture", model.texture("top"))
+setParam("tint", model.tint("top"))
 end
 
 // Mycelium & Nylium
@@ -22,7 +24,8 @@ match block.name.matches("minecraft:mycelium", "minecraft:crimson_nylium", "mine
 
 match isParam("type", "mycelium")
 model.extends("minecraft:block/cube_bottom_top")
-setParam("texture-mycelium", model.texture("top"))
+setParam("texture", model.texture("top"))
+setParam("tint", model.tint("top"))
 end
 
 // Dirt

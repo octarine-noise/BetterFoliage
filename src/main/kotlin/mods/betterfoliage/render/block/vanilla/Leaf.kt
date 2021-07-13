@@ -22,8 +22,6 @@ import mods.betterfoliage.resource.discovery.ModelDiscoveryContext
 import mods.betterfoliage.resource.discovery.ParametrizedModelDiscovery
 import mods.betterfoliage.resource.generated.GeneratedLeafSprite
 import mods.betterfoliage.util.Atlas
-import mods.betterfoliage.util.averageColor
-import mods.betterfoliage.util.colorOverride
 import mods.betterfoliage.util.lazyMap
 import mods.betterfoliage.util.logColorOverride
 import net.minecraft.client.renderer.RenderType
@@ -33,7 +31,7 @@ import org.apache.logging.log4j.Level.INFO
 
 object StandardLeafDiscovery : ParametrizedModelDiscovery() {
     override fun processModel(ctx: ModelDiscoveryContext, params: Map<String, String>) {
-        val leafSprite = params.texture("texture-leaf") ?: return
+        val leafSprite = params.location("texture-leaf") ?: return
         val leafType = LeafParticleRegistry.typeMappings.getType(leafSprite) ?: "default"
         val generated = GeneratedLeafSprite(leafSprite, leafType)
             .register(BetterFoliage.generatedPack)
@@ -52,11 +50,7 @@ data class StandardLeafKey(
     val tintIndex: Int get() = if (overrideColor == null) 0 else -1
 
     override fun bake(ctx: ModelBakingContext, wrapped: SpecialRenderModel): SpecialRenderModel {
-        val leafSpriteColor = Atlas.BLOCKS[roundLeafTexture].averageColor.let { hsb ->
-            logColorOverride(BetterFoliageMod.detailLogger(this), Config.leaves.saturationThreshold, hsb)
-            hsb.colorOverride(Config.leaves.saturationThreshold)
-        }
-        return StandardLeafModel(wrapped, this.copy(overrideColor = leafSpriteColor))
+        return StandardLeafModel(wrapped, this)
     }
 }
 

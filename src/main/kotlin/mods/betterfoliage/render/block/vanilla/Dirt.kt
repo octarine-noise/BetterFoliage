@@ -125,11 +125,11 @@ class StandardDirtModel(
         )
         val algaeModels by BetterFoliage.modelManager.lazy {
             val shapes = Config.algae.let { tuftShapeSet(it.size, it.heightMin, it.heightMax, it.hOffset) }
-            tuftModelSet(shapes, Color.white) { algaeSprites[randomI()] }.buildTufts()
+            tuftModelSet(shapes, Color.white, -1) { algaeSprites[randomI()] }.buildTufts()
         }
         val reedModels by BetterFoliage.modelManager.lazy {
             val shapes = Config.reed.let { tuftShapeSet(2.0, it.heightMin, it.heightMax, it.hOffset) }
-            tuftModelSet(shapes, Color.white) { reedSprites[randomI()] }.buildTufts()
+            tuftModelSet(shapes, Color.white, -1) { reedSprites[randomI()] }.buildTufts()
         }
     }
 }

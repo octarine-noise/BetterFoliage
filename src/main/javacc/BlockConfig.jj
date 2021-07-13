@@ -99,4 +99,7 @@ Node.Value matchValue() : {
     |
     "model.texture" <parenStart> t = <stringLiteral> <parenEnd>
     { return new Node.Value.Texture(t.image); }
+    |
+    "model.tint" <parenStart> t = <stringLiteral> <parenEnd>
+    { return new Node.Value.Tint(t.image); }
 }

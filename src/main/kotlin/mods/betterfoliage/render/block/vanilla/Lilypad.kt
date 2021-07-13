@@ -74,13 +74,13 @@ class StandardLilypadModel(
         }
         val lilypadRootModels by BetterFoliage.modelManager.lazy {
             val shapes = tuftShapeSet(1.0, 1.0, 1.0, Config.lilypad.hOffset)
-            tuftModelSet(shapes, Color.white) { lilypadRootSprites[it] }
+            tuftModelSet(shapes, Color.white, -1) { lilypadRootSprites[it] }
                 .transform { move(2.0 to DOWN) }
                 .buildTufts()
         }
         val lilypadFlowerModels by BetterFoliage.modelManager.lazy {
             val shapes = tuftShapeSet(0.5, 0.5, 0.5, Config.lilypad.hOffset)
-            tuftModelSet(shapes, Color.white) { lilypadFlowerSprites[it] }
+            tuftModelSet(shapes, Color.white, -1) { lilypadFlowerSprites[it] }
                 .transform { move(1.0 to DOWN) }
                 .buildTufts()
         }

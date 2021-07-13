@@ -78,7 +78,7 @@ class StandardNetherrackModel(
         }
         val netherrackTuftModels by BetterFoliage.modelManager.lazy {
             val shapes = Config.netherrack.let { tuftShapeSet(it.size, it.heightMin, it.heightMax, it.hOffset) }
-            tuftModelSet(shapes, Color.white) { netherrackTuftSprites[randomI()] }
+            tuftModelSet(shapes, Color.white, -1) { netherrackTuftSprites[randomI()] }
                 .transform { rotate(Rotation.fromUp[DOWN.ordinal]).rotateUV(2) }
                 .buildTufts()
         }

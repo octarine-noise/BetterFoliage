@@ -106,7 +106,7 @@ class StandardSandModel(
         val coralTuftModels by BetterFoliage.modelManager.lazy {
             val shapes = Config.coral.let { tuftShapeSet(it.size, 1.0, 1.0, it.hOffset) }
             allDirections.mapArray { face ->
-                tuftModelSet(shapes, Color.white) { coralTuftSprites[randomI()] }
+                tuftModelSet(shapes, Color.white, -1) { coralTuftSprites[randomI()] }
                     .transform { rotate(Rotation.fromUp[face]) }
                     .buildTufts()
             }

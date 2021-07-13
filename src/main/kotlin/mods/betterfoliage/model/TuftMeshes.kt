@@ -49,13 +49,13 @@ fun tuftQuadSingle(size: Double, height: Double, flipU: Boolean) =
     )
         .mirrorUV(flipU, false)
 
-fun tuftModelSet(shapes: Array<TuftShapeKey>, overrideColor: Color?, spriteGetter: (Int) -> TextureAtlasSprite) =
+fun tuftModelSet(shapes: Array<TuftShapeKey>, color: Color, tint: Int, spriteGetter: (Int) -> TextureAtlasSprite) =
     shapes.mapIndexed { idx, shape ->
         listOf(
             tuftQuadSingle(shape.size, shape.height, shape.flipU1),
             tuftQuadSingle(shape.size, shape.height, shape.flipU2).rotate(rot(UP))
         ).map { it.move(shape.offset) }
-            .map { it.colorAndIndex(overrideColor) }
+            .map { it.color(color).colorIndex(tint) }
             .map { it.sprite(spriteGetter(idx)) }
     }
 

@@ -33,5 +33,6 @@ sealed class Node {
         class Literal(value: String) : Value(value)
         class ClassOf(value: String) : Value(value)
         class Texture(value: String) : Value(value)
+        class Tint(value: String) : Value(value)
     }
 }

@@ -13,9 +13,15 @@ import org.apache.logging.log4j.Level
 abstract class ParametrizedModelDiscovery : HasLogger() {
     abstract fun processModel(ctx: ModelDiscoveryContext, params: Map<String, String>)
 
-    fun Map<String, String>.texture(key: String): ResourceLocation? {
+    fun Map<String, String>.location(key: String): ResourceLocation? {
         val result = get(key)?.let { ResourceLocation(it) }
         if (result == null) detailLogger.log(Level.WARN, "Cannot find texture parameter \"$key\"")
+        return result
+    }
+
+    fun Map<String, String>.int(key: String): Int? {
+        val result = get(key)?.toInt()
+        if (result == null) detailLogger.log(Level.WARN, "Cannot find integer parameter \"$key\"")
         return result
     }
 }
