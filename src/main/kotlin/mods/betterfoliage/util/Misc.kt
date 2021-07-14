@@ -22,6 +22,8 @@ inline fun String.stripEnd(str: String, ignoreCase: Boolean = true) = if (endsWi
 inline fun ResourceLocation.stripStart(str: String) = ResourceLocation(namespace, path.stripStart(str))
 inline fun ResourceLocation.stripEnd(str: String) = ResourceLocation(namespace, path.stripEnd(str))
 
+val String.quoted: String get() = "\"$this\""
+
 /**
  * Property-level delegate backed by a [ThreadLocal].
  *

@@ -10,29 +10,29 @@ data class ConfigSource(
 
 sealed class Node {
     enum class MatchSource { BLOCK_CLASS, BLOCK_NAME, MODEL_LOCATION }
-    interface HasSource { val configSource: ConfigSource }
+    abstract val configSource: ConfigSource
 
     class MatchValueList(
         val matchSource: MatchSource,
         val matchMethod: MatchMethod,
         override val configSource: ConfigSource,
         val values: List<Value>
-    ) : Node(), HasSource
+    ) : Node()
 
     class MatchParam(
         val name: String,
         val values: List<Value>,
         override val configSource: ConfigSource,
-    ) : Node(), HasSource
+    ) : Node()
 
-    class SetParam(val name: String, val value: Value, override val configSource: ConfigSource) : Node(), HasSource
+    class SetParam(val name: String, val value: Value, override val configSource: ConfigSource) : Node()
 
-    class MatchAll(override val configSource: ConfigSource, val list: List<Node>) : Node(), HasSource
+    class MatchAll(override val configSource: ConfigSource, val list: List<Node>) : Node()
 
-    abstract class Value(val value: String) : Node() {
-        class Literal(value: String) : Value(value)
-        class ClassOf(value: String) : Value(value)
-        class Texture(value: String) : Value(value)
-        class Tint(value: String) : Value(value)
+    abstract class Value(override val configSource: ConfigSource, val value: String) : Node() {
+        class Literal(configSource: ConfigSource, value: String) : Value(configSource, value)
+        class ClassOf(configSource: ConfigSource, value: String) : Value(configSource, value)
+        class Texture(configSource: ConfigSource, value: String) : Value(configSource, value)
+        class Tint(configSource: ConfigSource, value: String) : Value(configSource, value)
     }
 }

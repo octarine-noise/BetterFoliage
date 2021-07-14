@@ -92,14 +92,15 @@ void matchValueToList(List<Node.Value> values) : {
 Node.Value matchValue() : {
     Token t;
 } {
-    t = <stringLiteral> { return new Node.Value.Literal(t.image); }
+    t = <stringLiteral>
+    { return new Node.Value.Literal(getSource(t), t.image); }
     |
     "classOf" <parenStart> t = <stringLiteral> <parenEnd>
-    { return new Node.Value.ClassOf(t.image); }
+    { return new Node.Value.ClassOf(getSource(t), t.image); }
     |
     "model.texture" <parenStart> t = <stringLiteral> <parenEnd>
-    { return new Node.Value.Texture(t.image); }
+    { return new Node.Value.Texture(getSource(t), t.image); }
     |
     "model.tint" <parenStart> t = <stringLiteral> <parenEnd>
-    { return new Node.Value.Tint(t.image); }
+    { return new Node.Value.Tint(getSource(t), t.image); }
 }

@@ -1,9 +1,11 @@
 package mods.betterfoliage.resource.discovery
 
 import mods.betterfoliage.BetterFoliage
-import mods.betterfoliage.config.match.MatchResult
-import mods.betterfoliage.config.match.MatchRuleList
-import mods.betterfoliage.config.match.Node
+import mods.betterfoliage.config.match.MAnything
+import mods.betterfoliage.config.match.MListAll
+import mods.betterfoliage.config.match.MListAny
+import mods.betterfoliage.config.match.MValue
+import mods.betterfoliage.config.match.MatchRules
 import mods.betterfoliage.util.HasLogger
 import net.minecraft.client.renderer.model.BlockModel
 import net.minecraft.client.renderer.model.VariantList
@@ -44,7 +46,7 @@ class RuleBasedDiscovery : AbstractModelDiscovery() {
     fun processBlockModel(ctx: ModelDiscoveryContext) {
         val ruleCtx = RuleProcessingContext(ctx)
         val rulesToCheck = BetterFoliage.blockConfig.rules.toMutableList()
-        val ruleResults = mutableListOf<MatchResult>()
+        val ruleResults = mutableListOf<MListAll>()
         var previousSize = 0
 
         // stop processing if nothing changes anymore
@@ -53,33 +55,41 @@ class RuleBasedDiscovery : AbstractModelDiscovery() {
             val iterator = rulesToCheck.listIterator()
             while (iterator.hasNext()) iterator.next().let { rule ->
                 // process single rule
-                MatchRuleList.visitRoot(ruleCtx, rule).let { result ->
+                MatchRules.visitRoot(ruleCtx, rule).let { result ->
                     ruleResults.add(result)
                     // remove rule from active list if:
                     //  - rule succeeded (all directives returned success)
-                    //  - rule is invariant (result will always be the same)
-                    if (result.isSuccess || result.isInvariant) iterator.remove()
+                    //  - rule is immutable (result will always be the same)
+                    if (result.value || result.immutable) iterator.remove()
                 }
             }
         }
 
         // log result of rule processing
-        if (ruleResults.any { it.isSuccess }) {
+        if (ruleResults.any { it.value }) {
             detailLogger.log(Level.INFO, "================================")
             detailLogger.log(Level.INFO, "block state: ${ctx.blockState}")
             detailLogger.log(Level.INFO, "block class: ${ctx.blockState.block::class.java.name}")
             detailLogger.log(Level.INFO, "model      : ${ctx.modelLocation}")
             detailLogger.log(Level.INFO, "--------------------------------")
-            ruleResults.forEach { result ->
-                if (result !is MatchResult.RootList || result.results.shouldLog())
-                    result.log { source, message -> detailLogger.log(Level.INFO, "[$source] $message") }
-            }
+            ruleResults.forEach { logResult(it) }
         }
 
         discoverers[ruleCtx.params["type"]]?.processModel(ctx, ruleCtx.params)
     }
 
-    fun List<MatchResult>.shouldLog() = all { it.isSuccess } || fold(false) { seenInvariantSuccess, result ->
-        seenInvariantSuccess || (result.isSuccess && result.isInvariant)
+    fun logResult(match: MAnything<Boolean>) {
+        when(match) {
+            is MListAll -> if (match.list.any { it.value }) {
+                var seenInvariantSuccess = false
+                match.list.forEach { item ->
+                    if (item.immutable && item.value) seenInvariantSuccess = true
+                    if (seenInvariantSuccess) logResult(item)
+                }
+            }
+            is MListAny -> if (match.value) match.list.first { it.value }.let { logResult(it) }
+                else match.list.forEach { logResult(it) }
+            is MValue<Boolean> -> detailLogger.log(Level.INFO, "[${match.configSource}] ${match.description}")
+        }
     }
 }
