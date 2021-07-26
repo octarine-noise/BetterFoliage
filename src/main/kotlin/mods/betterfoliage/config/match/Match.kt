@@ -71,6 +71,11 @@ class MListAny(val list: List<MValue<Boolean>>) : MAnything<Boolean> {
     override val immutable get() = list.all { it.immutable }
 }
 
+class MNegated(val inner: MAnything<Boolean>) : MAnything<Boolean> {
+    override val value get() = !inner.value
+    override val immutable get() = inner.immutable
+}
+
 /**
  * Value with metadata related to rule matching applied.
  *

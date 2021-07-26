@@ -31,34 +31,42 @@ TOKEN : {
     < parenStart : "(" > |
     < parenEnd : ")" > |
     < dot : "." > |
-    < comma : "," >
+    < comma : "," > |
+    < exclamation : "!" >
 }
 
-void matchFile(List<Node.MatchAll> parent) : {
-    Token t;
+List<Node.MatchAll> matchFile() : {
+    Token t; Node n; List<Node.MatchAll> rules = new LinkedList<Node.MatchAll>();
 } {
     (
         t = "match"
         { List<Node> nodes = new LinkedList<Node>(); }
-        (match(nodes))*
+        (n = match() { nodes.add(n); })*
         "end"
-        { parent.add(new Node.MatchAll(getSource(t), nodes)); }
+        { rules.add(new Node.MatchAll(getSource(t), nodes)); }
     )*
+    { return rules; }
 }
 
-void match(List<Node> parent) : {
-    Token t; Token t2; MatchMethod mm; List<Node.Value> values; Node.Value v;
+Node match() : {
+    Token t; Token t2; MatchMethod mm; List<Node.Value> values; Node.Value v; Node n;
 } {
-    "block." matchBlock(parent)
+    <exclamation> n = match() { return new Node.Negate(n); }
+    |
+    t = "block.class." mm = matchMethod() <parenStart> values = matchValueList() <parenEnd>
+    { return new Node.MatchValueList(Node.MatchSource.BLOCK_CLASS, mm, getSource(t), values); }
+    |
+    t = "block.name." mm = matchMethod() <parenStart> values = matchValueList() <parenEnd>
+    { return new Node.MatchValueList(Node.MatchSource.BLOCK_NAME, mm, getSource(t), values); }
     |
     t = "model." mm = matchMethod() <parenStart> values = matchValueList() <parenEnd>
-    { parent.add(new Node.MatchValueList(Node.MatchSource.MODEL_LOCATION, mm, getSource(t), values)); }
+    { return new Node.MatchValueList(Node.MatchSource.MODEL_LOCATION, mm, getSource(t), values); }
     |
     t = "isParam" <parenStart> t2 = <stringLiteral> <comma> values = matchValueList() <parenEnd>
-    { parent.add(new Node.MatchParam(t2.image, values, getSource(t))); }
+    { return new Node.MatchParam(t2.image, values, getSource(t)); }
     |
     t = "setParam" <parenStart> t2 = <stringLiteral> <comma> v = matchValue() <parenEnd>
-    { parent.add(new Node.SetParam(t2.image, v, getSource(t))); }
+    { return new Node.SetParam(t2.image, v, getSource(t)); }
 }
 
 MatchMethod matchMethod() : {} {
@@ -67,26 +75,13 @@ MatchMethod matchMethod() : {} {
     "contains" { return MatchMethod.CONTAINS; }
 }
 
-void matchBlock(List<Node> parent) : {
-    Token t; MatchMethod mm; List<Node.Value> values;
-} {
-    t = "class." mm = matchMethod() <parenStart> values = matchValueList() <parenEnd>
-    { parent.add(new Node.MatchValueList(Node.MatchSource.BLOCK_CLASS, mm, getSource(t), values)); }
-    |
-    t = "name." mm = matchMethod() <parenStart> values = matchValueList() <parenEnd>
-    { parent.add(new Node.MatchValueList(Node.MatchSource.BLOCK_NAME, mm, getSource(t), values)); }
-}
-
 List<Node.Value> matchValueList() : {
     List<Node.Value> values = new LinkedList<Node.Value>();
-} {
-    matchValueToList(values) (<comma> matchValueToList(values))* { return values; }
-}
-
-void matchValueToList(List<Node.Value> values) : {
     Node.Value v;
 } {
     v = matchValue() { values.add(v); }
+    (<comma> v = matchValue() { values.add(v); } )*
+    { return values; }
 }
 
 Node.Value matchValue() : {

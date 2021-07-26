@@ -17,17 +17,22 @@ object MatchRules {
     fun visitRoot(ctx: RuleProcessingContext, node: Node.MatchAll): MListAll {
         val results = mutableListOf<MAnything<Boolean>>()
         for (rule in node.list) {
-            val result = when(rule) {
-                is Node.MatchValueList -> mMatchList(ctx, rule)
-                is Node.MatchParam -> mParam(ctx, rule)
-                is Node.SetParam -> mParamSet(ctx, rule)
-                else -> rule.error("match type not implemented: ${rule::class.java.name.quoted}").left
-            }
+            val result = mNode(ctx, rule)
             results.add(result)
             if (!result.value) break
         }
         return MListAll(results)
     }
+
+    fun mNode(ctx: RuleProcessingContext, node: Node): MAnything<Boolean> = when(node) {
+        is Node.MatchValueList -> mMatchList(ctx, node)
+        is Node.MatchParam -> mParam(ctx, node)
+        is Node.SetParam -> mParamSet(ctx, node)
+        is Node.Negate -> mNegate(ctx, node)
+        else -> node.error("match type not implemented: ${node::class.java.name.quoted}").left
+    }
+
+    fun mNegate(ctx: RuleProcessingContext, node: Node.Negate) = MNegated(mNode(ctx, node.node))
 
     fun mMatchList(ctx: RuleProcessingContext, node: Node.MatchValueList) = node.values.map { value ->
         when (node.matchSource) {

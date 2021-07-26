@@ -4,6 +4,7 @@ import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.config.match.MAnything
 import mods.betterfoliage.config.match.MListAll
 import mods.betterfoliage.config.match.MListAny
+import mods.betterfoliage.config.match.MNegated
 import mods.betterfoliage.config.match.MValue
 import mods.betterfoliage.config.match.MatchRules
 import mods.betterfoliage.util.HasLogger
@@ -89,6 +90,7 @@ class RuleBasedDiscovery : AbstractModelDiscovery() {
             }
             is MListAny -> if (match.value) match.list.first { it.value }.let { logResult(it) }
                 else match.list.forEach { logResult(it) }
+            is MNegated -> logResult(match.inner)
             is MValue<Boolean> -> detailLogger.log(Level.INFO, "[${match.configSource}] ${match.description}")
         }
     }

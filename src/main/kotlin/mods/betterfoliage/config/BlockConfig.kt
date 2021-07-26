@@ -21,7 +21,7 @@ class BlockConfig : HasLogger() {
             val parser = BlockConfigParser(resource.inputStream)
                 .apply { configFile = configLocation.stripStart("config/betterfoliage/").toString() }
             try {
-                mutableListOf<Node.MatchAll>().apply { parser.matchFile(this) }
+                parser.matchFile()
             } catch (e: ParseException) {
                 parseError(e, configLocation)
             } catch (e: TokenMgrError) {

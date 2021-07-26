@@ -25,6 +25,10 @@ sealed class Node {
         override val configSource: ConfigSource,
     ) : Node()
 
+    class Negate(val node: Node) : Node() {
+        override val configSource get() = node.configSource
+    }
+
     class SetParam(val name: String, val value: Value, override val configSource: ConfigSource) : Node()
 
     class MatchAll(override val configSource: ConfigSource, val list: List<Node>) : Node()
