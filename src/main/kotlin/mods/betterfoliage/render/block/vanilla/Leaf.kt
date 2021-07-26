@@ -39,6 +39,7 @@ object StandardLeafDiscovery : ParametrizedModelDiscovery() {
 
         detailLogger.log(INFO, "     particle $leafType")
         ctx.addReplacement(StandardLeafKey(generated, leafType, null))
+        BetterFoliage.blockTypes.leaf.add(ctx.blockState)
     }
 }
 

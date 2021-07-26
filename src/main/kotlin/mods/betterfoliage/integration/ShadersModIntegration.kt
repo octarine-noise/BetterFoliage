@@ -1,9 +1,12 @@
 package mods.betterfoliage.integration
 
 import mods.betterfoliage.BetterFoliage
+import mods.betterfoliage.BlockAliases
+import mods.betterfoliage.BufferBuilder_sVertexBuilder
+import mods.betterfoliage.SVertexBuilder
+import mods.betterfoliage.Shaders
 import mods.betterfoliage.render.pipeline.RenderCtxBase
 import mods.betterfoliage.render.pipeline.RenderCtxVanilla
-import mods.betterfoliage.resource.discovery.BakeWrapperManager
 import mods.betterfoliage.util.HasLogger
 import mods.betterfoliage.util.allAvailable
 import mods.betterfoliage.util.get
@@ -41,7 +44,7 @@ object ShadersModIntegration : HasLogger() {
      * @see mods.betterfoliage.loader.BetterFoliageTransformer
      */
     @JvmStatic fun getBlockStateOverride(state: BlockState, world: IBlockDisplayReader, pos: BlockPos): BlockState {
-//        if (LeafRegistry[state, world, pos] != null) return defaultLeaves
+        if (state in BetterFoliage.blockTypes.leaf) return defaultLeaves
 //        if (BlockConfig.crops.matchesClass(state.block)) return defaultGrass
         return state
     }
