@@ -41,7 +41,7 @@ object StandardLeafDiscovery : ParametrizedModelDiscovery() {
             detailLogger.logTextureColor(INFO, "leaf texture \"$texture\"", it)
             it.brighten().asColor
         }
-        val leafType = LeafParticleRegistry.typeMappings.getType(texture) ?: "default"
+        val leafType = params["particle"] ?: "default"
         val generated = GeneratedLeafSprite(texture, leafType)
             .register(BetterFoliage.generatedPack)
             .apply { ctx.sprites.add(this) }

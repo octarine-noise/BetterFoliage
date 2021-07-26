@@ -1,0 +1,9 @@
+match isParam("type", "leaf")
+block.name.contains("spruce", "fir")
+setParam("particle", "spruce")
+end
+
+match isParam("type", "leaf")
+block.name.contains("jungle", "palm")
+setParam("particle", "jungle")
+end

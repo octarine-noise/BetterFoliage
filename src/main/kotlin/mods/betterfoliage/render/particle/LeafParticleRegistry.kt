@@ -10,8 +10,10 @@ import mods.betterfoliage.util.HasLogger
 import mods.betterfoliage.util.get
 import mods.betterfoliage.util.getLines
 import mods.betterfoliage.util.resourceManager
+import mods.betterfoliage.util.stripEnd
 import mods.betterfoliage.util.stripStart
 import net.minecraft.client.renderer.texture.MissingTextureSprite
+import net.minecraft.resources.IResourceManager
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.event.TextureStitchEvent
 import net.minecraftforge.eventbus.api.SubscribeEvent
@@ -28,16 +30,18 @@ interface LeafParticleKey {
 }
 
 object LeafParticleRegistry : HasLogger(), VeryEarlyReloadListener {
-    val typeMappings = TextureMatcher()
-    val allTypes get() = (typeMappings.mappings.map { it.type } + "default").distinct()
-
+    val allTypes = mutableSetOf<String>()
     val particles = hashMapOf<String, SpriteSet>()
 
     operator fun get(type: String) = particles[type] ?: particles["default"]!!
 
-    override fun onReloadStarted() {
-        typeMappings.loadMappings(ResourceLocation(BetterFoliageMod.MOD_ID, "leaf_texture_mappings.cfg"))
-        detailLogger.log(INFO, "Loaded leaf particle mappings, types = [${allTypes.joinToString(", ")}]")
+    override fun onReloadStarted(resourceManager: IResourceManager) {
+        allTypes.clear()
+        resourceManager.listResources("textures/particle") { it.startsWith("falling_leaf_") }
+            .filter { it.namespace == BetterFoliageMod.MOD_ID }
+            .map { it.stripStart("textures/particle/falling_leaf_").stripEnd(".png") }
+            .map { it.path.substringBefore("_", "") }
+            .forEach { leafType -> if (!leafType.isEmpty()) allTypes.add(leafType) }
     }
 
     @SubscribeEvent
@@ -57,7 +61,7 @@ object LeafParticleRegistry : HasLogger(), VeryEarlyReloadListener {
     @SubscribeEvent
     fun handlePostStitch(event: TextureStitchEvent.Post) {
         if (event.map.location() == Atlas.PARTICLES.resourceId) {
-            (typeMappings.mappings.map { it.type } + "default").distinct().forEach { leafType ->
+            allTypes.forEach { leafType ->
                 val sprites = (0 until 16).map { idx ->
                     ResourceLocation(BetterFoliageMod.MOD_ID, "particle/falling_leaf_${leafType}_$idx")
                 }

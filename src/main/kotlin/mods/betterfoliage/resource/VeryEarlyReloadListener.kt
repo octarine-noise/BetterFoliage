@@ -19,9 +19,9 @@ interface VeryEarlyReloadListener : IFutureReloadListener {
         backgroundExecutor: Executor,
         gameExecutor: Executor
     ): CompletableFuture<Void> {
-        onReloadStarted()
+        onReloadStarted(resourceManager)
         return stage.wait(null)
     }
 
-    fun onReloadStarted() {}
+    fun onReloadStarted(resourceManager: IResourceManager) {}
 }
