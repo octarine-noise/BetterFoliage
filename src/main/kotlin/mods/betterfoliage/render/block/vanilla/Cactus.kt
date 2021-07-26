@@ -87,7 +87,7 @@ class StandardCactusModel(
                 crossModelsRaw(64, config.size, 0.0, 0.0)
                     .transform { rotateZ(randomD(-config.sizeVariation, config.sizeVariation)) }
             }
-            crossModelsTextured(models, -1, true) { cactusCrossSprite }
+            crossModelsTextured(models, Color.white, -1, true) { cactusCrossSprite }
         }
     }
 }

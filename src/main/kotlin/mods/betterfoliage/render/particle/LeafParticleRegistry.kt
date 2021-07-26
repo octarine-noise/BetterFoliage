@@ -23,7 +23,8 @@ interface LeafBlockModel {
 
 interface LeafParticleKey {
     val leafType: String
-    val overrideColor: Color?
+    val tintIndex: Int
+    val avgColor: Color
 }
 
 object LeafParticleRegistry : HasLogger(), VeryEarlyReloadListener {

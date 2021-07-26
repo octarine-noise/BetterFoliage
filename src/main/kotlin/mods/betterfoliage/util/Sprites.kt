@@ -16,6 +16,8 @@ import java.io.IOException
 import javax.imageio.ImageIO
 import kotlin.math.atan2
 import kotlin.math.cos
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.sin
 
 enum class Atlas(val resourceId: ResourceLocation) {
@@ -107,8 +109,10 @@ val ResourceLocation.averageHSB: HSB get() = resourceManager.loadSprite(this).le
     return HSB(avgHue, sumSaturation / numOpaque.toFloat(), sumBrightness / numOpaque.toFloat())
 }
 
-fun HSB.lighten(multiplier: Float = 2.0f, ceiling: Float = 0.9f) =
-    copy(brightness = (brightness * multiplier).coerceAtMost(ceiling)).asColor
+fun HSB.brighten(multiplier: Float = 1.5f, floor: Float = 0.1f, ceiling: Float = 0.9f) =
+    copy(brightness = (brightness * multiplier).coerceAtMost(max(ceiling, brightness)).coerceAtLeast(min(floor, brightness)))
+fun HSB.saturate(multiplier: Float = 1.5f, floor: Float = 0.1f, ceiling: Float = 0.9f) =
+    copy(saturation = (saturation * multiplier).coerceAtMost(max(ceiling, saturation)).coerceAtLeast(min(floor, saturation)))
 
 /** Weighted blend of 2 packed RGB colors */
 fun blendRGB(rgb1: Int, rgb2: Int, weight1: Int, weight2: Int): Int {

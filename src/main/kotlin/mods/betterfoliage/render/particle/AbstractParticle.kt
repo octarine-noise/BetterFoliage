@@ -1,6 +1,8 @@
 package mods.betterfoliage.render.particle
 
 import com.mojang.blaze3d.vertex.IVertexBuilder
+import mods.betterfoliage.model.Color
+import mods.betterfoliage.model.HSB
 import mods.betterfoliage.util.Double3
 import net.minecraft.client.Minecraft
 import net.minecraft.client.particle.SpriteTexturedParticle
@@ -92,10 +94,16 @@ abstract class AbstractParticle(world: ClientWorld, x: Double, y: Double, z: Dou
         renderVertex(coords[3], sprite.u0, sprite.v1)
     }
 
-    fun setColor(color: Int) {
-        bCol = (color and 255) / 256.0f
-        gCol = ((color shr 8) and 255) / 256.0f
-        rCol = ((color shr 16) and 255) / 256.0f
+    fun setColor(color: Color) {
+        rCol = color.red / 256.0f
+        gCol = color.green / 256.0f
+        bCol = color.blue / 256.0f
     }
+
+    /**
+     * Set particle color to the "stronger" of the given colors, determined by higher color saturation
+     */
+    fun setColor(color1: Color, color2: Color) =
+        setColor(if (color1.asHSB.saturation > color2.asHSB.saturation) color1 else color2)
 }
 

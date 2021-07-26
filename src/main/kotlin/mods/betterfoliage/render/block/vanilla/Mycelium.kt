@@ -25,7 +25,7 @@ import mods.betterfoliage.util.averageHSB
 import mods.betterfoliage.util.idxOrNull
 import mods.betterfoliage.util.lazy
 import mods.betterfoliage.util.lazyMap
-import mods.betterfoliage.util.lighten
+import mods.betterfoliage.util.brighten
 import mods.betterfoliage.util.randomI
 import net.minecraft.client.renderer.RenderType
 import net.minecraft.util.Direction
@@ -36,7 +36,7 @@ object StandardMyceliumDiscovery : ParametrizedModelDiscovery() {
     override fun processModel(ctx: ModelDiscoveryContext, params: Map<String, String>) {
         val texture = params.location("texture") ?: return
         val tint = params.int("tint") ?: -1
-        val color = Atlas.BLOCKS.file(texture).averageHSB.lighten(multiplier = 1.5f)
+        val color = Atlas.BLOCKS.file(texture).averageHSB.brighten(multiplier = 1.5f).asColor
         ctx.addReplacement(StandardMyceliumKey(texture, tint, color))
         ctx.blockState.block.extendLayers()
     }

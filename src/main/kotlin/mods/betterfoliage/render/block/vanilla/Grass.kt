@@ -28,19 +28,24 @@ import mods.betterfoliage.util.averageHSB
 import mods.betterfoliage.util.idxOrNull
 import mods.betterfoliage.util.lazy
 import mods.betterfoliage.util.lazyMap
-import mods.betterfoliage.util.lighten
+import mods.betterfoliage.util.brighten
+import mods.betterfoliage.util.logTextureColor
 import mods.betterfoliage.util.randomI
 import net.minecraft.client.renderer.RenderType
 import net.minecraft.util.Direction.DOWN
 import net.minecraft.util.Direction.UP
 import net.minecraft.util.ResourceLocation
+import org.apache.logging.log4j.Level.INFO
 import java.util.Random
 
 object StandardGrassDiscovery : ParametrizedModelDiscovery() {
     override fun processModel(ctx: ModelDiscoveryContext, params: Map<String, String>) {
         val texture = params.location("texture") ?: return
         val tint = params.int("tint") ?: -1
-        val color = Atlas.BLOCKS.file(texture).averageHSB.lighten()
+        val color = Atlas.BLOCKS.file(texture).averageHSB.let {
+            detailLogger.logTextureColor(INFO, "grass texture \"$texture\"", it)
+            it.brighten().asColor
+        }
         ctx.addReplacement(StandardGrassKey(texture, tint, color))
         BetterFoliage.blockTypes.grass.add(ctx.blockState)
         ctx.blockState.block.extendLayers()

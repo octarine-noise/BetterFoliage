@@ -70,6 +70,8 @@ data class Color(val alpha: Int, val red: Int, val green: Int, val blue: Int) {
     )
 
     val asInt get() = (alpha shl 24) or (red shl 16) or (green shl 8) or blue
+    val asHSB get() = HSB.fromColor(this)
+
     operator fun times(f: Float) = Color(
         alpha,
         (f * red.toFloat()).toInt().coerceIn(0 until 256),
@@ -91,6 +93,10 @@ data class HSB(var hue: Float, var saturation: Float, var brightness: Float) {
         }
         fun fromColorBGRA(color: Int): HSB {
             val hsbVals = java.awt.Color.RGBtoHSB((color shr 16) and 255, (color shr 8) and 255, color and 255, null)
+            return HSB(hsbVals[0], hsbVals[1], hsbVals[2])
+        }
+        fun fromColor(color: Color): HSB {
+            val hsbVals = java.awt.Color.RGBtoHSB(color.red, color.green, color.blue, null)
             return HSB(hsbVals[0], hsbVals[1], hsbVals[2])
         }
     }

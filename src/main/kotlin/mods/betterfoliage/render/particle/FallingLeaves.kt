@@ -1,6 +1,7 @@
 package mods.betterfoliage.render.particle
 
 import mods.betterfoliage.config.Config
+import mods.betterfoliage.model.Color
 import mods.betterfoliage.util.Double3
 import mods.betterfoliage.util.PI2
 import mods.betterfoliage.util.minmax
@@ -44,7 +45,7 @@ class FallingLeafParticle(
         yd = -Config.fallingLeaves.speed
 
         quadSize = Config.fallingLeaves.size.toFloat() * 0.1f
-        setColor(leaf.overrideColor?.asInt ?: blockColor)
+        if (leaf.tintIndex == -1) setColor(leaf.avgColor) else setColor(leaf.avgColor, Color(blockColor))
         sprite = LeafParticleRegistry[leaf.leafType][randomI(max = 1024)]
     }
 

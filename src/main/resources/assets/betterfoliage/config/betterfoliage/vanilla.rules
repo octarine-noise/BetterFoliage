@@ -3,8 +3,8 @@ match block.class.extends(classOf("minecraft:oak_leaves")) setParam("type", "lea
 
 match isParam("type", "leaf")
 model.extends("minecraft:block/leaves", "minecraft:block/cube_all")
-setParam("texture-leaf", model.texture("all"))
-setParam("tint-leaf", model.tint("all"))
+setParam("texture", model.texture("all"))
+setParam("tint", model.tint("all"))
 end
 
 // Podzol

@@ -2,6 +2,7 @@
 package mods.betterfoliage.util
 
 import mods.betterfoliage.BetterFoliageMod
+import mods.betterfoliage.model.HSB
 import net.minecraft.block.BlockState
 import net.minecraft.client.Minecraft
 import net.minecraft.util.ResourceLocation
@@ -63,6 +64,11 @@ fun nextPowerOf2(x: Int): Int {
 abstract class HasLogger {
     val logger = BetterFoliageMod.logger(this)
     val detailLogger = BetterFoliageMod.detailLogger(this)
+}
+
+fun Logger.logTextureColor(level: Level, description: String, avgColor: HSB) {
+    val rgb = avgColor.asColor
+    log(level, "$description average color RGB[${rgb.red},${rgb.green},${rgb.blue}], HSB[${avgColor.hue},${avgColor.saturation},${avgColor.brightness}]")
 }
 
 fun getBlockModel(state: BlockState) = Minecraft.getInstance().blockRenderer.blockModelShaper.getBlockModel(state)

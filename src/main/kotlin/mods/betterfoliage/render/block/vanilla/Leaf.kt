@@ -22,8 +22,12 @@ import mods.betterfoliage.resource.discovery.ModelDiscoveryContext
 import mods.betterfoliage.resource.discovery.ParametrizedModelDiscovery
 import mods.betterfoliage.resource.generated.GeneratedLeafSprite
 import mods.betterfoliage.util.Atlas
+import mods.betterfoliage.util.averageHSB
+import mods.betterfoliage.util.lazy
 import mods.betterfoliage.util.lazyMap
-import mods.betterfoliage.util.logColorOverride
+import mods.betterfoliage.util.brighten
+import mods.betterfoliage.util.logTextureColor
+import mods.betterfoliage.util.saturate
 import net.minecraft.client.renderer.RenderType
 import net.minecraft.util.Direction.UP
 import net.minecraft.util.ResourceLocation
@@ -31,14 +35,19 @@ import org.apache.logging.log4j.Level.INFO
 
 object StandardLeafDiscovery : ParametrizedModelDiscovery() {
     override fun processModel(ctx: ModelDiscoveryContext, params: Map<String, String>) {
-        val leafSprite = params.location("texture-leaf") ?: return
-        val leafType = LeafParticleRegistry.typeMappings.getType(leafSprite) ?: "default"
-        val generated = GeneratedLeafSprite(leafSprite, leafType)
+        val texture = params.location("texture") ?: return
+        val tint = params.int("tint") ?: -1
+        val color = Atlas.BLOCKS.file(texture).averageHSB.let {
+            detailLogger.logTextureColor(INFO, "leaf texture \"$texture\"", it)
+            it.brighten().asColor
+        }
+        val leafType = LeafParticleRegistry.typeMappings.getType(texture) ?: "default"
+        val generated = GeneratedLeafSprite(texture, leafType)
             .register(BetterFoliage.generatedPack)
             .apply { ctx.sprites.add(this) }
 
         detailLogger.log(INFO, "     particle $leafType")
-        ctx.addReplacement(StandardLeafKey(generated, leafType, null))
+        ctx.addReplacement(StandardLeafKey(generated, leafType, tint, color))
         BetterFoliage.blockTypes.leaf.add(ctx.blockState)
     }
 }
@@ -46,10 +55,9 @@ object StandardLeafDiscovery : ParametrizedModelDiscovery() {
 data class StandardLeafKey(
     val roundLeafTexture: ResourceLocation,
     override val leafType: String,
-    override val overrideColor: Color?
+    override val tintIndex: Int,
+    override val avgColor: Color
 ) : HalfBakedWrapperKey(), LeafParticleKey {
-    val tintIndex: Int get() = if (overrideColor == null) 0 else -1
-
     override fun bake(ctx: ModelBakingContext, wrapped: SpecialRenderModel): SpecialRenderModel {
         return StandardLeafModel(wrapped, this)
     }
@@ -78,14 +86,16 @@ class StandardLeafModel(
         val leafSpritesSnowed by SpriteSetDelegate(Atlas.BLOCKS) { idx ->
             ResourceLocation(BetterFoliageMod.MOD_ID, "blocks/better_leaves_snowed_$idx")
         }
-        val leafModelsBase = BetterFoliage.modelManager.lazyMap { key: StandardLeafKey ->
+        val leafModelsBase by BetterFoliage.modelManager.lazy {
             Config.leaves.let { crossModelsRaw(64, it.size, it.hOffset, it.vOffset) }
         }
         val leafModelsNormal = BetterFoliage.modelManager.lazyMap { key: StandardLeafKey ->
-            crossModelsTextured(leafModelsBase[key], key.tintIndex, true) { key.roundLeafTexture }
+            // generated leaf textures naturally carry the color of their source textures
+            // no need to color the quad a second time
+            crossModelsTextured(leafModelsBase, Color.white, key.tintIndex, true) { key.roundLeafTexture }
         }
         val leafModelsSnowed = BetterFoliage.modelManager.lazyMap { key: StandardLeafKey ->
-            crossModelsTextured(leafModelsBase[key], -1, false) { leafSpritesSnowed[it].name }
+            crossModelsTextured(leafModelsBase, Color.white, -1, false) { leafSpritesSnowed[it].name }
         }
     }
 }

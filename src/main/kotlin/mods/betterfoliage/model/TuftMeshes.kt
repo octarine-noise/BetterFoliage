@@ -84,20 +84,20 @@ fun crossModelsRaw(num: Int, size: Double, hOffset: Double, vOffset: Double): Li
     }
 }
 
-fun crossModelSingle(base: List<Quad>, sprite: TextureAtlasSprite, tintIndex: Int,scrambleUV: Boolean) =
+fun crossModelSingle(base: List<Quad>, sprite: TextureAtlasSprite, color: Color, tint: Int, scrambleUV: Boolean) =
     base.map { if (scrambleUV) it.scrambleUV(random, canFlipU = true, canFlipV = true, canRotate = true) else it }
-        .map { it.colorIndex(tintIndex) }
+        .map { it.color(color).colorIndex(tint) }
         .mapIndexed { idx, quad -> quad.sprite(sprite) }
         .withOpposites()
         .bake(false)
 
 fun crossModelsTextured(
     leafBase: Iterable<List<Quad>>,
-    tintIndex: Int,
+    color: Color, tint: Int,
     scrambleUV: Boolean,
     spriteGetter: (Int) -> ResourceLocation
 ) = leafBase.mapIndexed { idx, leaf ->
-    crossModelSingle(leaf, Atlas.BLOCKS[spriteGetter(idx)], tintIndex, scrambleUV)
+    crossModelSingle(leaf, Atlas.BLOCKS[spriteGetter(idx)], color, tint, scrambleUV)
 }.toTypedArray()
 
 fun Iterable<Quad>.withOpposites() = flatMap { listOf(it, it.flipped) }
