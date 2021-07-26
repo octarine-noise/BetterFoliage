@@ -2,7 +2,7 @@ package mods.betterfoliage.chunk
 
 import mods.betterfoliage.util.get
 import mods.betterfoliage.util.isInstance
-import mods.octarinecore.ChunkCacheOF
+import mods.betterfoliage.ChunkCacheOF
 import net.minecraft.client.renderer.chunk.ChunkRenderCache
 import net.minecraft.client.world.ClientWorld
 import net.minecraft.util.math.BlockPos

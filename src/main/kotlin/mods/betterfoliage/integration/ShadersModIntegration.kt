@@ -8,7 +8,6 @@ import mods.betterfoliage.util.HasLogger
 import mods.betterfoliage.util.allAvailable
 import mods.betterfoliage.util.get
 import mods.betterfoliage.util.mapArray
-import mods.octarinecore.*
 import net.minecraft.block.BlockRenderType
 import net.minecraft.block.BlockRenderType.MODEL
 import net.minecraft.block.BlockState

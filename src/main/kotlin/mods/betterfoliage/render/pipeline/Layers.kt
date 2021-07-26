@@ -1,7 +1,7 @@
 package mods.betterfoliage.render.pipeline
 
 import mods.betterfoliage.model.SpecialRenderData
-import mods.octarinecore.RenderTypeLookup
+import mods.betterfoliage.RenderTypeLookup
 import net.minecraft.block.Block
 import net.minecraft.client.renderer.RenderType
 import java.util.function.Predicate

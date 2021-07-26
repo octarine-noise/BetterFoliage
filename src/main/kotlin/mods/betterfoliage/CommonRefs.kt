@@ -1,4 +1,4 @@
-package mods.octarinecore
+package mods.betterfoliage
 
 import mods.betterfoliage.util.ClassRef
 import mods.betterfoliage.util.ClassRef.Companion.float

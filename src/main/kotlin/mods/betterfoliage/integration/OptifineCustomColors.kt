@@ -4,10 +4,10 @@ import mods.betterfoliage.chunk.BlockCtx
 import mods.betterfoliage.util.ThreadLocalDelegate
 import mods.betterfoliage.util.allAvailable
 import mods.betterfoliage.util.reflectField
-import mods.octarinecore.BlockPos
-import mods.octarinecore.BlockState
-import mods.octarinecore.CustomColors
-import mods.octarinecore.RenderEnv
+import mods.betterfoliage.BlockPos
+import mods.betterfoliage.BlockState
+import mods.betterfoliage.CustomColors
+import mods.betterfoliage.RenderEnv
 import net.minecraft.block.BlockState
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.model.BakedQuad

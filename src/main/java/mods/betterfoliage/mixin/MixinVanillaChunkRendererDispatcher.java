@@ -39,4 +39,11 @@ public class MixinChunkRendererDispatcher {
             BlockPos blockpos2) {
         RenderCtxBase.reset(chunkrendercache, blockrendererdispatcher, blockpos2, random);
     }
+
+//    @Inject(method = compile, at = @At(value = "INVOKE", target = getBlockState), locals = LocalCapture.PRINT)
+//    void printLocals(
+//            float p_228940_1_, float p_228940_2_, float p_228940_3_,
+//            ChunkRenderDispatcher.CompiledChunk p_228940_4_, RegionRenderCacheBuilder p_228940_5_,
+//            CallbackInfoReturnable ci) {
+//    }
 }
