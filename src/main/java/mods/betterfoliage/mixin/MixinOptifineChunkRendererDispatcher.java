@@ -1,0 +1,57 @@
+package mods.betterfoliage.mixin;
+
+import com.mojang.blaze3d.matrix.MatrixStack;
+import mods.betterfoliage.render.pipeline.RenderCtxBase;
+import net.minecraft.block.BlockState;
+import net.minecraft.client.renderer.BlockRendererDispatcher;
+import net.minecraft.client.renderer.RegionRenderCacheBuilder;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.chunk.ChunkRenderDispatcher;
+import net.minecraft.client.renderer.chunk.VisGraph;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockDisplayReader;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Coerce;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
+
+import java.util.Iterator;
+import java.util.Random;
+import java.util.Set;
+
+@Mixin(targets = "net.minecraft.client.renderer.chunk.ChunkRenderDispatcher$ChunkRender$RebuildTask")
+public class MixinOptifineChunkRendererDispatcher {
+
+    private static final String compile = "Lnet/minecraft/client/renderer/chunk/ChunkRenderDispatcher$ChunkRender$RebuildTask;compile(FFFLnet/minecraft/client/renderer/chunk/ChunkRenderDispatcher$CompiledChunk;Lnet/minecraft/client/renderer/RegionRenderCacheBuilder;)Ljava/util/Set;";
+    private static final String getBlockStateMcp = "Lnet/optifine/override/ChunkCacheOF;getBlockState(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/BlockState;";
+    private static final String getBlockStateSrg = "Lnet/optifine/override/ChunkCacheOF;func_180495_p(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/BlockState;";
+
+    @Inject(method = compile, locals = LocalCapture.CAPTURE_FAILHARD, require = 1, at = {
+            @At(value = "INVOKE", target = getBlockStateMcp),
+            @At(value = "INVOKE", target = getBlockStateSrg),
+    })
+    void onStartBlockRender(
+            float xIn, float yIn, float zIn,
+            ChunkRenderDispatcher.CompiledChunk compiledChunkIn, RegionRenderCacheBuilder builderIn,
+            CallbackInfoReturnable<Set> cir,
+            int i, BlockPos blockpos, BlockPos blockpos1, VisGraph visgraph, Set set, MatrixStack matrixstack,
+            @Coerce IBlockDisplayReader chunkrendercache, RenderType[] singleLayer,
+            boolean shaders, boolean shadersMidBlock, Random random,
+            BlockRendererDispatcher blockrendererdispatcher, Iterator var18,
+            @Coerce BlockPos blockpos2
+    ) {
+        RenderCtxBase.reset(chunkrendercache, blockrendererdispatcher, blockpos2, random);
+    }
+
+//    @Inject(method = compile, locals = LocalCapture.PRINT, require = 1, at = {
+//            @At(value = "INVOKE", target = getBlockStateMcp),
+//            @At(value = "INVOKE", target = getBlockStateSrg),
+//    })
+//    void printLocals(
+//            float p_228940_1_, float p_228940_2_, float p_228940_3_,
+//            ChunkRenderDispatcher.CompiledChunk p_228940_4_, RegionRenderCacheBuilder p_228940_5_,
+//            CallbackInfoReturnable<BlockState> ci) {
+//    }
+}

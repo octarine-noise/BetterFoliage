@@ -16,6 +16,7 @@ import net.minecraft.client.renderer.BlockRendererDispatcher
 import net.minecraft.client.renderer.chunk.ChunkRenderCache
 import net.minecraft.util.Direction
 import net.minecraft.util.math.BlockPos
+import net.minecraft.world.IBlockDisplayReader
 import net.minecraftforge.client.model.data.IModelData
 import java.util.Random
 
@@ -67,7 +68,7 @@ abstract class RenderCtxBase(
 
     companion object {
         @JvmStatic
-        fun reset(chunkRenderCache: ChunkRenderCache, blockRendererDispatcher: BlockRendererDispatcher, pos: BlockPos, random: Random) {
+        fun reset(chunkRenderCache: IBlockDisplayReader, blockRendererDispatcher: BlockRendererDispatcher, pos: BlockPos, random: Random) {
             // prepare render data
             val blockCtx = BasicBlockCtx(chunkRenderCache, pos)
             val model = blockRendererDispatcher.getBlockModel(blockCtx.state)

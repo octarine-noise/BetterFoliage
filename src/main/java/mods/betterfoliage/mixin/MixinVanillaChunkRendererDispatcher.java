@@ -2,8 +2,6 @@ package mods.betterfoliage.mixin;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import mods.betterfoliage.render.pipeline.RenderCtxBase;
-import mods.betterfoliage.render.pipeline.RenderCtxForge;
-import mods.betterfoliage.render.pipeline.RenderCtxVanilla;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.RegionRenderCacheBuilder;
 import net.minecraft.client.renderer.chunk.ChunkRenderCache;
@@ -13,7 +11,6 @@ import net.minecraft.util.math.BlockPos;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
@@ -22,7 +19,7 @@ import java.util.Random;
 import java.util.Set;
 
 @Mixin(targets = "net.minecraft.client.renderer.chunk.ChunkRenderDispatcher$ChunkRender$RebuildTask")
-public class MixinChunkRendererDispatcher {
+public class MixinVanillaChunkRendererDispatcher {
 
     private static final String compile = "Lnet/minecraft/client/renderer/chunk/ChunkRenderDispatcher$ChunkRender$RebuildTask;compile(FFFLnet/minecraft/client/renderer/chunk/ChunkRenderDispatcher$CompiledChunk;Lnet/minecraft/client/renderer/RegionRenderCacheBuilder;)Ljava/util/Set;";
     private static final String getBlockState = "Lnet/minecraft/client/renderer/chunk/ChunkRenderCache;getBlockState(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/BlockState;";
