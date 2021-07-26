@@ -78,7 +78,7 @@ class StandardLeafModel(
             ctx.vertexLighter = RoundLeafLightingPreferUp
             val leafIdx = ctx.random.nextInt(64)
             ctx.renderQuads(leafNormal[leafIdx])
-            if (ctx.state(UP).isSnow) ctx.renderQuads(leafSnowed[leafIdx])
+            if (Config.leaves.snowEnabled && ctx.state(UP).isSnow) ctx.renderQuads(leafSnowed[leafIdx])
         }
     }
 
