@@ -1,0 +1,1 @@
+match block.class.extends(classOf("desolation:charred_branches")) setParam("type", "leaf") end

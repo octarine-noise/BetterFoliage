@@ -1,0 +1,48 @@
+// A lot of BYG leaf models are very sloppily made, extending "block/cube" or even "block/block"
+// These rules are meh, but there's no better way to do it, there's no method to the madness here
+
+// snowy leaves
+match isParam("type", "leaf") block.name.contains("byg:leaves") model.contains("snowy")
+setParam("texture", model.texture("up")) setParam("tint", model.tint("up")) end
+
+// list of leaves where texture is "up"
+match model.matches(
+"byg:block/aspen_leaves",
+"byg:block/baobab_leaves",
+"byg:block/blue_enchanted_leaves"
+) setParam("texture", model.texture("up")) setParam("tint", model.tint("up"))
+end
+
+// list of leaves where texture is "top"
+match model.matches(
+"byg:block/flowering_orchard_leaves",
+"byg:block/joshua_leaves",
+"byg:block/mahogany_leaves",
+"byg:block/maple_leaves",
+"byg:block/orchard_leaves",
+"byg:block/rainbow_eucalyptus_leaves",
+"byg:block/willow_leaves"
+) setParam("texture", model.texture("top")) setParam("tint", model.tint("top"))
+end
+
+// ripe leaves (tint comes from overlay)
+match model.matches(
+"byg:block/ripe_joshua_leaves",
+"byg:block/ripe_orchard_leaves"
+) setParam("texture", model.texture("top")) setParam("tint", model.tint("overlay"))
+end
+
+//
+// other blocks
+//
+match block.name.matches("byg:meadow_dirt") setParam("type", "dirt") end
+match block.name.matches("byg:overgrown_crimson_blackstone") setParam("type", "mycelium") end
+
+match model.matches("byg:block/meadow_grass_block", "byg:block/overgrown_stone", "byg:block/overgrown_dacite", "byg:block/overgrown_netherrack")
+setParam("type", "grass")
+setParam("texture", model.texture("top")) setParam("tint", model.tint("top"))
+end
+
+match block.name.matches("byg:overgrown_stone", "byg:overgrown_dacite", "byg:overgrown_netherrack", "byg:podzol_dacite")
+setParam("no-connect", "true")
+end

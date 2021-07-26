@@ -46,7 +46,8 @@ object StandardGrassDiscovery : ParametrizedModelDiscovery() {
             detailLogger.logTextureColor(INFO, "grass texture \"$texture\"", it)
             it.brighten().asColor
         }
-        ctx.addReplacement(StandardGrassKey(texture, tint, color))
+        val noConnect = params["no-connect"] == "true"
+        ctx.addReplacement(StandardGrassKey(texture, tint, color, noConnect))
         BetterFoliage.blockTypes.grass.add(ctx.blockState)
         ctx.blockState.block.extendLayers()
     }
@@ -56,6 +57,7 @@ data class StandardGrassKey(
     val sprite: ResourceLocation,
     val tintIndex: Int,
     val avgColor: Color,
+    val noConnect: Boolean
 ) : HalfBakedWrapperKey() {
     override fun bake(ctx: ModelBakingContext, wrapped: SpecialRenderModel): SpecialRenderModel {
         return StandardGrassModel(wrapped, this)
@@ -76,7 +78,7 @@ class GrassRenderData(
 
 class StandardGrassModel(
     wrapped: SpecialRenderModel,
-    key: StandardGrassKey
+    val key: StandardGrassKey
 ) : HalfBakedSpecialWrapper(wrapped) {
 
     val tuftNormal by grassTuftMeshesNormal.delegate(key)
@@ -91,7 +93,7 @@ class StandardGrassModel(
         val stateAbove = ctx.state(UP)
         val isAir = ctx.isAir(UP)
         val isSnowed = stateAbove.isSnow
-        val connected = Config.connectedGrass.enabled &&
+        val connected = !key.noConnect && Config.connectedGrass.enabled &&
                 (!isSnowed || Config.connectedGrass.snowEnabled) &&
                 BetterFoliage.blockTypes.run { stateBelow in grass || stateBelow in dirt }
 

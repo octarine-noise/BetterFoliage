@@ -79,8 +79,16 @@ class StandardDirtModel(
         val isShallowWater = isWater && state2Up.isAir
         val isSaltWater = isWater && ctx.biome?.biomeCategory in SALTWATER_BIOMES
 
+        // get the actual grass model to use for connected grass rendering
+        // return null if the grass specifically does not want to connect
+        val connectedGrassModel = if (!isConnectedGrass) null else getBlockModel(stateUp).let { model ->
+            (model as? SpecialRenderModel)?.resolve(random)?.let { grassModel ->
+                if ((grassModel as? StandardGrassModel)?.key?.noConnect == true) null else grassModel
+            }
+        }
+
         return DirtRenderData(
-            connectedGrassModel = if (isConnectedGrass) (getBlockModel(stateUp) as? SpecialRenderModel)?.resolve(random) else null,
+            connectedGrassModel = connectedGrassModel,
             algaeIdx = random.idxOrNull(algaeModels) { Config.algae.enabled(random) && isDeepWater && isSaltWater },
             reedIdx = random.idxOrNull(reedModels) { Config.reed.enabled(random) && isShallowWater && !isSaltWater }
         )

@@ -1,0 +1,1 @@
+match block.class.extends(classOf("environmental:blue_wisteria_leaves")) setParam("type", "leaf") end

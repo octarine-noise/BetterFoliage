@@ -1,0 +1,11 @@
+match isParam("type", "leaf")
+model.extends("biomesoplenty:block/leaves_overlay")
+setParam("texture", model.texture("leaves"))
+setParam("tint", model.tint("leaves"))
+end
+
+match isParam("type", "grass")
+model.extends("biomesoplenty:block/origin_grass_block")
+setParam("texture", model.texture("top"))
+setParam("tint", model.tint("top"))
+end
