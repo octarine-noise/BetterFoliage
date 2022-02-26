@@ -9,6 +9,7 @@ import net.minecraft.client.render.model.BakedModel
 import net.minecraft.client.render.model.BasicBakedModel
 import net.minecraft.client.render.model.json.WeightedUnbakedModel
 import net.minecraft.util.Identifier
+import net.minecraft.util.collection.Weighted
 import org.apache.logging.log4j.Level.INFO
 import org.apache.logging.log4j.Level.WARN
 
@@ -50,9 +51,9 @@ class WeightedUnbakedKey(
             )
         }
         val weightedSpecials = bakedModels.map { (variant, model) ->
-            WeightedModelWrapper.WeightedModel(model, variant.weight)
+            Weighted.of(model, variant.weight)
         }
-        return WeightedModelWrapper(weightedSpecials, weightedSpecials[0].model)
+        return WeightedModelWrapper(weightedSpecials, weightedSpecials[0].data)
     }
 
     override fun toString() = "[WeightedUnbakedKey, ${replacements.size} replacements]"

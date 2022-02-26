@@ -10,7 +10,8 @@ import mods.betterfoliage.util.randomB
 import mods.betterfoliage.util.randomD
 import mods.betterfoliage.util.randomF
 import mods.betterfoliage.util.randomI
-import net.fabricmc.fabric.api.event.world.WorldTickCallback
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
 import net.minecraft.client.particle.ParticleTextureSheet
 import net.minecraft.client.world.ClientWorld
 import net.minecraft.util.math.BlockPos
@@ -54,7 +55,7 @@ class FallingLeafParticle(
 
     override fun update() {
         if (randomF() > 0.95f) rotationSpeed = -rotationSpeed
-        if (age > maxAge - 20) colorAlpha = 0.05f * (maxAge - age)
+        if (age > maxAge - 20) alpha = 0.05f * (maxAge - age)
 
         if (onGround || wasCollided) {
             velocity.setTo(0.0, 0.0, 0.0)
@@ -82,7 +83,7 @@ class FallingLeafParticle(
         else ParticleTextureSheet.PARTICLE_SHEET_TRANSLUCENT
 }
 
-object LeafWindTracker : WorldTickCallback, ClientWorldLoadCallback {
+object LeafWindTracker : ClientTickEvents.EndWorldTick, ClientWorldLoadCallback {
     val random = Random()
     val target = Double3.zero
     val current = Double3.zero
@@ -96,19 +97,17 @@ object LeafWindTracker : WorldTickCallback, ClientWorldLoadCallback {
         target.setTo(cos(direction) * speed, 0.0, sin(direction) * speed)
     }
 
-    override fun tick(world: World) {
-        if (world.isClient) {
-            // change target wind speed
-            if (world.time >= nextChange) changeWindTarget(world)
+    override fun onEndTick(world: ClientWorld) {
+        // change target wind speed
+        if (world.time >= nextChange) changeWindTarget(world)
 
-            // change current wind speed
-            val changeRate = if (world.isRaining) 0.015 else 0.005
-            current.add(
-                (target.x - current.x).minmax(-changeRate, changeRate),
-                0.0,
-                (target.z - current.z).minmax(-changeRate, changeRate)
-            )
-        }
+        // change current wind speed
+        val changeRate = if (world.isRaining) 0.015 else 0.005
+        current.add(
+            (target.x - current.x).minmax(-changeRate, changeRate),
+            0.0,
+            (target.z - current.z).minmax(-changeRate, changeRate)
+        )
     }
 
     override fun loadWorld(world: ClientWorld) {

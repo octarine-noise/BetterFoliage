@@ -68,7 +68,7 @@ abstract class AbstractParticle(world: ClientWorld, x: Double, y: Double, z: Dou
                            currentAngle: Float = this.angle,
                            prevAngle: Float = this.prevAngle,
                            sprite: Sprite = this.sprite,
-                           alpha: Float = this.colorAlpha) {
+                           alpha: Float = this.alpha) {
 
         val center = Double3.lerp(tickDelta.toDouble(), prevPos, currentPos)
         val angle = MathHelper.lerp(tickDelta, prevAngle, currentAngle)
@@ -84,7 +84,7 @@ abstract class AbstractParticle(world: ClientWorld, x: Double, y: Double, z: Dou
 
         fun renderVertex(vertex: Double3, u: Float, v: Float) = vertexConsumer
             .vertex(vertex.x, vertex.y, vertex.z).texture(u, v)
-            .color(colorRed, colorGreen, colorBlue, alpha).light(lightmapCoord)
+            .color(red, green, blue, alpha).light(lightmapCoord)
             .next()
 
         renderVertex(coords[0], sprite.maxU, sprite.maxV)
@@ -94,9 +94,9 @@ abstract class AbstractParticle(world: ClientWorld, x: Double, y: Double, z: Dou
     }
 
     fun setColor(color: Int) {
-        colorBlue = (color and 255) / 256.0f
-        colorGreen = ((color shr 8) and 255) / 256.0f
-        colorRed = ((color shr 16) and 255) / 256.0f
+        blue = (color and 255) / 256.0f
+        green = ((color shr 8) and 255) / 256.0f
+        red = ((color shr 16) and 255) / 256.0f
     }
 }
 
