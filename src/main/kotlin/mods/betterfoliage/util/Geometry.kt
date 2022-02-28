@@ -1,6 +1,6 @@
 package mods.betterfoliage.util
 
-import net.minecraft.client.util.math.Vector3f
+import net.minecraft.util.math.Vec3f
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import net.minecraft.util.math.Direction.Axis.*
@@ -101,7 +101,7 @@ data class Double3(var x: Double, var y: Double, var z: Double) {
     val length: Double get() = Math.sqrt(x * x + y * y + z * z)
     val normalize: Double3 get() = (1.0 / length).let { Double3(x * it, y * it, z * it) }
     val nearestCardinal: Direction get() = nearestAngle(this, allDirections.asIterable()) { it.vec }.first
-    val asVec3f: Vector3f get() = Vector3f(x.toFloat(), y.toFloat(), z.toFloat())
+    val asVec3f: Vec3f get() = Vec3f(x.toFloat(), y.toFloat(), z.toFloat())
 }
 
 /** 3D vector of [Int]s. Offers both mutable operations, and immutable operations in operator notation. */

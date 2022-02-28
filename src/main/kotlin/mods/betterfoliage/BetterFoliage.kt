@@ -1,6 +1,7 @@
 package mods.betterfoliage
 
-import me.zeroeightsix.fiber.JanksonSettings
+import io.github.fablabsmc.fablabs.api.fiber.v1.serialization.FiberSerialization
+import io.github.fablabsmc.fablabs.api.fiber.v1.serialization.JanksonValueSerializer
 import mods.betterfoliage.chunk.ChunkOverlayManager
 import mods.betterfoliage.config.BlockConfig
 import mods.betterfoliage.config.MainConfig
@@ -25,6 +26,7 @@ import org.apache.logging.log4j.simple.SimpleLogger
 import org.apache.logging.log4j.util.PropertiesUtil
 import java.io.File
 import java.io.PrintStream
+import java.nio.file.Files
 import java.util.*
 
 
@@ -41,11 +43,11 @@ object BetterFoliage : ClientModInitializer {
         obj::class.java.simpleName, Level.DEBUG, false, true, true, false, "yyyy-MM-dd HH:mm:ss", null, PropertiesUtil(Properties()), detailLogStream
     )
 
-    val configFile get() = File(FabricLoader.getInstance().configDirectory, "BetterFoliage.json")
+    val configFile get() = FabricLoader.getInstance().configDir.resolve("BetterFoliage.json")
 
     val config = MainConfig().apply {
-        if (configFile.exists()) JanksonSettings().deserialize(fiberNode, configFile.inputStream())
-        else JanksonSettings().serialize(fiberNode, configFile.outputStream(), false)
+        if (Files.exists(configFile)) FiberSerialization.deserialize(fiberNode, Files.newInputStream(configFile), JanksonValueSerializer(false))
+        else FiberSerialization.serialize(fiberNode, Files.newOutputStream(configFile), JanksonValueSerializer(false))
     }
 
     val blockConfig = BlockConfig()

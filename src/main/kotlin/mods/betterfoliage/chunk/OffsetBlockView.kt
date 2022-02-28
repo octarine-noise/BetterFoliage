@@ -16,6 +16,9 @@ open class OffsetBlockView(open val original: BlockView, val modded: BlockPos, v
     inline fun actualPos(pos: BlockPos) = if (pos != null && pos.x == modded.x && pos.y == modded.y && pos.z == modded.z) target else pos
 
     override fun getBlockState(pos: BlockPos) = original.getBlockState(actualPos(pos))
+    override fun getHeight() = original.height;
+    override fun getBottomY() = original.bottomY;
+
     override fun getBlockEntity(pos: BlockPos) = original.getBlockEntity(actualPos(pos))
     override fun getFluidState(pos: BlockPos) = original.getFluidState(actualPos(pos))
 }

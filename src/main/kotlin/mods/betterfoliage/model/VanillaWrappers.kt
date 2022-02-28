@@ -12,7 +12,8 @@ import net.minecraft.client.render.RenderLayers
 import net.minecraft.client.render.model.BakedModel
 import net.minecraft.client.render.model.BasicBakedModel
 import net.minecraft.item.ItemStack
-import net.minecraft.util.collection.WeightedPicker
+import net.minecraft.util.collection.Weighted
+import net.minecraft.util.collection.Weighting
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.BlockRenderView
 import java.util.*
@@ -69,11 +70,10 @@ class WrappedMeshModel(wrapped: BasicBakedModel, val mesh: Mesh) : WrappedBakedM
 }
 
 class WeightedModelWrapper(
-    val models: List<WeightedModel>, baseModel: BakedModel
+    val models: List<Weighted.Present<BakedModel>>, baseModel: BakedModel
 ): WrappedBakedModel(baseModel), FabricBakedModel {
 
-    class WeightedModel(val model: BakedModel, val weight: Int) : WeightedPicker.Entry(weight)
-    fun getModel(random: Random) = WeightedPicker.getRandom(random, models).model
+    fun getModel(random: Random): BakedModel = Weighting.getRandom(random, models).get().data
 
     override fun emitBlockQuads(blockView: BlockRenderView, state: BlockState, pos: BlockPos, randomSupplier: Supplier<Random>, context: RenderContext) {
         (getModel(randomSupplier.get()) as FabricBakedModel).emitBlockQuads(blockView, state, pos, randomSupplier, context)

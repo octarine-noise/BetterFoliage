@@ -34,6 +34,8 @@
     ]
   },
 
+  "accessWidener" : "betterfoliage.accesswidener",
+
   "mixins": [
     "betterfoliage.mixins.json"
   ],
@@ -42,6 +44,6 @@
     "fabricloader": ">=0.11.3",
     "fabric": "*",
     "fabric-language-kotlin": "*",
-    "minecraft": "1.16.5"
+    "minecraft": "1.18.x"
   }
 }

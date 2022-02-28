@@ -1,6 +1,7 @@
 package mods.betterfoliage.config
 
-import me.zeroeightsix.fiber.tree.ConfigNode
+import io.github.fablabsmc.fablabs.api.fiber.v1.builder.ConfigTreeBuilder
+import io.github.fablabsmc.fablabs.api.fiber.v1.tree.ConfigTree
 import java.util.*
 
 interface PopulationConfigData {
@@ -11,7 +12,7 @@ interface PopulationConfigData {
 
 fun population(default: Int) = integer(default, min = 0, max = 64, langKey = recurring)
 
-class MainConfig : DelegatingConfigGroup(ConfigNode("root", null)) {
+class MainConfig : DelegatingConfigGroup(ConfigTree.builder(null, "root")) {
 
     val enabled by boolean(true, langKey = fakeCategory("global"))
     val nVidia by boolean(true, langKey = fakeCategory("global"))
@@ -30,7 +31,7 @@ class MainConfig : DelegatingConfigGroup(ConfigNode("root", null)) {
     val risingSoul by subNode { RisingSoulConfig(it) }
 }
 
-class LeavesConfig(node: ConfigNode) : DelegatingConfigGroup(node) {
+class LeavesConfig(node: ConfigTreeBuilder) : DelegatingConfigGroup(node) {
     val enabled by boolean(true, langKey = recurring)
     val snowEnabled by boolean(true)
     val dense by boolean(false)
@@ -43,7 +44,7 @@ class LeavesConfig(node: ConfigNode) : DelegatingConfigGroup(node) {
     val saturationThreshold by double(0.1, min = 0.0, max = 1.0, langKey = recurring)
 }
 
-class ShortGrassConfig(node: ConfigNode) : DelegatingConfigGroup(node), PopulationConfigData {
+class ShortGrassConfig(node: ConfigTreeBuilder) : DelegatingConfigGroup(node), PopulationConfigData {
     override val enabled by boolean(true, langKey = recurring)
     val myceliumEnabled by boolean(true)
     val snowEnabled by boolean(true)
@@ -57,12 +58,12 @@ class ShortGrassConfig(node: ConfigNode) : DelegatingConfigGroup(node), Populati
     val saturationThreshold by double(0.1, min = 0.0, max = 1.0, langKey = recurring)
 }
 
-class ConnectedGrassConfig(node: ConfigNode) : DelegatingConfigGroup(node) {
+class ConnectedGrassConfig(node: ConfigTreeBuilder) : DelegatingConfigGroup(node) {
     val enabled by boolean(true, langKey = recurring)
     val snowEnabled by boolean(true)
 }
 
-class RoundLogConfig(node: ConfigNode) : DelegatingConfigGroup(node) {
+class RoundLogConfig(node: ConfigTreeBuilder) : DelegatingConfigGroup(node) {
     val enabled by boolean(true, langKey = recurring)
 
     val defaultY by boolean(false)
@@ -77,21 +78,21 @@ class RoundLogConfig(node: ConfigNode) : DelegatingConfigGroup(node) {
     val zProtection by double(0.99, min = 0.9, max = 1.0)
 }
 
-class CactusConfig(node: ConfigNode) : DelegatingConfigGroup(node) {
+class CactusConfig(node: ConfigTreeBuilder) : DelegatingConfigGroup(node) {
     val enabled by boolean(true, langKey = recurring)
     val size by double(1.3, min = 1.0, max = 2.0, langKey = recurring)
     val sizeVariation by double(0.1, min = 0.0, max = 0.5)
     val hOffset by double(0.1, min = 0.0, max = 0.5, langKey = recurring)
 }
 
-class LilypadConfig(node: ConfigNode) : DelegatingConfigGroup(node), PopulationConfigData {
+class LilypadConfig(node: ConfigTreeBuilder) : DelegatingConfigGroup(node), PopulationConfigData {
     override val enabled by boolean(true, langKey = recurring)
     val hOffset by double(0.1, min = 0.0, max = 0.25, langKey = recurring)
     override val population by population(16)
     val shaderWind by boolean(true, langKey = recurring)
 }
 
-class ReedConfig(node: ConfigNode) : DelegatingConfigGroup(node), PopulationConfigData {
+class ReedConfig(node: ConfigTreeBuilder) : DelegatingConfigGroup(node), PopulationConfigData {
     override val enabled by boolean(true, langKey = recurring)
     val hOffset by double(0.2, min = 0.0, max = 0.4, langKey = recurring)
     val heightMin by double(1.7, min = 1.5, max = 3.0, langKey = recurring)
@@ -102,7 +103,7 @@ class ReedConfig(node: ConfigNode) : DelegatingConfigGroup(node), PopulationConf
     val shaderWind by boolean(true, langKey = recurring)
 }
 
-class AlgaeConfig(node: ConfigNode) : DelegatingConfigGroup(node), PopulationConfigData {
+class AlgaeConfig(node: ConfigTreeBuilder) : DelegatingConfigGroup(node), PopulationConfigData {
     override val enabled by boolean(true, langKey = recurring)
     val hOffset by double(0.1, min = 0.0, max = 0.4, langKey = recurring)
     val size by double(1.0, min = 0.5, max = 1.5, langKey = recurring)
@@ -112,7 +113,7 @@ class AlgaeConfig(node: ConfigNode) : DelegatingConfigGroup(node), PopulationCon
     val shaderWind by boolean(true, langKey = recurring)
 }
 
-class CoralConfig(node: ConfigNode) : DelegatingConfigGroup(node), PopulationConfigData {
+class CoralConfig(node: ConfigTreeBuilder) : DelegatingConfigGroup(node), PopulationConfigData {
     override val enabled by boolean(true, langKey = recurring)
     val shallowWater by boolean(false)
     val hOffset by double(0.2, min = 0.0, max = 0.4, langKey = recurring)
@@ -123,7 +124,7 @@ class CoralConfig(node: ConfigNode) : DelegatingConfigGroup(node), PopulationCon
     override val population by population(48)
 }
 
-class NetherrackConfig(node: ConfigNode) : DelegatingConfigGroup(node) {
+class NetherrackConfig(node: ConfigTreeBuilder) : DelegatingConfigGroup(node) {
     val enabled by boolean(true, langKey = recurring)
     val hOffset by double(0.2, min = 0.0, max = 0.4, langKey = recurring)
     val size by double(1.0, min = 0.5, max = 1.5, langKey = recurring)
@@ -131,7 +132,7 @@ class NetherrackConfig(node: ConfigNode) : DelegatingConfigGroup(node) {
     val heightMax by double(0.8, min = 0.5, max = 1.5, langKey = recurring) { it.coerceAtLeast(heightMin) }
 }
 
-class FallingLeavesConfig(node: ConfigNode) : DelegatingConfigGroup(node) {
+class FallingLeavesConfig(node: ConfigTreeBuilder) : DelegatingConfigGroup(node) {
     val enabled by boolean(true, langKey = recurring)
     val opacityHack by boolean(false)
     val speed by double(0.05, min = 0.01, max = 0.15)
@@ -143,7 +144,7 @@ class FallingLeavesConfig(node: ConfigNode) : DelegatingConfigGroup(node) {
     val lifetime by double(7.5, min = 1.0, max = 15.0)
 }
 
-class RisingSoulConfig(node: ConfigNode) : DelegatingConfigGroup(node) {
+class RisingSoulConfig(node: ConfigTreeBuilder) : DelegatingConfigGroup(node) {
     val enabled by boolean(true, langKey = recurring)
     val chance by double(0.02, min = 0.001, max = 1.0)
     val perturb by double(0.05, min = 0.01, max = 0.25)

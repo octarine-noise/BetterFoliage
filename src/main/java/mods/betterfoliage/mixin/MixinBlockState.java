@@ -2,13 +2,14 @@ package mods.betterfoliage.mixin;
 
 import mods.betterfoliage.Hooks;
 import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockView;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
  * Mixin to override the result of {@link BlockState}.getAmbientOcclusionLightValue().
@@ -16,14 +17,14 @@ import org.spongepowered.asm.mixin.injection.Redirect;
  * Needed to avoid excessive darkening of Round Logs at the corners, now that they are not full blocks.
  */
 @Mixin(AbstractBlock.AbstractBlockState.class)
-@SuppressWarnings({"deprecation"})
-public class MixinBlockState {
-    private static final String callFrom = "Lnet/minecraft/block/AbstractBlock$AbstractBlockState;getAmbientOcclusionLightLevel(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;)F";
-    // why is the INVOKEVIRTUAL target class Block in the bytecode, not AbstractBlock?
-    private static final String callTo = "Lnet/minecraft/block/Block;getAmbientOcclusionLightLevel(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;)F";
+public abstract class MixinBlockState {
 
-    @Redirect(method = callFrom, at = @At(value = "INVOKE", target = callTo))
-    float getAmbientOcclusionValue(Block block, BlockState state, BlockView reader, BlockPos pos) {
-        return Hooks.getAmbientOcclusionLightValueOverride(block.getAmbientOcclusionLightLevel(state, reader, pos), state);
+    @Shadow protected abstract BlockState asBlockState();
+
+    @Inject(method = "getAmbientOcclusionLightLevel", at = @At("RETURN"), cancellable = true)
+    void getAmbientOcclusionValue(BlockView world, BlockPos pos, CallbackInfoReturnable<Float> cir) {
+        if (Hooks.shouldOverrideAmbientOcclusionLightValue(this.asBlockState())) {
+            cir.setReturnValue(Hooks.getAmbientOcclusionLightValueOverride());
+        }
     }
 }

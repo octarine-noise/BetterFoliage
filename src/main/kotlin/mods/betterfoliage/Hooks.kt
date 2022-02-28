@@ -20,12 +20,14 @@ import net.minecraft.util.shape.VoxelShape
 import net.minecraft.util.shape.VoxelShapes
 import net.minecraft.world.BlockView
 
-fun getAmbientOcclusionLightValueOverride(original: Float, state: BlockState): Float {
-    if (BetterFoliage.config.enabled &&
-        BetterFoliage.config.roundLogs.enabled &&
-        BetterFoliage.blockTypes.hasTyped<RoundLogKey>(state)
-    ) return BetterFoliage.config.roundLogs.dimming.toFloat()
-    return original
+fun shouldOverrideAmbientOcclusionLightValue(state: BlockState): Boolean {
+    return BetterFoliage.config.enabled &&
+            BetterFoliage.config.roundLogs.enabled &&
+            BetterFoliage.blockTypes.hasTyped<RoundLogKey>(state)
+}
+
+fun getAmbientOcclusionLightValueOverride(): Float {
+    return BetterFoliage.config.roundLogs.dimming.toFloat()
 }
 
 fun getUseNeighborBrightnessOverride(original: Boolean, state: BlockState): Boolean {
