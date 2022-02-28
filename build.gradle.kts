@@ -35,6 +35,7 @@ dependencies {
     listOf("modImplementation", "include").forEach { configuration ->
         configuration("me.shedaniel.cloth:cloth-config-fabric:${properties["clothConfigVersion"]}")
         configuration("me.zeroeightsix:fiber:${properties["fiberVersion"]}")
+        configuration("com.github.pyrofab:fibertocloth:${properties["fiberToClothVersion"]}")
     }
 
     // Canvas Renderer

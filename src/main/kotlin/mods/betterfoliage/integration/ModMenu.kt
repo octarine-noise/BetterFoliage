@@ -1,16 +1,16 @@
 package mods.betterfoliage.integration
 
-import io.github.prospector.modmenu.api.ConfigScreenFactory
-import io.github.prospector.modmenu.api.ModMenuApi
+import com.terraformersmc.modmenu.api.ConfigScreenFactory
+import com.terraformersmc.modmenu.api.ModMenuApi
+import io.github.fablabsmc.fablabs.api.fiber.v1.serialization.FiberSerialization
+import io.github.fablabsmc.fablabs.api.fiber.v1.serialization.JanksonValueSerializer
 import me.shedaniel.clothconfig2.api.ConfigBuilder
-import me.zeroeightsix.fiber.JanksonSettings
 import mods.betterfoliage.BetterFoliage
 import mods.betterfoliage.resource.discovery.BakeWrapperManager
 import net.minecraft.client.MinecraftClient
-import net.minecraft.client.gui.screen.Screen
 import net.minecraft.client.resource.language.I18n
 import net.minecraft.text.LiteralText
-import java.util.function.Function
+import java.nio.file.Files
 
 object ModMenu : ModMenuApi {
 
@@ -22,7 +22,7 @@ object ModMenu : ModMenuApi {
             builder.getOrCreateCategory(LiteralText("main")).addEntry(rootOption)
         }
         builder.savingRunnable = Runnable {
-            JanksonSettings().serialize(BetterFoliage.config.fiberNode, BetterFoliage.configFile.outputStream(), false)
+            FiberSerialization.serialize(BetterFoliage.config.fiberNode, Files.newOutputStream(BetterFoliage.configFile), JanksonValueSerializer(false))
             BakeWrapperManager.invalidate()
             MinecraftClient.getInstance().worldRenderer.reload()
         }
