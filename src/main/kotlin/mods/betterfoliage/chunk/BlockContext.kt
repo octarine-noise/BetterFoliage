@@ -11,6 +11,7 @@ import net.minecraft.client.MinecraftClient
 import net.minecraft.client.render.chunk.ChunkRendererRegion
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
+import net.minecraft.util.registry.RegistryEntry
 import net.minecraft.world.BlockRenderView
 import net.minecraft.world.WorldView
 import net.minecraft.world.biome.Biome
@@ -30,13 +31,13 @@ interface BlockCtx {
     fun state(dir: Direction) = world.getBlockState(pos + dir.offset)
     fun state(offset: Int3) = world.getBlockState(pos + offset)
 
-    val biome: Biome? get() =
+    val biome: RegistryEntry<Biome>? get() =
         (world as? WorldView)?.getBiome(pos) ?:
         (world as? ChunkRendererRegion)?.let { ChunkRendererRegion_world[it]?.getBiome(pos) }
 
     val isNormalCube: Boolean get() = state.isOpaqueFullCube(world, pos)
 
-    fun shouldSideBeRendered(side: Direction) = Block.shouldDrawSide(state, world, pos, side)
+    fun shouldSideBeRendered(side: Direction) = Block.shouldDrawSide(state, world, pos, side, pos.offset(side))
 
     fun isNeighborSolid(dir: Direction) = offset(dir).let { it.state.isSideSolidFullSquare(it.world, it.pos, dir.opposite) }
 
@@ -55,6 +56,6 @@ open class BasicBlockCtx(
 
 open class CachedBlockCtx(world: BlockRenderView, pos: BlockPos) : BasicBlockCtx(world, pos) {
     var neighbors = Array<BlockState>(6) { world.getBlockState(pos + allDirections[it].offset) }
-    override var biome: Biome? = super.biome
+    override var biome = super.biome
     override fun state(dir: Direction) = neighbors[dir.ordinal]
 }

@@ -18,6 +18,8 @@ open class OffsetBlockView(open val original: BlockView, val modded: BlockPos, v
     override fun getBlockState(pos: BlockPos) = original.getBlockState(actualPos(pos))
     override fun getBlockEntity(pos: BlockPos) = original.getBlockEntity(actualPos(pos))
     override fun getFluidState(pos: BlockPos) = original.getFluidState(actualPos(pos))
+    override fun getHeight(): Int = original.height
+    override fun getBottomY(): Int = original.bottomY
 }
 
 @Suppress("NOTHING_TO_INLINE", "NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS", "HasPlatformType")

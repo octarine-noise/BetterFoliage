@@ -21,11 +21,11 @@ import kotlin.collections.mutableListOf
 import kotlin.collections.mutableMapOf
 import kotlin.collections.set
 
-val BlockRenderView.dimType: DimensionType get() = when {
+val BlockRenderView.dimType: DimensionType? get() = when {
     this is WorldView -> dimension
     this is ChunkRendererRegion -> this[ChunkRendererRegion_world]!!.dimension
 //    this.isInstance(ChunkCacheOF) -> this[ChunkCacheOF.chunkCache]!!.dimType
-    else -> throw IllegalArgumentException("DimensionType of world with class ${this::class.qualifiedName} cannot be determined!")
+    else -> null
 }
 
 /**
@@ -83,7 +83,7 @@ object ChunkOverlayManager : ClientChunkLoadCallback, ClientWorldLoadCallback {
     }
 
     override fun loadChunk(chunk: WorldChunk) {
-        chunk[WorldChunk_world]!!.dimType.let { dim ->
+        chunk[WorldChunk_world]!!.dimType?.let { dim ->
             val data = chunkData[dim] ?: mutableMapOf<ChunkPos, ChunkOverlayData>().apply { chunkData[dim] = this }
             data.let { chunks ->
                 // check for existence first because Optifine fires a TON of these
@@ -93,7 +93,7 @@ object ChunkOverlayManager : ClientChunkLoadCallback, ClientWorldLoadCallback {
     }
 
     override fun unloadChunk(chunk: WorldChunk) {
-        chunk[WorldChunk_world]!!.dimType.let { dim ->
+        chunk[WorldChunk_world]!!.dimType?.let { dim ->
             chunkData[dim]?.remove(chunk.pos)
         }
     }

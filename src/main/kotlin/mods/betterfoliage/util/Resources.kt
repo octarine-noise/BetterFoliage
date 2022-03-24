@@ -1,14 +1,14 @@
 package mods.betterfoliage.util
 
 import net.minecraft.client.MinecraftClient
-import net.minecraft.resource.ReloadableResourceManager
+import net.minecraft.resource.ReloadableResourceManagerImpl
 import net.minecraft.resource.Resource
 import net.minecraft.resource.ResourceManager
 import net.minecraft.util.Identifier
 
 /** Concise getter for the Minecraft resource manager. */
-val resourceManager: ReloadableResourceManager get() =
-    MinecraftClient.getInstance().resourceManager as ReloadableResourceManager
+val resourceManager: ReloadableResourceManagerImpl get() =
+    MinecraftClient.getInstance().resourceManager as ReloadableResourceManagerImpl
 
 /** Append a string to the [ResourceLocation]'s path. */
 operator fun Identifier.plus(str: String) = Identifier(namespace, path + str)

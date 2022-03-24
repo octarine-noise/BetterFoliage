@@ -86,7 +86,7 @@ abstract class ColumnRenderLayer : ChunkOverlayLayer<ColumnLayerData> {
     val allNeighborOffsets = (-1..1).flatMap { offsetX -> (-1..1).flatMap { offsetY -> (-1..1).map { offsetZ -> Int3(offsetX, offsetY, offsetZ) }}}
 
     override fun onBlockUpdate(world: WorldView, pos: BlockPos) {
-        allNeighborOffsets.forEach { offset -> ChunkOverlayManager.clear(world.dimType, this, pos + offset) }
+        allNeighborOffsets.forEach { offset -> world.dimType?.let { ChunkOverlayManager.clear(it, this, pos + offset) } }
     }
 
     override fun calculate(ctx: BlockCtx): ColumnLayerData {
