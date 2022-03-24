@@ -3,6 +3,7 @@ package mods.betterfoliage.model
 import mods.betterfoliage.resource.discovery.ModelBakingContext
 import mods.betterfoliage.resource.discovery.ModelBakingKey
 import mods.betterfoliage.util.HasLogger
+import mods.betterfoliage.util.randomD
 import net.fabricmc.fabric.api.renderer.v1.material.BlendMode
 import net.fabricmc.fabric.api.renderer.v1.mesh.Mesh
 import net.fabricmc.fabric.api.renderer.v1.model.FabricBakedModel
@@ -12,7 +13,6 @@ import net.minecraft.client.render.RenderLayers
 import net.minecraft.client.render.model.BakedModel
 import net.minecraft.client.render.model.BasicBakedModel
 import net.minecraft.item.ItemStack
-import net.minecraft.util.collection.WeightedPicker
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.BlockRenderView
 import java.util.*
@@ -72,8 +72,12 @@ class WeightedModelWrapper(
     val models: List<WeightedModel>, baseModel: BakedModel
 ): WrappedBakedModel(baseModel), FabricBakedModel {
 
-    class WeightedModel(val model: BakedModel, val weight: Int) : WeightedPicker.Entry(weight)
-    fun getModel(random: Random) = WeightedPicker.getRandom(random, models).model
+    class WeightedModel(val model: BakedModel, val weight: Int)
+    fun getModel(random: Random): BakedModel {
+        val weights = models.runningFold(0) { acc, model -> acc + model.weight }
+        val index = random.randomD(0.0, weights.sum().toDouble())
+        return (weights.indexOfFirst { index < it }.takeIf { it > 0 }?.let { models[it - 1] } ?: models.last()).model
+    }
 
     override fun emitBlockQuads(blockView: BlockRenderView, state: BlockState, pos: BlockPos, randomSupplier: Supplier<Random>, context: RenderContext) {
         (getModel(randomSupplier.get()) as FabricBakedModel).emitBlockQuads(blockView, state, pos, randomSupplier, context)

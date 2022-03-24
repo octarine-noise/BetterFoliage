@@ -43,6 +43,7 @@ import net.minecraft.util.Identifier
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction.UP
 import net.minecraft.world.BlockRenderView
+import net.minecraft.world.biome.Biome
 import java.util.Random
 import java.util.function.Supplier
 
@@ -91,7 +92,7 @@ class DirtModel(wrapped: BakedModel) : WrappedBakedModel(wrapped) {
         val isWater = stateUp.material == Material.WATER
         val isDeepWater = isWater && ctx.offset(Int3(2 to UP)).state.material == Material.WATER
         val isShallowWater = isWater && ctx.offset(Int3(2 to UP)).state.isAir
-        val isSaltWater = isWater && ctx.biome?.category in SALTWATER_BIOMES
+        val isSaltWater = isWater && ctx.biome?.let(Biome::getCategory) in SALTWATER_BIOMES
 
         val random = randomSupplier.get()
         if (BetterFoliage.config.connectedGrass.enabled && isGrassUp) {

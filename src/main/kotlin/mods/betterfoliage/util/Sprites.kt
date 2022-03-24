@@ -62,7 +62,7 @@ val Sprite.averageColor: HSB get() {
     var sumBrightness = 0.0f
     for (x in 0 until width)
         for (y in 0 until height) {
-            val pixel = this[Sprite_images]!![0].getPixelColor(x, y)
+            val pixel = this[Sprite_images]!![0].getColor(x, y)
             val alpha = (pixel shr 24) and 255
             val hsb = HSB.fromColor(pixel)
             if (alpha == 255) {

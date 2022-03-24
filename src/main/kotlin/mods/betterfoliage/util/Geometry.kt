@@ -1,6 +1,5 @@
 package mods.betterfoliage.util
 
-import net.minecraft.client.util.math.Vector3f
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import net.minecraft.util.math.Direction.Axis.*
@@ -8,6 +7,7 @@ import net.minecraft.util.math.Direction.AxisDirection
 import net.minecraft.util.math.Direction.AxisDirection.*
 import net.minecraft.util.math.Direction.*
 import net.minecraft.util.math.Quaternion
+import net.minecraft.util.math.Vec3f
 
 // ================================
 // Axes and directions
@@ -101,7 +101,7 @@ data class Double3(var x: Double, var y: Double, var z: Double) {
     val length: Double get() = Math.sqrt(x * x + y * y + z * z)
     val normalize: Double3 get() = (1.0 / length).let { Double3(x * it, y * it, z * it) }
     val nearestCardinal: Direction get() = nearestAngle(this, allDirections.asIterable()) { it.vec }.first
-    val asVec3f: Vector3f get() = Vector3f(x.toFloat(), y.toFloat(), z.toFloat())
+    val asVec3f: Vec3f get() = Vec3f(x.toFloat(), y.toFloat(), z.toFloat())
 }
 
 /** 3D vector of [Int]s. Offers both mutable operations, and immutable operations in operator notation. */
@@ -230,7 +230,7 @@ val boxEdges = allDirections.flatMap { face1 -> allDirections.filter { it.axis >
  * @return [Pair] of (object, distance)
  */
 fun <T> nearestPosition(vertex: Double3, objs: Iterable<T>, objPos: (T)-> Double3): Pair<T, Double>  =
-        objs.map { it to (objPos(it) - vertex).length }.minBy { it.second }!!
+        objs.map { it to (objPos(it) - vertex).length }.minByOrNull { it.second }!!
 
 /**
  * Get the object closest in orientation to the specified vector from a list of objects.
@@ -241,4 +241,4 @@ fun <T> nearestPosition(vertex: Double3, objs: Iterable<T>, objPos: (T)-> Double
  * @return [Pair] of (object, normalized dot product)
  */
 fun <T> nearestAngle(vector: Double3, objs: Iterable<T>, objAngle: (T)-> Double3): Pair<T, Double> =
-        objs.map { it to objAngle(it).dot(vector) }.maxBy { it.second }!!
+        objs.map { it to objAngle(it).dot(vector) }.maxByOrNull { it.second }!!

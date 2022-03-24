@@ -54,7 +54,7 @@ class FallingLeafParticle(
 
     override fun update() {
         if (randomF() > 0.95f) rotationSpeed = -rotationSpeed
-        if (age > maxAge - 20) colorAlpha = 0.05f * (maxAge - age)
+        if (age > maxAge - 20) alpha = 0.05f * (maxAge - age)
 
         if (onGround || wasCollided) {
             velocity.setTo(0.0, 0.0, 0.0)

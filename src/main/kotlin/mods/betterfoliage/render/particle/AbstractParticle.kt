@@ -6,10 +6,9 @@ import net.minecraft.client.particle.SpriteBillboardParticle
 import net.minecraft.client.render.Camera
 import net.minecraft.client.render.VertexConsumer
 import net.minecraft.client.texture.Sprite
-import net.minecraft.client.util.math.Vector3f
 import net.minecraft.client.world.ClientWorld
 import net.minecraft.util.math.MathHelper
-import net.minecraft.world.World
+import net.minecraft.util.math.Vec3f
 
 abstract class AbstractParticle(world: ClientWorld, x: Double, y: Double, z: Double) : SpriteBillboardParticle(world, x, y, z) {
 
@@ -68,12 +67,12 @@ abstract class AbstractParticle(world: ClientWorld, x: Double, y: Double, z: Dou
                            currentAngle: Float = this.angle,
                            prevAngle: Float = this.prevAngle,
                            sprite: Sprite = this.sprite,
-                           alpha: Float = this.colorAlpha) {
+                           alpha: Float = this.alpha) {
 
         val center = Double3.lerp(tickDelta.toDouble(), prevPos, currentPos)
         val angle = MathHelper.lerp(tickDelta, prevAngle, currentAngle)
-        val rotation = camera.rotation.copy().apply { hamiltonProduct(Vector3f.POSITIVE_Z.getRadialQuaternion(angle)) }
-        val lightmapCoord = getColorMultiplier(tickDelta)
+        val rotation = camera.rotation.copy().apply { hamiltonProduct(Vec3f.POSITIVE_Z.getRadialQuaternion(angle)) }
+        val lightmapCoord = getBrightness(tickDelta)
 
         val coords = arrayOf(
             Double3(-1.0, -1.0, 0.0),
@@ -84,7 +83,7 @@ abstract class AbstractParticle(world: ClientWorld, x: Double, y: Double, z: Dou
 
         fun renderVertex(vertex: Double3, u: Float, v: Float) = vertexConsumer
             .vertex(vertex.x, vertex.y, vertex.z).texture(u, v)
-            .color(colorRed, colorGreen, colorBlue, alpha).light(lightmapCoord)
+            .color(red, green, blue, alpha).light(lightmapCoord)
             .next()
 
         renderVertex(coords[0], sprite.maxU, sprite.maxV)
@@ -94,9 +93,9 @@ abstract class AbstractParticle(world: ClientWorld, x: Double, y: Double, z: Dou
     }
 
     fun setColor(color: Int) {
-        colorBlue = (color and 255) / 256.0f
-        colorGreen = ((color shr 8) and 255) / 256.0f
-        colorRed = ((color shr 16) and 255) / 256.0f
+        blue = (color and 255) / 256.0f
+        green = ((color shr 8) and 255) / 256.0f
+        red = ((color shr 16) and 255) / 256.0f
     }
 }
 

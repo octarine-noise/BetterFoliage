@@ -2,8 +2,8 @@ import net.fabricmc.loom.task.RemapJarTask
 import org.ajoberstar.grgit.Grgit
 
 plugins {
-    id("fabric-loom").version("0.6-SNAPSHOT")
-    kotlin("jvm").version("1.4.31")
+    id("fabric-loom").version("0.11-SNAPSHOT")
+    kotlin("jvm").version("1.6.10")
     id("org.ajoberstar.grgit").version("3.1.1")
 }
 apply(plugin = "org.ajoberstar.grgit")
@@ -17,7 +17,8 @@ repositories {
     maven("https://minecraft.curseforge.com/api/maven")
     maven("https://maven.modmuss50.me/")
     maven("https://maven.shedaniel.me/")
-    maven("https://grondag-repo.appspot.com").credentials { username = "guest"; password = "" }
+    maven("https://maven.terraformersmc.com/")
+    //maven("https://grondag-repo.appspot.com").credentials { username = "guest"; password = "" }
     maven("https://jitpack.io")
 }
 
@@ -31,7 +32,7 @@ dependencies {
     "modImplementation"("net.fabricmc:fabric-language-kotlin:${properties["fabricKotlinVersion"]}")
 
     // configuration handling
-    "modImplementation"("io.github.prospector:modmenu:${properties["modMenuVersion"]}")
+    "modImplementation"("com.terraformersmc:modmenu:${properties["modMenuVersion"]}")
     listOf("modImplementation", "include").forEach { configuration ->
         configuration("me.shedaniel.cloth:cloth-config-fabric:${properties["clothConfigVersion"]}")
         configuration("me.zeroeightsix:fiber:${properties["fiberVersion"]}")
