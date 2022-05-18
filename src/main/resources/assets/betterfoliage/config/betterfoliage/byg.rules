@@ -15,20 +15,20 @@ end
 
 // list of leaves where texture is "top"
 match model.matches(
-"byg:block/flowering_orchard_leaves",
 "byg:block/joshua_leaves",
 "byg:block/mahogany_leaves",
-"byg:block/maple_leaves",
-"byg:block/orchard_leaves",
-"byg:block/rainbow_eucalyptus_leaves",
-"byg:block/willow_leaves"
+"byg:block/maple_leaves"
 ) setParam("texture", model.texture("top")) setParam("tint", model.tint("top"))
 end
 
 // ripe leaves (tint comes from overlay)
 match model.matches(
 "byg:block/ripe_joshua_leaves",
-"byg:block/ripe_orchard_leaves"
+"byg:block/ripe_orchard_leaves",
+"byg:block/rainbow_eucalyptus_leaves",
+"byg:block/orchard_leaves",
+"byg:block/flowering_orchard_leaves",
+"byg:block/willow_leaves"
 ) setParam("texture", model.texture("top")) setParam("tint", model.tint("overlay"))
 end
 
